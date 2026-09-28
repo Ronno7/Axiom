@@ -57,7 +57,7 @@ Classification depends on what is physically part of the game's fiction. Priorit
 ## Delivered scope
 
 The initial delivery established folder structure and a basic prototype scene.
-The next authorized milestone adds constant forward movement and bounded keyboard
+The current implementation adds forward movement with smooth throttle and bounded keyboard
 steering, with a camera that follows forward travel. See `FLIGHT.md` for controls,
-tuning, and component responsibilities. Throttle, combat, menus, Arduino code,
+tuning, component responsibilities, and verification status. Combat, menus, Arduino code,
 and the three finished levels belong to later milestones.

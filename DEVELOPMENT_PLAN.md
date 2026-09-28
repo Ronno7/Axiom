@@ -1,0 +1,231 @@
+# Geometric Flight — Development Plan
+
+Planning baseline: September 28, 2026. Target: Unity 6.3, Universal Render Pipeline.
+
+Place this file in `Docs/DEVELOPMENT_PLAN.md` inside the Unity project. **Geometric Flight is a working identifier; the final title is undecided.**
+
+## Instructions for Codex
+
+1. Read this plan, the repository's `AGENTS.md`, and any existing `Docs/DESIGN_BRIEF.md` and `Docs/CODEX_HANDOFF.md`.
+2. Inspect the actual repository and connected Unity editor before making changes. This document describes the delivered starting point, not necessarily the current checkout.
+3. Work on the milestone requested by the user. If asked simply to continue, complete the next unfinished milestone and report the result. Do not treat the entire roadmap as authorization to build everything in one session.
+4. Preserve existing scenes, assets, GUIDs, package versions, and user edits. Do not regenerate the project over existing work.
+5. Keep implementations small and understandable. Explain the result, how to try it, and what was actually tested.
+6. Update the progress checklist and session log after a milestone. Distinguish code written from behavior verified in Unity.
+
+The user deliberately reduced the first implementation to a foundation so subsequent work could proceed incrementally.
+
+## 1. Product intent
+
+Build a short, approachable third-person rail shooter controlled by an Arduino-based physical controller. The primary coursework goal is **excellent user interface design**: clear menus, teaching, status, feedback, navigation, and deliberate use of diegetic, non-diegetic, spatial, and meta UI.
+
+Gameplay should make those interfaces useful and enjoyable. The intended scope is approximately one month, with three levels initially lasting about two to three minutes each. Extend levels only if playtesting supports it.
+
+### Confirmed decisions
+
+| Area | Direction |
+| --- | --- |
+| Engine | Fresh Unity 6.3 project using the Universal 3D / URP template |
+| Camera | Third-person behind the aircraft |
+| Flight | Continuous forward travel along a designed route; horizontal and vertical steering |
+| Player | Simple, triangular geometric aircraft, inspired by early Star Fox |
+| Environment | Abstract geometric architecture |
+| Enemies | Mathematical and sacred-geometry-inspired shapes |
+| Palette | Predominantly black, white, and gray; color concentrated in weapon effects and enemy destruction |
+| Feel | Satisfying shattering, bursts, and fizzles when targets are destroyed |
+| Difficulty | Approachable completion with optional mastery |
+| Throttle | Meaningful adjustments at clearly signaled moments |
+| Threats | Enemy projectiles and collisions, with forgiving shields |
+| Required menus | Play, functional Options, Help, Quit |
+| Input coverage | Physical controller wherever practical, with keyboard support available |
+| Length | Three short levels, with a simple geometric boss proposed for the finale |
+
+### Proposed defaults, subject to playtesting
+
+- Hold to fire; unlimited ammunition for the initial version.
+- Steering also positions the firing line. One joystick handles both movement and aiming.
+- A reticle indicates the shot path; mild aim assistance helps with near misses.
+- Banking is visual and does not unexpectedly redirect shots or alter the collision body.
+- Brief protection after damage and quick retries.
+- Optional performance assessment using accuracy, damage taken, and completion time.
+- Throttle initially spans roughly 0.6–1.5 times cruising speed, with smooth acceleration and no stopping or reversing.
+- Three shield segments are a starting visual idea, not a fixed balance requirement.
+
+Do not add ammunition inventories, weapon trees, complex flight physics, branching campaigns, or procedural level generation to the baseline scope.
+
+## 2. Delivered foundation and verification boundary
+
+The original foundation ZIP contains:
+
+- `Assets/GeometricFlight/Scenes/Prototype.unity`: static, editable prototype scene.
+- Triangular ship, rear camera, monochrome corridor, gates, and three target placeholders.
+- `Scripts/Presentation/PrototypeMesh.cs`: editor/play-mode geometry for aircraft, octahedra, and polygon rings.
+- `Art/Shaders/FoundationFlat.shader` and five grayscale materials.
+- `Editor/FoundationTools.cs`: open-scene and reference-check commands.
+- Reserved folders, documentation, and Git setup files.
+
+**Flight, combat, working UI, physics, progression, and Arduino communication were not implemented in that delivery.** Placeholder names do not indicate working systems.
+
+Source syntax and asset-reference checks passed during generation. Unity Editor was unavailable, so import, shader compilation, Game view appearance, and Play Mode still require verification in the real project.
+
+Coordinate convention: **+Z forward, +Y up, +X right**. The player root starts at the origin. The current shader uses fixed facet shading and does not respond to realtime lights or shadows. Generated prototype meshes are temporary and depend on their `PrototypeMesh` component remaining enabled.
+
+## 3. Architecture and working conventions
+
+- Keep gameplay independent of the input device. A small shared input representation should carry steering, throttle, fire, and pause intent. Keyboard and Arduino supply the same values.
+- Read the project's installed input setup before choosing or changing input APIs. Preserve the existing template settings wherever possible.
+- Keep player movement, weapons, damage, camera, and UI in focused components. Introduce shared abstractions when a real second use appears.
+- Keep visual banking and aircraft art beneath the player root.
+- Expose useful tuning values in the Inspector. Add configuration assets only where shared values warrant them.
+- UI should observe state and events; avoid having HUD code own combat rules.
+- Use ordinary editable scene objects and prefabs. Preserve the ability to inspect and adjust the course in Unity.
+- Prefer Unity's existing UI facilities; choose the UI approach when implementing the first functional screens and record that choice.
+- Keep editor utilities under `Editor`. Avoid automatic import-time changes to project settings.
+- Preserve `.meta` files. Keep generated caches and build output out of the source repository unless the user specifically requests otherwise.
+
+## 4. Milestones
+
+### M0 — Verify and establish the baseline
+
+**Work:** Inspect the repository, confirm Unity 6.3 and URP, open `Prototype.unity`, run the foundation reference check, and correct import/rendering issues. Inspect framing at 16:9 and confirm the scene hierarchy is understandable.
+
+**Done when:** Console has no project errors; ship, targets, and corridor render correctly; Play Mode enters and exits cleanly; the scene remains editable. Record the exact Unity version and verification results. Create a baseline commit according to the user's repository workflow.
+
+### M1 — Keyboard flight and rear camera
+
+**Work:** Add bounded horizontal/vertical movement, continuous forward travel, adjustable throttle, smooth acceleration, and a stable following camera. Establish the shared input representation. Proposed keyboard mapping: WASD/arrows to steer, Q/E to lower/raise throttle, Space to fire later, Escape to pause later. Keep these mappings easy to change.
+
+**Done when:** The ship can traverse the blockout without leaving the intended flight area; low/high throttle visibly changes forward speed; steering remains responsive across speeds; camera behavior is stable; restarting Play Mode resets position and speed. Compare behavior at different frame rates available in the editor.
+
+**Scope:** No combat or complete menu system in this milestone.
+
+### M2 — Shooting, aiming, and target feedback
+
+**Work:** Add hold-to-fire, forward projectiles, an aiming reticle, target damage, and one satisfying destruction effect. Start with simple targets; tune shot alignment before adding mild aim assistance. Keep projectile and target lifetime cleanup explicit.
+
+**Done when:** Moving the ship moves the firing line predictably; projectiles line up with the reticle at useful engagement distances; nearby obstacles block shots appropriately; successful hits are clear; targets are destroyed once; projectiles and effects do not accumulate indefinitely. Verify fast projectiles cannot routinely pass through thin targets without hits.
+
+**Scope:** One weapon and one target behavior are sufficient.
+
+### M3 — First complete UI and gameplay loop
+
+**Work:** Build Title → Play → short first course → Results → Retry/Continue, plus Pause and failure/retry. Add shield damage from obstacles and one simple enemy attack. Implement the required Options, Help, and Quit screens. Make the existing first course playable before adding more levels.
+
+**Done when:** A player can start, learn controls, take damage, finish or fail, retry, and return to the menu. Pausing actually suspends gameplay; resuming does not cause a damage or movement jump. Repeated retries do not duplicate actors, listeners, or UI. Quit works in a desktop build; its editor behavior is explained.
+
+**Working options:** Volume, steering sensitivity, invert vertical steering, and screen-shake enable/disable if shake exists. Save settings between launches. Add buzzer and hardware controls in M4. Do not display controls that have no implemented effect.
+
+### M4 — Physical controller and preflight check
+
+**Work:** Assemble and test the Arduino controls, define a small serial protocol, add the Arduino input adapter, and create calibration/connection feedback. Reuse the flight and combat systems through the input abstraction. Add a short preflight interaction that demonstrates steering, throttle, and firing.
+
+**Done when:** Each control works independently and together; sensor readings are calibrated and smoothed; button input is debounced; communication does not block rendering; loss of valid input produces a clear safe response; reconnect and keyboard fallback are understandable. Test unplug/replug, invalid or incomplete packets, missing ultrasonic readings, and a port already in use. Close the connection cleanly on exit and repeated Play Mode runs.
+
+**Controller scope:** HC-SR04 physical throttle, two-axis joystick, firing button, buzzer. The parts are currently unassembled. Do not assume a final pinout, spare pause button, or working serial connection. Confirm the actual board and available joystick switch before wiring. Buzzer warnings must have matching visual cues and a mute option.
+
+**Scheduling:** Perform a small hardware reading/serial feasibility check during week one, even though complete integration is M4. Resolve connection uncertainty before late polish.
+
+### M5 — Expand to three short levels
+
+**Work:** Reuse the verified first-level systems to build two more courses. Introduce a small number of clearly differentiated enemy shapes and behaviors. Add a simple geometric boss using established damage and feedback systems.
+
+| Level | Suggested emphasis |
+| --- | --- |
+| 1 | Open architecture; teach steering, shooting, and one clear throttle adjustment |
+| 2 | Tighter geometric structures; combine dodging and enemy fire |
+| 3 | Combine learned skills, then a readable geometric core encounter |
+
+**Done when:** All levels have clear starts, objectives, endings, and retries; completion is achievable for a new player; UI conventions remain consistent. The boss works with variable forward speed and does not depend on unexplained controls. Decide its encounter movement deliberately rather than trapping the player against the end of the course.
+
+### M6 — UI polish, feedback, and user testing
+
+**Work:** Refine visual hierarchy, input prompts, navigation, target readability, hit/destruction feedback, audio, and transitions. Tune throttle decisions and approachable difficulty. Add optional mastery results only after basic completion works well.
+
+**Done when:** A new tester can understand the controls and complete the first course without verbal coaching; selected menu items are unmistakable; Help matches the actual bindings; text is readable at the intended display size; explosions do not obscure imminent threats; options genuinely affect behavior. Test controller navigation and keyboard fallback. Adjust effects for reduced-motion settings.
+
+### M7 — Build and presentation handoff
+
+**Work:** Produce and test the intended desktop build, complete setup/help documentation, and prepare a concise explanation of the UI categories using actual implemented examples. Record remaining issues and the hardware setup required for a demonstration.
+
+**Done when:** The build launches independently of Unity, all three levels and required menus work, settings persist, hardware and fallback controls are tested, Quit exits correctly, and a fresh checkout can be set up using the README.
+
+## 5. UI implementation map
+
+| Category | Planned example | Acceptance question |
+| --- | --- | --- |
+| Diegetic | Aircraft-mounted shield/status segments | Can the player read actual ship condition from the craft? |
+| Non-diegetic | Menus, score, throttle readout, and results | Is information precise, readable, and consistently placed? |
+| Spatial | Target brackets and route cues positioned relative to world objects | Is it obvious which object or location the cue refers to? |
+| Meta | Restrained screen-edge impact/damage feedback | Does it communicate urgency without hiding the flight path? |
+
+The present white aircraft segments are decorative until bound to shield state. A marker is not automatically diegetic because it occupies 3D space. Explain classification according to the final fiction and implementation.
+
+Use shape, position, animation, and sound alongside any color signals. Preserve the monochrome identity in ordinary UI; concentrate saturated color in combat effects. Keep aiming and nearby hazards visually dominant.
+
+## 6. Four-week pacing guide
+
+This is a flexible scope guide, not a fixed deadline.
+
+| Week | Main outcome |
+| --- | --- |
+| 1 | M0–M2: verified foundation, flight, shooting; early hardware feasibility check |
+| 2 | M3: one complete playable course and functional required screens |
+| 3 | M4–M5: controller integration and expansion using existing systems |
+| 4 | M6–M7: usability testing, polish, build verification, and presentation |
+
+If time becomes tight, simplify enemy variety, boss complexity, and optional rankings first. Preserve functional menus, clear feedback, reliable controls, and an approachable complete loop.
+
+## 7. Risks to check early
+
+- **Aiming and dodging compete for one stick:** tune target size, projectile alignment, and modest assistance before adding complex enemies.
+- **Minimum throttle becomes universally best:** design clearly signaled opportunities to accelerate and evaluate completion-time rewards. Do not simply make slow flight unpleasant.
+- **Monochrome objects blend together:** separate silhouettes, brightness, scale, spacing, and motion.
+- **Sensor noise or missing echoes move the throttle unexpectedly:** calibrate, smooth, reject invalid data, and define a timeout response.
+- **One button limits menu navigation:** provide consistent selectable Back controls and use a joystick switch only if available. Keyboard support remains acceptable.
+- **UI grows faster than gameplay:** establish one complete level and shared screens before expanding content.
+- **Prototype appearance differs from the concept art:** prioritize an achievable, readable visual direction over reproducing every illustrated detail.
+
+## 8. Progress checklist
+
+- [x] Foundation source and static scene delivered.
+- [ ] M0 — Prior import/play/framing checks recorded in `Axiom/Docs/FLIGHT.md`; rerun the foundation reference check to close the baseline checklist. Baseline commit: `27890f4`.
+- [ ] M1 — Flight, camera, throttle, and shared input implemented; throttle Play Mode acceptance checks pending.
+- [ ] M2 — Shooting, aiming, and target feedback.
+- [ ] M3 — First full loop and functional required UI.
+- [ ] M4 — Arduino integration and preflight.
+- [ ] M5 — Three levels and simple finale.
+- [ ] M6 — UI polish and user testing.
+- [ ] M7 — Tested desktop build and handoff.
+
+## 9. Session log
+
+After each milestone, append: date, milestone, changes, exact verification performed, remaining issues, and the next small task. Record any design changes explicitly so future sessions do not revive rejected ideas.
+
+Initial status: foundation delivered; actual Unity import/play verification pending. Next action is M0 against the user's current repository.
+
+### 2026-09-28 — M1 throttle implementation (editor verification pending)
+
+Inspected the current project and earlier handoff: Unity 6000.3.24f1, URP 17.3.0,
+Input System 1.20.0. The earlier flight implementation and its recorded 14 Unity
+EditMode tests/five live keyboard phases already exist in baseline commit `27890f4`.
+The original foundation-only checklist above was stale.
+
+Added latched Q/E throttle, smooth acceleration, Inspector tuning, and a shared
+steering/throttle/fire/pause snapshot. Cruise is 6 units/second, minimum 3.6,
+maximum 9; steering speed remains independent of throttle. Fire/pause are input
+intent only. Keyboard throttle resets to cruise on enable; Play Mode reloads
+reset flight position/speed with the project's current reload settings.
+
+Verification: runtime and EditorTests assemblies compiled using the generated
+project files and installed Unity references, with zero warnings/errors. All 25
+movement test cases passed through a temporary .NET reflection harness against
+the installed Unity math types (14 existing, 11 new), including acceleration
+travel at 30/60/144 simulated frames per second. `git diff --check` passed.
+These are source/managed checks, not a Unity Test Runner or live Play Mode run.
+The editor's MCP connection was unavailable and its log reported connection
+failures. No new visual, keyboard, camera, or restart verification is claimed.
+
+Next small task: reconnect Unity MCP, run `GeometricFlight.EditorTests`, verify
+Q/E and both-key/release behavior, steering at both speed limits, camera framing,
+and two Play Mode restarts. Close M1 after these checks; then begin M2 shooting.
+Scenes, asset GUIDs, package versions, and existing build-settings edits were preserved.

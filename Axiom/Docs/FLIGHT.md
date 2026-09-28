@@ -1,9 +1,12 @@
-# Forward flight and bounded steering
+# Forward flight, throttle, and bounded steering
 
 Open `Assets/Scenes/Prototype.unity`, use a 16:9 Game view, and press Play.
 Click the Game view to give it keyboard focus. The aircraft travels along world +Z.
 W/S or Up/Down steer vertically; A/D or Left/Right steer horizontally.
 Releasing the keys stops lateral movement without recentering the aircraft.
+Hold Q to lower throttle or E to raise it. Releasing both retains the selected
+setting; holding both makes no adjustment. Starting Play Mode resets to cruise.
+Space and Escape are captured as fire/pause intent but have no gameplay effect yet.
 Stop and restart Play Mode to restart the short blockout course.
 
 ## Tuning
@@ -12,7 +15,9 @@ Select `10_PlayerPrototype` and adjust `PlayerFlight`:
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| Forward Speed | 6 | World units per second along +Z |
+| Forward Speed | 6 | Cruising speed in world units per second along +Z |
+| Throttle Multipliers | 0.6, 1.5 | Minimum/maximum relative to cruise (3.6 to 9 units/second) |
+| Acceleration | 6 | Speed change in world units/second squared |
 | Steering Speed | 5 | Maximum lateral/vertical speed in units per second |
 | Horizontal Limits | -6 to 6 | X offsets from the starting position |
 | Vertical Limits | -2 to 4 | Y offsets from the starting position |
@@ -24,24 +29,39 @@ position, remain fixed in world X/Y, and work regardless of the player's rotatio
 The route is currently straight. Transform movement is intentional: collision
 handling and a physics response are a later milestone.
 
+`KeyboardFlightInput` exposes throttle change rate (default 1: one second from
+cruise to either limit) and Q/E/Space/Escape binding paths in the Inspector.
+Set bindings before entering Play Mode. Throttle uses a signed absolute setpoint:
+-1 is minimum, 0 is cruise, +1 is maximum. A future hardware adapter can return
+its calibrated setpoint without simulating key presses. Keyboard throttle resets
+to cruise when its component is re-enabled. Missing/disabled input returns neutral
+steering and a cruise target; speed returns smoothly to cruise.
+
 The camera retains its authored position relative to the course and follows only
 forward travel in `LateUpdate`. Steering therefore moves the aircraft across the
 screen. Camera rotation and aircraft rotation are not changed.
 
 ## Component responsibilities
 
-- `FlightInputSource`: small abstract MonoBehaviour contract returning steering.
+- `FlightInputSource`: small abstract MonoBehaviour contract returning a `FlightInput`
+  snapshot with steering, throttle, held fire, and a pause press edge.
   It is serializable in Unity's Inspector and is the dependency of `PlayerFlight`.
 - `KeyboardFlightInput`: Input System adapter with WASD and arrow-key bindings.
-  Owns, enables, disables, and disposes its action without modifying the template
+  Owns, enables, disables, and disposes its actions without modifying the template
   input asset. A future Arduino adapter can implement the same contract.
-- `FlightMovement`: stateless position calculation. It has no device, scene,
+- `FlightMovement`: stateless position, target-speed, and acceleration calculations.
+  Acceleration integrates the ramp and any time at the target speed within a frame.
+  It has no device, scene,
   frame clock, or camera dependencies and is covered by deterministic tests.
 - `PlayerFlight`: reads the assigned input, supplies delta time and configuration,
   and applies the calculated position to its Transform. A disabled or removed
-  input source produces neutral steering; an unassigned source at startup logs
+  input source produces neutral steering and cruise throttle; an unassigned source at startup logs
   a setup error and disables flight.
 - `ForwardFollowCamera`: follows the assigned target's Z displacement only.
+
+`PlayerFlight` reads input once per Update. Future weapons/UI can observe its
+`CurrentInput` and `CurrentSpeed`; do not read the input source a second time in
+the same frame, because keyboard reads advance the throttle setpoint.
 
 This uses component composition and a replaceable input strategy. No singleton,
 service locator, event bus, or dependency-injection container is needed here.
@@ -49,6 +69,26 @@ Runtime scripts share `GeometricFlight.Runtime`; the Editor test assembly is
 separate and is excluded from player builds.
 
 ## Verification
+
+Throttle update, 2026-09-28: runtime and test assemblies compile with zero warnings
+or errors using the generated .csproj files and installed Unity references.
+All 25 movement cases passed outside the editor in a temporary .NET reflection
+harness against Unity's math types. The 11 added cases cover throttle endpoints,
+acceleration and deceleration at 30/60/144 simulated FPS, gradual acceleration,
+overshoot prevention, paused time, and steering independence.
+This is not a Unity Test Runner run. The MCP connection was unavailable; current
+keyboard bindings, camera framing at different speeds, and Play Mode restart
+behavior still need live verification. Earlier editor results below predate throttle.
+
+Acceptance pass after reconnecting:
+
+1. Run `GeometricFlight.EditorTests` in the Unity EditMode Test Runner.
+2. Start Prototype at 16:9. Hold Q for at least one second, release, and confirm
+   the slower speed persists. Hold E for two seconds and confirm faster travel.
+3. Hold Q+E together: the selected throttle should remain unchanged.
+4. Steer to every bound at both speeds; check stable camera framing and response.
+5. Compare at 30, 60, and 144 FPS where available; stop and restart Play Mode twice
+   and confirm the authored spawn, camera position, and cruise speed return.
 
 Verified in Unity 6000.3.24f1 on 2026-09-24: all 14 EditMode tests passed. Live
 Play Mode checks used a temporary virtual keyboard to exercise WASD, arrow keys,
@@ -64,5 +104,5 @@ independence, and bounds away from world origin.
 
 In Play Mode, check both key sets, release and opposing keys, every edge, and
 camera framing. The existing course ends around Z=112 (about 19 seconds at the
-default speed); forward travel continues beyond it. Level completion, throttle,
+default speed); forward travel continues beyond it. Level completion,
 banking, collisions, combat, and hardware are not implemented by this milestone.

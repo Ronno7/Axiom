@@ -7,7 +7,11 @@ namespace GeometricFlight.Player
     public sealed class PlayerFlight : MonoBehaviour
     {
         [SerializeField] private FlightInputSource inputSource;
-        [SerializeField, Min(0f)] private float forwardSpeed = 6f;
+        [Tooltip("Cruising speed in world units per second.")]
+        [SerializeField, Min(0.01f)] private float forwardSpeed = 6f;
+        [Tooltip("Minimum and maximum speed relative to cruise. Minimum must be positive.")]
+        [SerializeField] private Vector2 throttleMultipliers = new Vector2(0.6f, 1.5f);
+        [SerializeField, Min(0.01f)] private float acceleration = 6f;
         [SerializeField, Min(0f)] private float steeringSpeed = 5f;
         [Tooltip("Minimum and maximum X offsets from the starting position, in world units.")]
         [SerializeField] private Vector2 horizontalLimits = new Vector2(-6f, 6f);
@@ -15,10 +19,14 @@ namespace GeometricFlight.Player
         [SerializeField] private Vector2 verticalLimits = new Vector2(-2f, 4f);
 
         private Vector3 startPosition;
+        private float currentSpeed;
+        public float CurrentSpeed => currentSpeed;
+        public FlightInput CurrentInput { get; private set; }
 
         private void Awake()
         {
             startPosition = transform.position;
+            currentSpeed = FlightMovement.TargetSpeed(0f, forwardSpeed, throttleMultipliers);
             if (inputSource == null)
             {
                 Debug.LogError("Assign a FlightInputSource to PlayerFlight before playing.", this);
@@ -28,10 +36,12 @@ namespace GeometricFlight.Player
 
         private void Update()
         {
-            Vector2 steering = inputSource != null && inputSource.isActiveAndEnabled
-                ? inputSource.ReadSteering() : Vector2.zero;
-            transform.position = FlightMovement.Step(transform.position, steering, Time.deltaTime,
-                forwardSpeed, steeringSpeed, GetBounds(startPosition));
+            CurrentInput = inputSource != null && inputSource.isActiveAndEnabled
+                ? inputSource.ReadInput(Time.deltaTime) : default;
+            float targetSpeed = FlightMovement.TargetSpeed(CurrentInput.Throttle, forwardSpeed, throttleMultipliers);
+            float averageSpeed = FlightMovement.Accelerate(ref currentSpeed, targetSpeed, acceleration, Time.deltaTime);
+            transform.position = FlightMovement.Step(transform.position, CurrentInput.Steering, Time.deltaTime,
+                averageSpeed, steeringSpeed, GetBounds(startPosition));
         }
 
         private Rect GetBounds(Vector3 origin)

@@ -10,17 +10,17 @@ Unity 6.3 URP flight-game project for UI coursework. Runtime code retains the
 2. Open `Assets/Scenes/Prototype.unity`, or use **Tools > Geometric Flight > Open Prototype**.
 3. Set the Game view to **16:9**, press Play, and click the Game view.
 4. Steer with **WASD or arrow keys**. Forward travel starts automatically.
+   Hold **Q/E** to lower/raise throttle; release to retain the chosen setting.
 5. Stop and restart Play Mode to reset the short course.
 
-The current milestone implements constant forward movement, bounded horizontal
+The current milestone implements throttle with smooth acceleration, bounded horizontal
 and vertical steering, and a camera that follows forward travel. See
 [flight controls and design](Docs/FLIGHT.md) for Inspector settings, component
 responsibilities, and verification instructions.
 
-The course ends around Z=112; travel currently continues beyond it. Throttle,
-combat, collision response, menus, level completion, and Arduino integration
-remain future work. Build settings still contain the template SampleScene;
-use Prototype directly in the editor for this milestone.
+The course ends around Z=112; travel currently continues beyond it.
+Combat, collision response, menus, level completion, and Arduino integration
+remain future work. Use Prototype directly in the editor for this milestone.
 
 ## Scene and assets
 
