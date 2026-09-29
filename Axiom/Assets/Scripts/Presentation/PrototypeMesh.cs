@@ -5,7 +5,8 @@ namespace GeometricFlight.Presentation
 {
     /// <summary>
     /// Small editable blockout meshes. Runs in the editor as well as Play Mode.
-    /// This component supplies geometry only; it has no gameplay behavior.
+    /// This component supplies geometry (and an optional MeshCollider's mesh) only;
+    /// it has no gameplay behavior.
     /// </summary>
     [ExecuteAlways]
     [DisallowMultipleComponent]
@@ -59,6 +60,9 @@ namespace GeometricFlight.Presentation
             generatedMesh.RecalculateNormals();
             generatedMesh.RecalculateBounds();
             GetComponent<MeshFilter>().sharedMesh = generatedMesh;
+            // Optional collision: generated meshes are not saved, so assign at runtime.
+            if (TryGetComponent(out MeshCollider meshCollider))
+                meshCollider.sharedMesh = generatedMesh;
         }
 
         private static void Triangle(List<Vector3> vertices, List<int> indices,
@@ -134,6 +138,8 @@ namespace GeometricFlight.Presentation
             MeshFilter filter = GetComponent<MeshFilter>();
             if (filter != null && filter.sharedMesh == generatedMesh)
                 filter.sharedMesh = null;
+            if (TryGetComponent(out MeshCollider meshCollider) && meshCollider.sharedMesh == generatedMesh)
+                meshCollider.sharedMesh = null;
             if (Application.isPlaying) Destroy(generatedMesh);
             else DestroyImmediate(generatedMesh);
             generatedMesh = null;

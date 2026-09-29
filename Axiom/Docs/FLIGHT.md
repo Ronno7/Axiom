@@ -6,7 +6,7 @@ W/S or Up/Down steer vertically; A/D or Left/Right steer horizontally.
 Releasing the keys stops lateral movement without recentering the aircraft.
 Hold Q to lower throttle or E to raise it. Releasing both retains the selected
 setting; holding both makes no adjustment. Starting Play Mode resets to cruise.
-Space and Escape are captured as fire/pause intent but have no gameplay effect yet.
+Hold Space to fire (see `COMBAT.md`). Escape is captured as pause intent but has no effect yet.
 Stop and restart Play Mode to restart the short blockout course.
 
 ## Tuning

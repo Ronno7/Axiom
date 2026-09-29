@@ -188,9 +188,9 @@ If time becomes tight, simplify enemy variety, boss complexity, and optional ran
 ## 8. Progress checklist
 
 - [x] Foundation source and static scene delivered.
-- [ ] M0 — Prior import/play/framing checks recorded in `Axiom/Docs/FLIGHT.md`; rerun the foundation reference check to close the baseline checklist. Baseline commit: `27890f4`.
-- [ ] M1 — Flight, camera, throttle, and shared input implemented; throttle Play Mode acceptance checks pending.
-- [ ] M2 — Shooting, aiming, and target feedback.
+- [x] M0 — Import/play/framing checks recorded in `Axiom/Docs/FLIGHT.md`; foundation reference check passed 2026-09-29. Baseline commit: `27890f4`.
+- [x] M1 — Flight, camera, throttle, and shared input implemented and verified in the editor (2026-09-29).
+- [ ] M2 — Shooting, aiming, and target feedback implemented and editor-verified (2026-09-29); awaiting a manual Space hold-to-fire check. See `Axiom/Docs/COMBAT.md`.
 - [ ] M3 — First full loop and functional required UI.
 - [ ] M4 — Arduino integration and preflight.
 - [ ] M5 — Three levels and simple finale.
@@ -229,3 +229,52 @@ Next small task: reconnect Unity MCP, run `GeometricFlight.EditorTests`, verify
 Q/E and both-key/release behavior, steering at both speed limits, camera framing,
 and two Play Mode restarts. Close M1 after these checks; then begin M2 shooting.
 Scenes, asset GUIDs, package versions, and existing build-settings edits were preserved.
+
+### 2026-09-29 — M1 editor verification via Unity MCP
+
+Unity MCP reconnected (the cause was a path-casing mismatch in the Claude Code config).
+Verified in the live editor, Unity 6000.3.24f1, `Assets/Scenes/Prototype.unity`:
+
+- `GeometricFlight.EditorTests` in Unity Test Runner (EditMode): 25/25 passed.
+- Play Mode, frames stepped manually at 0.02 s: cruise 6 u/s; latched throttle +1 ramps
+  smoothly to 9, −1 to 3.6, 0 back to 6 (6 u/s², no overshoot). Forward travel matches speed.
+- Camera offset stayed exactly (0, 3, −13) from the ship across all speeds; 16:9 Game view
+  framing checked by screenshot at z≈52.
+- Three Play Mode entries: each starts at the origin at speed 6 with the latched throttle at 0 and one
+  player instance. No console errors.
+
+Not verified: real key presses. Simulated keyboard events did not reach the InputActions
+while the editor window was unfocused, so throttle was driven by setting the latched value.
+Q/E, both-keys/release, and WASD/arrow steering at min/max speed still need a manual
+30-second check in the Game view. The Input System setting touched during the test was restored;
+no project files changed.
+
+Manual key check (user, Game view focused): Q/E throttle, both-keys/release latch, and
+WASD/arrow steering at min/max speed all behave correctly. `Tools/Geometric Flight/Check
+Foundation` reports one camera, URP active, no missing scripts/materials. M0 and M1 closed.
+
+Next small task: begin M2 — hold-to-fire projectiles, reticle, and one target destruction effect.
+
+### 2026-09-29 — M2 shooting, aiming, and target feedback
+
+Added `Scripts/Combat`: `WeaponRules` (cadence, shot velocity, swept hit), `PlayerWeapon`
+(8 shots/s hold-to-fire, alternating muzzles, fixed pool of 24), `Projectile` (sphere-cast
+per frame), `ShootableTarget` (3 hits, cyan hit flash, break once, `Destroyed` event), and
+`ShatterEffect` (orange/magenta tetrahedral shards, 0.9 s, created once then reused).
+Shots converge on `AimReticle` (25 units) and inherit ship forward speed; `NearReticle`
+(10 units) shows the line. Floor/pillars got box colliders; gates got mesh colliders fed
+by `PrototypeMesh`. Three accent materials and `PlayerProjectile.prefab` added. Targets
+renamed from `_VisualOnly`; muzzles from `_Reserved`. Unity re-serialized
+`Prototype.unity` into its native YAML style; all original object IDs are preserved.
+
+Verification: EditMode 36/36. In Play Mode (stepped frames, `Fire` invoked directly),
+Target_01 and Target_02 broke after exactly 3 shots, each with a single `Destroyed` event. The shatter
+and reticles were checked in screenshots. Pillar, floor, and gate colliders stop shots, and the pool stays
+bounded. Foundation check passes; no console errors. Not verified: Space key in the
+Game view, and the hit-flash visual (logic only).
+
+Design decisions: no aim assist yet (alignment first, per plan); any collider blocks
+shots; target colliders (r=1.4) are slightly generous. Reticle readability against
+white targets should be revisited in M6.
+
+Next small task: user Space check, then M3 (first full loop and required UI).

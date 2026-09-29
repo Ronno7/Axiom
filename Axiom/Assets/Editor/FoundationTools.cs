@@ -54,7 +54,7 @@ namespace GeometricFlight.Editor
             if (missing > 0 || cameras != 1)
                 Debug.LogError($"Foundation needs attention: {missing} missing/unsupported references, {cameras} cameras. Inspect the Console.");
             else
-                Debug.Log("Foundation references look correct: one camera, URP active, no missing scripts/materials. Play Mode has forward flight and WASD/arrow-key steering; combat is future work.");
+                Debug.Log("Foundation references look correct: one camera, URP active, no missing scripts/materials. Play Mode has forward flight, WASD/arrow steering, Q/E throttle, and Space hold-to-fire at shootable targets.");
         }
     }
 }

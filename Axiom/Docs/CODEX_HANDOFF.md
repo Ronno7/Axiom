@@ -3,8 +3,8 @@
 ## Current milestone
 
 The original static foundation now has **forward flight with smooth throttle and bounded
-keyboard steering**, plus a camera that follows forward travel. Read `README.md`,
-`Docs/DESIGN_BRIEF.md`, and `Docs/FLIGHT.md`. Develop in small, requested milestones.
+keyboard steering**, plus a camera that follows forward travel, and **hold-to-fire shooting at
+shootable targets** (M2). Read `README.md`, `Docs/DESIGN_BRIEF.md`, `Docs/FLIGHT.md`, and `Docs/COMBAT.md`. Develop in small, requested milestones.
 
 The Unity project is the nested `Axiom` folder within the repository. Assets live
 directly below `Assets`; the original `Assets/GeometricFlight` layout is obsolete.
@@ -18,6 +18,8 @@ installed package versions, including the user's Unity MCP installation.
 | `Assets/Scenes/Prototype.unity` | Editable blockout with input, flight, and camera components wired |
 | `Assets/Scripts/Input` | Shared steering/throttle/fire/pause snapshot and keyboard Input System adapter |
 | `Assets/Scripts/Player` | Stateless movement rules, player component, forward-following camera |
+| `Assets/Scripts/Combat` | Weapon rules, pooled player weapon, projectile, shootable target, shatter effect |
+| `Assets/Prefabs/Player/PlayerProjectile.prefab` | Pooled shot (no collider; hits by sweep) |
 | `Assets/Scripts/Presentation/PrototypeMesh.cs` | Edit/Play Mode geometry |
 | `Assets/Scripts/GeometricFlight.Runtime.asmdef` | Small runtime assembly referencing Input System |
 | `Assets/Tests/Editor` | Deterministic movement tests in a separate Editor test assembly |
@@ -47,7 +49,7 @@ installed Unity math types, including acceleration travel at 30/60/144 simulated
 FPS. This was not a Unity Test Runner run. Unity MCP was unavailable, so live
 Q/E/both-key/release checks, steering/camera at different speeds, and two Play Mode
 restarts remain pending. Run the acceptance pass in `FLIGHT.md` before marking M1
-complete. Space/Escape only populate input intent; firing and pausing are future work.
+complete. M1 was verified 2026-09-29. M2 shooting is implemented; see `COMBAT.md`. Escape (pause) is future work.
 The following Unity results belong to the earlier flight implementation.
 
 All 14 deterministic EditMode tests passed in Unity 6000.3.24f1. Five live virtual

@@ -59,5 +59,6 @@ Classification depends on what is physically part of the game's fiction. Priorit
 The initial delivery established folder structure and a basic prototype scene.
 The current implementation adds forward movement with smooth throttle and bounded keyboard
 steering, with a camera that follows forward travel. See `FLIGHT.md` for controls,
-tuning, component responsibilities, and verification status. Combat, menus, Arduino code,
+tuning, component responsibilities, and verification status. `COMBAT.md` covers M2 shooting,
+reticles, and target destruction. Enemy attacks, menus, Arduino code,
 and the three finished levels belong to later milestones.
