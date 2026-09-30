@@ -777,13 +777,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 22953582}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.876317, y: 17.445963, z: 49.60469}
+  m_LocalRotation: {x: -0, y: 0.43275332, z: -0, w: 0.9015124}
+  m_LocalPosition: {x: 11.575531, y: 17.445963, z: 50.353897}
   m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1014961684}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 51.285, z: 0}
 --- !u!114 &22953584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1524,7 +1524,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.GeometricConstruct
   primary: {fileID: 2100000, guid: 4ccad562d2185b3e7c4bac0b18de6c3e, type: 2}
   secondary: {fileID: 2100000, guid: 4a0c90af00cbbe6104dc82492627b1cf, type: 2}
-  tertiary: {fileID: 2100000, guid: dc7cdc2f4bb24a84629fa8c922d64f4a, type: 2}
+  tertiary: {fileID: 2100000, guid: faf5e6eb8b566c54db4b1bfcb4a5fa80, type: 2}
   coreRadius: 1
   coreSpin: 35
   cage: 1
@@ -1533,7 +1533,7 @@ MonoBehaviour:
   cageInertia: {x: 1, y: 2, z: 3}
   cageSpin: 0.8
   knot: 1
-  knotScale: 1.05
+  knotScale: 1.2
   knotThickness: 0.06
   knotSpin: 10
   satellites: 0

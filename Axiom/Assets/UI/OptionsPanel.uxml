@@ -4,6 +4,7 @@
         <ui:Slider name="steering-sensitivity" label="Steering sensitivity" low-value="0.5" high-value="1.5" value="1" class="option" />
         <ui:Toggle name="invert-vertical" label="Invert vertical steering" class="option" />
         <ui:Toggle name="controller-buzzer" label="Controller buzzer" value="true" class="option" />
+        <ui:Toggle name="controller-fan" label="Controller fan" value="true" class="option" />
         <GeometricFlight.UI.SlantButton name="options-calibrate" text="CALIBRATE CONTROLLER" class="menu-button options-calibrate" />
         <GeometricFlight.UI.SlantButton name="options-back" text="BACK" class="menu-button" />
     </ui:VisualElement>

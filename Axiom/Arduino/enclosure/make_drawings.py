@@ -1,54 +1,101 @@
 #!/usr/bin/env python3
-"""Axiom controller enclosure: generates blueprint.svg (assembly drawing) and
-templates.svg (1:1 cutting templates, print at 100% on US Letter).
+"""Axiom controller enclosure drawings.
 
-Every size is in millimetres and derives from the parameters below. Change a value
-(for example T for thicker foam board) and rerun:  python make_drawings.py
+Generates, for each build style:
+  blueprint-<mode>.svg  assembly drawing
+  templates-<mode>.svg  1:1 cutting templates (print at 100% on US Letter)
 
-Coordinate system for the interior: x from the inner face of the LEFT wall,
-y from the inner face of the FRONT wall (towards the back), z up from the floor top.
-Outer lid/wall positions add the sheet thickness T.
+Modes:
+  case       uxcell / generic 250 x 190 x 80 mm ABS instrument case (recommended), foam-board internals
+  cardboard  the all-cardboard 204 x 258 x 68 mm box
+
+Every size is in millimetres. Measure your case when it arrives, edit its preset below, and rerun:
+  python make_drawings.py            (both modes)
+  python make_drawings.py case       (one mode)
+
+Interior coordinates: x from the inside of the LEFT wall, y from the inside of the FRONT
+(towards the back), z up from the floor. Outer positions add the shell thickness T.
 """
 import math
+import sys
 from pathlib import Path
 
-# ---------------- Material and box ----------------
-T = 4.0                        # sheet thickness: corrugated cardboard ~4, foam board 5
-W_IN, D_IN, H_IN = 196.0, 250.0, 60.0
-W, D, H = W_IN + 2 * T, D_IN + 2 * T, H_IN + 2 * T   # outer (floor + walls + lid)
+PRESETS = {
+    "case": dict(
+        TITLE="ABS INSTRUMENT CASE EDITION",
+        SUBTITLE="250 × 190 × 80 mm ABS instrument case (removable front/rear panels), internals from 4–5 mm foam board, hot glued. "
+                 "Interior is an estimate: measure yours and update the preset.",
+        T=3.0, SHEET=4.0, W_IN=184.0, D_IN=244.0, H_IN=74.0,
+        TUN_W=50.0, D_FAR=150.0, STEM_LEN=105.0,
+        TOWER_X=128.0, TOWER_Y=28.0, TOWER_H=56.0,
+        BUTTON_X=158.0, BUTTON_Z=37.0,
+        BREADBOARD=(58.0, 73.0, 55.0, 165.0), UNO_X=117.0, GRILLE=(86.0, 222.0),
+        LID="TOP SHELL", FRONT="FRONT PANEL", BACK="REAR PANEL", SHELL="#cfd4d8", SHELL_EDGE="#7b848c",
+        CLOSURE="Top shell held by the case's own screws",
+        STEPS=["Measure the interior; update the case preset and rerun this script. Print templates-case.svg at 100%.",
+               "Cut openings with the Dremel (low–medium speed so ABS doesn't melt): top-shell slot and stick hole, front-panel square, rear-panel USB hole.",
+               "Build the tunnel (divider + sensor wall) and sled from foam board; hot glue the tunnel to the case floor. Tape-line it.",
+               "Glue HC-SR04 behind the window, tower + joystick, trigger button; place Uno and breadboard.",
+               "Wire (see wiring.svg), close the case, push on the knob. Calibrate in game: Options → Calibrate."],
+    ),
+    "cardboard": dict(
+        TITLE="CARDBOARD EDITION",
+        SUBTITLE="Desk console in 4 mm corrugated cardboard or foam board, hot glued.",
+        T=4.0, SHEET=4.0, W_IN=196.0, D_IN=250.0, H_IN=60.0,
+        TUN_W=56.0, D_FAR=170.0, STEM_LEN=90.0,
+        TOWER_X=144.0, TOWER_Y=32.0, TOWER_H=42.0,
+        BUTTON_X=176.0, BUTTON_Z=30.0,
+        BREADBOARD=(66.0, 78.0, 55.0, 165.0), UNO_X=138.0, GRILLE=(94.0, 225.0),
+        LID="LID", FRONT="FRONT WALL", BACK="BACK WALL", SHELL="#e9dcc3", SHELL_EDGE="#8a7757",
+        CLOSURE="Lid hinge: packing tape along this top edge",
+        STEPS=["Cut floor, walls, divider, sensor wall, lid; print templates-cardboard.svg at 100% for the openings.",
+               "Glue walls to the floor, then the divider and sensor wall. Tape-line the tunnel.",
+               "Build the sled; check it slides full length with the stem through a test slot.",
+               "Glue HC-SR04 behind the window, tower + joystick, trigger button; place Uno and breadboard.",
+               "Wire (see wiring.svg), fit the lid, push on the knob. Calibrate in game: Options → Calibrate."],
+    ),
+}
 
-# ---------------- Throttle tunnel (left side) ----------------
-TUN_W = 56.0                   # inner width; the sled fills it (1 mm clearance each side)
-SENSOR_WALL_Y = 232.0          # front face of the wall the HC-SR04 hides behind
+# Shared part sizes (researched; see README.md)
 SENSOR_WIN_W, SENSOR_WIN_H = 17.0, 43.0   # window for the transducers (sensor mounted on its side)
-CAN_LEN = 12.0                 # transducer can length; it pokes CAN_LEN - T into the tunnel
-D_NEAR, D_FAR = 50.0, 170.0    # plate distance from the transducer faces at the two travel ends
+CAN_LEN = 12.0                 # HC-SR04 transducer can length
+D_NEAR = 50.0                  # plate distance from the transducer faces at the near end of travel
 SLED_LEN, RUNNER_H = 50.0, 15.0
-STEM_W, STEM_FROM_PLATE, STEM_LEN = 10.0, 25.0, 90.0
+STEM_W, STEM_FROM_PLATE = 10.0, 25.0
 SLOT_W = 8.0
-
-# ---------------- Stick, trigger, electronics ----------------
-TOWER_X, TOWER_Y, TOWER_SIDE, TOWER_H = 144.0, 32.0, 40.0, 42.0
-STICK_X, STICK_Y = TOWER_X + TOWER_SIDE / 2, TOWER_Y + TOWER_SIDE / 2
+TOWER_SIDE = 40.0
 STICK_HOLE = 30.0              # lets the cap dip into the lid at full tilt
 JOY_PCB = (34.0, 26.0)
-BUTTON_X, BUTTON_Z, BUTTON_CUT, BUTTON_CAP = 176.0, 30.0, 6.5, 18.0
-BREADBOARD = (66.0, 78.0, 55.0, 165.0)          # x, y, width, length
+BUTTON_CUT, BUTTON_CAP = 6.5, 18.0
 UNO_W, UNO_L, USB_OUT = 53.4, 68.6, 6.2
-UNO = (138.0, D_IN - USB_OUT - UNO_L, UNO_W, UNO_L)
-USB_X = UNO[0] + 37.8          # jack centre along the board edge (check against your board)
 USB_HOLE_W, USB_HOLE_H = 18.0, 16.0
-GRILLE = (94.0, 225.0)         # above the buzzer's end of the breadboard; move to suit
+LED_D = 5.0                    # runway LEDs beside the slot (5 mm LEDs)
 
-# ---------------- Derived ----------------
-TUN_CX, TUN_CZ = TUN_W / 2, H_IN / 2
-FACE_Y = SENSOR_WALL_Y + T - CAN_LEN              # transducer faces
-PLATE_NEAR, PLATE_FAR = FACE_Y - D_NEAR, FACE_Y - D_FAR
-STEM_NEAR, STEM_FAR = PLATE_NEAR - STEM_FROM_PLATE, PLATE_FAR - STEM_FROM_PLATE
-SLOT_Y0, SLOT_Y1 = STEM_FAR - STEM_W / 2, STEM_NEAR + STEM_W / 2
-SLED_W = TUN_W - 2
-PLATE_H = H_IN - 4
-TRAVEL = D_FAR - D_NEAR
+
+def configure(mode):
+    """Loads a preset and computes the derived geometry as module globals used by the drawings."""
+    g = globals()
+    g.update(PRESETS[mode])
+    g["MODE"] = mode
+    g["W"], g["D"], g["H"] = W_IN + 2 * T, D_IN + 2 * T, H_IN + 2 * T
+    # The sensor wall sits just far enough back for the sled to reach D_FAR with 2 mm to spare.
+    g["SENSOR_WALL_Y"] = SLED_LEN + D_FAR + CAN_LEN - SHEET + 2
+    g["STICK_X"], g["STICK_Y"] = TOWER_X + TOWER_SIDE / 2, TOWER_Y + TOWER_SIDE / 2
+    g["UNO"] = (UNO_X, D_IN - USB_OUT - UNO_L, UNO_W, UNO_L)
+    g["USB_X"] = UNO_X + 37.8   # jack centre along the board edge (check against your board)
+    g["TUN_CX"], g["TUN_CZ"] = TUN_W / 2, H_IN / 2
+    g["FACE_Y"] = SENSOR_WALL_Y + SHEET - CAN_LEN
+    g["PLATE_NEAR"], g["PLATE_FAR"] = FACE_Y - D_NEAR, FACE_Y - D_FAR
+    g["STEM_NEAR"], g["STEM_FAR"] = PLATE_NEAR - STEM_FROM_PLATE, PLATE_FAR - STEM_FROM_PLATE
+    g["SLOT_Y0"], g["SLOT_Y1"] = STEM_FAR - STEM_W / 2, STEM_NEAR + STEM_W / 2
+    g["SLED_W"] = TUN_W - 2
+    g["PLATE_H"] = H_IN - 4
+    g["TRAVEL"] = D_FAR - D_NEAR
+    # Runway LEDs: just past the divider (clear of the 40 mm knob), one at the middle of each fifth of
+    # the lever's travel, LED 1 nearest the sensor.
+    g["LED_X"] = TUN_W + SHEET + 5
+    g["LED_YS"] = [STEM_NEAR - (i + 0.5) * (STEM_NEAR - STEM_FAR) / 5 for i in range(5)]
+
 
 BLUE, RED, ORANGE = "#1c6fd1", "#d62828", "#e8590c"
 
@@ -117,15 +164,15 @@ def callout(x1, y1, x2, y2, label, anchor="start"):
 def blueprint():
     out = []
     add = out.append
-    add('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1320" width="1600" height="1320" '
+    add('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1760 1720" width="1760" height="1720" '
         'font-family="Segoe UI, Helvetica, Arial, sans-serif">')
-    add("""<title>Axiom controller enclosure blueprint</title>
+    add("""<title>Axiom controller enclosure blueprint (MODENAME)</title>
 <defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
 <path d="M0,1 L9,5 L0,9" fill="none" stroke="#444" stroke-width="1.4"/></marker>
 <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
 <line x1="0" y1="0" x2="0" y2="6" stroke="#b9a98f" stroke-width="2"/></pattern></defs>
 <style>
-.sheet{fill:#e9dcc3;stroke:#8a7757;stroke-width:1.2}
+.sheet{fill:SHELLFILL;stroke:SHELLEDGE;stroke-width:1.2}
 .cut{fill:url(#hatch);stroke:#8a7757;stroke-width:1.2}
 .void{fill:#fbf8f2;stroke:#8a7757;stroke-width:1}
 .hole{fill:#ffffff;stroke:#222;stroke-width:1.4}
@@ -152,27 +199,25 @@ def blueprint():
 .tbl{font-size:12.5px;fill:#222}
 .tblh{font-size:13px;font-weight:700;fill:#111}
 </style>
-<rect width="1600" height="1320" fill="#ffffff"/>""")
-    add('<text x="40" y="44" font-size="26" font-weight="800" fill="#111">AXIOM CONTROLLER · ENCLOSURE BLUEPRINT</text>')
-    add(f'<text x="40" y="68" class="sub">Desk console in {f(T)} mm corrugated cardboard or foam board, hot glued. All dimensions in mm. '
-        f'Outer box {f(W)} W × {f(D)} D × {f(H)} H. Generated by make_drawings.py — change the parameters there and rerun.</text>')
+<rect width="1760" height="1720" fill="#ffffff"/>""")
+    add(f'<text x="40" y="44" font-size="26" font-weight="800" fill="#111">AXIOM CONTROLLER · ENCLOSURE BLUEPRINT · {TITLE}</text>')
+    add(f'<text x="40" y="68" class="sub">{SUBTITLE} All dimensions in mm. Outer {f(W)} W × {f(D)} D × {f(H)} H. '
+        f'Generated by make_drawings.py ({MODE} preset).</text>')
 
     # ---------------- 1. Interior plan ----------------
-    v = View(60, 700)
-    add('<text x="60" y="110" class="title">1 · INTERIOR LAYOUT (lid removed)</text>')
-    add('<text x="60" y="128" class="sub">Front of the console at the bottom. Dashed = lid openings above.</text>')
+    v = View(250, 700)
+    add('<text x="40" y="110" class="title">1 · INTERIOR LAYOUT (lid removed)</text>')
+    add('<text x="40" y="128" class="sub">Front of the console at the bottom. Dashed = lid openings above.</text>')
     add(v.rect(-T, -T, W, D, "sheet"))
     add(v.rect(0, 0, W_IN, D_IN, "void"))
     # tunnel and walls
-    add(v.rect(TUN_W, 0, T, SENSOR_WALL_Y, "cut"))                      # divider
-    add(v.rect(0, SENSOR_WALL_Y, TUN_W, T, "cut"))                      # sensor wall
+    add(v.rect(TUN_W, 0, SHEET, SENSOR_WALL_Y, "cut"))                      # divider
+    add(v.rect(0, SENSOR_WALL_Y, TUN_W, SHEET, "cut"))                      # sensor wall
     add(v.rect(0, 0, TUN_W, SENSOR_WALL_Y, "void", 'fill="#f3ecde"'))    # tunnel floor tint
-    add(v.text(TUN_CX, 205, "THROTTLE", "lbls", "middle"))
-    add(v.text(TUN_CX, 198, "TUNNEL", "lbls", "middle"))
     # sensor behind the wall (on its side): cans through the window, PCB flat on the back face
-    add(v.rect(TUN_CX - 8, FACE_Y, 16, CAN_LEN - T, "metal"))
-    add(v.rect(TUN_CX - 10, SENSOR_WALL_Y + T, 20, 1.6, "pcbb"))
-    add(v.rect(TUN_CX + 10, SENSOR_WALL_Y + T - 1, 25, 3, "dark"))       # header + sockets, pointing +x
+    add(v.rect(TUN_CX - 8, FACE_Y, 16, CAN_LEN - SHEET, "metal"))
+    add(v.rect(TUN_CX - 10, SENSOR_WALL_Y + SHEET, 20, 1.6, "pcbb"))
+    add(v.rect(TUN_CX + 10, SENSOR_WALL_Y + SHEET - 1, 25, 3, "dark"))       # header + sockets, pointing +x
     # sled at mid travel, ghosts at both ends
     mid = (PLATE_NEAR + PLATE_FAR) / 2
     for py, cls in ((PLATE_NEAR, "ghost"), (PLATE_FAR, "ghost"), (mid, "sled")):
@@ -183,6 +228,8 @@ def blueprint():
     add(v.poly([(TUN_CX - 8, FACE_Y), (TUN_CX + 8, FACE_Y), (TUN_CX + 8 + (FACE_Y - mid) * math.tan(math.radians(7.5)), mid),
                 (TUN_CX - 8 - (FACE_Y - mid) * math.tan(math.radians(7.5)), mid)], "beam"))
     add(v.rect(TUN_CX - SLOT_W / 2, SLOT_Y0, SLOT_W, SLOT_Y1 - SLOT_Y0, "lidcut"))
+    for ly in LED_YS:
+        add(v.circle(LED_X, ly, LED_D / 2, "lidcut"))
     # electronics
     bx, by, bw, bl = BREADBOARD
     add(v.rect(bx, by, bw, bl, "bb"))
@@ -213,9 +260,10 @@ def blueprint():
     add(callout(X(TUN_CX), Y(FACE_Y + 6), X(-T) - 10, Y(D_IN + 26), "HC-SR04 glued behind sensor wall", "end"))
     add(callout(X(TUN_CX), Y(mid - 20), X(-T) - 10, Y(mid - 20), "Sled + reflector plate", "end"))
     add(callout(X(TUN_CX), Y(STEM_FAR), X(-T) - 10, Y(STEM_FAR - 10), "Lid slot (lever travel)", "end"))
+    add(callout(X(6), Y(SENSOR_WALL_Y - 40), X(-T) - 10, Y(SENSOR_WALL_Y - 40), "Throttle tunnel (tape-lined)", "end"))
     add(callout(X(STICK_X + 12), Y(STICK_Y + 10), X(W_IN + T) + 16, Y(STICK_Y + 44), "Joystick on tower (h " + f(TOWER_H) + ")"))
     add(callout(X(BUTTON_X), Y(-T - 1), X(W_IN + T) + 16, Y(10), "Trigger: 6×6 button + cap"))
-    add(callout(X(USB_X), Y(D_IN + 2), X(W_IN + T) + 16, Y(D_IN + 20), "USB notch in back wall"))
+    add(callout(X(USB_X), Y(D_IN + 2), X(W_IN + T) + 16, Y(D_IN + 20), f"USB hole in {BACK.lower()}"))
     add(callout(X(ux + uw / 2), Y(uy + 20), X(W_IN + T) + 16, Y(uy + 20), "Uno (USB to the back)"))
     add(callout(X(bx + bw / 2 + 12), Y(by + bl - 22), X(W_IN + T) + 16, Y(by + bl - 60), "Buzzer (under lid grille)"))
     add(v.dim_h(-T, W_IN + T, -T, f"{f(W)} outer", 34))
@@ -223,9 +271,9 @@ def blueprint():
     add(v.dim_v(-T, -T, D_IN + T, f"{f(D)} outer", -34))
 
     # ---------------- 2. Lid ----------------
-    L = View(660, 700)
-    add('<text x="660" y="110" class="title">2 · LID CUTOUTS</text>')
-    add('<text x="660" y="128" class="sub">Measured from the lid\'s outer LEFT and FRONT edges.</text>')
+    L = View(990, 700)
+    add(f'<text x="990" y="110" class="title">2 · {LID} CUTOUTS</text>')
+    add(f'<text x="990" y="128" class="sub">Nominal, from the outer LEFT and FRONT edges. Confirm by marking through from inside with parts in place.</text>')
     add(L.rect(0, 0, W, D, "sheet"))
     sx, sy = TUN_CX + T, 0
     add(L.rect(sx - SLOT_W / 2, SLOT_Y0 + T, SLOT_W, SLOT_Y1 - SLOT_Y0, "hole"))
@@ -234,6 +282,12 @@ def blueprint():
         a = i * math.pi / 3
         gx, gy = (GRILLE[0] + T, GRILLE[1] + T) if i == 6 else (GRILLE[0] + T + 7 * math.cos(a), GRILLE[1] + T + 7 * math.sin(a))
         add(L.circle(gx, gy, 1.5, "hole"))
+    for i, ly in enumerate(LED_YS):
+        add(L.circle(LED_X + T, ly + T, LED_D / 2, "hole"))
+        add(L.text(LED_X + T + 5, ly + T - 1.5, str(i + 1), "lbls"))
+    add(L.text(LED_X + T + 12, (LED_YS[0] + LED_YS[-1]) / 2 + T + 4, f"runway LEDs 5× Ø{f(LED_D)}", "lbls"))
+    add(L.text(LED_X + T + 12, (LED_YS[0] + LED_YS[-1]) / 2 + T - 4,
+               f"{f(LED_X + T)} from left, pitch {f(LED_YS[0] - LED_YS[1])}", "lbls"))
     add(L.line(sx, SLOT_Y0 + T, sx, -2, "", 'stroke="#aaa" stroke-dasharray="3 3"'))
     add(L.dim_h(0, sx, 0, f(sx), 20))
     add(L.dim_h(0, STICK_X + T, 0, f(STICK_X + T), 40))
@@ -241,16 +295,16 @@ def blueprint():
     add(L.dim_v(W, 0, STICK_Y + T, f(STICK_Y + T), 44))
     add(L.dim_v(sx - SLOT_W / 2, SLOT_Y0 + T, SLOT_Y1 + T, f"slot {f(SLOT_Y1 - SLOT_Y0)} × {f(SLOT_W)}", -10))
     add(L.text(STICK_X + T, STICK_Y + T + STICK_HOLE / 2 + 4, f"Ø{f(STICK_HOLE)}", "lbl", "middle"))
-    add(L.text(GRILLE[0] + T, GRILLE[1] + T + 12, "sound grille 7× Ø3", "lbls", "middle"))
-    add(L.text(W / 2, D - 8, "BACK EDGE · tape hinge", "lbls", "middle"))
+    add(L.text(GRILLE[0] + T, GRILLE[1] + T - 16, "sound grille 7× Ø3", "lbls", "middle"))
+    add(L.text(W / 2, D - 8, "BACK EDGE", "lbls", "middle"))
     add(L.text(W / 2, 6, "FRONT EDGE", "lbls", "middle"))
     add(L.text(W / 2, D / 2 + 30, "Throttle knob push-fits on the stem", "lbls", "middle"))
     add(L.text(W / 2, D / 2 + 22, "(not glued) so the lid can lift off.", "lbls", "middle"))
 
     # ---------------- 3. Section through the tunnel ----------------
-    S = View(1100, 330)
-    add('<text x="1100" y="110" class="title">3 · SECTION A–A THROUGH THE THROTTLE</text>')
-    add('<text x="1100" y="128" class="sub">Viewed from the left. Front of the console on the left. Sled drawn at mid travel.</text>')
+    S = View(120, 1070)
+    add('<text x="40" y="800" class="title">3 · SECTION A–A THROUGH THE THROTTLE</text>')
+    add('<text x="40" y="818" class="sub">Viewed from the left; front of the console on the left. Sled at mid travel, dashed at both ends.</text>')
     # page x = y (front→back), page y = z
     Sz = lambda y, z: S.p(y + T, z + T)
 
@@ -274,9 +328,9 @@ def blueprint():
     add(S.rect(0, T, T, H_IN, "cut"))                                # front wall
     add(S.rect(D - T, T, T, H_IN, "cut"))                            # back wall
     win_z0 = TUN_CZ - SENSOR_WIN_H / 2
-    add(SV.rect(SENSOR_WALL_Y, 0, T, win_z0, "cut"))                 # sensor wall below/above the window
-    add(SV.rect(SENSOR_WALL_Y, win_z0 + SENSOR_WIN_H, T, H_IN - win_z0 - SENSOR_WIN_H, "cut"))
-    add(SV.rect(SENSOR_WALL_Y + T, TUN_CZ - 22.5, 1.6, 45, "pcbb"))  # PCB on its side
+    add(SV.rect(SENSOR_WALL_Y, 0, SHEET, win_z0, "cut"))                 # sensor wall below/above the window
+    add(SV.rect(SENSOR_WALL_Y, win_z0 + SENSOR_WIN_H, SHEET, H_IN - win_z0 - SENSOR_WIN_H, "cut"))
+    add(SV.rect(SENSOR_WALL_Y + SHEET, TUN_CZ - 22.5, 1.6, 45, "pcbb"))  # PCB on its side
     for cz in (TUN_CZ - 13, TUN_CZ + 13):
         add(SV.rect(FACE_Y, cz - 8, CAN_LEN, 16, "metal"))
     add(SV.poly([(FACE_Y, TUN_CZ - 16), (FACE_Y, TUN_CZ + 16), (mid, TUN_CZ + 16 + (FACE_Y - mid) * math.tan(math.radians(7.5))),
@@ -293,10 +347,10 @@ def blueprint():
     add(S.text(stem_y + T, H + 34, "KNOB (push-fit)", "lbls", "middle"))
     Sx = lambda y: S.p(y + T, 0)[0]
     Sy = lambda z: S.p(0, z + T)[1]
-    add(callout(Sx(FACE_Y + 6), Sy(TUN_CZ + 13), Sx(FACE_Y + 6), Sy(H_IN + 50), "HC-SR04 (hidden)"))
-    add(callout(Sx(mid - 2), Sy(PLATE_H - 6), Sx(mid + 20), Sy(H_IN + 34), "Reflector plate — flat, square to the sensor"))
+    add(callout(Sx(FACE_Y + 6), Sy(TUN_CZ + 13), Sx(FACE_Y - 10), Sy(H_IN + 44), "HC-SR04 hidden behind the sensor wall"))
+    add(callout(Sx(mid - 2), Sy(PLATE_H - 6), Sx(mid + 20), Sy(H_IN + 34), "Reflector plate: flat, square to the sensor"))
     add(callout(Sx(stem_y - 15), Sy(H_IN - 3), Sx(stem_y - 60), Sy(H_IN + 34), "Collar rides under lid", "end"))
-    add(callout(Sx(mid - 30), Sy(RUNNER_H / 2), Sx(mid - 60), Sy(-24), "Sled runs on the tunnel floor (tape-lined)", "end"))
+    add(callout(Sx(mid - 30), Sy(RUNNER_H / 2), Sx(mid - 60), Sy(-40), "Sled runs on the tunnel floor", "end"))
     add(SV.line(FACE_Y, -10, FACE_Y, -2, "ext"))
     add(S.dim_h(PLATE_NEAR + T, FACE_Y + T, 0, f"near {f(D_NEAR)}", 34))
     add(S.dim_h(PLATE_FAR + T, FACE_Y + T, 0, f"far {f(D_FAR)} (travel {f(TRAVEL)})", 58))
@@ -304,29 +358,30 @@ def blueprint():
     add(S.dim_v(D + 30, 0, H, f"{f(H)} outer", 30))
 
     # ---------------- 4. Front and back views ----------------
-    F = View(1100, 560)
-    add('<text x="1100" y="440" class="title">4 · FRONT VIEW</text>')
+    F = View(800, 1020)
+    add('<text x="800" y="800" class="title">4 · FRONT VIEW</text>')
     add(F.rect(0, 0, W, H, "sheet"))
     add(F.rect(BUTTON_X + T - BUTTON_CUT / 2, BUTTON_Z + T - BUTTON_CUT / 2, BUTTON_CUT, BUTTON_CUT, "hole"))
     add(F.circle(BUTTON_X + T, BUTTON_Z + T, BUTTON_CAP / 2, "ghost"))
     add(F.rect(STICK_X + T - 13, H, 26, 12, "dark"))                  # stick cap above the lid
+    add(F.rect(TUN_CX + T - STEM_W / 2, H, STEM_W, 14, "sled"))       # throttle stem above the lid
     add(F.rect(TUN_CX + T - 20, H + 14, 40, 14, "dark"))              # throttle knob
     add(F.dim_h(0, BUTTON_X + T, 0, f(BUTTON_X + T), 22))
     add(F.dim_v(W, 0, BUTTON_Z + T, f(BUTTON_Z + T), 20))
     add(F.text(BUTTON_X + T + 12, BUTTON_Z + T + 6, f"trigger: {f(BUTTON_CUT)} square, Ø{f(BUTTON_CAP)} cap", "lbls"))
 
-    B = View(1100, 760)
-    add('<text x="1100" y="640" class="title">5 · BACK VIEW</text>')
+    B = View(1300, 1020)
+    add('<text x="1300" y="800" class="title">5 · BACK VIEW</text>')
     add(B.rect(0, 0, W, H, "sheet"))
     ux_out = W - (USB_X + T)   # seen from behind, left/right swap
     add(B.rect(ux_out - USB_HOLE_W / 2, T, USB_HOLE_W, USB_HOLE_H, "hole"))
     add(B.dim_h(0, ux_out, 0, f"{f(ux_out)} from this edge", 22))
     add(B.text(ux_out + USB_HOLE_W / 2 + 6, T + 10, f"USB notch {f(USB_HOLE_W)} × {f(USB_HOLE_H)} from the floor", "lbls"))
-    add(B.text(0, H + 6, "Lid hinge: packing tape along this top edge", "lbls"))
+    add(B.text(0, H + 6, CLOSURE, "lbls"))
 
     # ---------------- 6. Sled detail ----------------
-    add('<text x="1100" y="840" class="title">6 · THROTTLE SLED (the moving part)</text>')
-    Q = View(1100, 1010)
+    add('<text x="1000" y="1210" class="title">6 · THROTTLE SLED (the moving part)</text>')
+    Q = View(1030, 1380)
     add(Q.rect(0, 0, SLED_W, SLED_LEN, "sled"))                     # base (top view)
     add(Q.rect(0, SLED_LEN - T, SLED_W, T, "plate"))
     add(Q.rect(0, 0, 3, SLED_LEN - T, "sheet"))
@@ -335,7 +390,7 @@ def blueprint():
     add(Q.dim_h(0, SLED_W, 0, f(SLED_W), 18))
     add(Q.dim_v(0, 0, SLED_LEN, f(SLED_LEN), -14))
     add(Q.text(SLED_W / 2, SLED_LEN + 6, "top: base + runners, plate at the back", "lbls", "middle"))
-    R2 = View(1260, 1010)
+    R2 = View(1200, 1380)
     add(R2.rect(0, 0, SLED_W, PLATE_H, "plate"))
     add(R2.rect(SLED_W / 2 - STEM_W / 2, 0, STEM_W, 0, "dark"))
     add(R2.dim_h(0, SLED_W, 0, f(SLED_W), 18))
@@ -349,7 +404,7 @@ def blueprint():
              "Collar 30 × 20 glued to the stem just under the lid stops the sled lifting or tilting.",
              "Line the tunnel floor and walls with packing tape: it slides smoothly and quietly."]
     for i, n in enumerate(notes):
-        add(f'<text x="1100" y="{1090 + i * 18}" class="tbl">• {n}</text>')
+        add(f'<text x="1000" y="{1440 + i * 18}" class="tbl">• {n}</text>')
 
     # ---------------- 7. Tables ----------------
     def table(x, y, title, rows, widths):
@@ -365,8 +420,8 @@ def blueprint():
             yy += 20
         return yy
 
-    y0 = 760
-    table(60, y0, "7 · PARTS (researched sizes — measure yours, clones vary)",
+    y0 = 1210
+    table(40, y0, "7 · PARTS (researched sizes — measure yours, clones vary)",
           [["Part", "Size (mm)", "Mounting"],
            ["Arduino Uno R3", "68.6 × 53.4, USB-B sticks out 6.2", "Corral of card strips on the floor, no glue on the PCB"],
            ["Breadboard, 830 point", "165 × 55 × 8.5–10", "Its own adhesive backing"],
@@ -375,23 +430,18 @@ def blueprint():
            ["6×6 tactile button", "6 × 6 × ~5", "Body in the front-wall square, glued from inside"],
            ["Active buzzer", "Ø12 × 9.5", "Stays on the breadboard, under the grille"]],
           [170, 230, 420])
-    table(60, y0 + 190, "8 · WIRE BUDGET (kit: 10 male–female, 65 male–male)",
+    table(40, y0 + 175, "8 · WIRE BUDGET (kit: 10 male–female, 65 male–male)",
           [["Link", "Female ends needed", "Note"],
            ["Joystick → breadboard", "5", "M–F; SW (pause) is optional"],
            ["HC-SR04 → breadboard", "4", "M–F, sockets point into the electronics bay"],
            ["Trigger button → breadboard", "2", "Only 1 M–F left: wrap the GND leg round an M–M pin and glue, or skip SW"],
            ["Everything else", "0", "M–M; extend reach by hopping through a spare breadboard row"]],
           [230, 170, 420])
-    table(60, y0 + 330, "9 · BUILD ORDER",
-          [["#", "Step", ""],
-           ["1", "Cut floor, walls, divider, sensor wall, lid; print templates.svg at 100% for the openings.", ""],
-           ["2", "Glue walls to the floor, then the divider and sensor wall. Tape-line the tunnel.", ""],
-           ["3", "Build the sled; check it slides full length with the stem through a test slot.", ""],
-           ["4", "Glue HC-SR04 behind the window, tower + joystick, trigger button; place Uno and breadboard.", ""],
-           ["5", "Wire (see wiring.svg), fit the lid, push on the knob. Calibrate in game: Options → Calibrate.", ""]],
+    table(40, y0 + 310, "9 · BUILD ORDER",
+          [["#", "Step", ""]] + [[str(i + 1), step, ""] for i, step in enumerate(STEPS)],
           [30, 790, 0])
     add("</svg>")
-    return "\n".join(out)
+    return "\n".join(out).replace("SHELLFILL", SHELL).replace("SHELLEDGE", SHELL_EDGE).replace("MODENAME", MODE)
 
 
 # =====================================================================
@@ -415,10 +465,10 @@ def templates():
     add(f'<rect width="{PW}" height="{PH}" fill="#fff"/>')
     add('<text x="10" y="14" class="h">AXIOM CONTROLLER — CUTTING TEMPLATES (print at 100% / actual size)</text>')
     add('<text x="10" y="19.5" class="s">Check the scale bar first. Cut out, place on the sheet at the stated position, trace or cut through.</text>')
-    add('<line x1="150" y1="17" x2="200" y2="17" stroke="#000" stroke-width="0.6"/>'
-        '<line x1="150" y1="15" x2="150" y2="19" stroke="#000" stroke-width="0.4"/>'
-        '<line x1="200" y1="15" x2="200" y2="19" stroke="#000" stroke-width="0.4"/>'
-        '<text x="175" y="14" class="s" text-anchor="middle">must measure 50 mm</text>')
+    add('<line x1="150" y1="27" x2="200" y2="27" stroke="#000" stroke-width="0.6"/>'
+        '<line x1="150" y1="25" x2="150" y2="29" stroke="#000" stroke-width="0.4"/>'
+        '<line x1="200" y1="25" x2="200" y2="29" stroke="#000" stroke-width="0.4"/>'
+        '<text x="175" y="24" class="s" text-anchor="middle">scale check: must measure 50 mm</text>')
 
     def cross(x, y, r):
         add(f'<line x1="{f(x - r)}" y1="{f(y)}" x2="{f(x + r)}" y2="{f(y)}" class="cx"/>'
@@ -432,7 +482,7 @@ def templates():
     cx, cy = 30, 48
     add(f'<circle cx="{cx}" cy="{cy}" r="{f(STICK_HOLE / 2)}" class="c"/>')
     cross(cx, cy, STICK_HOLE / 2 + 4)
-    label(10, 72, [f"LID · joystick hole Ø{f(STICK_HOLE)}", f"centre {f(STICK_X + T)} from left edge,",
+    label(10, 72, [f"{LID} · joystick hole Ø{f(STICK_HOLE)}", f"centre {f(STICK_X + T)} from left edge,",
                    f"{f(STICK_Y + T)} from front edge"])
 
     # Lid: sound grille
@@ -442,12 +492,12 @@ def templates():
         px, py = (gx, gy) if i == 6 else (gx + 7 * math.cos(a), gy + 7 * math.sin(a))
         add(f'<circle cx="{f(px)}" cy="{f(py)}" r="1.5" class="c"/>')
     cross(gx, gy, 12)
-    label(62, 72, ["LID · sound grille 7× Ø3", f"centre {f(GRILLE[0] + T)} from left,", f"{f(GRILLE[1] + T)} from front (over the buzzer)"])
+    label(62, 72, [f"{LID} · sound grille 7× Ø3", f"centre {f(GRILLE[0] + T)} from left,", f"{f(GRILLE[1] + T)} from front (over the buzzer)"])
 
     # Sensor wall window
     wx, wy = 118, 30
     add(f'<rect x="{wx}" y="{wy}" width="{f(SENSOR_WIN_W)}" height="{f(SENSOR_WIN_H)}" rx="3" class="c"/>')
-    cross(wx + SENSOR_WIN_W / 2, wy + SENSOR_WIN_H / 2, 26)
+    cross(wx + SENSOR_WIN_W / 2, wy + SENSOR_WIN_H / 2, 14)
     label(108, 82, [f"SENSOR WALL · window {f(SENSOR_WIN_W)} × {f(SENSOR_WIN_H)}", f"centred: {f(TUN_CX)} from either side,",
                     f"{f(TUN_CZ)} up from the wall's bottom edge", "Check against your sensor's cans"])
 
@@ -455,25 +505,25 @@ def templates():
     nx, ny = 160, 30
     add(f'<path d="M{nx},{ny + USB_HOLE_H} L{nx},{ny} L{nx + USB_HOLE_W},{ny} L{nx + USB_HOLE_W},{ny + USB_HOLE_H}" class="c"/>')
     add(f'<line x1="{nx - 4}" y1="{ny + USB_HOLE_H}" x2="{nx + USB_HOLE_W + 4}" y2="{ny + USB_HOLE_H}" class="cx" stroke-dasharray="1 1"/>')
-    label(152, 56, [f"BACK WALL · USB notch {f(USB_HOLE_W)} × {f(USB_HOLE_H)}", "open to the wall's bottom edge (dotted)",
+    label(152, 56, [f"{BACK} · USB notch {f(USB_HOLE_W)} × {f(USB_HOLE_H)}", "open to the wall's bottom edge (dotted)",
                     f"centre ≈ {f(USB_X + T)} from the LEFT (inside)", "confirm with the Uno in place"])
 
     # Trigger
     bx, by = 30, 108
     add(f'<rect x="{f(bx - BUTTON_CUT / 2)}" y="{f(by - BUTTON_CUT / 2)}" width="{f(BUTTON_CUT)}" height="{f(BUTTON_CUT)}" class="c"/>')
     cross(bx, by, 8)
-    add(f'<circle cx="{bx + 32}" cy="{by}" r="{f(BUTTON_CAP / 2)}" class="part"/>')
-    label(10, 124, [f"FRONT WALL · trigger square {f(BUTTON_CUT)}", f"centre {f(BUTTON_X + T)} from left edge,",
+    add(f'<circle cx="{bx + 55}" cy="{by}" r="{f(BUTTON_CAP / 2)}" class="part"/>')
+    label(10, 124, [f"{FRONT} · trigger square {f(BUTTON_CUT)}", f"centre {f(BUTTON_X + T)} from left edge,",
                     f"{f(BUTTON_Z)} up from the wall's bottom edge"])
-    label(52, 124, [f"TRIGGER CAP Ø{f(BUTTON_CAP)}", "2–3 layers, glue to the actuator only"])
+    label(72, 124, [f"TRIGGER CAP Ø{f(BUTTON_CAP)}", "2–3 layers, glue to the actuator only"])
 
     # Lid slot (long) along the right side of the page
     sx, sy = 196, 96
     add(f'<rect x="{f(sx - SLOT_W / 2)}" y="{sy}" width="{f(SLOT_W)}" height="{f(SLOT_Y1 - SLOT_Y0)}" rx="{f(SLOT_W / 2)}" class="c"/>')
     add(f'<line x1="{sx}" y1="{sy - 4}" x2="{sx}" y2="{f(sy + SLOT_Y1 - SLOT_Y0 + 4)}" class="cx"/>')
-    add(f'<text transform="translate({f(sx - 8)},{f(sy + (SLOT_Y1 - SLOT_Y0) / 2)}) rotate(-90)" class="t" text-anchor="middle">'
-        f'LID · throttle slot {f(SLOT_Y1 - SLOT_Y0)} × {f(SLOT_W)}</text>')
-    add(f'<text transform="translate({f(sx - 4.2)},{f(sy + (SLOT_Y1 - SLOT_Y0) / 2)}) rotate(-90)" class="s" text-anchor="middle">'
+    add(f'<text transform="translate({f(sx - 13)},{f(sy + (SLOT_Y1 - SLOT_Y0) / 2)}) rotate(-90)" class="t" text-anchor="middle">'
+        f'{LID} · throttle slot {f(SLOT_Y1 - SLOT_Y0)} × {f(SLOT_W)}</text>')
+    add(f'<text transform="translate({f(sx - 8.5)},{f(sy + (SLOT_Y1 - SLOT_Y0) / 2)}) rotate(-90)" class="s" text-anchor="middle">'
         f'centre line {f(TUN_CX + T)} from left edge; runs {f(SLOT_Y0 + T)} → {f(SLOT_Y1 + T)} from the front edge</text>')
 
     # Sled parts
@@ -488,12 +538,16 @@ def templates():
     part(70, 148, SLED_W, PLATE_H, "REFLECTOR PLATE", "(smooth face)")
     part(130, 148, SLED_LEN, RUNNER_H, "RUNNER", "×2")
     part(130, 167, 30, 20, "COLLAR")
-    add(f'<polygon points="130,192 160,192 130,222" class="part"/><text x="137" y="205" class="s">GUSSET ×2</text>'
-        '<text x="137" y="209" class="s">30 × 30</text>')
-    part(10, 206, STEM_LEN, STEM_W, "STEM", "×3 laminated")
-    part(10, 222, 40, 14, "KNOB", "×3 stacked, slot 10×4")
-    add(f'<rect x="{f(30 - 5)}" y="{f(229 - 2)}" width="10" height="4" fill="#fff" stroke="#000" stroke-width="0.3"/>')
-    label(10, 246, ["Sled assembly: runners on edge along the base sides; plate glued square at the back end",
+    add(f'<polygon points="130,192 160,192 130,222" class="part"/><text x="131.5" y="197" class="s">GUSSET ×2</text>'
+        '<text x="131.5" y="201" class="s">30 × 30</text>')
+    row = 148 + max(SLED_LEN, PLATE_H) + 6   # below the tallest sled part
+    part(10, row, STEM_LEN, STEM_W, "STEM", "×3 laminated")
+    k = row + 16
+    add(f'<rect x="10" y="{f(k)}" width="40" height="14" class="part"/>'
+        f'<rect x="25" y="{f(k + 2)}" width="10" height="4" fill="#fff" stroke="#000" stroke-width="0.3"/>'
+        f'<text x="30" y="{f(k + 11)}" class="t" text-anchor="middle">KNOB ×3 stacked</text>'
+        f'<text x="54" y="{f(k + 6)}" class="s">40 × 14, slot 10 × 4 fits</text><text x="54" y="{f(k + 10)}" class="s">the stem (push-fit)</text>')
+    label(10, k + 22, ["Sled assembly: runners on edge along the base sides; plate glued square at the back end",
                     f"with the gussets; stem centred {f(STEM_FROM_PLATE)} in front of the plate; collar at the stem height",
                     f"that sits just under the lid (about {f(H_IN - RUNNER_H - 2)} above the base). Knob push-fits, no glue."])
     add("</svg>")
@@ -502,7 +556,10 @@ def templates():
 
 if __name__ == "__main__":
     here = Path(__file__).parent
-    (here / "blueprint.svg").write_text(blueprint(), encoding="utf-8")
-    (here / "templates.svg").write_text(templates(), encoding="utf-8")
-    print(f"Outer box {W} x {D} x {H} mm; throttle travel {TRAVEL} mm "
-          f"({D_NEAR}-{D_FAR} mm from the sensor); slot {SLOT_Y1 - SLOT_Y0} mm.")
+    for mode in (sys.argv[1:] or list(PRESETS)):
+        configure(mode)
+        (here / f"blueprint-{mode}.svg").write_text(blueprint(), encoding="utf-8")
+        (here / f"templates-{mode}.svg").write_text(templates(), encoding="utf-8")
+        print(f"{mode}: outer {f(W)} x {f(D)} x {f(H)} mm, interior {f(W_IN)} x {f(D_IN)} x {f(H_IN)}; "
+              f"travel {f(TRAVEL)} mm ({f(D_NEAR)}-{f(D_FAR)} from the sensor), sensor wall y={f(SENSOR_WALL_Y)}, "
+              f"stick at ({f(STICK_X + T)}, {f(STICK_Y + T)}) from outer left/front")

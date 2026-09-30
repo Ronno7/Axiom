@@ -1,4 +1,6 @@
+using System;
 using System.Globalization;
+using System.Text;
 
 namespace GeometricFlight.Input
 {
@@ -26,6 +28,8 @@ namespace GeometricFlight.Input
     /// NMEA-style checksum: XOR of every character before '*', written as two hex digits.
     ///   controller → PC, ~50 Hz:  AX,&lt;x 0-1023&gt;,&lt;y 0-1023&gt;,&lt;mm or -1&gt;,&lt;fire 0/1&gt;,&lt;stick 0/1&gt;*HH
     ///   PC → controller:          BZ,&lt;hz&gt;,&lt;ms&gt;*HH   (buzzer tone)
+    ///   PC → controller:          LT,&lt;row 0/1&gt;,&lt;text&gt;*HH   (one LCD row, see FormatLcdRow)
+    ///   PC → controller:          LF,&lt;lights 0-255&gt;,&lt;fan 0-255&gt;*HH   (see ControllerOutputs)
     /// Anything that fails the checksum, field count, or range checks is rejected.
     /// </summary>
     public static class ControllerProtocol
@@ -59,6 +63,28 @@ namespace GeometricFlight.Input
 
         public static string FormatTone(int hz, int milliseconds) =>
             Frame(string.Format(CultureInfo.InvariantCulture, "BZ,{0},{1}", hz, milliseconds));
+
+        /// <summary>Lights (bit mask, see ControllerOutputs) and fan level, both 0-255.</summary>
+        public static string FormatOutputs(int lights, int fan) =>
+            Frame(string.Format(CultureInfo.InvariantCulture, "LF,{0},{1}", lights & 0xFF, Math.Max(0, Math.Min(255, fan))));
+
+        /// <summary>One LCD row. Glyphs (LcdGlyph) are sent as backslash escapes; other characters
+        /// outside printable ASCII become '?'. Trailing spaces are dropped: the firmware pads the row.</summary>
+        public static string FormatLcdRow(int row, string cells)
+        {
+            var body = new StringBuilder("LT,").Append(row == 0 ? '0' : '1').Append(',');
+            string text = LcdGlyph.Fit(cells).TrimEnd(' ');
+            foreach (char c in text)
+            {
+                if (c <= LcdGlyph.Target) body.Append('\\').Append((char)('0' + c));
+                else if (c == LcdGlyph.Right) body.Append("\\>");
+                else if (c == LcdGlyph.Left) body.Append("\\<");
+                else if (c == LcdGlyph.Full) body.Append("\\#");
+                else if (c == '\\') body.Append("\\\\");
+                else body.Append(c >= ' ' && c <= '~' ? c : '?');
+            }
+            return Frame(body.ToString());
+        }
 
         /// <summary>Appends '*' and the checksum to a message body.</summary>
         public static string Frame(string body) =>

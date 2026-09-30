@@ -9,6 +9,7 @@
             <ui:Label name="hud-targets" text="TARGETS 0/0" class="hud-readout hud-targets" />
             <ui:Label name="zone-banner" class="hud-readout zone-banner" />
             <ui:Label name="hud-controller" text="KEYBOARD" class="hud-readout hud-controller" />
+            <ui:Label name="hud-proximity" text="PROXIMITY" class="hud-readout hud-proximity" />
             <ui:VisualElement name="throttle" class="throttle" picking-mode="Ignore">
                 <ui:Label name="throttle-caption" text="THROTTLE" class="hud-caption" />
                 <ui:VisualElement class="throttle-track" picking-mode="Ignore">

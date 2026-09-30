@@ -6,8 +6,8 @@ using UnityEngine.UIElements;
 
 namespace GeometricFlight.UI
 {
-    /// <summary>In-level UI: HUD readouts, pause menu (with Options and Help), and results.
-    /// Observes LevelFlow and PlayerFlight; owns no gameplay rules.</summary>
+    /// <summary>In-level UI: HUD readouts, pause menu (with Options and Help), results, and the
+    /// controller LCD. Observes LevelFlow and PlayerFlight; owns no gameplay rules.</summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
     public sealed class LevelUi : MonoBehaviour
@@ -21,14 +21,19 @@ namespace GeometricFlight.UI
         private VisualElement screen, hud, pausePanel, resultsPanel, helpPanel;
         private VisualElement throttle, throttleFill, throttleSetpoint, throttleCruise, throttleBand, parRow;
         private Label timeLabel, targetsLabel, speedLabel, throttleCaption, throttleHint, zoneBanner, resultsTitle;
-        private Label controllerStatus, pauseNotice;
+        private Label controllerStatus, pauseNotice, proximityLabel;
         private string shownController;
         private Button resumeButton, nextButton, retryButton, helpBack;
         private OptionsPanel options;
         private CalibrationPanel calibration;
+        private CockpitDisplay cockpit;
+        private readonly ProximityAlarm proximity = new ProximityAlarm();
+        private ShipHull hull;
         private int shownTenths = -1, shownTargets = -1, shownSpeed = -1;
         private ThrottleZone[] zones;
         private ThrottleZone shownZone;
+        private Vector2 shownBand;
+        private int guidance;
         private string shownHint;
         private IVisualElementScheduledItem hideBanner;
 
@@ -51,6 +56,7 @@ namespace GeometricFlight.UI
             throttleBand = root.Q("throttle-band");
             zoneBanner = root.Q<Label>("zone-banner");
             controllerStatus = root.Q<Label>("hud-controller");
+            proximityLabel = root.Q<Label>("hud-proximity");
             pauseNotice = root.Q<Label>("pause-notice");
             parRow = root.Q("par-row");
             throttleFill = root.Q("throttle-fill");
@@ -74,6 +80,8 @@ namespace GeometricFlight.UI
 
             throttleCruise.style.left = Length.Percent(SpeedFraction(flight.CruiseSpeed) * 100f);
             zones = FindObjectsByType<ThrottleZone>(FindObjectsSortMode.None);
+            cockpit = new CockpitDisplay(flow, flight, zones);
+            hull = flight.GetComponent<ShipHull>();
             ShowZone(null);
             flow.StateChanged += OnStateChanged;
             ShowOverlay(null, null);
@@ -108,7 +116,9 @@ namespace GeometricFlight.UI
             }
             UpdateThrottleGuidance();
             UpdateControllerStatus();
-            calibration.Tick();
+            UpdateProximity();
+            cockpit.Show(shownZone, shownBand, guidance, proximity, UiScreens.FocusedLabel(screen));
+            calibration.Tick(); // Replaces the cockpit on the LCD while open.
         }
 
         private void ShowOptions() => ShowOverlay(options.Root, options.FirstFocus);
@@ -141,6 +151,15 @@ namespace GeometricFlight.UI
                     : "Controller disconnected. Reconnect it, or resume with the keyboard.";
         }
 
+        /// <summary>Parking-sensor beeps (ProximityAlarm) with a matching on-screen tag that pulses in time.</summary>
+        private void UpdateProximity()
+        {
+            bool flying = flow.State == RunState.Playing && flight.isActiveAndEnabled && !flight.InputLocked;
+            proximity.Update(flight, hull, flying && hull != null, Time.unscaledTime);
+            proximityLabel.style.display = proximity.Active ? DisplayStyle.Flex : DisplayStyle.None;
+            proximityLabel.EnableInClassList("hud-proximity--pulse", proximity.Pulse);
+        }
+
         /// <summary>Inside a ThrottleZone the gauge shows the recommended band and a hint.</summary>
         private void UpdateThrottleGuidance()
         {
@@ -149,12 +168,14 @@ namespace GeometricFlight.UI
             foreach (ThrottleZone candidate in zones)
                 if (candidate.Contains(z)) { zone = candidate; break; }
             if (zone != shownZone) ShowZone(zone);
+            guidance = 0;
             if (zone == null) return;
 
             Vector2 band = zone.RecommendedCruiseMultiple * flight.CruiseSpeed;
+            guidance = flight.TargetSpeed < band.x - 0.01f ? 1 : flight.TargetSpeed > band.y + 0.01f ? -1 : 0;
             bool keys = !ControllerService.Instance.State.Connected;
-            string hint = flight.TargetSpeed < band.x - 0.01f ? (keys ? "RAISE  [E]" : "RAISE")
-                : flight.TargetSpeed > band.y + 0.01f ? (keys ? "LOWER  [Q]" : "LOWER") : "HOLD";
+            string hint = guidance > 0 ? (keys ? "RAISE  [E]" : "RAISE")
+                : guidance < 0 ? (keys ? "LOWER  [Q]" : "LOWER") : "HOLD";
             if (hint == shownHint) return;
             shownHint = hint;
             throttleHint.text = hint;
@@ -186,6 +207,7 @@ namespace GeometricFlight.UI
             AnnounceZone(zone);
             float from = SpeedFraction(zone.RecommendedCruiseMultiple.x * flight.CruiseSpeed);
             float to = SpeedFraction(zone.RecommendedCruiseMultiple.y * flight.CruiseSpeed);
+            shownBand = new Vector2(from, to);
             throttleBand.style.left = Length.Percent(from * 100f);
             throttleBand.style.width = Length.Percent((to - from) * 100f);
         }

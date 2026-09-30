@@ -22,6 +22,9 @@ namespace GeometricFlight.UI
                 + "Use the invert switches if an axis runs backwards, then save.",
         };
 
+        private static readonly string[] LcdSteps =
+            { "1/3 CENTER STICK", "2/3 THROTTLE MIN", "3/3 THROTTLE MAX", "CHECK, THEN SAVE" };
+
         public VisualElement Root { get; }
         public VisualElement FirstFocus => primary;
         public bool IsOpen { get; private set; }
@@ -111,8 +114,24 @@ namespace GeometricFlight.UI
                 stickDot.style.left = Length.Percent((s.Stick.x + 1f) * 50f);
                 stickDot.style.top = Length.Percent((1f - s.Stick.y) * 50f);
                 throttleFill.style.width = Length.Percent((s.Throttle + 1f) * 50f);
+                ShowOnLcd(p, s, mm);
             }
             else readings.text = "Waiting for data…";
+        }
+
+        /// <summary>The step on top, the live reading it needs below, so the player can calibrate
+        /// looking at the controller. An error blinks the top row.</summary>
+        private void ShowOnLcd(ControllerPacket p, ControllerState s, float mm)
+        {
+            bool blink = Time.unscaledTime % 0.8f < 0.4f;
+            string top = wizard.Error != null && blink ? "! SEE THE SCREEN" : LcdSteps[(int)wizard.Current];
+            string bottom = wizard.Current switch
+            {
+                CalibrationWizard.Step.Center => $"X {p.StickX,4}   Y {p.StickY,4}",
+                CalibrationWizard.Step.Check => LcdGlyph.Bar((s.Throttle + 1f) * 0.5f, LcdGlyph.Columns),
+                _ => s.ThrottleValid && !float.IsNaN(mm) ? $"DISTANCE {Mathf.RoundToInt(mm),4} mm" : "DISTANCE NO ECHO",
+            };
+            Service.Display.Show(LcdGlyph.Center(top), bottom);
         }
 
         private void Advance()

@@ -1,34 +1,34 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="help-panel" class="panel panel--wide">
-        <ui:Label text="HELP" class="panel-title" />
+        <ui:Label text="HELP" class="panel-title"/>
         <ui:VisualElement class="help-columns">
             <ui:VisualElement class="help-column help-column--controls">
-                <ui:Label text="CONTROLS" class="section-title" />
+                <ui:Label text="CONTROLS" class="section-title"/>
                 <ui:VisualElement class="key-row">
-                    <ui:Label text="WASD / ARROWS" class="key" />
-                    <ui:Label text="Steer" class="key-action" />
+                    <ui:Label text="WASD / ARROWS" class="key"/>
+                    <ui:Label text="Steer" class="key-action"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="key-row">
-                    <ui:Label text="Q / E" class="key" />
-                    <ui:Label text="Lower / raise throttle. It stays where you leave it." class="key-action" />
+                    <ui:Label text="Q / E" class="key"/>
+                    <ui:Label text="Lower / raise throttle. It stays where you leave it." class="key-action"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="key-row">
-                    <ui:Label text="SPACE (HOLD)" class="key" />
-                    <ui:Label text="Fire" class="key-action" />
+                    <ui:Label text="SPACE (HOLD)" class="key"/>
+                    <ui:Label text="Fire" class="key-action"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="key-row">
-                    <ui:Label text="ESC" class="key" />
-                    <ui:Label text="Pause" class="key-action" />
+                    <ui:Label text="ESC" class="key"/>
+                    <ui:Label text="Pause" class="key-action"/>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="help-column">
-                <ui:Label text="MISSION" class="section-title" />
-                <ui:Label text="Fly to the end of the level. Destroy targets along the way for a better result." class="body-text" />
-                <ui:Label text="Your shield is the three blue segments on the back of your ship. Walls, targets, and enemy shots each remove one. After a hit the ship blinks: you are briefly protected." class="body-text" />
-                <ui:Label text="Blue floor markings call for a throttle change: bars mean slow down for a tight section, arrows mean speed up before a closing gate. The throttle gauge shows the target band." class="body-text" />
-                <ui:Label text="Lose every segment and the run ends. Beat the par time by flying fast where it is safe." class="body-text" />
+                <ui:Label text="MISSION" class="section-title"/>
+                <ui:Label text="Fly to the end of the level. Destroy targets along the way for a better result." class="body-text"/>
+                <ui:Label text="Your shield is the three blue blocks on the back of your ship." class="body-text"/>
+                <ui:Label text="Blue floor markings call for a throttle change. The throttle gauge shows the target speed." class="body-text"/>
+                <ui:Label text="Lose every segment and the run ends. Beat the par time by flying fast where it is safe." class="body-text"/>
             </ui:VisualElement>
         </ui:VisualElement>
-        <GeometricFlight.UI.SlantButton name="help-back" text="BACK" class="menu-button" />
+        <GeometricFlight.UI.SlantButton name="help-back" text="BACK" class="menu-button"/>
     </ui:VisualElement>
 </ui:UXML>

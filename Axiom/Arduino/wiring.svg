@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 920" width="1280" height="920" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 950" width="1280" height="950" font-family="Segoe UI, Helvetica, Arial, sans-serif">
   <title>Axiom controller wiring (Arduino Uno)</title>
   <style>
     .halo { fill: none; stroke: #ffffff; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
@@ -9,7 +9,7 @@
     .small { font-size: 12px; fill: #444; }
     .legend { font-size: 13px; fill: #222; }
   </style>
-  <rect width="1280" height="920" fill="#ffffff"/>
+  <rect width="1280" height="950" fill="#ffffff"/>
 
   <!-- Title -->
   <text x="30" y="44" font-size="24" font-weight="700" fill="#111">Axiom controller: Arduino Uno wiring</text>
@@ -68,8 +68,8 @@
     <rect class="pin" x="730" y="600" width="8" height="8"/><text class="pinlabel" transform="translate(734,588) rotate(-90)" font-weight="700">A1</text>
     <rect class="pin" x="752" y="600" width="8" height="8"/><text class="pinlabel" transform="translate(756,588) rotate(-90)">A2</text>
     <rect class="pin" x="774" y="600" width="8" height="8"/><text class="pinlabel" transform="translate(778,588) rotate(-90)">A3</text>
-    <rect class="pin" x="796" y="600" width="8" height="8"/><text class="pinlabel" transform="translate(800,588) rotate(-90)">A4</text>
-    <rect class="pin" x="818" y="600" width="8" height="8"/><text class="pinlabel" transform="translate(822,588) rotate(-90)">A5</text>
+    <rect class="pin" x="796" y="600" width="8" height="8"/><text class="pinlabel" transform="translate(800,588) rotate(-90)" font-weight="700">A4</text>
+    <rect class="pin" x="818" y="600" width="8" height="8"/><text class="pinlabel" transform="translate(822,588) rotate(-90)" font-weight="700">A5</text>
   </g>
 
   <!-- HC-SR04 ultrasonic sensor (throttle) -->
@@ -104,7 +104,19 @@
   <text class="pinlabel" font-size="10" text-anchor="end" transform="translate(712,700) rotate(-90)">VRx</text>
   <text class="pinlabel" font-size="10" text-anchor="end" transform="translate(734,700) rotate(-90)">VRy</text>
   <text class="pinlabel" font-size="10" text-anchor="end" transform="translate(756,700) rotate(-90)">SW</text>
-  <text x="784" y="720" class="part">Joystick</text>
+  <text x="604" y="720" class="part" text-anchor="end">Joystick</text>
+
+  <!-- 16x2 LCD with I2C backpack (the backpack's 4-pin header, drawn along the top edge) -->
+  <rect x="800" y="680" width="140" height="84" rx="6" fill="#1c4f9c" stroke="#123f70"/>
+  <text x="808" y="700" font-size="12" font-weight="700" fill="#ffffff">LCD</text>
+  <text class="pinlabel" font-size="10" transform="translate(856,684) rotate(90)">GND</text>
+  <text class="pinlabel" font-size="10" transform="translate(876,684) rotate(90)">VCC</text>
+  <text class="pinlabel" font-size="10" transform="translate(896,684) rotate(90)">SDA</text>
+  <text class="pinlabel" font-size="10" transform="translate(916,684) rotate(90)">SCL</text>
+  <rect x="806" y="712" width="128" height="46" rx="3" fill="#111"/>
+  <rect x="811" y="717" width="118" height="36" fill="#9bc53d"/>
+  <text x="815" y="732" font-family="Consolas, monospace" font-size="11" fill="#1d3b0a">◆ AXIOM STANDBY</text>
+  <text x="815" y="748" font-family="Consolas, monospace" font-size="11" fill="#1d3b0a"> 123mm X50 Y50</text>
 
   <!-- Wires: power first, then signals; each has a white halo so crossings read as gaps. -->
   <g>
@@ -117,6 +129,9 @@
     <!-- Buzzer and button grounds -->
     <polyline class="halo" points="716,184 716,232 1215,232 1215,826"/><polyline class="wire" stroke="#1f1f1f" points="716,184 716,232 1215,232 1215,826"/>
     <polyline class="halo" points="975,190 975,222 1235,222 1235,826"/><polyline class="wire" stroke="#1f1f1f" points="975,190 975,222 1235,222 1235,826"/>
+    <!-- LCD power -->
+    <polyline class="halo" points="876,680 876,662 782,662 782,790"/><polyline class="wire" stroke="#d62828" points="876,680 876,662 782,662 782,790"/>
+    <polyline class="halo" points="856,680 856,670 792,670 792,826"/><polyline class="wire" stroke="#1f1f1f" points="856,680 856,670 792,670 792,826"/>
     <!-- Joystick power -->
     <polyline class="halo" points="668,660 668,646 645,646 645,826"/><polyline class="wire" stroke="#1f1f1f" points="668,660 668,646 645,646 645,826"/>
     <polyline class="halo" points="690,660 690,640 617,640 617,790"/><polyline class="wire" stroke="#d62828" points="690,660 690,640 617,640 617,790"/>
@@ -129,6 +144,8 @@
     <polyline class="halo" points="756,660 756,636 920,636 920,320 832,320 832,356"/><polyline class="wire" stroke="#a0522d" points="756,660 756,636 920,636 920,320 832,320 832,356"/>
     <polyline class="halo" points="712,660 712,604"/><polyline class="wire" stroke="#2b8a3e" points="712,660 712,604"/>
     <polyline class="halo" points="734,660 734,604"/><polyline class="wire" stroke="#1971c2" points="734,660 734,604"/>
+    <polyline class="halo" points="896,680 896,654 800,654 800,604"/><polyline class="wire" stroke="#f59f00" points="896,680 896,654 800,654 800,604"/>
+    <polyline class="halo" points="916,680 916,646 822,646 822,604"/><polyline class="wire" stroke="#15aabf" points="916,680 916,646 822,646 822,604"/>
   </g>
 
   <!-- Connection dots -->
@@ -142,6 +159,8 @@
     <circle cx="688" cy="356" r="4.5" fill="#7048e8"/><circle cx="810" cy="356" r="4.5" fill="#e64980"/>
     <circle cx="832" cy="356" r="4.5" fill="#a0522d"/>
     <circle cx="712" cy="604" r="4.5" fill="#2b8a3e"/><circle cx="734" cy="604" r="4.5" fill="#1971c2"/>
+    <circle cx="800" cy="604" r="4.5" fill="#f59f00"/><circle cx="822" cy="604" r="4.5" fill="#15aabf"/>
+    <circle cx="792" cy="826" r="5" fill="#1f1f1f"/><circle cx="782" cy="790" r="5" fill="#d62828"/>
   </g>
 
   <!-- Wire labels near the parts -->
@@ -169,11 +188,16 @@
     <line x1="950" x2="974" y1="636" y2="636" stroke="#a0522d" stroke-width="4"/><text x="984" y="640">Joystick SW → D2 (pause)</text>
     <line x1="950" x2="974" y1="660" y2="660" stroke="#d62828" stroke-width="4"/><text x="984" y="664">Joystick +5V → +5V rail</text>
     <line x1="950" x2="974" y1="684" y2="684" stroke="#1f1f1f" stroke-width="4"/><text x="984" y="688">Joystick GND → GND rail</text>
+    <line x1="950" x2="974" y1="708" y2="708" stroke="#d62828" stroke-width="4"/><text x="984" y="712">LCD VCC → +5V rail, GND → GND rail</text>
+    <line x1="950" x2="974" y1="732" y2="732" stroke="#f59f00" stroke-width="4"/><text x="984" y="736">LCD SDA → A4</text>
+    <line x1="950" x2="974" y1="756" y2="756" stroke="#15aabf" stroke-width="4"/><text x="984" y="760">LCD SCL → A5</text>
   </g>
 
   <!-- Notes -->
   <g class="small">
     <text x="30" y="874">• Button and joystick switch go to GND and use the Uno's internal pull-ups, so no resistors are needed. A tactile button's legs on the same side are already joined; use two diagonal legs.</text>
     <text x="30" y="894">• HC-SR04 needs 5V. Passive buzzer: the + (longer) leg goes to D8. The pins can be changed at the top of the sketch; the game does not need to know them.</text>
+    <text x="30" y="914">• LCD blank, or a row of solid blocks? Turn the contrast screw on the backpack. Any I²C address works. Boards with SDA/SCL pins by AREF: those are A4/A5 too.</text>
+    <text x="30" y="934">• Runway lights (D11, D12, D13) and fan (D5): see wiring-outputs.svg.</text>
   </g>
 </svg>

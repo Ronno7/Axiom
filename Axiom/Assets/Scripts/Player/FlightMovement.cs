@@ -14,6 +14,16 @@ namespace GeometricFlight.Player
             return Mathf.Max(0.01f, cruiseSpeed) * multiplier;
         }
 
+        /// <summary>Inverse of TargetSpeed: the throttle (-1 to 1) that asks for this speed.</summary>
+        public static float ThrottleForSpeed(float speed, float cruiseSpeed, Vector2 multipliers)
+        {
+            float minimum = Mathf.Clamp(multipliers.x, 0.01f, 1f);
+            float maximum = Mathf.Max(1f, multipliers.y);
+            float multiplier = speed / Mathf.Max(0.01f, cruiseSpeed);
+            if (multiplier < 1f) return minimum < 1f ? -Mathf.Clamp01((1f - multiplier) / (1f - minimum)) : 0f;
+            return maximum > 1f ? Mathf.Clamp01((multiplier - 1f) / (maximum - 1f)) : 0f;
+        }
+
         /// <summary>Integrates a constant-acceleration ramp, including any time at target speed.
         /// Returns the frame's average speed so long frames do not overestimate travel.</summary>
         public static float Accelerate(ref float speed, float target, float acceleration, float deltaTime)

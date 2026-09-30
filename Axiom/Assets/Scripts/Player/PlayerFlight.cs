@@ -53,6 +53,19 @@ namespace GeometricFlight.Player
                 averageSpeed, steeringSpeed * GameSettings.SteeringSensitivity, GetBounds(startPosition));
         }
 
+        public float ThrottleForSpeed(float speed) =>
+            FlightMovement.ThrottleForSpeed(speed, forwardSpeed, throttleMultipliers);
+
+        /// <summary>Where the ship will be after <paramref name="seconds"/> if the current speed and
+        /// steering hold, clamped to the flight bounds like real movement.</summary>
+        public Vector3 PredictPosition(float seconds)
+        {
+            Vector2 steering = CurrentInput.Steering;
+            if (GameSettings.InvertVertical) steering.y = -steering.y;
+            return FlightMovement.Step(transform.position, steering, seconds, currentSpeed,
+                steeringSpeed * GameSettings.SteeringSensitivity, GetBounds(startPosition));
+        }
+
         private float SpeedAt(float throttle) => FlightMovement.TargetSpeed(throttle, forwardSpeed, throttleMultipliers);
 
         private Rect GetBounds(Vector3 origin)

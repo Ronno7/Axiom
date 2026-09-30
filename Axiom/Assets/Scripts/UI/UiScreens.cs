@@ -23,6 +23,18 @@ namespace GeometricFlight.UI
             field.RegisterCallback<FocusOutEvent>(_ => field.RemoveFromClassList(className));
         }
 
+        /// <summary>The focused control's caption in capitals (button text or field label), or null.
+        /// Sliders and toggles focus an inner element, so this walks up to the field.</summary>
+        public static string FocusedLabel(VisualElement root)
+        {
+            for (var e = root.panel?.focusController?.focusedElement as VisualElement; e != null; e = e.parent)
+            {
+                string label = e is Button b ? b.text : e is Toggle t ? t.label : e is Slider s ? s.label : null;
+                if (label != null) return label.ToUpperInvariant();
+            }
+            return null;
+        }
+
         /// <summary>Quits a desktop build. In the editor this exits Play Mode instead.</summary>
         public static void QuitGame()
         {

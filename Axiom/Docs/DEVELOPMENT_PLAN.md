@@ -315,3 +315,14 @@ the hardware is untested. Next: calibration screen and preflight.
 Calibration screen added (Options → Calibrate controller): stick centre, throttle min/max, live
 check with invert switches; tested with the simulator. User wired the hardware; controller reads
 correctly on COM3 after fixing a shorted button. Next: preflight check, then enclosure build.
+
+### 2026-09-29 — M4: cockpit LCD
+
+16×2 I²C LCD as a cockpit display: library-free driver in the sketch (auto address, diffed redraw,
+8 glyphs, standby self-test), `LT` rows in the protocol, game-drawn screens for menus, calibration,
+flight, zones, pause and results (`CockpitDisplay`). EditMode 90/90; screens checked with the simulator
+in Play Mode; sketch compiles (arduino-cli). Not yet run on the real LCD. Next: hardware check, preflight.
+Added runway lights (74HC595, 5 LEDs by the throttle slot pointing the lever at a zone's band),
+RGB underglow, a speed-following fan (L293D, Options toggle, firmware stops it after 1 s of silence)
+and parking-sensor proximity beeps with a pulsing HUD tag. Rejected: "ghost hand" best-run LED.
+EditMode 102/102; LF packets and beeps checked with the simulator. Hardware not built yet.

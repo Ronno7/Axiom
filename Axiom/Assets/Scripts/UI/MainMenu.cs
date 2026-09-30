@@ -1,3 +1,4 @@
+using GeometricFlight.Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -11,6 +12,10 @@ namespace GeometricFlight.UI
     {
         [SerializeField] private string firstLevelScene = "Prototype";
 
+        private static readonly string LcdTitle =
+            LcdGlyph.Center($"{LcdGlyph.Target} A X I O M {LcdGlyph.Target}");
+
+        private VisualElement root;
         private VisualElement titlePanel;
         private VisualElement helpPanel;
         private OptionsPanel options;
@@ -21,7 +26,7 @@ namespace GeometricFlight.UI
         private void OnEnable()
         {
             Time.timeScale = 1f;
-            VisualElement root = GetComponent<UIDocument>().rootVisualElement;
+            root = GetComponent<UIDocument>().rootVisualElement;
             titlePanel = root.Q("title-panel");
             helpPanel = root.Q("help-panel");
             options = new OptionsPanel(root.Q("options-panel"), ShowTitle, ShowCalibration);
@@ -40,7 +45,13 @@ namespace GeometricFlight.UI
 
         private VisualElement[] Panels => new[] { titlePanel, options.Root, helpPanel, calibration.Root };
 
-        private void Update() => calibration.Tick();
+        // The LCD mirrors the selected item; calibration replaces it while open.
+        private void Update()
+        {
+            string focused = UiScreens.FocusedLabel(root);
+            ControllerService.Instance.Display.Show(LcdTitle, focused == null ? "" : $"{LcdGlyph.Right} {focused}");
+            calibration.Tick();
+        }
 
         private void ShowOptions() => UiScreens.ShowOnly(options.Root, options.FirstFocus, Panels);
 
