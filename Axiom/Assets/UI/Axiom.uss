@@ -1,0 +1,386 @@
+/* Axiom UI theme. Monochrome; the focused item is always inverted (white fill, black text). */
+
+.screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    color: rgb(235, 235, 235);
+}
+
+.screen .unity-label,
+.screen .unity-base-field__label {
+    color: rgb(235, 235, 235);
+}
+
+.screen--dimmed {
+    background-color: rgba(0, 0, 0, 0.72);
+}
+
+.screen--menu {
+    align-items: flex-start;
+    padding-left: 160px;
+}
+
+/* ---------- Panels ---------- */
+
+.panel {
+    width: 780px;
+    padding: 44px 52px;
+    background-color: rgba(6, 6, 6, 0.97);
+    border-width: 2px;
+    border-color: rgb(235, 235, 235);
+}
+
+.panel--wide {
+    width: 1180px;
+}
+
+.panel--bare {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    padding: 0;
+    width: auto;
+    align-items: flex-start;
+}
+
+.game-title {
+    font-size: 150px;
+    letter-spacing: 48px;
+    -unity-font-style: bold;
+    margin-bottom: 56px;
+    padding: 0;
+}
+
+.screen .panel-title {
+    font-size: 46px;
+    letter-spacing: 14px;
+    -unity-font-style: bold;
+    margin-bottom: 32px;
+    padding: 0;
+}
+
+.screen .section-title {
+    font-size: 24px;
+    letter-spacing: 8px;
+    color: rgb(150, 150, 150);
+    margin: 8px 0 16px 0;
+    padding: 0;
+}
+
+.screen .hint {
+    font-size: 20px;
+    color: rgb(150, 150, 150);
+    margin: 16px 0 8px 0;
+    white-space: normal;
+}
+
+.screen .body-text {
+    font-size: 24px;
+    white-space: normal;
+    margin-bottom: 14px;
+    padding: 0;
+}
+
+/* ---------- Buttons ----------
+   SlantButton draws its own leaning, chevron-pointed shape from the --slant-* properties. */
+
+.screen .menu-button {
+    height: 66px;
+    min-width: 440px;
+    margin: 8px 0;
+    padding: 0 48px 0 40px;
+    font-size: 28px;
+    letter-spacing: 8px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    color: rgb(235, 235, 235);
+    background-color: rgba(0, 0, 0, 0);
+    background-image: none;
+    border-width: 0;
+    --slant-fill: rgba(0, 0, 0, 0.55);
+    --slant-stroke: rgb(90, 90, 90);
+    --slant-stroke-width: 2;
+    --slant-lean: 18;
+    --slant-point: 22;
+    transition-property: translate, color;
+    transition-duration: 0.08s;
+}
+
+.screen .menu-button:hover {
+    background-color: rgba(0, 0, 0, 0);
+    --slant-stroke: rgb(235, 235, 235);
+}
+
+.screen .menu-button:focus {
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(0, 0, 0);
+    --slant-fill: rgb(235, 235, 235);
+    --slant-stroke: rgb(235, 235, 235);
+    translate: 14px 0;
+}
+
+.screen .menu-button:active {
+    background-color: rgba(0, 0, 0, 0);
+    --slant-fill: rgb(170, 170, 170);
+    --slant-stroke: rgb(170, 170, 170);
+}
+
+/* ---------- Options (slider, toggle) ---------- */
+
+.screen .option {
+    margin: 10px 0;
+    padding: 12px 16px;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.screen .option--focused {
+    border-color: rgb(235, 235, 235);
+}
+
+.screen .option .unity-base-field__label {
+    font-size: 26px;
+    min-width: 360px;
+}
+
+.screen .unity-base-slider__tracker {
+    background-color: rgb(40, 40, 40);
+    border-color: rgb(150, 150, 150);
+    border-radius: 0;
+}
+
+.screen .unity-base-slider__dragger {
+    background-color: rgb(235, 235, 235);
+    border-color: rgb(235, 235, 235);
+    border-radius: 0;
+    width: 18px;
+    height: 28px;
+    margin-top: -10px;
+}
+
+.screen .unity-toggle__checkmark {
+    width: 30px;
+    height: 30px;
+    border-width: 2px;
+    border-radius: 0;
+    border-color: rgb(235, 235, 235);
+    background-color: rgba(0, 0, 0, 0);
+    -unity-background-image-tint-color: rgb(0, 0, 0);
+}
+
+.screen .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-color: rgb(235, 235, 235);
+}
+
+/* ---------- Help ---------- */
+
+.help-columns {
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.help-column {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 48px;
+}
+
+.help-column--controls {
+    flex-grow: 1.3;
+}
+
+.key-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.screen .key {
+    min-width: 230px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    padding: 6px 10px;
+    margin-right: 18px;
+    border-width: 2px;
+    border-color: rgb(235, 235, 235);
+    -unity-text-align: middle-center;
+}
+
+.screen .key-action {
+    font-size: 24px;
+    flex-shrink: 1;
+    white-space: normal;
+    padding: 0;
+}
+
+/* ---------- Results ---------- */
+
+.stat-row {
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom-width: 1px;
+    border-color: rgb(70, 70, 70);
+    padding: 10px 0;
+}
+
+.screen .stat-name {
+    font-size: 26px;
+    letter-spacing: 4px;
+    color: rgb(150, 150, 150);
+    padding: 0;
+}
+
+.screen .stat-value {
+    font-size: 30px;
+    -unity-font-style: bold;
+    padding: 0;
+}
+
+.results-buttons {
+    margin-top: 28px;
+}
+
+/* ---------- HUD ---------- */
+
+.hud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* HUD text sits over bright scenery; a dark halo keeps it readable. */
+.hud .unity-label {
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.95);
+}
+
+.screen .hud-readout {
+    font-size: 36px;
+    letter-spacing: 4px;
+    -unity-font-style: bold;
+    padding: 0;
+}
+
+.hud-time {
+    position: absolute;
+    left: 56px;
+    top: 40px;
+}
+
+.hud-targets {
+    position: absolute;
+    right: 56px;
+    top: 40px;
+}
+
+.throttle {
+    position: absolute;
+    left: 56px;
+    bottom: 48px;
+    width: 460px;
+}
+
+.screen .hud-caption {
+    font-size: 20px;
+    letter-spacing: 6px;
+    color: rgb(200, 200, 200);
+    padding: 0;
+}
+
+.throttle-track {
+    height: 18px;
+    margin: 10px 0;
+    border-width: 2px;
+    border-color: rgb(235, 235, 235);
+}
+
+.throttle-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background-color: rgb(150, 150, 150);
+}
+
+.throttle-cruise {
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    width: 2px;
+    margin-left: -1px;
+    background-color: rgb(90, 90, 90);
+}
+
+.throttle-setpoint {
+    position: absolute;
+    top: -10px;
+    bottom: -10px;
+    width: 6px;
+    margin-left: -3px;
+    background-color: rgb(235, 235, 235);
+}
+
+.screen .throttle-speed {
+    font-size: 26px;
+}
+
+/* Throttle guidance (inside a ThrottleZone). Blue marks player guidance, like the
+   shield segments, reticles, and floor cues. */
+.throttle-band {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    background-color: rgba(44, 160, 255, 0.45);
+    border-width: 0 2px;
+    border-color: rgb(44, 160, 255);
+}
+
+.throttle-readouts {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.screen .throttle-hint {
+    font-size: 26px;
+    margin-left: 24px;
+    color: rgb(44, 160, 255);
+}
+
+.screen .throttle--guided .hud-caption {
+    color: rgb(44, 160, 255);
+}
+
+.screen .throttle--in-band .throttle-hint {
+    color: rgb(235, 235, 235);
+}
+
+.zone-banner {
+    position: absolute;
+    top: 120px;
+    left: 0;
+    right: 0;
+    -unity-text-align: middle-center;
+    opacity: 0;
+    translate: 0 -12px;
+    transition-property: opacity, translate;
+    transition-duration: 0.25s;
+}
+
+.screen .zone-banner {
+    font-size: 40px;
+    letter-spacing: 10px;
+    color: rgb(44, 160, 255);
+}
+
+.zone-banner--visible {
+    opacity: 1;
+    translate: 0 0;
+}
+

@@ -6,7 +6,7 @@ namespace GeometricFlight.Combat
     /// <summary>Takes projectile hits, flashes on each hit, and breaks exactly once. On breaking it
     /// stops colliding, hides its visuals, plays an optional ShatterEffect, then deactivates.</summary>
     [DisallowMultipleComponent]
-    public sealed class ShootableTarget : MonoBehaviour
+    public sealed class ShootableTarget : MonoBehaviour, IDamageable
     {
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 

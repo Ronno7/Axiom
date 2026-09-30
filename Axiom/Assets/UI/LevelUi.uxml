@@ -1,0 +1,66 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Axiom.uss" />
+    <ui:Template name="Options" src="OptionsPanel.uxml" />
+    <ui:Template name="Help" src="HelpPanel.uxml" />
+    <ui:VisualElement name="screen" class="screen" picking-mode="Ignore">
+        <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+            <ui:Label name="hud-time" text="0:00.0" class="hud-readout hud-time" />
+            <ui:Label name="hud-targets" text="TARGETS 0/0" class="hud-readout hud-targets" />
+            <ui:Label name="zone-banner" class="hud-readout zone-banner" />
+            <ui:VisualElement name="throttle" class="throttle" picking-mode="Ignore">
+                <ui:Label name="throttle-caption" text="THROTTLE" class="hud-caption" />
+                <ui:VisualElement class="throttle-track" picking-mode="Ignore">
+                    <ui:VisualElement name="throttle-fill" class="throttle-fill" picking-mode="Ignore" />
+                    <ui:VisualElement name="throttle-band" class="throttle-band" picking-mode="Ignore" />
+                    <ui:VisualElement name="throttle-cruise" class="throttle-cruise" picking-mode="Ignore" />
+                    <ui:VisualElement name="throttle-setpoint" class="throttle-setpoint" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="throttle-readouts" picking-mode="Ignore">
+                    <ui:Label name="throttle-speed" text="SPEED 100%" class="hud-readout throttle-speed" />
+                    <ui:Label name="throttle-hint" text="HOLD" class="hud-readout throttle-hint" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="pause-panel" class="panel">
+            <ui:Label text="PAUSED" class="panel-title" />
+            <GeometricFlight.UI.SlantButton name="resume-button" text="RESUME" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="pause-retry-button" text="RESTART LEVEL" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="pause-options-button" text="OPTIONS" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="pause-help-button" text="HELP" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="pause-menu-button" text="MAIN MENU" class="menu-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="results-panel" class="panel">
+            <ui:Label name="results-title" text="LEVEL COMPLETE" class="panel-title" />
+            <ui:VisualElement class="stat-row">
+                <ui:Label text="TIME" class="stat-name" />
+                <ui:Label name="result-time" class="stat-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="stat-row">
+                <ui:Label text="TARGETS" class="stat-name" />
+                <ui:Label name="result-targets" class="stat-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="stat-row">
+                <ui:Label text="ACCURACY" class="stat-name" />
+                <ui:Label name="result-accuracy" class="stat-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="stat-row">
+                <ui:Label text="SHIELD" class="stat-name" />
+                <ui:Label name="result-shield" class="stat-value" />
+            </ui:VisualElement>
+            <ui:VisualElement name="par-row" class="stat-row">
+                <ui:Label text="PAR" class="stat-name" />
+                <ui:Label name="result-par" class="stat-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="results-buttons">
+                <GeometricFlight.UI.SlantButton name="next-button" text="NEXT LEVEL" class="menu-button" />
+                <GeometricFlight.UI.SlantButton name="retry-button" text="RETRY" class="menu-button" />
+                <GeometricFlight.UI.SlantButton name="results-menu-button" text="MAIN MENU" class="menu-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Instance template="Options" />
+        <ui:Instance template="Help" />
+    </ui:VisualElement>
+</ui:UXML>

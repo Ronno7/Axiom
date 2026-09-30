@@ -37,6 +37,10 @@ its calibrated setpoint without simulating key presses. Keyboard throttle resets
 to cruise when its component is re-enabled. Missing/disabled input returns neutral
 steering and a cruise target; speed returns smoothly to cruise.
 
+`GroundShadow` (child of the player) drops the aircraft silhouette onto the floor directly
+below the ship, the lowest surface under it, so it slides beneath obstacles rather than onto
+them. It shrinks slightly with height. It is the main cue for position and altitude.
+
 The camera retains its authored position relative to the course and follows only
 forward travel in `LateUpdate`. Steering therefore moves the aircraft across the
 screen. Camera rotation and aircraft rotation are not changed.
@@ -106,3 +110,18 @@ In Play Mode, check both key sets, release and opposing keys, every edge, and
 camera framing. The existing course ends around Z=112 (about 19 seconds at the
 default speed); forward travel continues beyond it. Level completion,
 banking, collisions, combat, and hardware are not implemented by this milestone.
+
+## Throttle sections (level 1)
+
+Throttle matters because steering speed is fixed: slower flight gives more lateral
+room per metre, faster flight beats timed obstacles. Each section is a `ThrottleZone`
+(recommended band on the HUD gauge, a banner on entry) with blue floor cues as children:
+V-chevrons pointing back mean slow down, forward chevrons mean speed up.
+
+| Section | Z | Rule |
+| --- | --- | --- |
+| Lattice (slow) | 100–152 | 3 see-through walls 12 apart (solid collision, blue post on each gap edge). At 60–65% cruise a weave has ≥0.3 s slack; 80%+ takes hits |
+| Iris (fast) | 152–212 | `ClosingIris` shuts over 5.2 s from the trigger line at 180; ~125%+ cruise gets through |
+
+Par (`LevelFlow`, 35 s) sits between "follow the cues" (~38 s) and "also boost in open
+stretches" (~33 s). Gates are sized so the whole flight area passes through them.

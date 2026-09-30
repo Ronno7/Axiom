@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Axiom.uss" />
+    <ui:Template name="Options" src="OptionsPanel.uxml" />
+    <ui:Template name="Help" src="HelpPanel.uxml" />
+    <ui:VisualElement name="screen" class="screen screen--menu">
+        <ui:VisualElement name="title-panel" class="panel panel--bare">
+            <ui:Label text="AXIOM" class="game-title" />
+            <GeometricFlight.UI.SlantButton name="play-button" style="margin-left: 67px;" text="PLAY" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="options-button" style="margin-left: 45px;" text="OPTIONS" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="help-button" style="margin-left: 22px;" text="HELP" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="quit-button" style="margin-left: 0px;" text="QUIT" class="menu-button" />
+        </ui:VisualElement>
+        <ui:Instance template="Options" />
+        <ui:Instance template="Help" />
+    </ui:VisualElement>
+</ui:UXML>

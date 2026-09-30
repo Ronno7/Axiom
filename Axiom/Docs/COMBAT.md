@@ -56,15 +56,17 @@ Move `AimReticle` to change the convergence distance. The weapon aims at that tr
 Colors: `WeaponProjectile` (cyan) for shots and hit flashes, `DestructionPrimary` (orange) and
 `DestructionSecondary` (magenta) for shards. Ordinary scenery stays monochrome.
 
-## Verification (2026-09-29, Unity 6000.3.24f1)
+## Shield, enemies, and run flow (M3)
 
-- EditMode: 36/36 passed (25 flight + 11 weapon). The weapon tests cover the immediate first shot,
-  a held rate independent of frame rate (30/60/144 fps), tap-spamming limits, paused time,
-  shots meeting the reticle at 3.6/6/9 speed, a sweep hitting a 0.02-thick wall that a
-  7-unit frame step would skip, and a target breaking exactly once.
-- Play Mode (frames stepped; `Fire` invoked directly, because simulated keys do not reach
-  the Input System while the editor is unfocused): Target_01 and Target_02 each broke after
-  exactly 3 shots, with one `Destroyed` event; shots after the break flew on. The shatter and both
-  reticles were checked in Game view screenshots. Sweeps confirmed Pillar_1_5, Floor,
-  and HexagonalGate_1 stop shots. No shots were live after they expired; the pool stayed at 24. No console errors.
-- By the user: holding Space in the Game view (see the plan's session log).
+- **Shield** (`ShipShield`, rules in `Shield`): 3 segments; a hit removes one and grants
+  1.2 s of protection (the ship blinks). `ShieldDisplay` darkens the hull segments.
+- **Crashes** (`ShipHull`): overlapping scenery or a target costs a segment; the ship flies on.
+  The hull `BoxCollider` is on the `Player` layer; player shots and crash checks exclude it.
+- **Enemy fire** (`EnemyTurret` on Target_02/03): a slow red shot at the player every 1.6 s
+  while 12–45 units ahead. It stops when the target breaks.
+- **Run flow** (`LevelFlow` in 50_Systems): Escape pauses (and so does losing window focus); completes past
+  `CourseEnd` (Z=112); fails when the shield depletes (the ship shatters). Retry reloads the scene.
+  Exposes time, targets, shots, accuracy, and shield for the UI.
+- Course: `Barrier_Low` (Z=50, fly over) and `Barrier_Left` (Z=88, fly right).
+
+Verified in the editor: 41/41 EditMode tests; fail, complete, pause/resume, and a clean retry in Play Mode.

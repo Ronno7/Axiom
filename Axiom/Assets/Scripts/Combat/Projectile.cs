@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 
 namespace GeometricFlight.Combat
 {
-    /// <summary>Pooled straight-line shot. Any collider stops it; a ShootableTarget also takes a hit.
+    /// <summary>Pooled straight-line shot. Any collider stops it; an IDamageable also takes a hit.
     /// The owning weapon reactivates it; it deactivates itself on impact or when its lifetime ends.</summary>
     [DisallowMultipleComponent]
     public sealed class Projectile : MonoBehaviour
@@ -13,12 +14,16 @@ namespace GeometricFlight.Combat
         private Vector3 velocity;
         private float remainingLifetime;
         private LayerMask hitLayers;
+        private Action onDamageDealt;
 
-        public void Launch(Vector3 position, Vector3 worldVelocity, float lifetime, LayerMask layers)
+        /// <param name="damageDealt">Optional; invoked when this shot damages something.</param>
+        public void Launch(Vector3 position, Vector3 worldVelocity, float lifetime, LayerMask layers,
+            Action damageDealt = null)
         {
             velocity = worldVelocity;
             remainingLifetime = lifetime;
             hitLayers = layers;
+            onDamageDealt = damageDealt;
             transform.SetPositionAndRotation(position,
                 velocity.sqrMagnitude > 0f ? Quaternion.LookRotation(velocity) : Quaternion.identity);
             gameObject.SetActive(true);
@@ -33,8 +38,8 @@ namespace GeometricFlight.Combat
             Vector3 to = from + velocity * deltaTime;
             if (WeaponRules.TrySweep(from, to, radius, hitLayers, out RaycastHit hit))
             {
-                ShootableTarget target = hit.collider.GetComponentInParent<ShootableTarget>();
-                if (target != null) target.ApplyHit();
+                IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+                if (damageable != null && damageable.ApplyHit()) onDamageDealt?.Invoke();
                 gameObject.SetActive(false);
                 return;
             }

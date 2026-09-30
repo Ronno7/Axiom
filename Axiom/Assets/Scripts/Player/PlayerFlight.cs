@@ -1,3 +1,4 @@
+using GeometricFlight.Core;
 using GeometricFlight.Input;
 using UnityEngine;
 
@@ -21,12 +22,19 @@ namespace GeometricFlight.Player
         private Vector3 startPosition;
         private float currentSpeed;
         public float CurrentSpeed => currentSpeed;
+        /// <summary>Raw input snapshot for this frame (before player options are applied).</summary>
         public FlightInput CurrentInput { get; private set; }
+        public float CruiseSpeed => SpeedAt(0f);
+        public float MinSpeed => SpeedAt(-1f);
+        public float MaxSpeed => SpeedAt(1f);
+        public float TargetSpeed => SpeedAt(CurrentInput.Throttle);
+        /// <summary>When locked, input is ignored: no steering, cruise throttle, no fire or pause.</summary>
+        public bool InputLocked { get; set; }
 
         private void Awake()
         {
             startPosition = transform.position;
-            currentSpeed = FlightMovement.TargetSpeed(0f, forwardSpeed, throttleMultipliers);
+            currentSpeed = CruiseSpeed;
             if (inputSource == null)
             {
                 Debug.LogError("Assign a FlightInputSource to PlayerFlight before playing.", this);
@@ -36,13 +44,16 @@ namespace GeometricFlight.Player
 
         private void Update()
         {
-            CurrentInput = inputSource != null && inputSource.isActiveAndEnabled
+            CurrentInput = !InputLocked && inputSource != null && inputSource.isActiveAndEnabled
                 ? inputSource.ReadInput(Time.deltaTime) : default;
-            float targetSpeed = FlightMovement.TargetSpeed(CurrentInput.Throttle, forwardSpeed, throttleMultipliers);
-            float averageSpeed = FlightMovement.Accelerate(ref currentSpeed, targetSpeed, acceleration, Time.deltaTime);
-            transform.position = FlightMovement.Step(transform.position, CurrentInput.Steering, Time.deltaTime,
-                averageSpeed, steeringSpeed, GetBounds(startPosition));
+            float averageSpeed = FlightMovement.Accelerate(ref currentSpeed, TargetSpeed, acceleration, Time.deltaTime);
+            Vector2 steering = CurrentInput.Steering;
+            if (GameSettings.InvertVertical) steering.y = -steering.y;
+            transform.position = FlightMovement.Step(transform.position, steering, Time.deltaTime,
+                averageSpeed, steeringSpeed * GameSettings.SteeringSensitivity, GetBounds(startPosition));
         }
+
+        private float SpeedAt(float throttle) => FlightMovement.TargetSpeed(throttle, forwardSpeed, throttleMultipliers);
 
         private Rect GetBounds(Vector3 origin)
         {

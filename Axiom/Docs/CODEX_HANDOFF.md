@@ -15,10 +15,13 @@ installed package versions, including the user's Unity MCP installation.
 
 | Path | Contents |
 | --- | --- |
-| `Assets/Scenes/Prototype.unity` | Editable blockout with input, flight, and camera components wired |
+| `Assets/Scenes/MainMenu.unity` | Title/Options/Help/Quit (build index 0) |
+| `Assets/Scenes/Prototype.unity` | Course 1 with flight, combat, `LevelFlow`, and `LevelUi` |
+| `Assets/UI`, `Assets/Scripts/UI` | UI Toolkit screens and controllers (see `UI.md`) |
 | `Assets/Scripts/Input` | Shared steering/throttle/fire/pause snapshot and keyboard Input System adapter |
 | `Assets/Scripts/Player` | Stateless movement rules, player component, forward-following camera |
-| `Assets/Scripts/Combat` | Weapon rules, pooled player weapon, projectile, shootable target, shatter effect |
+| `Assets/Scripts/Combat` | Weapons, projectiles, pools, shootable targets, enemy turret, shatter effect |
+| `Assets/Scripts/Core/LevelFlow.cs` | Run state (pause/complete/fail), stats, retry/menu scene loads |
 | `Assets/Prefabs/Player/PlayerProjectile.prefab` | Pooled shot (no collider; hits by sweep) |
 | `Assets/Scripts/Presentation/PrototypeMesh.cs` | Edit/Play Mode geometry |
 | `Assets/Scripts/GeometricFlight.Runtime.asmdef` | Small runtime assembly referencing Input System |

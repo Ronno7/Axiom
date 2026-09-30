@@ -18,7 +18,7 @@ This is primarily a user-interface coursework project. Engaging flight and comba
 - Use the physical controller for as much of the experience as practical; keyboard support is acceptable.
 - A small geometric boss at the end is within the proposed scope.
 - The physical components are available but still packaged and unassembled.
-- Final title has not been chosen. Do not silently adopt a suggested title such as AXIOM or VECTOR BREAK.
+- The game is titled **Axiom**.
 
 ## Controller plan
 

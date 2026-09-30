@@ -1,8 +1,8 @@
-# Geometric Flight — Development Plan
+# Axiom — Development Plan
 
 Planning baseline: September 28, 2026. Target: Unity 6.3, Universal Render Pipeline.
 
-Place this file in `Docs/DEVELOPMENT_PLAN.md` inside the Unity project. **Geometric Flight is a working identifier; the final title is undecided.**
+The game is titled **Axiom**; `GeometricFlight` remains the code namespace.
 
 ## Instructions for Codex
 
@@ -278,3 +278,29 @@ shots; target colliders (r=1.4) are slightly generous. Reticle readability again
 white targets should be revisited in M6.
 
 Next small task: user Space check, then M3 (first full loop and required UI).
+
+### 2026-09-29 — M3 pass 1: gameplay loop
+
+Shield + hull collisions, diegetic shield segments, enemy turret shots, two barriers, and
+`LevelFlow` (pause, complete, fail, retry, stats). UI decision: UI Toolkit for menus/HUD,
+uGUI world space for later spatial markers; separate menu and level scenes.
+Editor-verified; awaiting the user's playtest. Next: pass 2 screens (Title, Options, Help,
+HUD, Pause, Results, Quit) and the MainMenu scene.
+
+### 2026-09-29 — M3 pass 2: screens
+
+MainMenu scene (Title, Options, Help, Quit) and level UI (HUD, pause with Options/Help,
+results with Retry/Next/Menu) in UI Toolkit; saved settings for sensitivity and invert.
+See `UI.md`. Editor-verified via UI navigation events; awaiting the user's keyboard/mouse playtest.
+Open design issue: throttle is rarely needed. Next: throttle-driven course sections.
+
+### 2026-09-29 — M3 UI feedback and throttle design
+
+Menu: procedural geometric constructs at several depths, fog, slanted buttons; "restart
+level" wording; results no longer steer the ship. Throttle: lattice (slow) and closing iris
+(fast) sections with floor cues, HUD band/hints, and a 33 s par. See `FLIGHT.md`, `UI.md`.
+Editor-verified with an autopilot; awaiting the user's playtest.
+Refinement after playtest: calmer menu composition; see-through lattice with gap posts, 12-unit
+spacing and 60–65% band; V-chevron slow cue and zone banner; gates enlarged (they could clip
+the flight area); targets moved later (40/62/80); par 35 s.
+

@@ -7,4 +7,4 @@
 - Preserve scene edits, `.meta` files, and asset GUIDs. Do not overwrite the whole project or regenerate scenes over user edits.
 - Keep editor utilities in `Editor`; avoid import-time project mutations.
 - Validate changed behavior in Unity when an editor/MCP connection exists. Report source-only checks separately from editor/build/playtesting.
-- The final game title is undecided. `GeometricFlight` is a neutral working identifier.
+- The game is titled **Axiom**. `GeometricFlight` remains the code namespace.

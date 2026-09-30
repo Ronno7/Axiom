@@ -1,51 +1,35 @@
-# Axiom prototype
+# Axiom
 
-Unity 6.3 URP flight-game project for UI coursework. Runtime code retains the
-`GeometricFlight` namespace and the existing asset GUIDs.
+Unity 6.3 URP rail-shooter for UI coursework. Runtime code uses the `GeometricFlight`
+namespace.
 
 ## Open and play
 
 1. Open this folder (`Axiom`, containing `Assets`, `Packages`, and `ProjectSettings`)
    in Unity Hub with the installed **6000.3.24f1** editor.
-2. Open `Assets/Scenes/Prototype.unity`, or use **Tools > Geometric Flight > Open Prototype**.
-3. Set the Game view to **16:9**, press Play, and click the Game view.
-4. Steer with **WASD or arrow keys**. Forward travel starts automatically.
-   Hold **Q/E** to lower/raise throttle; release to retain the chosen setting.
-5. Stop and restart Play Mode to reset the short course.
+2. Open `Assets/Scenes/MainMenu.unity`, set the Game view to **16:9**, press Play,
+   and click the Game view. Menus work with mouse or keyboard (arrows, Enter, Esc).
+3. Controls: **WASD/arrows** steer, **Q/E** throttle (it holds when released),
+   **Space** (hold) fire, **Esc** pause.
 
-The current milestone implements throttle with smooth acceleration, bounded horizontal
-and vertical steering, and a camera that follows forward travel. See
-[flight controls and design](Docs/FLIGHT.md) for Inspector settings, component
-responsibilities, and verification instructions.
+`Prototype.unity` is the first course and can also be played directly.
 
-The course ends around Z=112; travel currently continues beyond it.
-Combat, collision response, menus, level completion, and Arduino integration
-remain future work. Use Prototype directly in the editor for this milestone.
+## Scenes
 
-## Scene and assets
-
-The scene contains 66 editable GameObjects, with a triangular aircraft, corridor,
-pillars, floor markings, three hexagonal gates, and three target silhouettes.
-
-| Root | Purpose |
+| Scene | Contents |
 | --- | --- |
-| `00_CameraAndLighting` | Forward-following camera, audio listener, reserved light |
-| `10_PlayerPrototype` | Flight/input components, aircraft visual, decorative shields, muzzle placeholders |
-| `20_EnvironmentBlockout` | Corridor, gates, and start/end markers |
-| `30_TargetPlaceholders` | Static enemy silhouettes |
-| `40_UIReserved` | Future UI scene objects |
-| `50_SystemsReserved` | Future game systems |
+| `MainMenu` | Title, Options, Help, Quit (build index 0) |
+| `Prototype` | Course 1: player, blockout, targets, `LevelFlow` (50_Systems), `LevelUi` (40_UI) |
 
-Forward is **+Z**, up is **+Y**, and right is **+X**. Steering does not rotate the
-player root. Keep future visual banking under `AircraftVisual`.
+Forward is **+Z**, up is **+Y**, right is **+X**. `PrototypeMesh` generates the blockout
+meshes in Edit and Play Mode; keep the component or bake the meshes before removing it.
 
-`PrototypeMesh` supplies temporary meshes in Edit and Play Modes. Its serialized
-settings are the source of truth; retain the component or bake the meshes before
-removing it. `Foundation Flat` is a URP shader with fixed directional shading;
-it does not receive realtime lights or shadows. Shields and targets are visual
-placeholders without health or collision behavior.
+## Docs
 
-Use **Tools > Geometric Flight > Check Foundation** for scene reference checks.
-Run `GeometricFlight.EditorTests` from Unity's EditMode Test Runner for movement
-regression checks. See [the handoff](Docs/CODEX_HANDOFF.md) and
-[the design brief](Docs/DESIGN_BRIEF.md) before extending the milestone.
+- [Flight](Docs/FLIGHT.md): movement, throttle, input.
+- [Combat](Docs/COMBAT.md): weapons, targets, shield, enemies, run flow.
+- [UI](Docs/UI.md): screens, theme, settings.
+- [Development plan](Docs/DEVELOPMENT_PLAN.md) and [design brief](Docs/DESIGN_BRIEF.md).
+
+Run `GeometricFlight.EditorTests` in the EditMode Test Runner. **Tools > Geometric Flight >
+Check Foundation** checks scene references.

@@ -4,19 +4,12 @@
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject:
-    fileID: 0
-  m_PrefabInstance:
-    fileID: 0
-  m_PrefabAsset:
-    fileID: 0
-  m_Name: IndicatorWhite
-  m_Shader:
-    fileID: 4800000
-    guid: a103e9c008d33d0f063d2b17646c2255
-    type: 3
-  m_Parent:
-    fileID: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: IndicatorBlue
+  m_Shader: {fileID: 4800000, guid: a103e9c008d33d0f063d2b17646c2255, type: 3}
+  m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -26,17 +19,14 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: ''
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _ShadeStrength: 0.0
+    - _ShadeStrength: 0
     m_Colors:
-    - _BaseColor:
-        r: 0.95
-        g: 0.95
-        b: 0.95
-        a: 1
+    - _BaseColor: {r: 0.17295581, g: 0.6270851, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

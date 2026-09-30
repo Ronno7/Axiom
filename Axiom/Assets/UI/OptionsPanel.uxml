@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="options-panel" class="panel">
+        <ui:Label text="OPTIONS" class="panel-title" />
+        <ui:Slider name="steering-sensitivity" label="Steering sensitivity" low-value="0.5" high-value="1.5" value="1" class="option" />
+        <ui:Toggle name="invert-vertical" label="Invert vertical steering" class="option" />
+        <GeometricFlight.UI.SlantButton name="options-back" style="margin-top: 24px;" text="BACK" class="menu-button" />
+    </ui:VisualElement>
+</ui:UXML>
