@@ -14,13 +14,15 @@ namespace GeometricFlight.UI
 
         private readonly Slider sensitivity;
         private readonly Toggle invertVertical;
+        private readonly Toggle buzzer;
         private readonly Action back;
 
-        public OptionsPanel(VisualElement root, Action back)
+        public OptionsPanel(VisualElement root, Action back, Action calibrate)
         {
             Root = root;
             sensitivity = root.Q<Slider>("steering-sensitivity");
             invertVertical = root.Q<Toggle>("invert-vertical");
+            buzzer = root.Q<Toggle>("controller-buzzer");
 
             sensitivity.lowValue = GameSettings.MinSteeringSensitivity;
             sensitivity.highValue = GameSettings.MaxSteeringSensitivity;
@@ -37,10 +39,14 @@ namespace GeometricFlight.UI
 
             invertVertical.SetValueWithoutNotify(GameSettings.InvertVertical);
             invertVertical.RegisterValueChangedCallback(e => GameSettings.InvertVertical = e.newValue);
+            buzzer.SetValueWithoutNotify(GameSettings.BuzzerEnabled);
+            buzzer.RegisterValueChangedCallback(e => GameSettings.BuzzerEnabled = e.newValue);
 
             UiScreens.MarkFocusWithin(sensitivity);
             UiScreens.MarkFocusWithin(invertVertical);
+            UiScreens.MarkFocusWithin(buzzer);
             this.back = back;
+            root.Q<Button>("options-calibrate").clicked += calibrate;
             root.Q<Button>("options-back").clicked += Close;
         }
 

@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="calibration-panel" class="panel panel--wide">
+        <ui:Label text="CONTROLLER CALIBRATION" class="panel-title" />
+        <ui:Label name="calibration-status" class="hint" />
+        <ui:Label name="calibration-step" class="section-title" />
+        <ui:Label name="calibration-instruction" class="body-text calibration-instruction" />
+        <ui:Label name="calibration-error" class="body-text pause-notice" />
+        <ui:VisualElement class="calibration-live">
+            <ui:VisualElement class="calibration-stick" picking-mode="Ignore">
+                <ui:VisualElement class="calibration-cross calibration-cross--h" picking-mode="Ignore" />
+                <ui:VisualElement class="calibration-cross calibration-cross--v" picking-mode="Ignore" />
+                <ui:VisualElement name="calibration-stick-dot" class="calibration-stick-dot" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="calibration-throttle">
+                <ui:Label text="THROTTLE" class="section-title" />
+                <ui:VisualElement class="throttle-track calibration-throttle-track" picking-mode="Ignore">
+                    <ui:VisualElement name="calibration-throttle-fill" class="throttle-fill" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="calibration-readings" class="hint" />
+                <ui:VisualElement name="calibration-inverts">
+                    <ui:Toggle name="calibration-invert-x" label="Invert stick left / right" class="option" />
+                    <ui:Toggle name="calibration-invert-y" label="Invert stick up / down" class="option" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="calibration-buttons">
+            <GeometricFlight.UI.SlantButton name="calibration-primary" text="CAPTURE" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="calibration-restart" text="START OVER" class="menu-button" />
+            <GeometricFlight.UI.SlantButton name="calibration-cancel" text="CANCEL" class="menu-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -11,10 +11,12 @@ namespace GeometricFlight.Core
 
         private const string SensitivityKey = "axiom.steeringSensitivity";
         private const string InvertVerticalKey = "axiom.invertVertical";
+        private const string BuzzerKey = "axiom.buzzerEnabled";
 
         private static bool loaded;
         private static float steeringSensitivity = 1f;
         private static bool invertVertical;
+        private static bool buzzerEnabled = true;
 
         /// <summary>Multiplies steering speed. 1 is the tuned default.</summary>
         public static float SteeringSensitivity
@@ -39,6 +41,18 @@ namespace GeometricFlight.Core
             }
         }
 
+        /// <summary>Controller buzzer cues. Every cue also has an on-screen equivalent.</summary>
+        public static bool BuzzerEnabled
+        {
+            get { Load(); return buzzerEnabled; }
+            set
+            {
+                Load();
+                buzzerEnabled = value;
+                PlayerPrefs.SetInt(BuzzerKey, value ? 1 : 0);
+            }
+        }
+
         public static void Save() => PlayerPrefs.Save();
 
         private static void Load()
@@ -48,6 +62,7 @@ namespace GeometricFlight.Core
             steeringSensitivity = Mathf.Clamp(PlayerPrefs.GetFloat(SensitivityKey, 1f),
                 MinSteeringSensitivity, MaxSteeringSensitivity);
             invertVertical = PlayerPrefs.GetInt(InvertVerticalKey, 0) == 1;
+            buzzerEnabled = PlayerPrefs.GetInt(BuzzerKey, 1) == 1;
         }
     }
 }

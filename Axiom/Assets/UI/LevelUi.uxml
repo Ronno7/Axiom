@@ -2,11 +2,13 @@
     <Style src="Axiom.uss" />
     <ui:Template name="Options" src="OptionsPanel.uxml" />
     <ui:Template name="Help" src="HelpPanel.uxml" />
+    <ui:Template name="Calibration" src="CalibrationPanel.uxml" />
     <ui:VisualElement name="screen" class="screen" picking-mode="Ignore">
         <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
             <ui:Label name="hud-time" text="0:00.0" class="hud-readout hud-time" />
             <ui:Label name="hud-targets" text="TARGETS 0/0" class="hud-readout hud-targets" />
             <ui:Label name="zone-banner" class="hud-readout zone-banner" />
+            <ui:Label name="hud-controller" text="KEYBOARD" class="hud-readout hud-controller" />
             <ui:VisualElement name="throttle" class="throttle" picking-mode="Ignore">
                 <ui:Label name="throttle-caption" text="THROTTLE" class="hud-caption" />
                 <ui:VisualElement class="throttle-track" picking-mode="Ignore">
@@ -24,6 +26,7 @@
 
         <ui:VisualElement name="pause-panel" class="panel">
             <ui:Label text="PAUSED" class="panel-title" />
+            <ui:Label name="pause-notice" class="body-text pause-notice" />
             <GeometricFlight.UI.SlantButton name="resume-button" text="RESUME" class="menu-button" />
             <GeometricFlight.UI.SlantButton name="pause-retry-button" text="RESTART LEVEL" class="menu-button" />
             <GeometricFlight.UI.SlantButton name="pause-options-button" text="OPTIONS" class="menu-button" />
@@ -62,5 +65,6 @@
 
         <ui:Instance template="Options" />
         <ui:Instance template="Help" />
+        <ui:Instance template="Calibration" />
     </ui:VisualElement>
 </ui:UXML>

@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="215.9mm" height="279.4mm" viewBox="0 0 215.9 279.4" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>Axiom controller cutting templates (1:1)</title>
+<style>
+.c{fill:none;stroke:#000;stroke-width:0.35}
+.cx{stroke:#666;stroke-width:0.2}
+.t{font-size:3.2px;fill:#111}
+.s{font-size:2.6px;fill:#444}
+.h{font-size:4.6px;font-weight:700;fill:#111}
+.part{fill:#f3ecde;stroke:#000;stroke-width:0.35}
+</style>
+<rect width="215.9" height="279.4" fill="#fff"/>
+<text x="10" y="14" class="h">AXIOM CONTROLLER — CUTTING TEMPLATES (print at 100% / actual size)</text>
+<text x="10" y="19.5" class="s">Check the scale bar first. Cut out, place on the sheet at the stated position, trace or cut through.</text>
+<line x1="150" y1="17" x2="200" y2="17" stroke="#000" stroke-width="0.6"/><line x1="150" y1="15" x2="150" y2="19" stroke="#000" stroke-width="0.4"/><line x1="200" y1="15" x2="200" y2="19" stroke="#000" stroke-width="0.4"/><text x="175" y="14" class="s" text-anchor="middle">must measure 50 mm</text>
+<circle cx="30" cy="48" r="15" class="c"/>
+<line x1="11" y1="48" x2="49" y2="48" class="cx"/><line x1="30" y1="29" x2="30" y2="67" class="cx"/>
+<text x="10" y="72" class="t">LID · joystick hole Ø30</text>
+<text x="10" y="76.2" class="s">centre 168 from left edge,</text>
+<text x="10" y="80.4" class="s">56 from front edge</text>
+<circle cx="87" cy="48" r="1.5" class="c"/>
+<circle cx="83.5" cy="54.06" r="1.5" class="c"/>
+<circle cx="76.5" cy="54.06" r="1.5" class="c"/>
+<circle cx="73" cy="48" r="1.5" class="c"/>
+<circle cx="76.5" cy="41.94" r="1.5" class="c"/>
+<circle cx="83.5" cy="41.94" r="1.5" class="c"/>
+<circle cx="80" cy="48" r="1.5" class="c"/>
+<line x1="68" y1="48" x2="92" y2="48" class="cx"/><line x1="80" y1="36" x2="80" y2="60" class="cx"/>
+<text x="62" y="72" class="t">LID · sound grille 7× Ø3</text>
+<text x="62" y="76.2" class="s">centre 98 from left,</text>
+<text x="62" y="80.4" class="s">229 from front (over the buzzer)</text>
+<rect x="118" y="30" width="17" height="43" rx="3" class="c"/>
+<line x1="100.5" y1="51.5" x2="152.5" y2="51.5" class="cx"/><line x1="126.5" y1="25.5" x2="126.5" y2="77.5" class="cx"/>
+<text x="108" y="82" class="t">SENSOR WALL · window 17 × 43</text>
+<text x="108" y="86.2" class="s">centred: 28 from either side,</text>
+<text x="108" y="90.4" class="s">30 up from the wall's bottom edge</text>
+<text x="108" y="94.6" class="s">Check against your sensor's cans</text>
+<path d="M160,46.0 L160,30 L178.0,30 L178.0,46.0" class="c"/>
+<line x1="156" y1="46.0" x2="182.0" y2="46.0" class="cx" stroke-dasharray="1 1"/>
+<text x="152" y="56" class="t">BACK WALL · USB notch 18 × 16</text>
+<text x="152" y="60.2" class="s">open to the wall's bottom edge (dotted)</text>
+<text x="152" y="64.4" class="s">centre ≈ 179.8 from the LEFT (inside)</text>
+<text x="152" y="68.6" class="s">confirm with the Uno in place</text>
+<rect x="26.75" y="104.75" width="6.5" height="6.5" class="c"/>
+<line x1="22" y1="108" x2="38" y2="108" class="cx"/><line x1="30" y1="100" x2="30" y2="116" class="cx"/>
+<circle cx="62" cy="108" r="9" class="part"/>
+<text x="10" y="124" class="t">FRONT WALL · trigger square 6.5</text>
+<text x="10" y="128.2" class="s">centre 180 from left edge,</text>
+<text x="10" y="132.4" class="s">30 up from the wall's bottom edge</text>
+<text x="52" y="124" class="t">TRIGGER CAP Ø18</text>
+<text x="52" y="128.2" class="s">2–3 layers, glue to the actuator only</text>
+<rect x="192" y="96" width="8" height="130" rx="4" class="c"/>
+<line x1="196" y1="92" x2="196" y2="230" class="cx"/>
+<text transform="translate(188,161) rotate(-90)" class="t" text-anchor="middle">LID · throttle slot 130 × 8</text>
+<text transform="translate(191.8,161) rotate(-90)" class="s" text-anchor="middle">centre line 32 from left edge; runs 28 → 158 from the front edge</text>
+<text x="10" y="142" class="t" font-weight="700">THROTTLE SLED PARTS (cut from the same sheet)</text>
+<rect x="10" y="148" width="54" height="50" class="part"/>
+<text x="37" y="173" class="t" text-anchor="middle">BASE</text>
+<text x="37" y="176.6" class="s" text-anchor="middle">54 × 50 </text>
+<rect x="70" y="148" width="54" height="56" class="part"/>
+<text x="97" y="176" class="t" text-anchor="middle">REFLECTOR PLATE</text>
+<text x="97" y="179.6" class="s" text-anchor="middle">54 × 56 (smooth face)</text>
+<rect x="130" y="148" width="50" height="15" class="part"/>
+<text x="155" y="155.5" class="t" text-anchor="middle">RUNNER</text>
+<text x="155" y="159.1" class="s" text-anchor="middle">50 × 15 ×2</text>
+<rect x="130" y="167" width="30" height="20" class="part"/>
+<text x="145" y="177" class="t" text-anchor="middle">COLLAR</text>
+<text x="145" y="180.6" class="s" text-anchor="middle">30 × 20 </text>
+<polygon points="130,192 160,192 130,222" class="part"/><text x="137" y="205" class="s">GUSSET ×2</text><text x="137" y="209" class="s">30 × 30</text>
+<rect x="10" y="206" width="90" height="10" class="part"/>
+<text x="55" y="211" class="t" text-anchor="middle">STEM</text>
+<text x="55" y="214.6" class="s" text-anchor="middle">90 × 10 ×3 laminated</text>
+<rect x="10" y="222" width="40" height="14" class="part"/>
+<text x="30" y="229" class="t" text-anchor="middle">KNOB</text>
+<text x="30" y="232.6" class="s" text-anchor="middle">40 × 14 ×3 stacked, slot 10×4</text>
+<rect x="25" y="227" width="10" height="4" fill="#fff" stroke="#000" stroke-width="0.3"/>
+<text x="10" y="246" class="t">Sled assembly: runners on edge along the base sides; plate glued square at the back end</text>
+<text x="10" y="250.2" class="s">with the gussets; stem centred 25 in front of the plate; collar at the stem height</text>
+<text x="10" y="254.4" class="s">that sits just under the lid (about 43 above the base). Knob push-fits, no glue.</text>
+</svg>

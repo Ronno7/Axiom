@@ -2,6 +2,7 @@
     <Style src="Axiom.uss" />
     <ui:Template name="Options" src="OptionsPanel.uxml" />
     <ui:Template name="Help" src="HelpPanel.uxml" />
+    <ui:Template name="Calibration" src="CalibrationPanel.uxml" />
     <ui:VisualElement name="screen" class="screen screen--menu">
         <ui:VisualElement name="title-panel" class="panel panel--bare">
             <ui:Label text="AXIOM" class="game-title" />
@@ -12,5 +13,6 @@
         </ui:VisualElement>
         <ui:Instance template="Options" />
         <ui:Instance template="Help" />
+        <ui:Instance template="Calibration" />
     </ui:VisualElement>
 </ui:UXML>

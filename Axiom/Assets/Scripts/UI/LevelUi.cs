@@ -1,4 +1,5 @@
 using GeometricFlight.Core;
+using GeometricFlight.Input;
 using GeometricFlight.Player;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,8 +21,11 @@ namespace GeometricFlight.UI
         private VisualElement screen, hud, pausePanel, resultsPanel, helpPanel;
         private VisualElement throttle, throttleFill, throttleSetpoint, throttleCruise, throttleBand, parRow;
         private Label timeLabel, targetsLabel, speedLabel, throttleCaption, throttleHint, zoneBanner, resultsTitle;
+        private Label controllerStatus, pauseNotice;
+        private string shownController;
         private Button resumeButton, nextButton, retryButton, helpBack;
         private OptionsPanel options;
+        private CalibrationPanel calibration;
         private int shownTenths = -1, shownTargets = -1, shownSpeed = -1;
         private ThrottleZone[] zones;
         private ThrottleZone shownZone;
@@ -36,7 +40,8 @@ namespace GeometricFlight.UI
             pausePanel = root.Q("pause-panel");
             resultsPanel = root.Q("results-panel");
             helpPanel = root.Q("help-panel");
-            options = new OptionsPanel(root.Q("options-panel"), ShowPause);
+            options = new OptionsPanel(root.Q("options-panel"), ShowPause, ShowCalibration);
+            calibration = new CalibrationPanel(root.Q("calibration-panel"), ShowOptions);
             timeLabel = root.Q<Label>("hud-time");
             targetsLabel = root.Q<Label>("hud-targets");
             speedLabel = root.Q<Label>("throttle-speed");
@@ -45,6 +50,8 @@ namespace GeometricFlight.UI
             throttleHint = root.Q<Label>("throttle-hint");
             throttleBand = root.Q("throttle-band");
             zoneBanner = root.Q<Label>("zone-banner");
+            controllerStatus = root.Q<Label>("hud-controller");
+            pauseNotice = root.Q<Label>("pause-notice");
             parRow = root.Q("par-row");
             throttleFill = root.Q("throttle-fill");
             throttleSetpoint = root.Q("throttle-setpoint");
@@ -57,8 +64,7 @@ namespace GeometricFlight.UI
 
             resumeButton.clicked += flow.Resume;
             root.Q<Button>("pause-retry-button").clicked += flow.Retry;
-            root.Q<Button>("pause-options-button").clicked +=
-                () => ShowOverlay(options.Root, options.FirstFocus);
+            root.Q<Button>("pause-options-button").clicked += ShowOptions;
             root.Q<Button>("pause-help-button").clicked += () => ShowOverlay(helpPanel, helpBack);
             root.Q<Button>("pause-menu-button").clicked += flow.ExitToMenu;
             helpBack.clicked += ShowPause;
@@ -101,6 +107,38 @@ namespace GeometricFlight.UI
                 speedLabel.text = $"SPEED {speedPercent}%";
             }
             UpdateThrottleGuidance();
+            UpdateControllerStatus();
+            calibration.Tick();
+        }
+
+        private void ShowOptions() => ShowOverlay(options.Root, options.FirstFocus);
+
+        private void ShowCalibration()
+        {
+            calibration.Open();
+            ShowOverlay(calibration.Root, calibration.FirstFocus);
+        }
+
+        /// <summary>Which device is driving the ship, and a warning (paired with a buzzer cue) when the
+        /// throttle sensor has no signal. While paused by a disconnect, the pause panel explains it.</summary>
+        private void UpdateControllerStatus()
+        {
+            ControllerState controller = ControllerService.Instance.State;
+            bool warning = controller.Connected && !controller.ThrottleValid;
+            string text = !controller.Connected ? "KEYBOARD" : warning ? "THROTTLE SENSOR: NO SIGNAL" : "CONTROLLER";
+            if (text != shownController)
+            {
+                shownController = text;
+                controllerStatus.text = text;
+                controllerStatus.EnableInClassList("hud-controller--warning", warning);
+            }
+
+            bool lost = flow.State == RunState.Paused && flow.PauseReason == PauseReason.ControllerLost;
+            pauseNotice.style.display = lost ? DisplayStyle.Flex : DisplayStyle.None;
+            if (lost)
+                pauseNotice.text = controller.Connected
+                    ? "Controller reconnected. Resume when ready."
+                    : "Controller disconnected. Reconnect it, or resume with the keyboard.";
         }
 
         /// <summary>Inside a ThrottleZone the gauge shows the recommended band and a hint.</summary>
@@ -114,8 +152,9 @@ namespace GeometricFlight.UI
             if (zone == null) return;
 
             Vector2 band = zone.RecommendedCruiseMultiple * flight.CruiseSpeed;
-            string hint = flight.TargetSpeed < band.x - 0.01f ? "RAISE  [E]"
-                : flight.TargetSpeed > band.y + 0.01f ? "LOWER  [Q]" : "HOLD";
+            bool keys = !ControllerService.Instance.State.Connected;
+            string hint = flight.TargetSpeed < band.x - 0.01f ? (keys ? "RAISE  [E]" : "RAISE")
+                : flight.TargetSpeed > band.y + 0.01f ? (keys ? "LOWER  [Q]" : "LOWER") : "HOLD";
             if (hint == shownHint) return;
             shownHint = hint;
             throttleHint.text = hint;
@@ -158,7 +197,11 @@ namespace GeometricFlight.UI
         {
             switch (state)
             {
-                case RunState.Playing: ShowOverlay(null, null); break;
+                case RunState.Playing:
+                    // Resuming (e.g. Esc) mid-calibration abandons it and restores the old values.
+                    if (calibration.IsOpen) calibration.Cancel();
+                    ShowOverlay(null, null);
+                    break;
                 case RunState.Paused: ShowPause(); break;
                 case RunState.Completed:
                     screen.schedule.Execute(ShowResults).ExecuteLater((long)(completedResultsDelay * 1000f));
@@ -195,7 +238,7 @@ namespace GeometricFlight.UI
         private void ShowOverlay(VisualElement panel, VisualElement focus)
         {
             screen.EnableInClassList("screen--dimmed", panel != null);
-            UiScreens.ShowOnly(panel, focus, pausePanel, resultsPanel, options.Root, helpPanel);
+            UiScreens.ShowOnly(panel, focus, pausePanel, resultsPanel, options.Root, helpPanel, calibration.Root);
         }
     }
 }

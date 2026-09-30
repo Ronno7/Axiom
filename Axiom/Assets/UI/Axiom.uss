@@ -384,3 +384,103 @@
     translate: 0 0;
 }
 
+/* Controller status (bottom right). Warnings invert so they read even without the buzzer. */
+.hud-controller {
+    position: absolute;
+    right: 56px;
+    bottom: 48px;
+    padding: 4px 10px;
+}
+
+.screen .hud-controller {
+    font-size: 22px;
+    letter-spacing: 6px;
+    color: rgb(200, 200, 200);
+}
+
+.screen .hud-controller--warning {
+    color: rgb(0, 0, 0);
+    background-color: rgb(235, 235, 235);
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.screen .pause-notice {
+    border-left-width: 4px;
+    border-color: rgb(44, 160, 255);
+    padding-left: 14px;
+    margin-bottom: 20px;
+}
+
+/* ---------- Controller calibration ---------- */
+
+.calibration-instruction {
+    min-height: 64px;
+}
+
+.calibration-live {
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 12px 0 8px 0;
+}
+
+.calibration-stick {
+    width: 200px;
+    height: 200px;
+    margin-right: 48px;
+    border-width: 2px;
+    border-color: rgb(235, 235, 235);
+}
+
+.calibration-cross {
+    position: absolute;
+    background-color: rgb(70, 70, 70);
+}
+
+.calibration-cross--h {
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+}
+
+.calibration-cross--v {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+}
+
+.calibration-stick-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    margin-top: -9px;
+    border-radius: 9px;
+    background-color: rgb(44, 160, 255);
+}
+
+.calibration-throttle {
+    flex-grow: 1;
+}
+
+.calibration-throttle-track {
+    width: 100%;
+    height: 24px;
+}
+
+.calibration-buttons {
+    flex-direction: row;
+    margin-top: 16px;
+}
+
+.calibration-buttons .menu-button {
+    min-width: 300px;
+    margin-right: 16px;
+}
+
+.options-calibrate {
+    margin-top: 16px;
+}

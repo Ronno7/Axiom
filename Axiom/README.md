@@ -10,7 +10,8 @@ namespace.
 2. Open `Assets/Scenes/MainMenu.unity`, set the Game view to **16:9**, press Play,
    and click the Game view. Menus work with mouse or keyboard (arrows, Enter, Esc).
 3. Controls: **WASD/arrows** steer, **Q/E** throttle (it holds when released),
-   **Space** (hold) fire, **Esc** pause.
+   **Space** (hold) fire, **Esc** pause. The Arduino controller is optional and connects
+   on its own: see [Arduino/README.md](Arduino/README.md).
 
 `Prototype.unity` is the first course and can also be played directly.
 

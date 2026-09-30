@@ -360,6 +360,7 @@ GameObject:
   - component: {fileID: 3005}
   - component: {fileID: 3004}
   - component: {fileID: 3007}
+  - component: {fileID: 3009}
   m_Layer: 8
   m_Name: 10_PlayerPrototype
   m_TagString: Untagged
@@ -5550,6 +5551,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 451169378}
+  - {fileID: 69187521}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3000
@@ -5581,7 +5583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c6f2dd96eaa48ceb7af6eeee22cf162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputSource: {fileID: 3000}
+  inputSource: {fileID: 3009}
   forwardSpeed: 6
   throttleMultipliers: {x: 0.6, y: 1.5}
   acceleration: 6
@@ -5726,6 +5728,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.4, y: 0.6, z: 2.6}
   m_Center: {x: 0, y: 0.1, z: 0.3}
+--- !u!114 &3009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 931a4bc2c0172ec4894c5ec083b4b716, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Input.CombinedFlightInput
+  keyboard: {fileID: 3000}
 --- !u!1 &14844702
 GameObject:
   m_ObjectHideFlags: 0
@@ -6180,6 +6195,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 492205407}
   m_ActionId: 0489e84a-4833-4c40-bfae-cea84b696689
+--- !u!1 &69187520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 69187521}
+  - component: {fileID: 69187522}
+  m_Layer: 0
+  m_Name: ControllerFeedback
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &69187521
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69187520}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1246}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &69187522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69187520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07cbf04fd9ef7d444a9dcd9b7cd1fa87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Input.ControllerFeedback
+  shield: {fileID: 3006}
+  flight: {fileID: 3001}
 --- !u!65 &84525678
 BoxCollider:
   m_ObjectHideFlags: 0

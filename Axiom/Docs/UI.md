@@ -19,7 +19,7 @@ panel switching, quit, and time formatting. UI never owns gameplay rules: `Level
 `LevelFlow`/`PlayerFlight` and calls `Resume`, `Retry`, `Continue`, `ExitToMenu`.
 
 **Options** (`Core/GameSettings`, saved in PlayerPrefs): steering sensitivity (50–150%) and
-invert vertical. Volume is left out until the game has audio. Screen shake is left out because shake doesn't exist yet.
+invert vertical, controller buzzer, and **Calibrate controller** (`CalibrationPanel`, a step wizard in `CalibrationWizard`). Volume is left out until the game has audio. Screen shake is left out because shake doesn't exist yet.
 
 **Quit** exits a desktop build; in the editor it stops Play Mode.
 

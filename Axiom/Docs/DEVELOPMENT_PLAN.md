@@ -190,9 +190,9 @@ If time becomes tight, simplify enemy variety, boss complexity, and optional ran
 - [x] Foundation source and static scene delivered.
 - [x] M0 — Import/play/framing checks recorded in `Axiom/Docs/FLIGHT.md`; foundation reference check passed 2026-09-29. Baseline commit: `27890f4`.
 - [x] M1 — Flight, camera, throttle, and shared input implemented and verified in the editor (2026-09-29).
-- [ ] M2 — Shooting, aiming, and target feedback implemented and editor-verified (2026-09-29); awaiting a manual Space hold-to-fire check. See `Axiom/Docs/COMBAT.md`.
-- [ ] M3 — First full loop and functional required UI.
-- [ ] M4 — Arduino integration and preflight.
+- [x] M2 — Shooting, aiming, and target feedback (user-verified 2026-09-29). See `Axiom/Docs/COMBAT.md`.
+- [x] M3 — Full loop, required screens, saved options, throttle sections (user playtested). Quit checked in the editor; the desktop-build check moves to M7.
+- [ ] M4 — Controller software done with a simulator (see `Arduino/README.md`); calibration/preflight screens and hardware testing pending.
 - [ ] M5 — Three levels and simple finale.
 - [ ] M6 — UI polish and user testing.
 - [ ] M7 — Tested desktop build and handoff.
@@ -304,3 +304,14 @@ Refinement after playtest: calmer menu composition; see-through lattice with gap
 spacing and 60–65% band; V-chevron slow cue and zone banner; gates enlarged (they could clip
 the flight area); targets moved later (40/62/80); par 35 s.
 
+### 2026-09-29 — M4 pass 1: controller software (hardware not yet assembled)
+
+Uno sketch, serial protocol v1 with checksums, background-thread link with port scanning,
+reconnect and a simulated controller, sonar filtering (median, smoothing, hold, then ease to cruise),
+keyboard fallback, controller-loss pause, HUD status and warnings, buzzer cues and mute. API
+compatibility is now .NET Framework (required for System.IO.Ports). Verified with tests and the
+simulator in Play Mode; the sketch has not been compiled (no Arduino toolchain on this PC) and
+the hardware is untested. Next: calibration screen and preflight.
+Calibration screen added (Options → Calibrate controller): stick centre, throttle min/max, live
+check with invert switches; tested with the simulator. User wired the hardware; controller reads
+correctly on COM3 after fixing a shorted button. Next: preflight check, then enclosure build.

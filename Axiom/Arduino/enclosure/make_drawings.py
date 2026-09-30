@@ -1,0 +1,508 @@
+#!/usr/bin/env python3
+"""Axiom controller enclosure: generates blueprint.svg (assembly drawing) and
+templates.svg (1:1 cutting templates, print at 100% on US Letter).
+
+Every size is in millimetres and derives from the parameters below. Change a value
+(for example T for thicker foam board) and rerun:  python make_drawings.py
+
+Coordinate system for the interior: x from the inner face of the LEFT wall,
+y from the inner face of the FRONT wall (towards the back), z up from the floor top.
+Outer lid/wall positions add the sheet thickness T.
+"""
+import math
+from pathlib import Path
+
+# ---------------- Material and box ----------------
+T = 4.0                        # sheet thickness: corrugated cardboard ~4, foam board 5
+W_IN, D_IN, H_IN = 196.0, 250.0, 60.0
+W, D, H = W_IN + 2 * T, D_IN + 2 * T, H_IN + 2 * T   # outer (floor + walls + lid)
+
+# ---------------- Throttle tunnel (left side) ----------------
+TUN_W = 56.0                   # inner width; the sled fills it (1 mm clearance each side)
+SENSOR_WALL_Y = 232.0          # front face of the wall the HC-SR04 hides behind
+SENSOR_WIN_W, SENSOR_WIN_H = 17.0, 43.0   # window for the transducers (sensor mounted on its side)
+CAN_LEN = 12.0                 # transducer can length; it pokes CAN_LEN - T into the tunnel
+D_NEAR, D_FAR = 50.0, 170.0    # plate distance from the transducer faces at the two travel ends
+SLED_LEN, RUNNER_H = 50.0, 15.0
+STEM_W, STEM_FROM_PLATE, STEM_LEN = 10.0, 25.0, 90.0
+SLOT_W = 8.0
+
+# ---------------- Stick, trigger, electronics ----------------
+TOWER_X, TOWER_Y, TOWER_SIDE, TOWER_H = 144.0, 32.0, 40.0, 42.0
+STICK_X, STICK_Y = TOWER_X + TOWER_SIDE / 2, TOWER_Y + TOWER_SIDE / 2
+STICK_HOLE = 30.0              # lets the cap dip into the lid at full tilt
+JOY_PCB = (34.0, 26.0)
+BUTTON_X, BUTTON_Z, BUTTON_CUT, BUTTON_CAP = 176.0, 30.0, 6.5, 18.0
+BREADBOARD = (66.0, 78.0, 55.0, 165.0)          # x, y, width, length
+UNO_W, UNO_L, USB_OUT = 53.4, 68.6, 6.2
+UNO = (138.0, D_IN - USB_OUT - UNO_L, UNO_W, UNO_L)
+USB_X = UNO[0] + 37.8          # jack centre along the board edge (check against your board)
+USB_HOLE_W, USB_HOLE_H = 18.0, 16.0
+GRILLE = (94.0, 225.0)         # above the buzzer's end of the breadboard; move to suit
+
+# ---------------- Derived ----------------
+TUN_CX, TUN_CZ = TUN_W / 2, H_IN / 2
+FACE_Y = SENSOR_WALL_Y + T - CAN_LEN              # transducer faces
+PLATE_NEAR, PLATE_FAR = FACE_Y - D_NEAR, FACE_Y - D_FAR
+STEM_NEAR, STEM_FAR = PLATE_NEAR - STEM_FROM_PLATE, PLATE_FAR - STEM_FROM_PLATE
+SLOT_Y0, SLOT_Y1 = STEM_FAR - STEM_W / 2, STEM_NEAR + STEM_W / 2
+SLED_W = TUN_W - 2
+PLATE_H = H_IN - 4
+TRAVEL = D_FAR - D_NEAR
+
+BLUE, RED, ORANGE = "#1c6fd1", "#d62828", "#e8590c"
+
+
+def f(v):
+    return f"{v:.2f}".rstrip("0").rstrip(".")
+
+
+# =====================================================================
+# Blueprint (screen/print sheet, 2 px per mm in each view)
+# =====================================================================
+class View:
+    """Maps millimetres to page pixels. Plan views put +y (towards the back) up the page."""
+
+    def __init__(self, ox, oy, scale=2.0, y_up=True):
+        self.ox, self.oy, self.s, self.y_up = ox, oy, scale, y_up
+
+    def p(self, x, y):
+        return self.ox + x * self.s, (self.oy - y * self.s) if self.y_up else (self.oy + y * self.s)
+
+    def rect(self, x, y, w, h, cls="", extra=""):
+        x0, y0 = self.p(x, y + h if self.y_up else y)
+        return f'<rect x="{f(x0)}" y="{f(y0)}" width="{f(w * self.s)}" height="{f(h * self.s)}" class="{cls}" {extra}/>'
+
+    def circle(self, x, y, r, cls="", extra=""):
+        cx, cy = self.p(x, y)
+        return f'<circle cx="{f(cx)}" cy="{f(cy)}" r="{f(r * self.s)}" class="{cls}" {extra}/>'
+
+    def line(self, x1, y1, x2, y2, cls="", extra=""):
+        a, b = self.p(x1, y1), self.p(x2, y2)
+        return f'<line x1="{f(a[0])}" y1="{f(a[1])}" x2="{f(b[0])}" y2="{f(b[1])}" class="{cls}" {extra}/>'
+
+    def poly(self, pts, cls="", extra=""):
+        s = " ".join(f"{f(a)},{f(b)}" for a, b in (self.p(x, y) for x, y in pts))
+        return f'<polygon points="{s}" class="{cls}" {extra}/>'
+
+    def text(self, x, y, s, cls="lbl", anchor="start", dx=0, dy=0):
+        px, py = self.p(x, y)
+        return f'<text x="{f(px + dx)}" y="{f(py + dy)}" class="{cls}" text-anchor="{anchor}">{s}</text>'
+
+    def dim_h(self, x1, x2, y, label, off=10):
+        """Horizontal dimension; off is in px, positive = below (page)."""
+        a, b = self.p(x1, y), self.p(x2, y)
+        yy = a[1] + off
+        return (f'<line x1="{f(a[0])}" y1="{f(a[1])}" x2="{f(a[0])}" y2="{f(yy + 4 * (1 if off > 0 else -1))}" class="ext"/>'
+                f'<line x1="{f(b[0])}" y1="{f(b[1])}" x2="{f(b[0])}" y2="{f(yy + 4 * (1 if off > 0 else -1))}" class="ext"/>'
+                f'<line x1="{f(a[0])}" y1="{f(yy)}" x2="{f(b[0])}" y2="{f(yy)}" class="dim" marker-start="url(#a)" marker-end="url(#a)"/>'
+                f'<text x="{f((a[0] + b[0]) / 2)}" y="{f(yy - 4)}" class="dimt" text-anchor="middle">{label}</text>')
+
+    def dim_v(self, x, y1, y2, label, off=-10):
+        a, b = self.p(x, y1), self.p(x, y2)
+        xx = a[0] + off
+        tip = xx + (4 if off > 0 else -4)
+        return (f'<line x1="{f(a[0])}" y1="{f(a[1])}" x2="{f(tip)}" y2="{f(a[1])}" class="ext"/>'
+                f'<line x1="{f(b[0])}" y1="{f(b[1])}" x2="{f(tip)}" y2="{f(b[1])}" class="ext"/>'
+                f'<line x1="{f(xx)}" y1="{f(a[1])}" x2="{f(xx)}" y2="{f(b[1])}" class="dim" marker-start="url(#a)" marker-end="url(#a)"/>'
+                f'<text transform="translate({f(xx - 4)},{f((a[1] + b[1]) / 2)}) rotate(-90)" class="dimt" text-anchor="middle">{label}</text>')
+
+
+def callout(x1, y1, x2, y2, label, anchor="start"):
+    return (f'<polyline points="{f(x1)},{f(y1)} {f(x2)},{f(y2)}" class="lead"/>'
+            f'<circle cx="{f(x1)}" cy="{f(y1)}" r="2" fill="#333"/>'
+            f'<text x="{f(x2 + (4 if anchor == "start" else -4))}" y="{f(y2 + 4)}" class="lbl" text-anchor="{anchor}">{label}</text>')
+
+
+def blueprint():
+    out = []
+    add = out.append
+    add('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1320" width="1600" height="1320" '
+        'font-family="Segoe UI, Helvetica, Arial, sans-serif">')
+    add("""<title>Axiom controller enclosure blueprint</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,1 L9,5 L0,9" fill="none" stroke="#444" stroke-width="1.4"/></marker>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+<line x1="0" y1="0" x2="0" y2="6" stroke="#b9a98f" stroke-width="2"/></pattern></defs>
+<style>
+.sheet{fill:#e9dcc3;stroke:#8a7757;stroke-width:1.2}
+.cut{fill:url(#hatch);stroke:#8a7757;stroke-width:1.2}
+.void{fill:#fbf8f2;stroke:#8a7757;stroke-width:1}
+.hole{fill:#ffffff;stroke:#222;stroke-width:1.4}
+.lidcut{fill:none;stroke:#222;stroke-width:1.4;stroke-dasharray:6 4}
+.ghost{fill:none;stroke:#999;stroke-width:1;stroke-dasharray:4 3}
+.pcbg{fill:#2f7d4f;stroke:#1d5233;stroke-width:1}
+.pcbb{fill:#1c5fa8;stroke:#123f70;stroke-width:1}
+.uno{fill:#0f7291;stroke:#0a4f66;stroke-width:1}
+.bb{fill:#f4f4f0;stroke:#bdbdb4;stroke-width:1}
+.metal{fill:#c9ced3;stroke:#7d868f;stroke-width:1}
+.dark{fill:#2b2b2b;stroke:#111;stroke-width:1}
+.plate{fill:#f7f7f7;stroke:#333;stroke-width:1.6}
+.sled{fill:#d7c7a6;stroke:#6e5d3e;stroke-width:1.2}
+.beam{fill:rgba(28,111,209,0.12);stroke:#1c6fd1;stroke-width:1;stroke-dasharray:5 3}
+.ext{stroke:#777;stroke-width:0.8}
+.dim{stroke:#444;stroke-width:1}
+.dimt{font-size:12px;fill:#222}
+.lead{fill:none;stroke:#333;stroke-width:1}
+.lbl{font-size:13px;fill:#222}
+.lbls{font-size:11px;fill:#555}
+.lblw{font-size:11px;fill:#fff;font-weight:700}
+.title{font-size:17px;font-weight:700;fill:#111}
+.sub{font-size:12px;fill:#555}
+.tbl{font-size:12.5px;fill:#222}
+.tblh{font-size:13px;font-weight:700;fill:#111}
+</style>
+<rect width="1600" height="1320" fill="#ffffff"/>""")
+    add('<text x="40" y="44" font-size="26" font-weight="800" fill="#111">AXIOM CONTROLLER · ENCLOSURE BLUEPRINT</text>')
+    add(f'<text x="40" y="68" class="sub">Desk console in {f(T)} mm corrugated cardboard or foam board, hot glued. All dimensions in mm. '
+        f'Outer box {f(W)} W × {f(D)} D × {f(H)} H. Generated by make_drawings.py — change the parameters there and rerun.</text>')
+
+    # ---------------- 1. Interior plan ----------------
+    v = View(60, 700)
+    add('<text x="60" y="110" class="title">1 · INTERIOR LAYOUT (lid removed)</text>')
+    add('<text x="60" y="128" class="sub">Front of the console at the bottom. Dashed = lid openings above.</text>')
+    add(v.rect(-T, -T, W, D, "sheet"))
+    add(v.rect(0, 0, W_IN, D_IN, "void"))
+    # tunnel and walls
+    add(v.rect(TUN_W, 0, T, SENSOR_WALL_Y, "cut"))                      # divider
+    add(v.rect(0, SENSOR_WALL_Y, TUN_W, T, "cut"))                      # sensor wall
+    add(v.rect(0, 0, TUN_W, SENSOR_WALL_Y, "void", 'fill="#f3ecde"'))    # tunnel floor tint
+    add(v.text(TUN_CX, 205, "THROTTLE", "lbls", "middle"))
+    add(v.text(TUN_CX, 198, "TUNNEL", "lbls", "middle"))
+    # sensor behind the wall (on its side): cans through the window, PCB flat on the back face
+    add(v.rect(TUN_CX - 8, FACE_Y, 16, CAN_LEN - T, "metal"))
+    add(v.rect(TUN_CX - 10, SENSOR_WALL_Y + T, 20, 1.6, "pcbb"))
+    add(v.rect(TUN_CX + 10, SENSOR_WALL_Y + T - 1, 25, 3, "dark"))       # header + sockets, pointing +x
+    # sled at mid travel, ghosts at both ends
+    mid = (PLATE_NEAR + PLATE_FAR) / 2
+    for py, cls in ((PLATE_NEAR, "ghost"), (PLATE_FAR, "ghost"), (mid, "sled")):
+        add(v.rect(1, py - SLED_LEN, SLED_W, SLED_LEN, cls))
+        if cls == "sled":
+            add(v.rect(1, py - T, SLED_W, T, "plate"))
+            add(v.rect(TUN_CX - STEM_W / 2, py - STEM_FROM_PLATE - 2, STEM_W, 4, "dark"))
+    add(v.poly([(TUN_CX - 8, FACE_Y), (TUN_CX + 8, FACE_Y), (TUN_CX + 8 + (FACE_Y - mid) * math.tan(math.radians(7.5)), mid),
+                (TUN_CX - 8 - (FACE_Y - mid) * math.tan(math.radians(7.5)), mid)], "beam"))
+    add(v.rect(TUN_CX - SLOT_W / 2, SLOT_Y0, SLOT_W, SLOT_Y1 - SLOT_Y0, "lidcut"))
+    # electronics
+    bx, by, bw, bl = BREADBOARD
+    add(v.rect(bx, by, bw, bl, "bb"))
+    for xx in (bx + 4, bx + 8, bx + bw - 8, bx + bw - 4):
+        add(v.line(xx, by + 4, xx, by + bl - 4, "", f'stroke="{RED if xx in (bx + 4, bx + bw - 4) else BLUE}" stroke-width="1"'))
+    add(v.rect(bx + bw / 2 - 1.5, by + 3, 3, bl - 6, "", 'fill="#dcdcd4"'))
+    add(v.text(bx + bw / 2, by + bl / 2, "BREADBOARD", "lbls", "middle"))
+    add(v.circle(bx + bw / 2 + 12, by + bl - 22, 6, "dark"))
+    ux, uy, uw, ul = UNO
+    add(v.rect(ux, uy, uw, ul, "uno"))
+    add(v.rect(USB_X - 6, uy + ul - 4, 12, USB_OUT + 4, "metal"))
+    add(v.text(ux + uw / 2, uy + ul / 2 - 4, "UNO", "lblw", "middle"))
+    # joystick tower
+    add(v.rect(TOWER_X, TOWER_Y, TOWER_SIDE, TOWER_SIDE, "sled"))
+    add(v.rect(STICK_X - JOY_PCB[0] / 2, STICK_Y - JOY_PCB[1] / 2, JOY_PCB[0], JOY_PCB[1], "pcbg"))
+    add(v.rect(STICK_X - JOY_PCB[0] / 2 - 8, STICK_Y - 6, 8, 12, "dark"))
+    add(v.circle(STICK_X, STICK_Y, 12, "dark"))
+    add(v.circle(STICK_X, STICK_Y, STICK_HOLE / 2, "lidcut"))
+    # trigger behind the front wall
+    add(v.rect(BUTTON_X - 3, 0, 6, 4, "dark"))
+    add(v.rect(BUTTON_X - BUTTON_CAP / 2, -T - 3, BUTTON_CAP, 3, "plate"))
+    # grille and USB
+    add(v.circle(GRILLE[0], GRILLE[1], 9, "lidcut"))
+    add(v.rect(USB_X - USB_HOLE_W / 2, D_IN, USB_HOLE_W, T, "hole"))
+    # callouts
+    X = lambda x: v.p(x, 0)[0]
+    Y = lambda y: v.p(0, y)[1]
+    add(callout(X(TUN_CX), Y(FACE_Y + 6), X(-T) - 10, Y(D_IN + 26), "HC-SR04 glued behind sensor wall", "end"))
+    add(callout(X(TUN_CX), Y(mid - 20), X(-T) - 10, Y(mid - 20), "Sled + reflector plate", "end"))
+    add(callout(X(TUN_CX), Y(STEM_FAR), X(-T) - 10, Y(STEM_FAR - 10), "Lid slot (lever travel)", "end"))
+    add(callout(X(STICK_X + 12), Y(STICK_Y + 10), X(W_IN + T) + 16, Y(STICK_Y + 44), "Joystick on tower (h " + f(TOWER_H) + ")"))
+    add(callout(X(BUTTON_X), Y(-T - 1), X(W_IN + T) + 16, Y(10), "Trigger: 6×6 button + cap"))
+    add(callout(X(USB_X), Y(D_IN + 2), X(W_IN + T) + 16, Y(D_IN + 20), "USB notch in back wall"))
+    add(callout(X(ux + uw / 2), Y(uy + 20), X(W_IN + T) + 16, Y(uy + 20), "Uno (USB to the back)"))
+    add(callout(X(bx + bw / 2 + 12), Y(by + bl - 22), X(W_IN + T) + 16, Y(by + bl - 60), "Buzzer (under lid grille)"))
+    add(v.dim_h(-T, W_IN + T, -T, f"{f(W)} outer", 34))
+    add(v.dim_h(0, TUN_W, 0, f"{f(TUN_W)} tunnel", 18))
+    add(v.dim_v(-T, -T, D_IN + T, f"{f(D)} outer", -34))
+
+    # ---------------- 2. Lid ----------------
+    L = View(660, 700)
+    add('<text x="660" y="110" class="title">2 · LID CUTOUTS</text>')
+    add('<text x="660" y="128" class="sub">Measured from the lid\'s outer LEFT and FRONT edges.</text>')
+    add(L.rect(0, 0, W, D, "sheet"))
+    sx, sy = TUN_CX + T, 0
+    add(L.rect(sx - SLOT_W / 2, SLOT_Y0 + T, SLOT_W, SLOT_Y1 - SLOT_Y0, "hole"))
+    add(L.circle(STICK_X + T, STICK_Y + T, STICK_HOLE / 2, "hole"))
+    for i in range(7):
+        a = i * math.pi / 3
+        gx, gy = (GRILLE[0] + T, GRILLE[1] + T) if i == 6 else (GRILLE[0] + T + 7 * math.cos(a), GRILLE[1] + T + 7 * math.sin(a))
+        add(L.circle(gx, gy, 1.5, "hole"))
+    add(L.line(sx, SLOT_Y0 + T, sx, -2, "", 'stroke="#aaa" stroke-dasharray="3 3"'))
+    add(L.dim_h(0, sx, 0, f(sx), 20))
+    add(L.dim_h(0, STICK_X + T, 0, f(STICK_X + T), 40))
+    add(L.dim_v(W, 0, SLOT_Y0 + T, f(SLOT_Y0 + T), 18))
+    add(L.dim_v(W, 0, STICK_Y + T, f(STICK_Y + T), 44))
+    add(L.dim_v(sx - SLOT_W / 2, SLOT_Y0 + T, SLOT_Y1 + T, f"slot {f(SLOT_Y1 - SLOT_Y0)} × {f(SLOT_W)}", -10))
+    add(L.text(STICK_X + T, STICK_Y + T + STICK_HOLE / 2 + 4, f"Ø{f(STICK_HOLE)}", "lbl", "middle"))
+    add(L.text(GRILLE[0] + T, GRILLE[1] + T + 12, "sound grille 7× Ø3", "lbls", "middle"))
+    add(L.text(W / 2, D - 8, "BACK EDGE · tape hinge", "lbls", "middle"))
+    add(L.text(W / 2, 6, "FRONT EDGE", "lbls", "middle"))
+    add(L.text(W / 2, D / 2 + 30, "Throttle knob push-fits on the stem", "lbls", "middle"))
+    add(L.text(W / 2, D / 2 + 22, "(not glued) so the lid can lift off.", "lbls", "middle"))
+
+    # ---------------- 3. Section through the tunnel ----------------
+    S = View(1100, 330)
+    add('<text x="1100" y="110" class="title">3 · SECTION A–A THROUGH THE THROTTLE</text>')
+    add('<text x="1100" y="128" class="sub">Viewed from the left. Front of the console on the left. Sled drawn at mid travel.</text>')
+    # page x = y (front→back), page y = z
+    Sz = lambda y, z: S.p(y + T, z + T)
+
+    class SV:  # section helpers: (y, z) in interior coords
+        @staticmethod
+        def rect(y, z, dy, dz, cls, extra=""):
+            return S.rect(y + T, z + T, dy, dz, cls, extra)
+
+        @staticmethod
+        def line(y1, z1, y2, z2, cls="", extra=""):
+            return S.line(y1 + T, z1 + T, y2 + T, z2 + T, cls, extra)
+
+        @staticmethod
+        def poly(pts, cls, extra=""):
+            return S.poly([(a + T, b + T) for a, b in pts], cls, extra)
+
+    add(S.rect(0, 0, D, T, "cut"))                                   # floor
+    add(S.rect(0, H - T, TUN_CX, T, "cut"))                          # lid pieces either side of the slot
+    add(SV.rect(SLOT_Y1, H_IN, D_IN - SLOT_Y1 + T, T, "cut"))
+    add(SV.rect(-T, H_IN, SLOT_Y0 + T, T, "cut"))
+    add(S.rect(0, T, T, H_IN, "cut"))                                # front wall
+    add(S.rect(D - T, T, T, H_IN, "cut"))                            # back wall
+    win_z0 = TUN_CZ - SENSOR_WIN_H / 2
+    add(SV.rect(SENSOR_WALL_Y, 0, T, win_z0, "cut"))                 # sensor wall below/above the window
+    add(SV.rect(SENSOR_WALL_Y, win_z0 + SENSOR_WIN_H, T, H_IN - win_z0 - SENSOR_WIN_H, "cut"))
+    add(SV.rect(SENSOR_WALL_Y + T, TUN_CZ - 22.5, 1.6, 45, "pcbb"))  # PCB on its side
+    for cz in (TUN_CZ - 13, TUN_CZ + 13):
+        add(SV.rect(FACE_Y, cz - 8, CAN_LEN, 16, "metal"))
+    add(SV.poly([(FACE_Y, TUN_CZ - 16), (FACE_Y, TUN_CZ + 16), (mid, TUN_CZ + 16 + (FACE_Y - mid) * math.tan(math.radians(7.5))),
+                 (mid, TUN_CZ - 16 - (FACE_Y - mid) * math.tan(math.radians(7.5)))], "beam"))
+    for py in (PLATE_NEAR, PLATE_FAR):
+        add(SV.rect(py - SLED_LEN, 0, SLED_LEN, PLATE_H, "ghost"))
+    add(SV.rect(mid - SLED_LEN, 0, SLED_LEN, RUNNER_H, "sled"))       # base + runners (side view)
+    add(SV.rect(mid - T, 0, T, PLATE_H, "plate"))                      # reflector plate
+    add(SV.poly([(mid - T, RUNNER_H), (mid - T, RUNNER_H + 28), (mid - T - 28, RUNNER_H)], "sled"))  # gusset
+    stem_y = mid - STEM_FROM_PLATE
+    add(SV.rect(stem_y - STEM_W / 2, RUNNER_H, STEM_W, STEM_LEN - RUNNER_H, "sled"))
+    add(SV.rect(stem_y - 15, H_IN - 4, 30, 3, "sled"))                  # collar under the lid
+    add(SV.rect(stem_y - 20, H_IN + T + 14, 40, 14, "dark"))            # knob
+    add(S.text(stem_y + T, H + 34, "KNOB (push-fit)", "lbls", "middle"))
+    Sx = lambda y: S.p(y + T, 0)[0]
+    Sy = lambda z: S.p(0, z + T)[1]
+    add(callout(Sx(FACE_Y + 6), Sy(TUN_CZ + 13), Sx(FACE_Y + 6), Sy(H_IN + 50), "HC-SR04 (hidden)"))
+    add(callout(Sx(mid - 2), Sy(PLATE_H - 6), Sx(mid + 20), Sy(H_IN + 34), "Reflector plate — flat, square to the sensor"))
+    add(callout(Sx(stem_y - 15), Sy(H_IN - 3), Sx(stem_y - 60), Sy(H_IN + 34), "Collar rides under lid", "end"))
+    add(callout(Sx(mid - 30), Sy(RUNNER_H / 2), Sx(mid - 60), Sy(-24), "Sled runs on the tunnel floor (tape-lined)", "end"))
+    add(SV.line(FACE_Y, -10, FACE_Y, -2, "ext"))
+    add(S.dim_h(PLATE_NEAR + T, FACE_Y + T, 0, f"near {f(D_NEAR)}", 34))
+    add(S.dim_h(PLATE_FAR + T, FACE_Y + T, 0, f"far {f(D_FAR)} (travel {f(TRAVEL)})", 58))
+    add(S.dim_v(D, T, H - T, f"{f(H_IN)} inside", 30))
+    add(S.dim_v(D + 30, 0, H, f"{f(H)} outer", 30))
+
+    # ---------------- 4. Front and back views ----------------
+    F = View(1100, 560)
+    add('<text x="1100" y="440" class="title">4 · FRONT VIEW</text>')
+    add(F.rect(0, 0, W, H, "sheet"))
+    add(F.rect(BUTTON_X + T - BUTTON_CUT / 2, BUTTON_Z + T - BUTTON_CUT / 2, BUTTON_CUT, BUTTON_CUT, "hole"))
+    add(F.circle(BUTTON_X + T, BUTTON_Z + T, BUTTON_CAP / 2, "ghost"))
+    add(F.rect(STICK_X + T - 13, H, 26, 12, "dark"))                  # stick cap above the lid
+    add(F.rect(TUN_CX + T - 20, H + 14, 40, 14, "dark"))              # throttle knob
+    add(F.dim_h(0, BUTTON_X + T, 0, f(BUTTON_X + T), 22))
+    add(F.dim_v(W, 0, BUTTON_Z + T, f(BUTTON_Z + T), 20))
+    add(F.text(BUTTON_X + T + 12, BUTTON_Z + T + 6, f"trigger: {f(BUTTON_CUT)} square, Ø{f(BUTTON_CAP)} cap", "lbls"))
+
+    B = View(1100, 760)
+    add('<text x="1100" y="640" class="title">5 · BACK VIEW</text>')
+    add(B.rect(0, 0, W, H, "sheet"))
+    ux_out = W - (USB_X + T)   # seen from behind, left/right swap
+    add(B.rect(ux_out - USB_HOLE_W / 2, T, USB_HOLE_W, USB_HOLE_H, "hole"))
+    add(B.dim_h(0, ux_out, 0, f"{f(ux_out)} from this edge", 22))
+    add(B.text(ux_out + USB_HOLE_W / 2 + 6, T + 10, f"USB notch {f(USB_HOLE_W)} × {f(USB_HOLE_H)} from the floor", "lbls"))
+    add(B.text(0, H + 6, "Lid hinge: packing tape along this top edge", "lbls"))
+
+    # ---------------- 6. Sled detail ----------------
+    add('<text x="1100" y="840" class="title">6 · THROTTLE SLED (the moving part)</text>')
+    Q = View(1100, 1010)
+    add(Q.rect(0, 0, SLED_W, SLED_LEN, "sled"))                     # base (top view)
+    add(Q.rect(0, SLED_LEN - T, SLED_W, T, "plate"))
+    add(Q.rect(0, 0, 3, SLED_LEN - T, "sheet"))
+    add(Q.rect(SLED_W - 3, 0, 3, SLED_LEN - T, "sheet"))
+    add(Q.rect(SLED_W / 2 - STEM_W / 2, SLED_LEN - T - STEM_FROM_PLATE - 2, STEM_W, 4, "dark"))
+    add(Q.dim_h(0, SLED_W, 0, f(SLED_W), 18))
+    add(Q.dim_v(0, 0, SLED_LEN, f(SLED_LEN), -14))
+    add(Q.text(SLED_W / 2, SLED_LEN + 6, "top: base + runners, plate at the back", "lbls", "middle"))
+    R2 = View(1260, 1010)
+    add(R2.rect(0, 0, SLED_W, PLATE_H, "plate"))
+    add(R2.rect(SLED_W / 2 - STEM_W / 2, 0, STEM_W, 0, "dark"))
+    add(R2.dim_h(0, SLED_W, 0, f(SLED_W), 18))
+    add(R2.dim_v(SLED_W, 0, PLATE_H, f(PLATE_H), 16))
+    add(R2.text(SLED_W / 2, PLATE_H / 2, "REFLECTOR", "lbls", "middle"))
+    add(R2.text(SLED_W / 2, PLATE_H / 2 - 7, "smooth face", "lbls", "middle"))
+    add(R2.text(SLED_W / 2, PLATE_H + 6, "back: plate fills the tunnel", "lbls", "middle"))
+    notes = ["Base " + f(SLED_W) + " × " + f(SLED_LEN) + "; runners 2× " + f(SLED_LEN) + " × " + f(RUNNER_H) + " glued on edge along the sides.",
+             "Plate " + f(SLED_W) + " × " + f(PLATE_H) + ": smooth card or plastic, braced square with 2 triangular gussets.",
+             "Stem " + f(STEM_W) + " × " + f(STEM_LEN) + " (3 layers laminated) " + f(STEM_FROM_PLATE) + " in front of the plate.",
+             "Collar 30 × 20 glued to the stem just under the lid stops the sled lifting or tilting.",
+             "Line the tunnel floor and walls with packing tape: it slides smoothly and quietly."]
+    for i, n in enumerate(notes):
+        add(f'<text x="1100" y="{1090 + i * 18}" class="tbl">• {n}</text>')
+
+    # ---------------- 7. Tables ----------------
+    def table(x, y, title, rows, widths):
+        add(f'<text x="{x}" y="{y}" class="title">{title}</text>')
+        yy = y + 22
+        for r, row in enumerate(rows):
+            if r == 0:
+                add(f'<rect x="{x - 6}" y="{yy - 15}" width="{sum(widths) + 12}" height="21" fill="#efe7d6"/>')
+            xx = x
+            for c, cell in enumerate(row):
+                add(f'<text x="{xx}" y="{yy}" class="{"tblh" if r == 0 else "tbl"}">{cell}</text>')
+                xx += widths[c]
+            yy += 20
+        return yy
+
+    y0 = 760
+    table(60, y0, "7 · PARTS (researched sizes — measure yours, clones vary)",
+          [["Part", "Size (mm)", "Mounting"],
+           ["Arduino Uno R3", "68.6 × 53.4, USB-B sticks out 6.2", "Corral of card strips on the floor, no glue on the PCB"],
+           ["Breadboard, 830 point", "165 × 55 × 8.5–10", "Its own adhesive backing"],
+           ["HC-SR04", "45 × 20 × 15, cans Ø16", "Hot glue PCB edges behind the sensor wall, on its side"],
+           ["KY-023 joystick", "34 × 26 × 32 (with cap)", "Hot glue PCB to the tower top; shim for clearance"],
+           ["6×6 tactile button", "6 × 6 × ~5", "Body in the front-wall square, glued from inside"],
+           ["Active buzzer", "Ø12 × 9.5", "Stays on the breadboard, under the grille"]],
+          [170, 230, 420])
+    table(60, y0 + 190, "8 · WIRE BUDGET (kit: 10 male–female, 65 male–male)",
+          [["Link", "Female ends needed", "Note"],
+           ["Joystick → breadboard", "5", "M–F; SW (pause) is optional"],
+           ["HC-SR04 → breadboard", "4", "M–F, sockets point into the electronics bay"],
+           ["Trigger button → breadboard", "2", "Only 1 M–F left: wrap the GND leg round an M–M pin and glue, or skip SW"],
+           ["Everything else", "0", "M–M; extend reach by hopping through a spare breadboard row"]],
+          [230, 170, 420])
+    table(60, y0 + 330, "9 · BUILD ORDER",
+          [["#", "Step", ""],
+           ["1", "Cut floor, walls, divider, sensor wall, lid; print templates.svg at 100% for the openings.", ""],
+           ["2", "Glue walls to the floor, then the divider and sensor wall. Tape-line the tunnel.", ""],
+           ["3", "Build the sled; check it slides full length with the stem through a test slot.", ""],
+           ["4", "Glue HC-SR04 behind the window, tower + joystick, trigger button; place Uno and breadboard.", ""],
+           ["5", "Wire (see wiring.svg), fit the lid, push on the knob. Calibrate in game: Options → Calibrate.", ""]],
+          [30, 790, 0])
+    add("</svg>")
+    return "\n".join(out)
+
+
+# =====================================================================
+# Templates (1:1, US Letter). Units are millimetres.
+# =====================================================================
+def templates():
+    PW, PH = 215.9, 279.4
+    o = []
+    add = o.append
+    add(f'<svg xmlns="http://www.w3.org/2000/svg" width="{PW}mm" height="{PH}mm" viewBox="0 0 {PW} {PH}" '
+        'font-family="Segoe UI, Helvetica, Arial, sans-serif">')
+    add("""<title>Axiom controller cutting templates (1:1)</title>
+<style>
+.c{fill:none;stroke:#000;stroke-width:0.35}
+.cx{stroke:#666;stroke-width:0.2}
+.t{font-size:3.2px;fill:#111}
+.s{font-size:2.6px;fill:#444}
+.h{font-size:4.6px;font-weight:700;fill:#111}
+.part{fill:#f3ecde;stroke:#000;stroke-width:0.35}
+</style>""")
+    add(f'<rect width="{PW}" height="{PH}" fill="#fff"/>')
+    add('<text x="10" y="14" class="h">AXIOM CONTROLLER — CUTTING TEMPLATES (print at 100% / actual size)</text>')
+    add('<text x="10" y="19.5" class="s">Check the scale bar first. Cut out, place on the sheet at the stated position, trace or cut through.</text>')
+    add('<line x1="150" y1="17" x2="200" y2="17" stroke="#000" stroke-width="0.6"/>'
+        '<line x1="150" y1="15" x2="150" y2="19" stroke="#000" stroke-width="0.4"/>'
+        '<line x1="200" y1="15" x2="200" y2="19" stroke="#000" stroke-width="0.4"/>'
+        '<text x="175" y="14" class="s" text-anchor="middle">must measure 50 mm</text>')
+
+    def cross(x, y, r):
+        add(f'<line x1="{f(x - r)}" y1="{f(y)}" x2="{f(x + r)}" y2="{f(y)}" class="cx"/>'
+            f'<line x1="{f(x)}" y1="{f(y - r)}" x2="{f(x)}" y2="{f(y + r)}" class="cx"/>')
+
+    def label(x, y, lines):
+        for i, s in enumerate(lines):
+            add(f'<text x="{f(x)}" y="{f(y + i * 4.2)}" class="{"t" if i == 0 else "s"}">{s}</text>')
+
+    # Lid: joystick hole
+    cx, cy = 30, 48
+    add(f'<circle cx="{cx}" cy="{cy}" r="{f(STICK_HOLE / 2)}" class="c"/>')
+    cross(cx, cy, STICK_HOLE / 2 + 4)
+    label(10, 72, [f"LID · joystick hole Ø{f(STICK_HOLE)}", f"centre {f(STICK_X + T)} from left edge,",
+                   f"{f(STICK_Y + T)} from front edge"])
+
+    # Lid: sound grille
+    gx, gy = 80, 48
+    for i in range(7):
+        a = i * math.pi / 3
+        px, py = (gx, gy) if i == 6 else (gx + 7 * math.cos(a), gy + 7 * math.sin(a))
+        add(f'<circle cx="{f(px)}" cy="{f(py)}" r="1.5" class="c"/>')
+    cross(gx, gy, 12)
+    label(62, 72, ["LID · sound grille 7× Ø3", f"centre {f(GRILLE[0] + T)} from left,", f"{f(GRILLE[1] + T)} from front (over the buzzer)"])
+
+    # Sensor wall window
+    wx, wy = 118, 30
+    add(f'<rect x="{wx}" y="{wy}" width="{f(SENSOR_WIN_W)}" height="{f(SENSOR_WIN_H)}" rx="3" class="c"/>')
+    cross(wx + SENSOR_WIN_W / 2, wy + SENSOR_WIN_H / 2, 26)
+    label(108, 82, [f"SENSOR WALL · window {f(SENSOR_WIN_W)} × {f(SENSOR_WIN_H)}", f"centred: {f(TUN_CX)} from either side,",
+                    f"{f(TUN_CZ)} up from the wall's bottom edge", "Check against your sensor's cans"])
+
+    # USB notch
+    nx, ny = 160, 30
+    add(f'<path d="M{nx},{ny + USB_HOLE_H} L{nx},{ny} L{nx + USB_HOLE_W},{ny} L{nx + USB_HOLE_W},{ny + USB_HOLE_H}" class="c"/>')
+    add(f'<line x1="{nx - 4}" y1="{ny + USB_HOLE_H}" x2="{nx + USB_HOLE_W + 4}" y2="{ny + USB_HOLE_H}" class="cx" stroke-dasharray="1 1"/>')
+    label(152, 56, [f"BACK WALL · USB notch {f(USB_HOLE_W)} × {f(USB_HOLE_H)}", "open to the wall's bottom edge (dotted)",
+                    f"centre ≈ {f(USB_X + T)} from the LEFT (inside)", "confirm with the Uno in place"])
+
+    # Trigger
+    bx, by = 30, 108
+    add(f'<rect x="{f(bx - BUTTON_CUT / 2)}" y="{f(by - BUTTON_CUT / 2)}" width="{f(BUTTON_CUT)}" height="{f(BUTTON_CUT)}" class="c"/>')
+    cross(bx, by, 8)
+    add(f'<circle cx="{bx + 32}" cy="{by}" r="{f(BUTTON_CAP / 2)}" class="part"/>')
+    label(10, 124, [f"FRONT WALL · trigger square {f(BUTTON_CUT)}", f"centre {f(BUTTON_X + T)} from left edge,",
+                    f"{f(BUTTON_Z)} up from the wall's bottom edge"])
+    label(52, 124, [f"TRIGGER CAP Ø{f(BUTTON_CAP)}", "2–3 layers, glue to the actuator only"])
+
+    # Lid slot (long) along the right side of the page
+    sx, sy = 196, 96
+    add(f'<rect x="{f(sx - SLOT_W / 2)}" y="{sy}" width="{f(SLOT_W)}" height="{f(SLOT_Y1 - SLOT_Y0)}" rx="{f(SLOT_W / 2)}" class="c"/>')
+    add(f'<line x1="{sx}" y1="{sy - 4}" x2="{sx}" y2="{f(sy + SLOT_Y1 - SLOT_Y0 + 4)}" class="cx"/>')
+    add(f'<text transform="translate({f(sx - 8)},{f(sy + (SLOT_Y1 - SLOT_Y0) / 2)}) rotate(-90)" class="t" text-anchor="middle">'
+        f'LID · throttle slot {f(SLOT_Y1 - SLOT_Y0)} × {f(SLOT_W)}</text>')
+    add(f'<text transform="translate({f(sx - 4.2)},{f(sy + (SLOT_Y1 - SLOT_Y0) / 2)}) rotate(-90)" class="s" text-anchor="middle">'
+        f'centre line {f(TUN_CX + T)} from left edge; runs {f(SLOT_Y0 + T)} → {f(SLOT_Y1 + T)} from the front edge</text>')
+
+    # Sled parts
+    add('<text x="10" y="142" class="t" font-weight="700">THROTTLE SLED PARTS (cut from the same sheet)</text>')
+
+    def part(x, y, w, h, name, qty=""):
+        add(f'<rect x="{f(x)}" y="{f(y)}" width="{f(w)}" height="{f(h)}" class="part"/>')
+        add(f'<text x="{f(x + w / 2)}" y="{f(y + h / 2)}" class="t" text-anchor="middle">{name}</text>')
+        add(f'<text x="{f(x + w / 2)}" y="{f(y + h / 2 + 3.6)}" class="s" text-anchor="middle">{f(w)} × {f(h)} {qty}</text>')
+
+    part(10, 148, SLED_W, SLED_LEN, "BASE")
+    part(70, 148, SLED_W, PLATE_H, "REFLECTOR PLATE", "(smooth face)")
+    part(130, 148, SLED_LEN, RUNNER_H, "RUNNER", "×2")
+    part(130, 167, 30, 20, "COLLAR")
+    add(f'<polygon points="130,192 160,192 130,222" class="part"/><text x="137" y="205" class="s">GUSSET ×2</text>'
+        '<text x="137" y="209" class="s">30 × 30</text>')
+    part(10, 206, STEM_LEN, STEM_W, "STEM", "×3 laminated")
+    part(10, 222, 40, 14, "KNOB", "×3 stacked, slot 10×4")
+    add(f'<rect x="{f(30 - 5)}" y="{f(229 - 2)}" width="10" height="4" fill="#fff" stroke="#000" stroke-width="0.3"/>')
+    label(10, 246, ["Sled assembly: runners on edge along the base sides; plate glued square at the back end",
+                    f"with the gussets; stem centred {f(STEM_FROM_PLATE)} in front of the plate; collar at the stem height",
+                    f"that sits just under the lid (about {f(H_IN - RUNNER_H - 2)} above the base). Knob push-fits, no glue."])
+    add("</svg>")
+    return "\n".join(o)
+
+
+if __name__ == "__main__":
+    here = Path(__file__).parent
+    (here / "blueprint.svg").write_text(blueprint(), encoding="utf-8")
+    (here / "templates.svg").write_text(templates(), encoding="utf-8")
+    print(f"Outer box {W} x {D} x {H} mm; throttle travel {TRAVEL} mm "
+          f"({D_NEAR}-{D_FAR} mm from the sensor); slot {SLOT_Y1 - SLOT_Y0} mm.")

@@ -21,6 +21,8 @@ installed package versions, including the user's Unity MCP installation.
 | `Assets/Scripts/Input` | Shared steering/throttle/fire/pause snapshot and keyboard Input System adapter |
 | `Assets/Scripts/Player` | Stateless movement rules, player component, forward-following camera |
 | `Assets/Scripts/Combat` | Weapons, projectiles, pools, shootable targets, enemy turret, shatter effect |
+| `Assets/Scripts/Input/Controller` | Arduino protocol, calibration/filtering, serial link and simulator, `ControllerService` |
+| `Arduino/` | Uno sketch, wiring, and protocol (`README.md`) |
 | `Assets/Scripts/Core/LevelFlow.cs` | Run state (pause/complete/fail), stats, retry/menu scene loads |
 | `Assets/Prefabs/Player/PlayerProjectile.prefab` | Pooled shot (no collider; hits by sweep) |
 | `Assets/Scripts/Presentation/PrototypeMesh.cs` | Edit/Play Mode geometry |

@@ -1,5 +1,6 @@
 using System;
 using GeometricFlight.Combat;
+using GeometricFlight.Input;
 using GeometricFlight.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,6 +8,8 @@ using UnityEngine.SceneManagement;
 namespace GeometricFlight.Core
 {
     public enum RunState { Playing, Paused, Completed, Failed }
+
+    public enum PauseReason { None, Player, FocusLost, ControllerLost }
 
     /// <summary>Owns one run of a course: pause, completion at the course end, failure when the
     /// shield depletes, and run statistics. UI observes StateChanged and calls the public actions.
@@ -32,6 +35,7 @@ namespace GeometricFlight.Core
 
         public event Action<RunState> StateChanged;
         public RunState State { get; private set; } = RunState.Playing;
+        public PauseReason PauseReason { get; private set; }
         public float ElapsedTime { get; private set; }
         public int TargetsDestroyed { get; private set; }
         public int TargetsTotal { get; private set; }
@@ -52,12 +56,14 @@ namespace GeometricFlight.Core
             TargetsTotal = targets.Length;
             foreach (ShootableTarget target in targets) target.Destroyed += CountTarget;
             shield.Depleted += Fail;
+            ControllerService.Instance.Disconnected += OnControllerLost;
         }
 
         private void OnDestroy()
         {
             foreach (ShootableTarget target in targets) if (target != null) target.Destroyed -= CountTarget;
             if (shield != null) shield.Depleted -= Fail;
+            if (ControllerService.Current != null) ControllerService.Current.Disconnected -= OnControllerLost;
             Time.timeScale = 1f;
         }
 
@@ -78,12 +84,18 @@ namespace GeometricFlight.Core
 
         private void OnApplicationFocus(bool focused)
         {
-            if (!focused) Pause();
+            if (!focused) Pause(PauseReason.FocusLost);
         }
 
-        public void Pause()
+        // Safe response to losing the controller mid-run: stop, and say so.
+        private void OnControllerLost() => Pause(PauseReason.ControllerLost);
+
+        public void Pause() => Pause(PauseReason.Player);
+
+        private void Pause(PauseReason reason)
         {
             if (State != RunState.Playing) return;
+            PauseReason = reason;
             Time.timeScale = 0f;
             SetState(RunState.Paused);
         }
@@ -91,6 +103,7 @@ namespace GeometricFlight.Core
         public void Resume()
         {
             if (State != RunState.Paused) return;
+            PauseReason = PauseReason.None;
             Time.timeScale = 1f;
             SetState(RunState.Playing);
         }
