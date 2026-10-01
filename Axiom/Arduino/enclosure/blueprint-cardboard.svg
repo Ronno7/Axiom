@@ -52,11 +52,6 @@
 <rect x="296" y="522" width="20" height="8" class="dark" />
 <polygon points="290,256 322,256 350.96,476 261.04,476" class="beam" />
 <rect x="298" y="396" width="16" height="260" class="lidcut" />
-<circle cx="380" cy="430" r="5" class="lidcut" />
-<circle cx="380" cy="478" r="5" class="lidcut" />
-<circle cx="380" cy="526" r="5" class="lidcut" />
-<circle cx="380" cy="574" r="5" class="lidcut" />
-<circle cx="380" cy="622" r="5" class="lidcut" />
 <rect x="382" y="214" width="110" height="330" class="bb" />
 <line x1="390" y1="536" x2="390" y2="222" class="" stroke="#d62828" stroke-width="1"/>
 <line x1="398" y1="536" x2="398" y2="222" class="" stroke="#1c6fd1" stroke-width="1"/>
@@ -101,18 +96,6 @@
 <circle cx="1179" cy="254.12" r="3" class="hole" />
 <circle cx="1193" cy="254.12" r="3" class="hole" />
 <circle cx="1186" cy="242" r="3" class="hole" />
-<circle cx="1128" cy="422" r="5" class="hole" />
-<text x="1138" y="425" class="lbls" text-anchor="start">1</text>
-<circle cx="1128" cy="470" r="5" class="hole" />
-<text x="1138" y="473" class="lbls" text-anchor="start">2</text>
-<circle cx="1128" cy="518" r="5" class="hole" />
-<text x="1138" y="521" class="lbls" text-anchor="start">3</text>
-<circle cx="1128" cy="566" r="5" class="hole" />
-<text x="1138" y="569" class="lbls" text-anchor="start">4</text>
-<circle cx="1128" cy="614" r="5" class="hole" />
-<text x="1138" y="617" class="lbls" text-anchor="start">5</text>
-<text x="1152" y="510" class="lbls" text-anchor="start">runway LEDs 5× Ø5</text>
-<text x="1152" y="526" class="lbls" text-anchor="start">69 from left, pitch 24</text>
 <line x1="1054" y1="648" x2="1054" y2="704" class="" stroke="#aaa" stroke-dasharray="3 3"/>
 <line x1="990" y1="700" x2="990" y2="724" class="ext"/><line x1="1054" y1="700" x2="1054" y2="724" class="ext"/><line x1="990" y1="720" x2="1054" y2="720" class="dim" marker-start="url(#a)" marker-end="url(#a)"/><text x="1022" y="716" class="dimt" text-anchor="middle">32</text>
 <line x1="990" y1="700" x2="990" y2="744" class="ext"/><line x1="1326" y1="700" x2="1326" y2="744" class="ext"/><line x1="990" y1="740" x2="1326" y2="740" class="dim" marker-start="url(#a)" marker-end="url(#a)"/><text x="1158" y="736" class="dimt" text-anchor="middle">168</text>

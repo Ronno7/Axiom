@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Text;
 
@@ -29,7 +28,6 @@ namespace GeometricFlight.Input
     ///   controller → PC, ~50 Hz:  AX,&lt;x 0-1023&gt;,&lt;y 0-1023&gt;,&lt;mm or -1&gt;,&lt;fire 0/1&gt;,&lt;stick 0/1&gt;*HH
     ///   PC → controller:          BZ,&lt;hz&gt;,&lt;ms&gt;*HH   (buzzer tone)
     ///   PC → controller:          LT,&lt;row 0/1&gt;,&lt;text&gt;*HH   (one LCD row, see FormatLcdRow)
-    ///   PC → controller:          LF,&lt;lights 0-255&gt;,&lt;fan 0-255&gt;*HH   (see ControllerOutputs)
     /// Anything that fails the checksum, field count, or range checks is rejected.
     /// </summary>
     public static class ControllerProtocol
@@ -63,10 +61,6 @@ namespace GeometricFlight.Input
 
         public static string FormatTone(int hz, int milliseconds) =>
             Frame(string.Format(CultureInfo.InvariantCulture, "BZ,{0},{1}", hz, milliseconds));
-
-        /// <summary>Lights (bit mask, see ControllerOutputs) and fan level, both 0-255.</summary>
-        public static string FormatOutputs(int lights, int fan) =>
-            Frame(string.Format(CultureInfo.InvariantCulture, "LF,{0},{1}", lights & 0xFF, Math.Max(0, Math.Min(255, fan))));
 
         /// <summary>One LCD row. Glyphs (LcdGlyph) are sent as backslash escapes; other characters
         /// outside printable ASCII become '?'. Trailing spaces are dropped: the firmware pads the row.</summary>

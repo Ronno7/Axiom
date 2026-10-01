@@ -41,6 +41,9 @@ namespace GeometricFlight.Presentation
         [SerializeField, Min(0.005f)] private float knotThickness = 0.06f;
         [Tooltip("Spin about the knot's 3-fold symmetry axis, degrees per second.")]
         [SerializeField] private float knotSpin = 10f;
+        [Tooltip("Second rotation: the symmetry axis itself turns about the vertical, degrees per second. "
+               + "A rate unrelated to knotSpin keeps the combined motion from repeating.")]
+        [SerializeField] private float knotTurn = 7f;
 
         [Header("Satellites: Kepler orbits")]
         [SerializeField, Range(0, 6)] private int satellites = 3;
@@ -90,7 +93,8 @@ namespace GeometricFlight.Presentation
             }
 
             if (knotTransform != null)
-                knotTransform.localRotation = knotTilt * Quaternion.Euler(0f, 0f, knotSpin * t);
+                knotTransform.localRotation = Quaternion.AngleAxis(knotTurn * t, Vector3.up)
+                    * knotTilt * Quaternion.Euler(0f, 0f, knotSpin * t);
 
             for (int i = 0; i < satelliteTransforms.Length; i++)
             {

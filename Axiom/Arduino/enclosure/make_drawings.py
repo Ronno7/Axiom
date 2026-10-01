@@ -69,7 +69,6 @@ JOY_PCB = (34.0, 26.0)
 BUTTON_CUT, BUTTON_CAP = 6.5, 18.0
 UNO_W, UNO_L, USB_OUT = 53.4, 68.6, 6.2
 USB_HOLE_W, USB_HOLE_H = 18.0, 16.0
-LED_D = 5.0                    # runway LEDs beside the slot (5 mm LEDs)
 
 
 def configure(mode):
@@ -91,10 +90,6 @@ def configure(mode):
     g["SLED_W"] = TUN_W - 2
     g["PLATE_H"] = H_IN - 4
     g["TRAVEL"] = D_FAR - D_NEAR
-    # Runway LEDs: just past the divider (clear of the 40 mm knob), one at the middle of each fifth of
-    # the lever's travel, LED 1 nearest the sensor.
-    g["LED_X"] = TUN_W + SHEET + 5
-    g["LED_YS"] = [STEM_NEAR - (i + 0.5) * (STEM_NEAR - STEM_FAR) / 5 for i in range(5)]
 
 
 BLUE, RED, ORANGE = "#1c6fd1", "#d62828", "#e8590c"
@@ -228,8 +223,6 @@ def blueprint():
     add(v.poly([(TUN_CX - 8, FACE_Y), (TUN_CX + 8, FACE_Y), (TUN_CX + 8 + (FACE_Y - mid) * math.tan(math.radians(7.5)), mid),
                 (TUN_CX - 8 - (FACE_Y - mid) * math.tan(math.radians(7.5)), mid)], "beam"))
     add(v.rect(TUN_CX - SLOT_W / 2, SLOT_Y0, SLOT_W, SLOT_Y1 - SLOT_Y0, "lidcut"))
-    for ly in LED_YS:
-        add(v.circle(LED_X, ly, LED_D / 2, "lidcut"))
     # electronics
     bx, by, bw, bl = BREADBOARD
     add(v.rect(bx, by, bw, bl, "bb"))
@@ -282,12 +275,6 @@ def blueprint():
         a = i * math.pi / 3
         gx, gy = (GRILLE[0] + T, GRILLE[1] + T) if i == 6 else (GRILLE[0] + T + 7 * math.cos(a), GRILLE[1] + T + 7 * math.sin(a))
         add(L.circle(gx, gy, 1.5, "hole"))
-    for i, ly in enumerate(LED_YS):
-        add(L.circle(LED_X + T, ly + T, LED_D / 2, "hole"))
-        add(L.text(LED_X + T + 5, ly + T - 1.5, str(i + 1), "lbls"))
-    add(L.text(LED_X + T + 12, (LED_YS[0] + LED_YS[-1]) / 2 + T + 4, f"runway LEDs 5× Ø{f(LED_D)}", "lbls"))
-    add(L.text(LED_X + T + 12, (LED_YS[0] + LED_YS[-1]) / 2 + T - 4,
-               f"{f(LED_X + T)} from left, pitch {f(LED_YS[0] - LED_YS[1])}", "lbls"))
     add(L.line(sx, SLOT_Y0 + T, sx, -2, "", 'stroke="#aaa" stroke-dasharray="3 3"'))
     add(L.dim_h(0, sx, 0, f(sx), 20))
     add(L.dim_h(0, STICK_X + T, 0, f(STICK_X + T), 40))

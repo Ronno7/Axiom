@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 950" width="1280" height="950" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 930" width="1280" height="930" font-family="Segoe UI, Helvetica, Arial, sans-serif">
   <title>Axiom controller wiring (Arduino Uno)</title>
   <style>
     .halo { fill: none; stroke: #ffffff; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
@@ -9,7 +9,7 @@
     .small { font-size: 12px; fill: #444; }
     .legend { font-size: 13px; fill: #222; }
   </style>
-  <rect width="1280" height="950" fill="#ffffff"/>
+  <rect width="1280" height="930" fill="#ffffff"/>
 
   <!-- Title -->
   <text x="30" y="44" font-size="24" font-weight="700" fill="#111">Axiom controller: Arduino Uno wiring</text>
@@ -198,6 +198,5 @@
     <text x="30" y="874">• Button and joystick switch go to GND and use the Uno's internal pull-ups, so no resistors are needed. A tactile button's legs on the same side are already joined; use two diagonal legs.</text>
     <text x="30" y="894">• HC-SR04 needs 5V. Passive buzzer: the + (longer) leg goes to D8. The pins can be changed at the top of the sketch; the game does not need to know them.</text>
     <text x="30" y="914">• LCD blank, or a row of solid blocks? Turn the contrast screw on the backpack. Any I²C address works. Boards with SDA/SCL pins by AREF: those are A4/A5 too.</text>
-    <text x="30" y="934">• Runway lights (D11, D12, D13) and fan (D5): see wiring-outputs.svg.</text>
   </g>
 </svg>

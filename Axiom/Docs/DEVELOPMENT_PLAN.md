@@ -326,3 +326,32 @@ Added runway lights (74HC595, 5 LEDs by the throttle slot pointing the lever at 
 RGB underglow, a speed-following fan (L293D, Options toggle, firmware stops it after 1 s of silence)
 and parking-sensor proximity beeps with a pulsing HUD tag. Rejected: "ghost hand" best-run LED.
 EditMode 102/102; LF packets and beeps checked with the simulator. Hardware not built yet.
+Then: underglow removed; a second chained 74HC595 adds a front status strip (3 blue shield, 2 red
+caution, 5 green targets) and the light of a 30 mm LED arcade fire button (Adafruit 3491), which
+replaces the tactile trigger; the case drawings move the joystick tower back 10 mm to clear it.
+Unity MCP was offline: both assemblies build with dotnet and 22/23 tests pass in a .NET harness
+(the other needs PlayerPrefs); run EditMode in Unity next.
+
+### 2026-09-30 — Reverted to the LCD baseline
+
+While v2 parts ship, the game and sketch are back to the kit hardware plus the LCD: runway lights,
+underglow/status strip and fan (and its Options toggle) were removed from Unity, the sketch, wiring and
+README (they return with the cockpit build). Proximity beeps stay: they only use the kit buzzer.
+Sketch compiles. PLAY is now a step larger than the other menu buttons (`menu-button--primary`).
+Menu: the trefoil knot now also turns its symmetry axis about the vertical (`knotTurn`, 7°/s).
+
+### 2026-09-30 — Controller v2 design (cockpit box), decided, not yet built
+
+One box, compact preset 420 × 245 mm (roomy 500 × 280 kept as an alternative), top sloped 8°
+(60 → 94 mm), 65 mm palm rest; laser-cut 3 mm black acrylic top + 6 mm Baltic birch body. 3D model:
+`Arduino/cockpit/make_cockpit.py` (Blender). Left: HC-SR04 throttle (100 mm travel, push = faster, cruise detent) with
+8 NeoPixels beside it. Right: JH-D400X-R4 analog stick, FIRE on its top button. Centre: LCD, shield ×3
+and LINK/SLOW/FAST/PROX/EMP warning lights (16 NeoPixels on one pin), a 40 mm red mushroom EMP button
+(in flight: once per round, destroys all enemies near the ship; EMP light = still available; in menus:
+confirm/launch — gameplay not implemented yet),
+one MENU button (pause in flight, back in menus; a second button was dropped for lack of a real job), flip-cover MASTER ARM (arm to launch, SAFE pauses). DRV2605L engine rumble under the
+throttle hand. Uno on a DFRobot Gravity IO shield (GND/5V/signal per pin, no power bus). Dropped: fan, underglow, target tally, button lights,
+UltraStik (cost). Next: buy and measure parts, cardboard mock-up from a 1:1 template, then cut files.
+Shopping list, wiring (`Arduino/cockpit/wiring-cockpit.svg`) and a part-by-part check against the
+manufacturers' docs are in `Arduino/cockpit/README.md`. The check moved the buzzer onto the kit's S8050
+(≈30 mA is over the 20 mA pin limit) and set 28 mm holes for the Happ-style buttons.

@@ -2,12 +2,10 @@
 // Sends one packet every 20 ms:   AX,<x>,<y>,<mm>,<fire>,<stick>*HH
 // Accepts buzzer commands:        BZ,<hz>,<ms>*HH
 // Accepts LCD rows:               LT,<row>,<text>*HH
-// Accepts lights and fan:          LF,<lights 0-255>,<fan 0-255>*HH
 // HH is the XOR of every character before '*', as two hex digits.
 //
 // Optional 16x2 LCD with an I2C backpack (PCF8574): SDA to A4, SCL to A5. Its address is found automatically
 // and no library is needed. Without one, everything else works the same.
-// Optional outputs: 5 runway LEDs + RGB underglow on a 74HC595, and a fan motor through an L293D.
 
 #include <Wire.h>
 
@@ -19,17 +17,6 @@ const uint8_t PIN_FIRE   = 3;    // fire button to GND
 const uint8_t PIN_TRIG   = 9;    // HC-SR04 TRIG
 const uint8_t PIN_ECHO   = 10;   // HC-SR04 ECHO
 const uint8_t PIN_BUZZER = 8;    // passive buzzer (+) ; (-) to GND
-const uint8_t PIN_FAN    = 5;    // L293D pin 1 (EN1, PWM)
-const uint8_t PIN_SR_DATA  = 11; // 74HC595 pin 14 (DS)
-const uint8_t PIN_SR_LATCH = 12; // 74HC595 pin 12 (ST_CP)
-const uint8_t PIN_SR_CLOCK = 13; // 74HC595 pin 11 (SH_CP)
-
-// ---- Outputs ----
-const bool RGB_COMMON_ANODE = false;  // RGB LED's long leg to 5V instead of GND? Set true.
-const uint8_t FAN_MIN_DUTY  = 90;     // lowest PWM that keeps your fan turning; raise if it stalls
-const unsigned long FAN_KICK_MS = 150;  // full power for a moment to get it spinning from rest
-const long LEVER_NEAR_MM = 50;        // standby self-test: lever travel ends, as distance from the sensor
-const long LEVER_FAR_MM  = 150;       // (the case edition's defaults)
 
 // ---- Timing ----
 const unsigned long SEND_INTERVAL_MS  = 20;     // 50 packets per second
@@ -39,8 +26,6 @@ const unsigned long DEBOUNCE_MS       = 15;
 const unsigned long LCD_SILENCE_MS    = 3000;   // no LT rows for this long -> standby screen
 const unsigned long STANDBY_FRAME_MS  = 150;
 const uint8_t LCD_CELLS_PER_LOOP      = 4;      // redraw budget, so the display never stalls input
-const unsigned long FAN_SILENCE_MS    = 1000;   // no LF for this long -> fan stops (the game quit or froze)
-const unsigned long LIGHTS_SILENCE_MS = 3000;   // no LF for this long -> lights show the self-test
 
 // ---- LCD glyphs (CGRAM slots 0-7). The game refers to them by slot; keep the order. ----
 const uint8_t GLYPHS[8][8] = {
@@ -86,25 +71,13 @@ bool gameDrivesLcd = false;
 unsigned long lastStandbyFrame = 0;
 uint8_t spinFrame = 0;
 
-// Outputs from the game (LF) and what the hardware currently has.
-uint8_t lightsWant = 0, fanWant = 0;
-int lightsShown = -1;
-uint8_t fanShown = 0;
-unsigned long lastOutputs = 0;
-unsigned long fanKickUntil = 0;
-
 void setup() {
   pinMode(PIN_FIRE, INPUT_PULLUP);
   pinMode(PIN_JOY_SW, INPUT_PULLUP);
   pinMode(PIN_TRIG, OUTPUT);
   pinMode(PIN_ECHO, INPUT);
   pinMode(PIN_BUZZER, OUTPUT);
-  pinMode(PIN_FAN, OUTPUT);
-  pinMode(PIN_SR_DATA, OUTPUT);
-  pinMode(PIN_SR_LATCH, OUTPUT);
-  pinMode(PIN_SR_CLOCK, OUTPUT);
   digitalWrite(PIN_TRIG, LOW);
-  writeLights(0);
   Serial.begin(115200);
   lcdBegin();
   tone(PIN_BUZZER, 880, 60);  // power-on chirp
@@ -125,7 +98,6 @@ void loop() {
   }
   readCommands();
   updateLcd(now);
-  updateOutputs(now);
 }
 
 // Buttons are wired to GND with pull-ups: LOW means pressed. A change must hold for
@@ -188,15 +160,11 @@ void handleCommand(char *line) {
   *star = '\0';
   unsigned int expected = 0;
   if (sscanf(star + 1, "%2X", &expected) != 1 || checksum(line) != expected) return;
-  unsigned int a = 0, b = 0;
-  if (sscanf(line, "BZ,%u,%u", &a, &b) == 2 && a >= 31 && b > 0 && b <= 2000) {
-    tone(PIN_BUZZER, a, b);  // a = Hz, b = ms
+  unsigned int hz = 0, ms = 0;
+  if (sscanf(line, "BZ,%u,%u", &hz, &ms) == 2 && hz >= 31 && ms > 0 && ms <= 2000) {
+    tone(PIN_BUZZER, hz, ms);
   } else if (strncmp(line, "LT,", 3) == 0) {
     handleLcdRow(line + 3);
-  } else if (sscanf(line, "LF,%u,%u", &a, &b) == 2 && a <= 255 && b <= 255) {
-    lightsWant = a;          // a = light bits, b = fan level
-    fanWant = b;
-    lastOutputs = millis();
   }
 }
 
@@ -327,42 +295,4 @@ void updateLcd(unsigned long now) {
   if (gameDrivesLcd && now - lastLcdRow > LCD_SILENCE_MS) gameDrivesLcd = false;
   if (!gameDrivesLcd) drawStandby(now);
   lcdFlush();
-}
-
-// ---- Runway lights, underglow and fan ----
-
-// Q0-Q4: runway LEDs, Q0 nearest the sensor. Q5-Q7: underglow red, green, blue.
-void writeLights(uint8_t bits) {
-  if (RGB_COMMON_ANODE) bits ^= 0xE0;
-  digitalWrite(PIN_SR_LATCH, LOW);
-  shiftOut(PIN_SR_DATA, PIN_SR_CLOCK, MSBFIRST, bits);
-  digitalWrite(PIN_SR_LATCH, HIGH);
-}
-
-// Without the game, the LED beside the lever lights up (a check that the lights line up with the
-// slot), or a slow sweep runs when the sensor has no echo.
-uint8_t selfTestLights(unsigned long now) {
-  if (distanceMm < 0) {
-    uint8_t step = (now / 200) % 8;           // 0 1 2 3 4 3 2 1
-    return 1 << (step < 5 ? step : 8 - step);
-  }
-  long span = LEVER_FAR_MM - LEVER_NEAR_MM;
-  long index = (distanceMm - LEVER_NEAR_MM) * 5 / span;
-  return 1 << constrain(index, 0, 4);
-}
-
-void updateOutputs(unsigned long now) {
-  unsigned long silence = now - lastOutputs;
-  uint8_t lights = silence > LIGHTS_SILENCE_MS ? selfTestLights(now) : lightsWant;
-  if (lights != lightsShown) {
-    writeLights(lights);
-    lightsShown = lights;
-  }
-
-  uint8_t fan = silence > FAN_SILENCE_MS ? 0 : fanWant;
-  if (fan > 0 && fanShown == 0) fanKickUntil = now + FAN_KICK_MS;
-  fanShown = fan;
-  if (fan == 0) analogWrite(PIN_FAN, 0);
-  else if (now < fanKickUntil) analogWrite(PIN_FAN, 255);
-  else analogWrite(PIN_FAN, map(fan, 1, 255, FAN_MIN_DUTY, 255));
 }

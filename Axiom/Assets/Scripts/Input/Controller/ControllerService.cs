@@ -67,8 +67,6 @@ namespace GeometricFlight.Input
         public ThrottleFilter Throttle { get; } = new ThrottleFilter();
         /// <summary>The controller's LCD. Screens call Display.Show every frame while they are active.</summary>
         public ControllerDisplay Display { get; } = new ControllerDisplay();
-        /// <summary>Runway lights, underglow and fan. The level sets them every frame; otherwise they switch off.</summary>
-        public ControllerOutputs Outputs { get; } = new ControllerOutputs();
         /// <summary>Non-null while the simulated controller replaces serial ports.</summary>
         public SimulatedLineTransport Simulator { get; private set; }
 
@@ -155,7 +153,6 @@ namespace GeometricFlight.Input
                 {
                     if (Simulator == null) PlayerPrefs.SetString(PortKey, snapshot.PortName);
                     Display.Invalidate();
-                    Outputs.Invalidate();
                     Display.Flash(LcdGlyph.Center("LINK ESTABLISHED"), LcdGlyph.Center(snapshot.PortName),
                         Time.unscaledTimeAsDouble + 1.5);
                     Connected?.Invoke();
@@ -168,15 +165,12 @@ namespace GeometricFlight.Input
             wasThrottleLost = throttleLost;
         }
 
-        // LateUpdate, so every screen has set the display and outputs for this frame.
+        // LateUpdate, so every screen has called Display.Show for this frame.
         private void LateUpdate()
         {
             if (!State.Connected) return;
-            double now = Time.unscaledTimeAsDouble;
-            string row = Display.Next(now);
+            string row = Display.Next(Time.unscaledTimeAsDouble);
             if (row != null) link.Send(row);
-            string outputs = Outputs.Next(now);
-            if (outputs != null) link.Send(outputs);
         }
 
         private static ControllerCalibration LoadCalibration()

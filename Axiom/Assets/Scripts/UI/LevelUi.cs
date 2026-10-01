@@ -80,7 +80,7 @@ namespace GeometricFlight.UI
 
             throttleCruise.style.left = Length.Percent(SpeedFraction(flight.CruiseSpeed) * 100f);
             zones = FindObjectsByType<ThrottleZone>(FindObjectsSortMode.None);
-            cockpit = new CockpitDisplay(flow, flight, zones);
+            cockpit = new CockpitDisplay(flow, flight);
             hull = flight.GetComponent<ShipHull>();
             ShowZone(null);
             flow.StateChanged += OnStateChanged;

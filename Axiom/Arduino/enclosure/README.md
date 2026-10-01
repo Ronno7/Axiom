@@ -70,8 +70,7 @@ smooth card or plastic and keep it square: the datasheet wants a flat, smooth ta
 
 1. Measure, update the preset, regenerate and print the templates.
 2. Cut the openings: top-shell slot and Ø30 stick hole (plus optional grille), front-panel trigger
-   square, rear-panel USB hole. Drill the five Ø5 runway LED holes after step 4, measured from the
-   lever's real end stops (see [../README.md](../README.md#runway-lights-and-fan)).
+   square, rear-panel USB hole.
 3. From 4–5 mm foam board, build the divider and sensor wall, then hot glue them to the case floor.
    Line the tunnel with packing tape.
 4. Build the sled from the template parts. Dry-fit it with the stem through the slot and check it slides

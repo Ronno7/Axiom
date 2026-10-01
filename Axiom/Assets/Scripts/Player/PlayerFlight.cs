@@ -53,9 +53,6 @@ namespace GeometricFlight.Player
                 averageSpeed, steeringSpeed * GameSettings.SteeringSensitivity, GetBounds(startPosition));
         }
 
-        public float ThrottleForSpeed(float speed) =>
-            FlightMovement.ThrottleForSpeed(speed, forwardSpeed, throttleMultipliers);
-
         /// <summary>Where the ship will be after <paramref name="seconds"/> if the current speed and
         /// steering hold, clamped to the flight bounds like real movement.</summary>
         public Vector3 PredictPosition(float seconds)

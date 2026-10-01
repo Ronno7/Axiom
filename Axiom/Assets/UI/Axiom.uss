@@ -129,6 +129,13 @@
     --slant-stroke: rgb(170, 170, 170);
 }
 
+/* The main call to action (PLAY) is a step larger than its neighbours. */
+.screen .menu-button--primary {
+    height: 78px;
+    min-width: 480px;
+    font-size: 34px;
+}
+
 /* ---------- Options (slider, toggle) ---------- */
 
 .screen .option {
