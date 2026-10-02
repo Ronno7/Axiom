@@ -1182,6 +1182,72 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 19286241}
   m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
+--- !u!1 &440154361
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 440154362}
+  - component: {fileID: 440154363}
+  m_Layer: 0
+  m_Name: Construct_E
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &440154362
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440154361}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.18605512, y: 0.7674446, z: 0.25611582, w: 0.55750966}
+  m_LocalPosition: {x: -18.52, y: 13.48, z: 38.83}
+  m_LocalScale: {x: 1.49898, y: 1.49898, z: 1.49898}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1014961684}
+  m_LocalEulerAnglesHint: {x: -36.91, y: 108.007, z: 0}
+--- !u!114 &440154363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440154361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f74c33acb287a84ba53a1efb10a8282, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.GeometricConstruct
+  primary: {fileID: 2100000, guid: 4ccad562d2185b3e7c4bac0b18de6c3e, type: 2}
+  secondary: {fileID: 2100000, guid: 4a0c90af00cbbe6104dc82492627b1cf, type: 2}
+  tertiary: {fileID: 2100000, guid: dc7cdc2f4bb24a84629fa8c922d64f4a, type: 2}
+  coreRadius: 0.1
+  coreSpin: 35
+  cage: 0
+  cageRadius: 1.9
+  cageEdge: 0.05
+  cageInertia: {x: 1, y: 2, z: 3}
+  cageSpin: 0.8
+  knot: 0
+  knotScale: 1.05
+  knotThickness: 0.06
+  knotSpin: 10
+  knotTurn: 7
+  satellites: 4
+  orbitSize: 3
+  eccentricity: 0.5
+  orbitPeriod: 6
+  drawOrbits: 1
+  bob: 0.15
+  seed: 3
 --- !u!114 &450327759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1609,6 +1675,7 @@ Transform:
   - {fileID: 1471925554}
   - {fileID: 22953583}
   - {fileID: 360964606}
+  - {fileID: 440154362}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1244182475
