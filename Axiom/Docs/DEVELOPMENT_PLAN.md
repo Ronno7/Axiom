@@ -195,6 +195,7 @@ If time becomes tight, simplify enemy variety, boss complexity, and optional ran
 - [ ] M4 — Kit controller (v1) works with calibration and the LCD. Cockpit box (v2): parts in hand except the lights, sketch written, bench test under way; its game features and the preflight check are next.
 - [ ] M5 — Three levels and simple finale.
 - [ ] M6 — UI polish and user testing.
+- [x] M6 feature slice — Geometric throttle exhaust and meta damage feedback implemented and checked in Unity (2026-10-19); broader UI polish/user testing remains open.
 - [ ] M7 — Tested desktop build and handoff.
 
 ## 9. Session log
@@ -378,3 +379,16 @@ slot), `RM` rumble with a 1.5 s keep-alive, `LA` dome lamp, and a standby self-t
 Bench test on the shield (user): MENU and EMP + lamp harnesses soldered; FIRE, EMP, MENU, clicks, rumble and the
 lamp work in standby. Still to bench: MASTER ARM, joystick, sonar. Docs consolidated from all sessions: what each cockpit control and light does (decided
 2026-09-30) and the rejected ideas now live in `Arduino/cockpit/README.md`; handoff, brief and FLIGHT are current.
+
+### 2026-10-19 — Geometric thrust and meta damage feedback
+
+Added paired faceted exhaust at the existing rear engine ports: white cores, translucent
+outer facets, and travelling diamonds scale and animate with selected throttle. Added a
+0.55-second angular screen-edge pulse for accepted shield hits, beneath the HUD and menus.
+Pause freezes exhaust and clears impact feedback; destruction hides the jets; retry resets
+both effects. Presentation reads existing flight/shield state without changing gameplay.
+
+Verified in Unity 6000.3.24f1: 91/91 existing EditMode tests passed, no project errors in the
+Console, and live checks passed for throttle endpoints, pause, accepted/blocked hits, pulse
+expiry, menu clearing, destruction, and retry. Inspected 16:9 Game-view captures. Hardware,
+other aspect ratios, and standalone builds remain untested. See UI.md for tuning.

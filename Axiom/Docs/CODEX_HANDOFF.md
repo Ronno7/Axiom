@@ -1,5 +1,13 @@
 # Handoff
 
+## Latest presentation update (2026-10-19)
+
+Prototype now includes diegetic geometric engine exhaust (`ThrustDisplay` under
+`AircraftVisual/Thrust`) and meta screen-edge damage pulses (`DamageFeedback`, bound by
+`LevelUi`). See `Docs/UI.md` for tuning and verification. Both were inspected in Play Mode;
+all 91 EditMode tests available before the controller update passed. No package versions
+or gameplay rules were changed by the presentation work.
+
 ## Where things stand
 
 M0–M3 are done: flight, combat, the full loop, menus and saved options. M4 (physical controller) is in

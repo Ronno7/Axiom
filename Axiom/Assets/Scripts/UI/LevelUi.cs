@@ -29,6 +29,8 @@ namespace GeometricFlight.UI
         private CockpitDisplay cockpit;
         private readonly ProximityAlarm proximity = new ProximityAlarm();
         private ShipHull hull;
+        private ShipShield shield;
+        private DamageFeedback damageFeedback;
         private int shownTenths = -1, shownTargets = -1, shownSpeed = -1;
         private ThrottleZone[] zones;
         private ThrottleZone shownZone;
@@ -42,6 +44,10 @@ namespace GeometricFlight.UI
             VisualElement root = GetComponent<UIDocument>().rootVisualElement;
             screen = root.Q("screen");
             hud = root.Q("hud");
+            damageFeedback = root.Q<DamageFeedback>("damage-feedback");
+            damageFeedback.ResetPulse();
+            shield = flight.GetComponent<ShipShield>();
+            if (shield != null) shield.Changed += OnShieldHit;
             pausePanel = root.Q("pause-panel");
             resultsPanel = root.Q("results-panel");
             helpPanel = root.Q("help-panel");
@@ -90,10 +96,15 @@ namespace GeometricFlight.UI
         private void OnDisable()
         {
             if (flow != null) flow.StateChanged -= OnStateChanged;
+            if (shield != null) shield.Changed -= OnShieldHit;
+            damageFeedback?.ResetPulse();
         }
+
+        private void OnShieldHit(int remaining) => damageFeedback.Pulse(remaining == 0);
 
         private void Update()
         {
+            damageFeedback.Tick(Time.unscaledDeltaTime);
             int tenths = Mathf.FloorToInt(flow.ElapsedTime * 10f);
             if (tenths != shownTenths)
             {
@@ -259,6 +270,7 @@ namespace GeometricFlight.UI
 
         private void ShowOverlay(VisualElement panel, VisualElement focus)
         {
+            if (panel != null) damageFeedback.ResetPulse();
             screen.EnableInClassList("screen--dimmed", panel != null);
             UiScreens.ShowOnly(panel, focus, pausePanel, resultsPanel, options.Root, helpPanel, calibration.Root);
         }

@@ -42,12 +42,15 @@ the LCD, shield and warning lights, buzzer and rumble. Parts, wiring and what ea
 
 | Type | Candidate use |
 | --- | --- |
-| Diegetic | Physical shield/status indicators on the aircraft |
+| Diegetic | Physical shield/status indicators and throttle-responsive geometric engine exhaust |
 | Non-diegetic | Menus, score, results, and precise readouts |
 | Spatial | World-positioned target brackets or route guidance |
 | Meta | Restrained screen-edge feedback for impacts or damage |
 
 Classification depends on what is physically part of the game's fiction. Prioritize readability, consistent interaction, and useful feedback. Keep the center of the flight view clear; do not rely on color alone for essential information.
+
+The exhaust and screen-edge damage pulse are implemented in the prototype; see `UI.md`
+for their behavior, tuning, and verification.
 
 ## Delivered scope
 

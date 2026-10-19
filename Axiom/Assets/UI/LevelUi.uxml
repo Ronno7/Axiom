@@ -4,6 +4,7 @@
     <ui:Template name="Help" src="HelpPanel.uxml" />
     <ui:Template name="Calibration" src="CalibrationPanel.uxml" />
     <ui:VisualElement name="screen" class="screen" picking-mode="Ignore">
+        <GeometricFlight.UI.DamageFeedback name="damage-feedback" class="damage-feedback" />
         <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
             <ui:Label name="hud-time" text="0:00.0" class="hud-readout hud-time" />
             <ui:Label name="hud-targets" text="TARGETS 0/0" class="hud-readout hud-targets" />
