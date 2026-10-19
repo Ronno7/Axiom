@@ -30,6 +30,7 @@ meshes in Edit and Play Mode; keep the component or bake the meshes before remov
 - [Flight](Docs/FLIGHT.md): movement, throttle, input.
 - [Combat](Docs/COMBAT.md): weapons, targets, shield, enemies, run flow.
 - [UI](Docs/UI.md): screens, theme, settings.
+- Controller: [kit controller (v1)](Arduino/README.md) and [cockpit box (v2)](Arduino/cockpit/README.md).
 - [Development plan](Docs/DEVELOPMENT_PLAN.md) and [design brief](Docs/DESIGN_BRIEF.md).
 
 Run `GeometricFlight.EditorTests` in the EditMode Test Runner. **Tools > Geometric Flight >

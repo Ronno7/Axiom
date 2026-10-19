@@ -6,8 +6,8 @@ W/S or Up/Down steer vertically; A/D or Left/Right steer horizontally.
 Releasing the keys stops lateral movement without recentering the aircraft.
 Hold Q to lower throttle or E to raise it. Releasing both retains the selected
 setting; holding both makes no adjustment. Starting Play Mode resets to cruise.
-Hold Space to fire (see `COMBAT.md`). Escape is captured as pause intent but has no effect yet.
-Stop and restart Play Mode to restart the short blockout course.
+Hold Space to fire (see `COMBAT.md`); Escape pauses. The Arduino controller supplies the same
+input through `CombinedFlightInput` (keyboard steering keys override the stick while held).
 
 ## Tuning
 
@@ -74,42 +74,9 @@ separate and is excluded from player builds.
 
 ## Verification
 
-Throttle update, 2026-09-28: runtime and test assemblies compile with zero warnings
-or errors using the generated .csproj files and installed Unity references.
-All 25 movement cases passed outside the editor in a temporary .NET reflection
-harness against Unity's math types. The 11 added cases cover throttle endpoints,
-acceleration and deceleration at 30/60/144 simulated FPS, gradual acceleration,
-overshoot prevention, paused time, and steering independence.
-This is not a Unity Test Runner run. The MCP connection was unavailable; current
-keyboard bindings, camera framing at different speeds, and Play Mode restart
-behavior still need live verification. Earlier editor results below predate throttle.
-
-Acceptance pass after reconnecting:
-
-1. Run `GeometricFlight.EditorTests` in the Unity EditMode Test Runner.
-2. Start Prototype at 16:9. Hold Q for at least one second, release, and confirm
-   the slower speed persists. Hold E for two seconds and confirm faster travel.
-3. Hold Q+E together: the selected throttle should remain unchanged.
-4. Steer to every bound at both speeds; check stable camera framing and response.
-5. Compare at 30, 60, and 144 FPS where available; stop and restart Play Mode twice
-   and confirm the authored spawn, camera position, and cruise speed return.
-
-Verified in Unity 6000.3.24f1 on 2026-09-24: all 14 EditMode tests passed. Live
-Play Mode checks used a temporary virtual keyboard to exercise WASD, arrow keys,
-neutral and opposing input, both opposite corners, and forward camera tracking.
-All five phases passed; the virtual device was removed afterward. The initial
-view and upper-right boundary were visually inspected at 16:9. No compilation
-or gameplay errors were reported. The scene was returned to Edit Mode.
-
-Run `GeometricFlight.EditorTests` in Unity's EditMode Test Runner. Cases cover
-automatic forward travel, diagonal speed, analog magnitude, all four bounds and
-two corners, long frames, immediate reversal at an edge, paused time, frame-rate
-independence, and bounds away from world origin.
-
-In Play Mode, check both key sets, release and opposing keys, every edge, and
-camera framing. The existing course ends around Z=112 (about 19 seconds at the
-default speed); forward travel continues beyond it. Level completion,
-banking, collisions, combat, and hardware are not implemented by this milestone.
+`GeometricFlight.EditorTests` (EditMode) covers forward travel, diagonal and analog steering, every bound,
+long frames, paused time, frame-rate independence and the throttle ramp. Keyboard flight, camera framing
+and Play Mode restarts were checked in the editor (2026-09-29).
 
 ## Throttle sections (level 1)
 

@@ -30,6 +30,28 @@ namespace GeometricFlight.Tests
             Assert.That(p.DistanceMm, Is.EqualTo(-1));
         }
 
+        [Test]
+        public void ParsesCockpitPacketAndKeepsV1FieldsInPlace()
+        {
+            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,700,300,180,1,1,1023,1,0"),
+                out ControllerPacket p), Is.True);
+            Assert.That(p.IsCockpit, Is.True);
+            Assert.That(p.StickX, Is.EqualTo(700));
+            Assert.That(p.DistanceMm, Is.EqualTo(180));
+            Assert.That(p.Fire && p.StickButton, Is.True);
+            Assert.That(p.Twist, Is.EqualTo(1023));
+            Assert.That(p.Emp, Is.True);
+            Assert.That(p.Armed, Is.False);
+        }
+
+        [Test]
+        public void V1PacketIsNotCockpit()
+        {
+            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,512,512,200,0,0"), out ControllerPacket p), Is.True);
+            Assert.That(p.IsCockpit, Is.False);
+            Assert.That(p.Emp || p.Armed, Is.False);
+        }
+
         [TestCase("")]
         [TestCase("AX,512,512,200,0,0")]            // no checksum
         [TestCase("AX,512,512,200,0,0*00")]         // wrong checksum
@@ -43,6 +65,9 @@ namespace GeometricFlight.Tests
         [TestCase("AX,2000,512,200,0,0")]           // axis out of range
         [TestCase("AX,512,512,200,2,0")]            // button not 0/1
         [TestCase("AX,512,512,200,0")]              // missing field
+        [TestCase("AX,512,512,200,0,0,512,0")]      // cockpit packet missing a field
+        [TestCase("AX,512,512,200,0,0,1024,0,0")]   // twist out of range
+        [TestCase("AX,512,512,200,0,0,512,0,2")]    // arm not 0/1
         [TestCase("BZ,440,100")]                    // wrong message type
         public void RejectsValidlyFramedButInvalidContent(string body)
         {
@@ -56,6 +81,20 @@ namespace GeometricFlight.Tests
             Assert.That(command, Does.StartWith("BZ,440,120*"));
             Assert.That(command.Substring(command.Length - 2),
                 Is.EqualTo(ControllerProtocol.Checksum("BZ,440,120").ToString("X2")));
+        }
+
+        [Test]
+        public void RumbleCommandIsFramedAndClamped()
+        {
+            Assert.That(ControllerProtocol.FormatRumble(120, 0), Is.EqualTo(ControllerProtocol.Frame("RM,120,0")));
+            Assert.That(ControllerProtocol.FormatRumble(400, 5000), Is.EqualTo(ControllerProtocol.Frame("RM,255,2000")));
+        }
+
+        [Test]
+        public void LampCommandIsFramed()
+        {
+            Assert.That(ControllerProtocol.FormatLamp(ControllerProtocol.Lamp.Blink),
+                Is.EqualTo(ControllerProtocol.Frame("LA,2")));
         }
 
         // ---------- Calibration and filtering ----------

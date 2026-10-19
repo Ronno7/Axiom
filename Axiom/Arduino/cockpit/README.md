@@ -2,55 +2,70 @@
 
 One sloped box (compact preset 420 × 245 mm): throttle lever with 8 lights on the left, analog stick
 with FIRE on top on the right, LCD, shield lights and LINK/SLOW/FAST/PROX/EMP warning lights in the
-middle, a red mushroom EMP button, a MENU button (pause in flight, back in menus) and a flip-cover
-MASTER ARM switch.
+middle, a 60 mm red dome EMP button (with its own lamp), a MENU button and a flip-cover MASTER ARM switch.
+The 16 lights are one pre-wired LED string, and the buzzer and rumble are plug-in modules, so the whole build
+has 24 solder joints.
 
 - 3D model: [axiom_cockpit.blend](axiom_cockpit.blend) (built by [make_cockpit.py](make_cockpit.py); `--roomy` for 500 × 280)
 - Wiring: [wiring-cockpit.svg](wiring-cockpit.svg) (built by [make_wiring.py](make_wiring.py)): overview, every harness
-  terminal by terminal, the NeoPixel route with wire lengths, and a soldering summary (about 120 joints, 94 of them NeoPixels)
+  terminal by terminal, where the lights go, and a soldering summary
 
 ![Wiring](wiring-cockpit.svg)
 
-## Shopping list
+## In the game
 
-Prices are approximate (September 2026). Quantities include a few spares where parts are easy to lose or damage.
+Decided 2026-09-30. Only the parts marked ✓ are in the game so far; the rest is for M4.
 
-**Controls**
+| Control | In flight | In menus |
+| --- | --- | --- |
+| Stick | Steer ✓ | Move the selection |
+| FIRE (stick top) | Hold to fire ✓ | Capture in calibration ✓ |
+| Throttle lever | Push forward = faster, cruise detent in the middle ✓ | |
+| EMP (60 mm dome) | Once per run: destroys all enemies near the ship. Its lamp is lit while the EMP is unused | Confirm; **LAUNCH** once armed; continue/retry on results |
+| MENU | Pause ✓ | Back |
+| MASTER ARM | Flipping to SAFE pauses | A run waits until armed: flip ARM (the cockpit lights wake), then EMP to launch |
+| Twist | Undecided: barrel roll or visual banking | |
 
-| Qty | Part | Link | ≈ | Notes |
-| --- | --- | --- | --- | --- |
-| 1 | JH-D400X-R4 joystick, 10 kΩ, **with button** | [Amazon](https://www.amazon.com/4-axis-Joystick-Potentiometer-JH-D400X-R4-Button/dp/B015IJANPO) | $25 | FIRE is the top button |
-| 1 | APIELE 22 mm red mushroom push button, **momentary**, SPST | [Amazon](https://www.amazon.com/dp/B09KZK8SXQ) | $10 | EMP. Not an E-stop: those latch |
-| 1 | 30 mm Happ-style arcade buttons, 6-pack | [EG STARTS, Amazon](https://www.amazon.com/EG-STARTS-American-Standard-Switchable/dp/B07GBRD4HJ) | $12 | MENU + spares; 28 mm hole, 4.8 mm tabs |
-| 1 | Illuminated toggle with missile cover | [SparkFun COM-11310](https://www.sparkfun.com/toggle-switch-and-cover-illuminated-red.html) or [DaierTek 2-pack, Amazon](https://www.amazon.com/dp/B07T6XJF1T) | $5–12 | MASTER ARM. Same 3-pin, 12 mm hole switch. DaierTek's LED is rated 12 V, so it may glow dimly at 5 V |
+Without the cockpit, runs start as now and the keyboard gets an EMP key.
 
-**Lights and haptics**
+- **Rumble:** engine rumble that grows with speed, plus a jolt when the shield is hit.
+- **Buzzer and LCD:** as on the kit controller (hits, zones, lost sensor, proximity beeps; [../README.md](../README.md)).
+- **Throttle lights (8):** a dot where the lever is. Before and in a zone, its recommended range lights up and a
+  running light leads the lever toward it.
+- **Shield (3, blue):** one per segment.
+- **Warning lights,** each behind a printed label so nothing relies on colour alone: **LINK** connected to the
+  game, **SLOW / FAST** a zone coming up or active, **PROX** blinks with the proximity beeps, **EMP** still available.
+- **Preflight check** (closes M4): arm MASTER ARM, match the throttle to the lit light, follow the stick prompts
+  on the LCD, press FIRE.
 
-| Qty | Part | Link | ≈ | Notes |
-| --- | --- | --- | --- | --- |
-| 4 | Breadboard-friendly RGB Smart NeoPixel, 5-pack | [Adafruit 1312](https://www.adafruit.com/product/1312) | $32 | 16 used + 4 spares. Labelled pads, capacitor on board; glued behind 5 mm holes |
-| 1 | 1000 µF electrolytic capacitor, 10 V or higher | [Amazon search](https://www.amazon.com/s?k=1000uf+electrolytic+capacitor+16v) | $2 | Across the NeoPixel power |
-| 1 | DRV2605L haptic driver | [Adafruit 2305](https://www.adafruit.com/product/2305) | $8 | Engine rumble |
-| 2 | Vibrating mini motor disc | [Adafruit 1201](https://www.adafruit.com/product/1201) | $4 | One in the throttle knob, one spare. The driver runs one disc only |
-| 1 | STEMMA QT to female-header cable | [Adafruit 4397](https://www.adafruit.com/product/4397) | $1 | DRV2605L to the shield |
+Rejected, so not to be revived: ghost-hand best-run light, underglow, fan, target tally, lit buttons, a second
+button (HUD toggle), throttle-sensor light, fire-button glow, START light, UltraStik.
 
-**Wiring**
+## Parts
 
-| Qty | Part | Link | ≈ | Notes |
-| --- | --- | --- | --- | --- |
-| 1 | DFRobot Gravity IO Expansion Shield V7.1 (DFR0265) | [DFRobot](https://www.dfrobot.com/product-1009.html) · [The Pi Hut](https://thepihut.com/products/gravity-io-expansion-shield-for-arduino-v7-1) | $5–9 | GND / 5V / signal for every pin |
-| 1 | Panel-mount USB-B cable | [Adafruit 907](https://www.adafruit.com/product/907) | $4 | Fits the 6 mm back wall |
-| 1 | Female–female Dupont cables: 14 × 3-pin, 5 × 4-pin, 30 cm | [ACEBOTT, Amazon](https://www.amazon.com/dp/B0DTKDKF5C) | $8 | 3-pin: cut in half, one plug per shield row (10 used). 4-pin: LCD to the shield whole; if the pin order differs, lift the housing tabs and swap pins |
-| 1 | 22 AWG silicone wire kit, 6 colours | [TUOFENG, Amazon](https://www.amazon.com/Electric-Flexible-Silicone-different-Electronic/dp/B07G2JWYDW) | $15 | Flexible enough for the throttle knob |
-| 1 | Heat-shrink kit, 2:1 | [Amazon](https://www.amazon.com/580PCS-Heat-Shrink-Tubings-Assortment/dp/B089FMGCZS) | $9 | |
+Prices are approximate (October 2026).
 
-**Tools** (skip what you have)
+**Have** (everything but the lights, as of 2026-10-18)
 
-| Qty | Part | Link | ≈ | Notes |
-| --- | --- | --- | --- | --- |
-| 1 | Soldering iron: Pinecil V2 | [Amazon](https://www.amazon.com/PINECIL-Smart-Mini-Portable-Soldering/dp/B096X6SG13) | $26 | Needs a USB-C PD charger (45 W+); or a 60 W station kit |
-| 1 | Rosin-core solder 0.8 mm + flux pen | [Amazon search](https://www.amazon.com/s?k=rosin+core+solder+0.8mm) | $10 | |
-| 1 | Multimeter | [Amazon search](https://www.amazon.com/s?k=digital+multimeter) | $15 | For the checks below |
+| Part | Notes |
+| --- | --- |
+| SaiDian JH-D400X-R4 joystick with button ([Amazon](https://www.amazon.com/dp/B08CGYGMJL)) | X and Y pots have bare lugs; the 5 leads are the twist pot (red/white/black) and the top button (2 yellow) |
+| uxcell 60 mm red dome arcade button ([Amazon](https://www.amazon.com/dp/B07XMCL5YW)) | EMP. Momentary microswitch, 23.5 mm hole; its 12 V lamp has its own resistor |
+| EG STARTS 30 mm Happ-style buttons, 6 colours ([Amazon](https://www.amazon.com/dp/B07GBSJX2H)) | MENU + spares; 28 mm hole |
+| DaierTek lit toggle with flip cover, 2-pack ([Amazon](https://www.amazon.com/dp/B07T6XJF1T)) | MASTER ARM + a spare |
+| DFRobot Gravity IO Expansion Shield V7.1 ([Amazon](https://www.amazon.com/dp/B00G3IKO68)) | GND / 5V / signal for every pin |
+| DFRobot Gravity digital buzzer DFR0032 and vibration module DFR0440 ([Mouser](https://www.mouser.com/ProductDetail/DFRobot/DFR0440?qs=lqAf/iVYw9hBeDOJTobUyg%3D%3D)) | Buzzer passive; rumble cable 30 cm (extend with 3 M–F jumpers) |
+| ACEBOTT female–female Dupont cables, 14 × 3-pin, 5 × 4-pin ([Amazon](https://www.amazon.com/dp/B0DTKDKF5C)) | Cut in half for the soldered parts; one 4-pin for the LCD |
+| EDGELEC jumper wires, 40 cm, assorted F–F / M–F / M–M ([Amazon](https://www.amazon.com/dp/B07GD2PGY4)) | F–F: HC-SR04. M–F: rumble extension. M–M: bench tests |
+| StarTech USBPNLBFBM1 panel-mount USB-B cable, 30 cm ([Amazon](https://www.amazon.com/dp/B002M8VBIS)) | Socket screws into the back wall |
+| Bates heat-shrink kit, capacitor set (470–1000 µF, 10 V+ for the lights), soldering gear, multimeter | |
+| APIELE 22 mm mushroom | Spare, replaced by the 60 mm dome |
+| From the SunFounder kit: Uno R3, HC-SR04, LCD1602 (I2C), resistors (330 Ω, 10 kΩ) | |
+
+**On order:** TOPXCDZ pre-wired WS2812B LED modules, 5 V, 10 cm wire, 2 strings of 50
+([Amazon](https://www.amazon.com/dp/B0B6NVQGJF)). 16 used. Must be **5 V**, not 12 V.
+
+Optional: 4.8 mm female spade connectors and a crimper, if you'd rather crimp than solder the button tabs.
 
 **Enclosure** (order after the cardboard mock-up)
 
@@ -60,41 +75,73 @@ Prices are approximate (September 2026). Quantities include a few spares where p
 | 1 | Body, 6 mm Baltic birch plywood, laser cut | [SendCutSend](https://sendcutsend.com/materials/baltic-birch-plywood/) | $40–60 | Sides, front, back, bottom |
 | 1 | Rubber feet, wood glue, M3 screws, adhesive leatherette for the palm rest | Any | $15 | |
 
-**Total:** about $150 in parts and wiring, $50 in tools, and $90–130 for the enclosure.
-
-**From the SunFounder kit:** Uno R3, HC-SR04, LCD1602 (I2C), active buzzer, S8050 transistor,
-resistors (330 Ω, 1 kΩ, 10 kΩ), breadboard and jumpers for bench tests.
-
 ## Wiring checked against the manufacturers
 
 | Part | Our wiring | Source | Result |
 | --- | --- | --- | --- |
-| Arduino Uno R3 | A4/A5 = I2C; pins ≤ 20 mA; USB ≤ 500 mA | [Arduino store](https://store-usa.arduino.cc/products/arduino-uno-rev3), [Wikipedia](https://en.wikipedia.org/wiki/Arduino_Uno) | OK, **the buzzer needed a transistor** (below) |
-| Gravity IO shield V7.1 | Every part on its own G/V/S row, I2C on the two 4-pin headers | [DFRobot wiki](https://wiki.dfrobot.com/IO_Expansion_Shield_for_Arduino_V7_SKU_DFR0265) | OK. **Power jumper on 5V**; I2C headers are fixed 5 V; SERVO_PWR only feeds D0–D13, leave it empty |
-| HC-SR04 | VCC/TRIG/GND on D9, ECHO on D10 | [Datasheet](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf) | OK: 5 V part, 5 V echo |
-| JH-D400X-R4 | X/Y wipers to A0/A1, outer lugs to 5V/GND; button (2 blue) to D2 | [JH-D202X datasheet](https://uelectronics.com/wp-content/uploads/2019/10/D202X-R4.pdf), seller specs | OK. Z pot is red/black/white, unused. No lug diagram published: **meter check** |
+| Arduino Uno R3 | A4/A5 = I2C; pins ≤ 20 mA; USB ≤ 500 mA | [Arduino store](https://store-usa.arduino.cc/products/arduino-uno-rev3) | OK: no pin drives a load directly (the buzzer and rumble modules switch their own current) |
+| Gravity IO shield V7.1 | Every part on its own G/V/S row, LCD on I2C #1 | [DFRobot wiki](https://wiki.dfrobot.com/IO_Expansion_Shield_for_Arduino_V7_SKU_DFR0265) | OK. **Power jumper on 5V**; SERVO_PWR only feeds D0–D13, leave it empty |
+| JH-D400X-R4 | X pot lugs to A0, Y pot lugs to A1, twist leads to A2 (G/V/S each), button pair to D2 G/S | Seller's lead colours + meter | **Metered**: all three pots 10 kΩ, full sweep, wiper on the middle lug / black lead; button isolated. Lug order: wiring sheet, H1 |
+| HC-SR04 | VCC/TRIG/GND on D9, ECHO on D10, single jumpers | [Datasheet](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf) | OK: 5 V part, 5 V echo |
 | LCD1602 I2C backpack | GND/VCC/SDA/SCL to I2C #1 | Kit module (PCF8574) | OK: address 0x27 or 0x3F |
-| NeoPixel 1312 | 330 Ω on data, 1000 µF at the chain start, boards chained IN → OUT | [Adafruit 1312](https://www.adafruit.com/product/1312), [board schematic](https://github.com/adafruit/Adafruit_Breadboard_NeoPixel_PCB), [Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide/best-practices) | OK. SK6812 (GRB), up to 36 mA each; 1 µF capacitor already on each board |
-| DRV2605L | STEMMA QT to I2C #2, motor +/− to the disc | [Adafruit guide](https://learn.adafruit.com/adafruit-drv2605-haptic-controller-breakout/pinouts) | OK: 3–5 V, 0x5A, own 10 kΩ pull-ups |
-| Vibration disc 1201 | Motor +/− on the DRV2605L | [Adafruit 1201](https://www.adafruit.com/product/1201) | OK: 2–5 V, 100 mA at 5 V |
-| MASTER ARM (COM-11310) | + to 5V, accessory to D7, ground to GND, 10 kΩ accessory→ground | [SparkFun](https://www.sparkfun.com/toggle-switch-and-cover-illuminated-red.html), [Core Electronics forum](https://forum.core-electronics.com.au/t/toggle-switch-and-cover-illuminated-red-com-11310/12826) | OK. Ground is the terminal nearest the top. **Reads HIGH when armed**, unlike the buttons |
-| EMP mushroom (APIELE) | Its two NO terminals to D3 and GND | [Listing](https://www.amazon.com/dp/B09KZK8SXQ): momentary SPST | OK |
-| 30 mm buttons | Microswitch COM to GND, NO to the pin | [EG STARTS listing](https://www.amazon.com/EG-STARTS-American-Standard-Switchable/dp/B07GBRD4HJ) | OK. **28 mm hole**, not 30 (model updated) |
-| Buzzer (kit, active) | D8 → 1 kΩ → S8050 base; buzzer between 5V and collector; emitter to GND | Uno pin limit 20 mA | **Changed**: the buzzer draws ~30 mA, too much for a pin |
-| Panel USB (907) | Uno to the back wall | [Adafruit 907](https://www.adafruit.com/product/907) | OK: for 3–6.35 mm walls; ours is 6 mm |
+| Pre-wired LED string | 330 Ω on data, 470–1000 µF at the start, input end first | [Module specs](https://www.ledlightinghut.com/pre-soldered-ws2812b-sk6812-smart-circle-pcb-string.html), [Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide/best-practices) | OK: WS2812B or SK6812, 5 V, GRB, up to ~55 mA each at full white |
+| Gravity buzzer DFR0032 | Its cable on D8 | [DFRobot](https://www.dfrobot.com/product-84.html) | OK: passive (plays the sent pitch), 3.3–5 V, cable included |
+| Gravity vibration DFR0440 | Its cable + 3 M–F jumpers on D5 (PWM) | [DFRobot](https://www.dfrobot.com/product-1542.html) | OK: 5 V, on/off or PWM strength, 30 × 22 mm, 30 cm cable included |
+| MASTER ARM (DaierTek) | +1 to 5V, +2 to D7, − (side tab) to GND, 10 kΩ +2→− | [DaierTek](https://daiertek.net/led-toggle-switch-12v/) | OK: 12 mm hole. **Reads HIGH when armed**. 12 V LED: may be dim at 5 V |
+| EMP: uxcell 60 mm dome | Microswitch COM to GND, NO to D3; lamp + to D12 S, − to D12 G | [Listing](https://www.amazon.com/uxcell-Button-Illuminated-Switch-Arcade/dp/B07XYV5NNP) | OK: momentary, 1 NO, 23.5 mm hole. The lamp's own resistor keeps it to a few mA at 5 V |
+| 30 mm buttons | Microswitch COM to GND, NO to the pin | [EG STARTS listing](https://www.amazon.com/dp/B07GBSJX2H) | OK: **28 mm hole**, not 30 |
+| Panel USB (StarTech USBPNLBFBM1) | Uno to the back wall | [Datasheet](https://media.startech.com/cms/pdfs/usbpnlbfbm1_datasheet.pdf) | OK: B socket to B plug, 30 cm, screw mount. Hole spacing not published: **measure** before the back wall is cut |
 
-**Power from USB (500 mA fuse):** Uno 50 + LCD 25 + HC-SR04 15 + NeoPixels 145 (16 × 36 mA at a 25 %
-brightness cap) + haptic 100 + buzzer 30 ≈ 365 mA. The sketch must cap brightness: all 16 at full
-white would draw 576 mA on their own.
+**Power from USB (500 mA fuse):** Uno 50 + LCD 25 + HC-SR04 15 + lights ≤ 180 (16 × ~55 mA at a 20 %
+brightness cap) + rumble ~80 + buzzer ~30 ≈ 380 mA. The sketch must cap brightness: all 16 at full white
+would draw ~880 mA on their own.
+
+**Fit (checked in the model):** the throttle stem is a 6 mm rod in the 8 mm slot; the rumble module sits on
+the back of the reflector plate, where the sonar can't see it; the Uno lies sideways against the back wall
+so its plugs clear the MENU microswitch, with the USB socket beside it.
+
+## Sketch (v2)
+
+[AxiomCockpit/AxiomCockpit.ino](../AxiomCockpit/AxiomCockpit.ino). The v1 sketch stays for the kit wiring
+(its pins differ). Protocol v2 extends v1, so the game works with either:
+
+| Direction | Message | Fields |
+| --- | --- | --- |
+| Controller → PC, every 20 ms | `AX,x,y,mm,fire,menu,twist,emp,arm*HH` | The first six as in v1 (MENU in the pause slot); twist 0–1023, emp/arm 0/1 |
+| PC → controller | `RM,level,ms*HH` | Rumble 0–255. `ms` 0 = steady level, dropped 1.5 s after the last one; `ms` > 0 = a pulse |
+| PC → controller | `LA,mode*HH` | EMP dome lamp: 0 off, 1 on, 2 blink |
+
+`BZ` and `LT` are unchanged. A0 X (right = high), A1 Y (forward = high), A2 twist (clockwise = high).
+Pull-ups on D2 FIRE, D3 EMP, D4 MENU: pressed = LOW. D7 MASTER ARM: HIGH = armed.
+
+**Standby self-test** (no game running): row 1 shows the distance, X, Y and twist (0–99); row 0 shows
+F E M A for FIRE, EMP, MENU and armed. Each press clicks, MASTER ARM chirps up/down, **holding EMP runs the
+rumble**, and the EMP lamp stays lit.
+
+Not yet: the D6 lights (GRB, brightness capped at 20 %). Call `show()` right before sending each `AX` packet,
+and have the game send right after receiving one: `show()` pauses interrupts for ~0.5 ms, and serial bytes
+arriving during it are lost.
+
+## Bench test (before soldering)
+
+1. Shield on the Uno, power jumper on **5V**. Upload `AxiomCockpit` (board: Arduino Uno).
+2. Plug on the LCD (I2C #1), the buzzer (D8), the rumble module (D5) and the sonar (D9/D10 jumpers).
+3. **D7 floats without the switch:** put a jumper from D7 S to D7 G, or the A flickers.
+4. Buttons: touch a jumper between a row's S and G pins (D2 FIRE, D3 EMP, D4 MENU), or wire the real
+   microswitch's COM to G and NO to S. EMP lamp: + to D12 S, − to D12 G. Joystick: a clip lead per lug.
+5. Check each reading on the LCD. Hold D3 S to G to feel the rumble.
 
 ## Check when the parts arrive
 
-1. **NeoPixels:** on the breadboard, run a colour test on one board (pads are labelled) before
-   soldering the chain.
-2. **Joystick lugs:** the two outer lugs of each pot read about 10 kΩ; the middle one is the wiper.
-3. **Mushroom button:** it springs back when released (momentary); the meter shows it closes when pressed.
-   If it opens instead (normally closed), it still works: the sketch inverts it.
-4. **MASTER ARM:** confirm which terminal is ground with the meter (the LED conducts to it).
-5. **S8050:** with the flat face toward you, the legs are usually E, B, C. Check the marking on yours.
-6. **Before ordering the panel:** measure the joystick's panel hole and screw spacing, and the button
-   and switch bodies. The model's openings are from listings (stick 40 mm hole, 32.5 mm screw square).
+Done 2026-10-18: joystick wires metered, EMP springs back with NO closing, MASTER ARM's − tab found,
+EMP lamp has its own resistor.
+
+1. **Light string:** find the input end (first module's pads read DIN), run a colour test on the whole string
+   before cutting it after module 16.
+2. **EMP dome:** check the body plus microswitch is under about 60 mm below the panel (the box has about
+   65 mm there).
+3. **Rumble:** with the module taped to the plate, check you can feel it at the knob. If not, it moves into
+   the knob with its cable down a hollow stem.
+4. **Before ordering the panel:** measure the joystick's flange and screw spacing, and the button and switch
+   bodies, and the USB socket's screw spacing. The model's openings are from listings (stick 40 mm hole,
+   32.5 mm screw square, dome 24 mm).

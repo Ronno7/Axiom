@@ -9,7 +9,7 @@ controls keep working whether or not it is connected.
 ![Wiring diagram](wiring.svg)
 
 To house it all, see the [enclosure build guide](enclosure/README.md). The next controller, a cockpit
-box with an arcade-style layout, is in [cockpit/](cockpit/README.md) (shopping list and wiring).
+box with an arcade-style layout, is in [cockpit/](cockpit/README.md) (parts, wiring, and its sketch `AxiomCockpit`).
 
 | Part | Pin | Notes |
 | --- | --- | --- |

@@ -19,6 +19,6 @@
 | `UI` | UI documents, fonts, sprites, and styles as needed |
 | `Editor` | Tools that run in the Unity editor |
 | `Docs` at project root | Design and handoff documentation |
-| `Arduino` at project root | Future firmware and wiring documentation |
+| `Arduino` at project root | Controller sketches, wiring, enclosure and cockpit model |
 
 Paths below `Scenes` in this table are relative to `Assets`. Empty folders contain `.gitkeep` placeholders so Git retains the structure. They are organizational placeholders, not implemented systems.

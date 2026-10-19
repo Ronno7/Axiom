@@ -17,20 +17,15 @@ This is primarily a user-interface coursework project. Engaging flight and comba
 - Required menus: Play, Options with functioning basic settings, Help, and Quit.
 - Use the physical controller for as much of the experience as practical; keyboard support is acceptable.
 - A small geometric boss at the end is within the proposed scope.
-- The physical components are available but still packaged and unassembled.
 - The game is titled **Axiom**.
 
 ## Controller plan
 
-| Component | Intended function |
-| --- | --- |
-| Arduino | USB serial connection to Unity |
-| HC-SR04 ultrasonic sensor | Measures a movable physical throttle |
-| Two-axis joystick | Steering, with aiming tied to aircraft position |
-| Push button | Firing |
-| Buzzer | Short effects and feedback sounds |
-
-The electrical pinout, physical assembly, calibration, and serial protocol are not implemented in this foundation. Resolve those during controller development.
+The kit controller (v1: Uno, HC-SR04 throttle, thumbstick, button, buzzer, 16×2 LCD) works and is documented
+in `Arduino/README.md`. It is being replaced by a cockpit box (v2): HC-SR04 throttle lever with 8 lights, an
+analog stick with FIRE on top and a twist axis, a 60 mm EMP button, MENU, a flip-cover MASTER ARM switch,
+the LCD, shield and warning lights, buzzer and rumble. Parts, wiring and what each control does in the game:
+`Arduino/cockpit/README.md`.
 
 ## Proposed implementation defaults to revisit during playtesting
 
@@ -56,9 +51,5 @@ Classification depends on what is physically part of the game's fiction. Priorit
 
 ## Delivered scope
 
-The initial delivery established folder structure and a basic prototype scene.
-The current implementation adds forward movement with smooth throttle and bounded keyboard
-steering, with a camera that follows forward travel. See `FLIGHT.md` for controls,
-tuning, component responsibilities, and verification status. `COMBAT.md` covers M2 shooting,
-reticles, and target destruction. Enemy attacks, menus, Arduino code,
-and the three finished levels belong to later milestones.
+Progress against the milestones is tracked in `DEVELOPMENT_PLAN.md`. `FLIGHT.md`, `COMBAT.md` and `UI.md`
+describe what is built.

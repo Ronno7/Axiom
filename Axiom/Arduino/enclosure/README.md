@@ -1,5 +1,7 @@
 # Axiom controller enclosure
 
+For the kit controller (v1). Superseded by the [cockpit box](../cockpit/README.md); kept for reference.
+
 A desk console: throttle lever on the left, thumbstick on the right, fire trigger on the front face.
 The recommended build uses an off-the-shelf ABS case cut with a Dremel. An all-cardboard version
 is kept as a fallback.

@@ -192,7 +192,7 @@ If time becomes tight, simplify enemy variety, boss complexity, and optional ran
 - [x] M1 — Flight, camera, throttle, and shared input implemented and verified in the editor (2026-09-29).
 - [x] M2 — Shooting, aiming, and target feedback (user-verified 2026-09-29). See `Axiom/Docs/COMBAT.md`.
 - [x] M3 — Full loop, required screens, saved options, throttle sections (user playtested). Quit checked in the editor; the desktop-build check moves to M7.
-- [ ] M4 — Controller software done with a simulator (see `Arduino/README.md`); calibration/preflight screens and hardware testing pending.
+- [ ] M4 — Kit controller (v1) works with calibration and the LCD. Cockpit box (v2): parts in hand except the lights, sketch written, bench test under way; its game features and the preflight check are next.
 - [ ] M5 — Three levels and simple finale.
 - [ ] M6 — UI polish and user testing.
 - [ ] M7 — Tested desktop build and handoff.
@@ -355,3 +355,26 @@ UltraStik (cost). Next: buy and measure parts, cardboard mock-up from a 1:1 temp
 Shopping list, wiring (`Arduino/cockpit/wiring-cockpit.svg`) and a part-by-part check against the
 manufacturers' docs are in `Arduino/cockpit/README.md`. The check moved the buzzer onto the kit's S8050
 (≈30 mA is over the 20 mA pin limit) and set 28 mm holes for the Happ-style buttons.
+
+### 2026-10-07 — Controller v2 simplified (16 solder joints)
+
+The 16 separate NeoPixel boards (94 joints) became one pre-wired string of 10 mm WS2812B modules: same
+holes, same pin (D6), 4 joints at its start. The kit buzzer + S8050 became a Gravity buzzer (DFR0032) on
+D8, and the DRV2605L + disc a Gravity vibration module (DFR0440) on D5, glued behind the throttle's
+reflector plate; the HC-SR04 uses single jumpers. EMP is now a 60 mm red dome (uxcell, 24 mm hole). The
+joystick has 5 bare wires (power pair, X, Y, button), spliced to A0/A1/D2. Review fixes in the model: 6 mm
+throttle stem (the 9.6 mm one didn't fit the 8 mm slot) and the Uno turned sideways against the back wall
+so its plugs clear the MENU microswitch. Parts in hand and to buy: `Arduino/cockpit/README.md`.
+
+### 2026-10-18 — Cockpit parts in hand (lights shipping), v2 sketch, docs consolidated
+
+The JH-D400X-R4's 5 leads are the **twist** pot (red/white/black) and the top button (2 yellow); X and Y are
+bare-lug pots. All three are 10 kΩ with a full sweep (metered). Each gets its own row: X → A0, Y → A1, twist → A2
+(game use undecided: barrel roll or visual banking); button → D2 G/S. The EMP dome's lamp has its own resistor, so
+D12 drives it (lit = EMP available). MASTER ARM terminals as DaierTek names them (+1, +2, −). Build: 24 joints.
+v2 sketch `Arduino/AxiomCockpit` (lights not yet): `AX` gains twist/EMP/ARM after the v1 fields (MENU in the pause
+slot), `RM` rumble with a 1.5 s keep-alive, `LA` dome lamp, and a standby self-test of every input. Unity parses
+6- or 9-field packets and can format `RM`/`LA`; no gameplay uses them yet. Sketch compiles; EditMode 98/98.
+Bench test on the shield (user): MENU and EMP + lamp harnesses soldered; FIRE, EMP, MENU, clicks, rumble and the
+lamp work in standby. Still to bench: MASTER ARM, joystick, sonar. Docs consolidated from all sessions: what each cockpit control and light does (decided
+2026-09-30) and the rejected ideas now live in `Arduino/cockpit/README.md`; handoff, brief and FLIGHT are current.

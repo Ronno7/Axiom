@@ -2,7 +2,7 @@
 
 1  Overview: every part to its own row on the DFRobot Gravity IO shield (G = ground, V = +5 V, S = signal).
 2  Each harness terminal by terminal, with every solder joint marked.
-3  The NeoPixel chain: start circuit, board-to-board links, route across the panel and wire lengths.
+3  The light string: its start connection, how to fit it and where each light sits on the panel.
 4  Soldering summary, build order and rules.
 Run: python make_wiring.py
 """
@@ -15,11 +15,13 @@ o = []
 add = o.append
 
 BLACK, RED, GRAY = "#1f1f1f", "#d62828", "#868e96"
-BLUE, YELLOW = "#1971c2", "#f2b705"
+BLUE, YELLOW, GRAVITY_GREEN = "#1971c2", "#f2b705", "#2f9e44"
 SOLDER, SOLDER_EDGE = "#f08c00", "#7a4300"
-SIG = {"A0": "#2b8a3e", "A1": "#1864ab", "D2": "#e8590c", "D3": "#c92a2a", "D4": "#7048e8",
-       "D6": "#e64980", "D7": "#a61e4d", "D8": "#5c940d", "D9": "#f76707", "D10": "#0ca678"}
+PLUGIN = "#495057"
+SIG = {"A0": "#2b8a3e", "A1": "#1864ab", "A2": "#5f3dc4", "D2": "#e8590c", "D3": "#c92a2a", "D4": "#7048e8", "D5": "#0c8599",
+       "D6": "#e64980", "D7": "#a61e4d", "D8": "#5c940d", "D9": "#f76707", "D10": "#0ca678", "D12": "#9c36b5"}
 I2C = [("GND", BLACK), ("VCC", RED), ("SDA", BLUE), ("SCL", YELLOW)]
+STICK_WIRE = "#adb5bd"   # factory leads (the joystick's twist and button wires, the light string)
 
 
 # ---------------- Drawing helpers ----------------
@@ -46,14 +48,19 @@ def sleeve(x, y, vertical=False, size=30):
     add(f'<rect x="{x - w / 2:g}" y="{y - h / 2:g}" width="{w}" height="{h}" rx="4" fill="#495057" opacity=".22"/>')
 
 
-def screw(x, y):
-    add(f'<circle cx="{x:g}" cy="{y:g}" r="7" fill="#dee2e6" stroke="#495057" stroke-width="1.5"/>'
-        f'<path d="M{x - 4:g},{y:g} h8 M{x:g},{y - 4:g} v8" stroke="#495057" stroke-width="1.5"/>')
+def splice(x, y):
+    sleeve(x, y)
+    joint(x, y)
 
 
 def plugmark(x, y):
     """Plug-in contact: no solder."""
     add(f'<rect x="{x - 5:g}" y="{y - 5:g}" width="10" height="10" rx="2" fill="#fff" stroke="#495057" stroke-width="2"/>')
+
+
+def capped(x, y):
+    """An unused wire end, insulated."""
+    add(f'<rect x="{x - 4:g}" y="{y - 5:g}" width="10" height="10" rx="3" fill="#495057" opacity=".55"/>')
 
 
 def resistor(x1, y1, x2, y2, label, label_side=-1):
@@ -114,6 +121,15 @@ def section(y, number, title, sub):
     t(40, y + 56, sub, "small")
 
 
+def gravity_module(x, y, w, h, name):
+    """A DFRobot Gravity module with its PH2.0 socket on the left edge; returns the socket pin ys (G, V, S)."""
+    add(f'<rect x="{x:g}" y="{y:g}" width="{w}" height="{h}" rx="6" fill="#1c7ed6"/>')
+    t(x + 54, y + h / 2 + 5, name, "pin", "middle", 'font-size="12"')
+    cy = y + h / 2
+    add(f'<rect x="{x - 4:g}" y="{cy - 18:g}" width="12" height="36" rx="2" fill="#f1f3f5" stroke="#495057"/>')
+    return [cy - 10, cy, cy + 10]
+
+
 # ---------------- Sheet ----------------
 add("@@HEADER@@")
 add("""<style>
@@ -136,25 +152,25 @@ t(40, 74, "Every part has its own cable to its own row on the Gravity shield, so
 # Legend
 ly = 104
 joint(50, ly)
-t(62, ly + 4, "solder joint", "small")
-sleeve(178, ly)
-joint(178, ly)
-t(200, ly + 4, "solder joint + heat-shrink (wire to wire)", "small")
-plugmark(475, ly)
-t(488, ly + 4, "plugs on, no solder", "small")
-screw(625, ly)
-t(640, ly + 4, "screw terminal", "small")
-chip(870, ly - 11, "8 solder", SOLDER)
-t(878, ly + 4, "joints in that harness", "small")
-add(f'<rect x="1060" y="{ly - 6}" width="34" height="12" rx="3" fill="#e9dcc3" stroke="#8a7757"/>')
-t(1102, ly + 4, "resistor (from the kit)", "small")
-t(1290, ly + 4, "H1–H10 = harness, see section 2", "small")
+t(62, ly + 4, "solder joint (on a tab)", "small")
+splice(232, ly)
+t(254, ly + 4, "solder joint + heat-shrink (wire to wire)", "small")
+plugmark(530, ly)
+t(543, ly + 4, "plugs on, no solder", "small")
+capped(690, ly)
+t(704, ly + 4, "unused wire: heat-shrink the end", "small")
+chip(990, ly - 11, "5 solder", SOLDER)
+t(998, ly + 4, "joints in that harness", "small")
+add(f'<rect x="1170" y="{ly - 6}" width="34" height="12" rx="3" fill="#e9dcc3" stroke="#8a7757"/>')
+t(1212, ly + 4, "resistor (kit)", "small")
+t(1330, ly + 4, "H1–H10: see section 2", "small")
 
 # =====================================================================
 # 1  Overview
 # =====================================================================
 S1 = 140
-section(S1, "1", "Overview", "Which shield row each part plugs into. The orange dots are where the cable meets the part.")
+section(S1, "1", "Overview", "Which shield row each part plugs into. 24 solder joints in the whole build; "
+                             "the buzzer, rumble, sonar, LCD and USB just plug in.")
 
 LX, RX = 640, 920
 PX, QX = 500, 1000
@@ -192,41 +208,46 @@ def ov_box(x, y, w, h, title, lines, chip_text, chip_color=SOLDER):
         t(x + 12, y + 42 + i * 17, s, "small")
 
 
-left = [("A0", TOP + 110, "stick X"), ("A1", TOP + 160, "stick Y"), ("D2", TOP + 210, "FIRE (stick top)"),
-        ("D3", TOP + 300, "EMP"), ("D4", TOP + 380, "MENU"), ("D7", TOP + 470, "MASTER ARM"),
-        ("D9", TOP + 550, "sonar TRIG"), ("D10", TOP + 600, "sonar ECHO")]
-used_l = {"A0": "GVS", "A1": "GVS", "D2": "GS", "D3": "GS", "D4": "GS", "D7": "GVS", "D9": "GVS", "D10": "S"}
+left = [("A0", TOP + 100, "stick X (left–right)"), ("A1", TOP + 140, "stick Y (fwd–back)"),
+        ("A2", TOP + 180, "stick twist"), ("D2", TOP + 220, "FIRE (stick top)"),
+        ("D3", TOP + 296, "EMP"), ("D12", TOP + 330, "EMP lamp"), ("D4", TOP + 380, "MENU"), ("D7", TOP + 470, "MASTER ARM"),
+        ("D9", TOP + 540, "sonar TRIG + power"), ("D10", TOP + 580, "sonar ECHO")]
+used_l = {"A0": "GVS", "A1": "GVS", "A2": "GVS", "D2": "GS", "D3": "GS", "D12": "GS", "D4": "GS", "D7": "GVS", "D9": "GVS", "D10": "S"}
 for name, y, desc in left:
     row("L", y, name, desc, used_l[name])
 ly_ = {n: y for n, y, _ in left}
 
 ov_box(40, TOP + 70, PX - 40, 180, "H1  Joystick JH-D400X-R4", [
-    "X pot → A0, Y pot → A1", "Outer lugs → G and V, middle lug (wiper) → S",
-    "Top button (2 blue wires) → D2 S and G", "Twist pot: unused"], "8 solder")
-for n in ("A0", "A1"):
-    cable("L", ly_[n], PX, [("G", BLACK), ("V", RED), ("S", SIG[n])])
-cable("L", ly_["D2"], PX, [("G", BLACK), ("S", SIG["D2"])])
-ov_box(40, TOP + 268, PX - 40, 64, "H2  EMP mushroom (APIELE 22 mm)", ["Its two contacts → G and S, either way round"],
-       "screws", "#495057")
-cable("L", ly_["D3"], PX, [("G", BLACK), ("S", SIG["D3"])], screw)
+    "X pot (front face): its 3 lugs → A0", "Y pot (left face): its 3 lugs → A1",
+    "Twist leads red / white / black → A2", "Top button, 2 yellow leads → D2 G and S"], "11 solder")
+cable("L", ly_["A0"], PX, [("G", BLACK), ("V", RED), ("S", SIG["A0"])])
+cable("L", ly_["A1"], PX, [("G", BLACK), ("V", RED), ("S", SIG["A1"])])
+cable("L", ly_["A2"], PX, [("G", BLACK), ("V", RED), ("S", SIG["A2"])], splice)
+cable("L", ly_["D2"], PX, [("G", BLACK), ("S", SIG["D2"])], splice)
+ov_box(40, TOP + 266, PX - 40, 82, "H2  EMP: 60 mm red dome (uxcell)", ["Microswitch COM → G, NO → S (D3)",
+    "Lamp − → G, + → S (D12)"], "4 solder")
+cable("L", ly_["D3"], PX, [("G", BLACK), ("S", SIG["D3"])])
+cable("L", ly_["D12"], PX, [("G", BLACK), ("S", SIG["D12"])])
 ov_box(40, TOP + 350, PX - 40, 64, "H3  MENU: 30 mm arcade button", ["Microswitch COM → G, NO → S"], "2 solder")
 cable("L", ly_["D4"], PX, [("G", BLACK), ("S", SIG["D4"])])
-ov_box(40, TOP + 432, PX - 40, 80, "H4  MASTER ARM (flip-cover toggle)", [
-    "+ → V, ACC → S, GND → G", "10 kΩ across ACC and GND"], "3 solder")
+ov_box(40, TOP + 432, PX - 40, 80, "H4  MASTER ARM (DaierTek flip-cover toggle)", [
+    "+1 → V, +2 → S, − → G", "10 kΩ across +2 and −"], "3 solder")
 cable("L", ly_["D7"], PX, [("G", BLACK), ("V", RED), ("S", SIG["D7"])])
 ov_box(40, TOP + 530, PX - 40, 90, "H5  HC-SR04 throttle sonar (kit)", [
-    "VCC → V, TRIG → S, GND → G on the D9 row", "ECHO → S on the D10 row"], "4 solder")
-cable("L", ly_["D9"], PX, [("G", BLACK), ("V", RED), ("S", SIG["D9"])])
-cable("L", ly_["D10"], PX, [("S", SIG["D10"])])
+    "4 single jumpers: VCC → V, TRIG → S, GND → G (D9)", "ECHO → S (D10)"], "plug-in", PLUGIN)
+cable("L", ly_["D9"], PX, [("G", BLACK), ("V", RED), ("S", SIG["D9"])], plugmark)
+cable("L", ly_["D10"], PX, [("S", SIG["D10"])], plugmark)
 
 # Right side
-row("R", TOP + 110, "D6", "NeoPixel data")
-row("R", TOP + 300, "D8", "buzzer")
-ov_box(QX, TOP + 70, W - 40 - QX, 190, "H7  NeoPixel chain: 16 × Adafruit 1312", [
-    "V → +5V, G → GND, S → 330 Ω → DIN of board 1", "1000 µF across +5V/GND at board 1",
-    "Each board's OUT → the next board's IN (see section 3)"], "94 solder")
-cable("R", TOP + 110, QX, [("G", BLACK), ("V", RED), ("S", SIG["D6"])])
+right = [("D6", TOP + 110, "light data"), ("D5", TOP + 300, "rumble (PWM)"), ("D8", TOP + 380, "buzzer")]
+for name, y, desc in right:
+    row("R", y, name, desc)
 CHAIN = (["#f1f3f5"] * 8 + ["#51cf66", "#339af0", "#ffa94d", "#ff6b6b", "#ffd43b"] + ["#4dabf7"] * 3)
+ov_box(QX, TOP + 70, W - 40 - QX, 190, "H7  Light string: 16 pre-wired LED modules", [
+    "V → 5V, G → GND, S → 330 Ω → DIN of module 1",
+    "470–1000 µF across 5V/GND at the same joins",
+    "Modules 1 → 16 come wired together (section 3)"], "4 solder")
+cable("R", TOP + 110, QX, [("G", BLACK), ("V", RED), ("S", SIG["D6"])], splice)
 for i, c in enumerate(CHAIN):
     cx, cy = QX + 30 + i * 32, TOP + 210
     add(f'<circle cx="{cx}" cy="{cy}" r="10" fill="{c}" stroke="#495057" stroke-width="1.3"/>')
@@ -234,79 +255,96 @@ for i, c in enumerate(CHAIN):
     if i < 15:
         add(f'<line x1="{cx + 10}" y1="{cy}" x2="{cx + 21}" y2="{cy}" stroke="#e64980" stroke-width="2" marker-end="url(#arr)"/>')
 t(QX + 30, TOP + 240, "1–8 throttle (front → back) · 9–13 LINK SLOW FAST PROX EMP · 14–16 shield", "tiny")
-ov_box(QX, TOP + 272, W - 40 - QX, 64, "H6  Buzzer (kit) through an S8050 (kit)", [
-    "S → 1 kΩ → base · V → buzzer + · buzzer − → collector · emitter → G"], "5 solder")
-cable("R", TOP + 300, QX, [("G", BLACK), ("V", RED), ("S", SIG["D8"])])
+ov_box(QX, TOP + 272, W - 40 - QX, 64, "H9  Rumble: Gravity vibration module (DFR0440)", [
+    "Its Gravity cable + 3 male–female jumpers to the D5 row"], "plug-in", PLUGIN)
+cable("R", TOP + 300, QX, [("G", BLACK), ("V", RED), ("S", SIG["D5"])], plugmark)
+ov_box(QX, TOP + 352, W - 40 - QX, 64, "H6  Buzzer: Gravity digital buzzer (DFR0032)", [
+    "Its Gravity cable plugs onto the D8 row"], "plug-in", PLUGIN)
+cable("R", TOP + 380, QX, [("G", BLACK), ("V", RED), ("S", SIG["D8"])], plugmark)
 
-for y, label in ((TOP + 400, "I2C #1"), (TOP + 480, "I2C #2")):
-    add(f'<rect x="{RX}" y="{y - 22}" width="22" height="44" rx="3" fill="#212529"/>')
-    for k in range(4):
-        add(f'<rect x="{RX + 7}" y="{y - 18 + k * 10}" width="8" height="6" fill="#ced4da"/>')
-    t(RX - 10, y - 2, label, "pin", "end")
-    t(RX - 10, y + 13, "GND · VCC (5V) · SDA · SCL", "tiny", "end", 'style="fill:#a5d8ff"')
-    for k, (_, c) in enumerate(I2C):
-        line([(RX + 22, y - 15 + k * 10), (QX, y - 15 + k * 10)], c, 2.5)
-        plugmark(QX - 10, y - 15 + k * 10)
-ov_box(QX, TOP + 362, W - 40 - QX, 64, "H8  LCD1602 + I2C backpack (kit)", [
-    "4-pin cable, used whole: GND, VCC, SDA, SCL match by label"], "plug-in", "#495057")
-ov_box(QX, TOP + 444, W - 40 - QX, 80, "H9  Haptics: DRV2605L + vibration disc", [
-    "STEMMA QT cable to I2C #2 (plug-in)", "Motor + / − pads → disc in the throttle knob"], "4 solder")
-add(f'<rect x="{RX}" y="{TOP + 552}" width="30" height="26" rx="3" fill="#adb5bd" stroke="#495057"/>')
-t(RX - 10, TOP + 570, "USB-B", "pin", "end")
-line([(RX + 30, TOP + 565), (QX, TOP + 565)], GRAY, 6)
-ov_box(QX, TOP + 540, W - 40 - QX, 50, "H10  Panel USB cable (Adafruit 907) to the back wall", [], "plug-in", "#495057")
+y = TOP + 470
+add(f'<rect x="{RX}" y="{y - 22}" width="22" height="44" rx="3" fill="#212529"/>')
+for k in range(4):
+    add(f'<rect x="{RX + 7}" y="{y - 18 + k * 10}" width="8" height="6" fill="#ced4da"/>')
+t(RX - 10, y - 2, "I2C #1", "pin", "end")
+t(RX - 10, y + 13, "GND · VCC (5V) · SDA · SCL", "tiny", "end", 'style="fill:#a5d8ff"')
+for k, (_, c) in enumerate(I2C):
+    line([(RX + 22, y - 15 + k * 10), (QX, y - 15 + k * 10)], c, 2.5)
+    plugmark(QX - 10, y - 15 + k * 10)
+ov_box(QX, TOP + 440, W - 40 - QX, 64, "H8  LCD1602 + I2C backpack (kit)", [
+    "4-pin cable, used whole: GND, VCC, SDA, SCL match by label"], "plug-in", PLUGIN)
+add(f'<rect x="{RX}" y="{TOP + 547}" width="30" height="26" rx="3" fill="#adb5bd" stroke="#495057"/>')
+t(RX - 10, TOP + 565, "USB-B", "pin", "end")
+line([(RX + 30, TOP + 560), (QX, TOP + 560)], GRAY, 6)
+ov_box(QX, TOP + 530, W - 40 - QX, 60, "H10  Panel USB cable (StarTech USBPNLBFBM1)", ["Uno to a socket in the back wall"],
+       "plug-in", PLUGIN)
+t(QX + 12, TOP + 615, "Free: A3, D11, D13 and I2C #2.", "tiny")
 
 # =====================================================================
 # 2  Harness details
 # =====================================================================
 S2 = TOP + 680
 section(S2, "2", "Harness by harness",
-        "Cut each 3-pin cable in half: the plug goes on the shield row, the cut end is soldered to the part. "
+        "Where a 3-pin cable is cut in half, the plug goes on the shield row and the cut end is soldered to the part. "
         "Strip 5 mm, tin both ends, slide the heat-shrink on first.")
-PW, PH = 490, 320
+PW, PH = 490, 360
 COLS = [40, 555, 1070]
 R1, R2, R3 = S2 + 80, S2 + 80 + PH + 24, S2 + 80 + 2 * (PH + 24)
 TX = 300   # where wires meet the part in most panels
 
 # H1 joystick ------------------------------------------------------------
-panel(COLS[0], R1, PW, PH, "H1  Joystick JH-D400X-R4", "8 solder")
-rows = [("A0", 74, "X pot", SIG["A0"]), ("A1", 140, "Y pot", SIG["A1"])]
-for name, y0, pot, sc in rows:
-    ys = header(44, y0, name)
-    for py, c, lab in zip(ys, (BLACK, RED, sc), ("outer lug", "other outer lug", "middle lug (wiper)")):
-        line([(60, py), (TX, py)], c, 2.5)
-        joint(TX, py)
-        t(TX + 12, py + 4, f"{pot}: {lab}", "tiny")
-ys = header(44, 206, "D2", used="GS")
-for py, c in ((ys[0], BLACK), (ys[2], SIG["D2"])):
-    line([(60, py), (TX, py)], c, 2.5)
-    sleeve(TX - 30, py)
-    joint(TX - 30, py)
-    line([(TX - 24, py), (TX, py)], "#4dabf7", 2.5)
-    t(TX + 12, py + 4, "button: blue wire", "tiny")
-notes(16, 256, [
-    "Meter check: the two outer lugs read about 10 kΩ end to end; the middle one is the wiper.",
-    "Axis runs backwards? Swap that pot's outer lugs, or flip it in calibration.",
-    "Twist pot (red/black/white wires): unused. Insulate the ends with heat-shrink.",
-    "Hole: per the stick's flange. Measure before the panel is cut."])
+panel(COLS[0], R1, PW, PH, "H1  Joystick: X, Y and twist pots + top button", "11 solder")
+# (shield pin, colour, what it goes to, wire-to-wire?) per row; lug 1 = leftmost, looking at the pot's face
+stick = {"A0": [(BLACK, "X pot lug 1"), (RED, "X pot lug 3"), (SIG["A0"], "X pot lug 2 (wiper)")],
+         "A1": [(BLACK, "Y pot lug 3"), (RED, "Y pot lug 1"), (SIG["A1"], "Y pot lug 2 (wiper)")],
+         "A2": [(BLACK, "white lead"), (RED, "red lead"), (SIG["A2"], "black lead (wiper)")],
+         "D2": [(BLACK, "yellow lead"), (None, None), (SIG["D2"], "yellow lead")]}
+for k, (name, wires) in enumerate(stick.items()):
+    ys = header(44, 70 + k * 58, name, used="GS" if name == "D2" else "GVS")
+    for py, (c, lab) in zip(ys, wires):
+        if c is None:
+            continue
+        line([(60, py), (TX - 40, py)], c, 2.5)
+        if name in ("A2", "D2"):
+            line([(TX - 40, py), (TX + 20, py)], STICK_WIRE, 3)
+            splice(TX - 40, py)
+        else:
+            joint(TX - 40, py)
+        t(TX + 28, py + 4, lab, "tiny")
+notes(16, 292, [
+    "Mount the stick with its leads toward the back of the box. Lug 1 is the leftmost,",
+    "looking at the pot's face from outside. X pot: front face. Y pot: left face.",
+    "Right, forward and clockwise all read higher, so nothing needs inverting.",
+    "All three pots are 10 kΩ with a full 0–10 kΩ sweep (metered). The button pair is",
+    "isolated from the pots. Measure the stick's flange before the panel is cut."], 15)
 add("</g>")
 
-# H2 EMP -------------------------------------------------------------------
-panel(COLS[1], R1, PW, PH, "H2  EMP: red mushroom button (D3)", "0–2 solder", "#495057")
-ys = header(44, 90, "D3", used="GS")
-add(f'<rect x="{TX}" y="60" width="120" height="80" rx="6" fill="#343a40"/>')
-t(TX + 60, 94, "contact", "pin", "middle", 'font-size="12"')
-t(TX + 60, 110, "block", "pin", "middle", 'font-size="12"')
-for py, c in ((ys[0], BLACK), (ys[2], SIG["D3"])):
-    line([(60, py), (TX - 8, py)], c, 2.5)
-    screw(TX, py)
-t(TX + 60, 160, "either contact to G, the other to S", "tiny", "middle")
-notes(16, 200, [
-    "Screw terminals: strip 6 mm, twist and tin the end, clamp it under the screw. No solder on the switch.",
-    "Solder tabs instead? Then it is 2 joints, each with heat-shrink.",
-    "Meter check: the contacts close when pressed and it springs back.",
-    "If it opens when pressed instead (normally closed), it still works: the sketch inverts it.",
-    "Momentary, not an E-stop (those latch). Hole: 22 mm."])
+# H2 EMP ------------------------------------------------------------------
+panel(COLS[1], R1, PW, PH, "H2  EMP: 60 mm red dome button (D3, lamp D12)", "4 solder")
+ys = header(44, 74, "D3", used="GS")
+add(f'<rect x="{TX + 6}" y="54" width="110" height="64" rx="5" fill="#495057"/>')
+t(TX + 61, 90, "microswitch", "pin", "middle", 'font-size="12"')
+for py, c, lab in ((ys[0], BLACK, "COM"), (ys[2], SIG["D3"], "NO")):
+    line([(60, py), (TX, py)], c, 2.5)
+    joint(TX, py)
+    t(TX - 10, py - 8, lab, "tinyb", "end")
+pad(TX, 110, None, used=False)
+t(TX - 10, 114, "NC (unused)", "tinyb", "end")
+ls = header(44, 150, "D12", used="GS")
+add(f'<rect x="{TX + 6}" y="138" width="110" height="38" rx="5" fill="#c92a2a"/>')
+t(TX + 61, 161, "lamp", "pin", "middle", 'font-size="12"')
+for py, c, lab in ((ls[0], BLACK, "−"), (ls[2], SIG["D12"], "+")):
+    line([(60, py), (TX, py)], c, 2.5)
+    joint(TX, py)
+    t(TX - 10, py - 8, lab, "tinyb", "end")
+notes(16, 214, [
+    "uxcell 60 mm dome: momentary, normally-open microswitch. Hole 23.5 mm (cut 24).",
+    "Tabs are 4.8 mm (3/16 in): solder to them, or crimp 4.8 mm female spade connectors instead.",
+    "Find COM and NO with the meter: COM–NC reads 0 Ω at rest, COM–NO only when pressed.",
+    "The lamp has its own resistor (12 V part), so at 5 V it draws a few mA and D12 drives it directly.",
+    "Lamp dark? Swap its two tabs: it only lights one way round. Lit = EMP available.",
+    "Below the panel: about 55 mm with the microswitch; the box has about 65 mm there. Measure it.",
+    "Pressed = LOW (internal pull-up). The 22 mm APIELE mushroom becomes a spare."], 17)
 add("</g>")
 
 # H3 MENU ------------------------------------------------------------------
@@ -320,253 +358,195 @@ for py, c, lab in ((ys[0], BLACK, "COM"), (ys[2], SIG["D4"], "NO")):
     t(TX - 10, py - 8, lab, "tinyb", "end")
 pad(TX, 138, None, used=False)
 t(TX - 10, 142, "NC (unused)", "tinyb", "end")
-notes(16, 200, [
+notes(16, 206, [
     "Tabs are 4.8 mm (3/16 in): solder to them, or crimp 4.8 mm female spade connectors instead.",
-    "COM, NO and NC are moulded on the switch body next to each tab.",
+    "Find COM and NO with the meter: COM–NC reads 0 Ω at rest, COM–NO only when pressed.",
     "The microswitch clips off the button: wire it first, then clip it back on.",
-    "Hole: 28 mm (not 30)."])
+    "Hole: 28 mm (not 30). Pick any colour from the EG STARTS set."], 17)
 add("</g>")
 
 # H4 MASTER ARM ----------------------------------------------------------------
 panel(COLS[0], R2, PW, PH, "H4  MASTER ARM: flip-cover toggle (D7)", "3 solder")
 ys = header(44, 74, "D7")
-targets = [(ys[0], 70, BLACK, "GND"), (ys[1], 120, RED, "+ (power)"), (ys[2], 170, SIG["D7"], "ACC (lamp/load)")]
-for py, ty, c, lab in targets:
-    pts = [(60, py), (150, py), (175, ty), (TX, ty)] if py != ty else [(60, py), (TX, ty)]
+targets = [(ys[0], 70, BLACK, "− (side tab)"), (ys[1], 120, RED, "+1 (power)"), (ys[2], 170, SIG["D7"], "+2 (load)")]
+for py, ty_, c, lab in targets:
+    pts = [(60, py), (150, py), (175, ty_), (TX, ty_)] if py != ty_ else [(60, py), (TX, ty_)]
     line(pts, c, 2.5)
-    joint(TX, ty)
-    t(TX - 10, ty - 8, lab, "tinyb", "end")
+    joint(TX, ty_)
+    t(TX - 10, ty_ - 8, lab, "tinyb", "end")
 add(f'<rect x="{TX + 6}" y="50" width="70" height="140" rx="6" fill="#495057"/>')
 t(TX + 41, 210, "switch tabs", "tiny", "middle")
 line([(TX, 70), (TX + 110, 70)], "#495057", 2)
 line([(TX, 170), (TX + 110, 170)], "#495057", 2)
 resistor(TX + 110, 70, TX + 110, 170, "10 kΩ", 1)
-notes(16, 236, [
-    "Solder the 10 kΩ straight across the GND and ACC tabs, sharing their joints.",
-    "Armed = HIGH (the switch feeds +5 V to ACC). Safe = LOW (the 10 kΩ pulls it down).",
-    "Tab positions vary: find GND with the meter (the lamp conducts to it). LED lit = armed.",
-    "Hole: 12 mm. DaierTek's LED is rated 12 V, so at 5 V it may be dim."])
+notes(16, 240, [
+    "Solder the 10 kΩ straight across the − and +2 tabs, sharing their joints.",
+    "Armed = HIGH (the switch feeds +5 V to +2). Safe = LOW (the 10 kΩ pulls it down).",
+    "− is the tab on the side; +1 and +2 are the two pins underneath (DaierTek's diagram). LED lit = armed.",
+    "DaierTek's LED is rated 12 V, so at 5 V it may be dim. Hole: 12 mm.",
+    "You have two: keep the second as a spare."], 17)
 add("</g>")
 
 # H5 sonar -----------------------------------------------------------------------
-panel(COLS[1], R2, PW, PH, "H5  HC-SR04 throttle sonar (D9, D10)", "4 solder")
+panel(COLS[1], R2, PW, PH, "H5  HC-SR04 throttle sonar (D9, D10)", "plug-in", PLUGIN)
 d9 = header(44, 74, "D9")
 d10 = header(44, 134, "D10", used="S")
-SX = 210
 sensor = {"VCC": 80, "TRIG": 100, "ECHO": 120, "GND": 140}
+SXX = TX + 60
 wires = [(d9[0], "GND", BLACK), (d9[1], "VCC", RED), (d9[2], "TRIG", SIG["D9"]), (d10[2], "ECHO", SIG["D10"])]
 for py, pin, c in wires:
-    line([(60, py), (SX, py)], c, 2.5)
-    line([(SX, py), (SX + 40, py), (SX + 110, sensor[pin]), (TX + 60, sensor[pin])], c, 2.5)
-    sleeve(SX, py)
-    joint(SX, py)
-add(f'<rect x="{TX + 60}" y="70" width="14" height="80" rx="3" fill="#212529"/>')
-for pin, y in sensor.items():
-    plugmark(TX + 80, y)
-    t(TX + 94, y + 4, pin, "tinyb")
-add(f'<rect x="{TX + 130}" y="66" width="44" height="88" rx="4" fill="#1c7ed6"/>')
-add(f'<circle cx="{TX + 152}" cy="90" r="14" fill="#dee2e6"/><circle cx="{TX + 152}" cy="130" r="14" fill="#dee2e6"/>')
-t(SX, 182, "splices", "tiny", "middle")
-t(TX + 67, 170, "4-pin half", "tiny", "middle")
+    line([(60, py), (150, py), (230, sensor[pin]), (SXX, sensor[pin])], c, 2.5)
+    plugmark(70, py)
+    plugmark(SXX - 10, sensor[pin])
+add(f'<rect x="{SXX}" y="70" width="14" height="80" rx="3" fill="#212529"/>')
+for pin, y_ in sensor.items():
+    t(SXX + 22, y_ + 4, pin, "tinyb")
+add(f'<rect x="{SXX + 60}" y="66" width="44" height="88" rx="4" fill="#1c7ed6"/>')
+add(f'<circle cx="{SXX + 82}" cy="90" r="14" fill="#dee2e6"/><circle cx="{SXX + 82}" cy="130" r="14" fill="#dee2e6"/>')
+t(190, 182, "4 single female–female jumpers, 40 cm", "tiny", "middle")
 notes(16, 220, [
-    "The sensor end is half of a 4-pin cable, plugged onto the sensor: no solder on the sensor itself.",
-    "Splice its 4 wires to the D9 half (G, V, S) and the S wire of the D10 half.",
+    "No solder: one jumper per pin. The sensor is ~22 cm from the Uno; 40 cm jumpers leave slack.",
     "Pins left to right, facing the transducers: VCC  TRIG  ECHO  GND (printed on the board).",
-    "It sits at the front of the throttle tunnel, facing the sliding plate.",
-    "The D10 plug only uses S: its G and V wires stay unconnected (heat-shrink the ends)."])
+    "The D10 row only uses S. A dab of hot glue on each plug once it all works.",
+    "It sits at the front of the throttle tunnel, facing the sliding plate. Keep wires out of the tunnel:",
+    "the sonar sees anything in front of the plate."], 17)
 add("</g>")
 
 # H6 buzzer ------------------------------------------------------------------------
-panel(COLS[2], R2, PW, PH, "H6  Buzzer through an S8050 (D8)", "5 solder")
-ys = header(44, 74, "D8")
-qx, qy = 330, 172                      # transistor centre
-add(f'<circle cx="{qx}" cy="{qy}" r="22" fill="#fff" stroke="#212529" stroke-width="2"/>')
-add(f'<path d="M{qx - 8},{qy - 12} v24 M{qx - 8},{qy - 5} L{qx + 8},{qy - 16} M{qx - 8},{qy + 5} L{qx + 8},{qy + 16}" '
-    f'stroke="#212529" stroke-width="2" fill="none"/>')
-t(qx + 30, qy + 4, "S8050", "tinyb")
-t(qx - 30, qy - 6, "B", "tinyb", "end")
-t(qx + 10, qy - 26, "C", "tinyb")
-t(qx + 10, qy + 34, "E", "tinyb")
-# buzzer
-add(f'<rect x="{qx - 18}" y="86" width="36" height="34" rx="17" fill="#212529"/>')
-t(qx - 24, 108, "buzzer", "tinyb", "end")
-t(qx - 24, 84, "+", "tinyb", "end")
-# G: over the top and down the right side to the emitter
-line([(60, ys[0]), (72, ys[0]), (72, 44), (460, 44), (460, 250), (qx, 250), (qx, qy + 16)], BLACK, 2.5)
-# V to buzzer +
-line([(60, ys[1]), (100, ys[1]), (100, 62), (qx, 62), (qx, 86)], RED, 2.5)
-# S through 1 kΩ to the base
-line([(60, ys[2]), (190, ys[2]), (190, qy)], SIG["D8"], 2.5)
-resistor(190, qy, qx - 8, qy, "1 kΩ", -1)
-# buzzer − to collector
-line([(qx, 120), (qx, qy - 16)], "#495057", 2.5)
-for x, y, v in ((qx, 72, True), (qx, 140, True), (qx, 228, True), (198, qy, False), (qx - 34, qy, False)):
-    sleeve(x, y, v)
-    joint(x, y)
-# TO-92 pictogram
-px_, py_ = 425, 120
-add(f'<path d="M{px_ - 18},{py_} a18,18 0 0 1 36,0 z" fill="#212529"/>')
-for i, lab in enumerate("EBC"):
-    lx = px_ - 12 + i * 12
-    add(f'<rect x="{lx - 1.5}" y="{py_}" width="3" height="18" fill="#adb5bd"/>')
-    t(lx, py_ + 30, lab, "tinyb", "middle")
-t(px_, py_ - 24, "flat face", "tiny", "middle")
-notes(16, 272, [
-    "Build it in the air, heat-shrink each joint, then one bigger sleeve over the lot.",
-    "Check your S8050's legs (usually E B C, flat face toward you). Buzzer + is the longer leg."])
+panel(COLS[2], R2, PW, PH, "H6  Buzzer: DFRobot Gravity DFR0032 (D8)", "plug-in", PLUGIN)
+ys = header(44, 90, "D8")
+sock = gravity_module(TX, 64, 130, 76, "buzzer")
+for py, sy, c in zip(ys, sock, (BLACK, RED, GRAVITY_GREEN)):
+    line([(60, py), (130, py), (200, sy), (TX - 4, sy)], c, 2.5)
+    plugmark(70, py)
+add(f'<circle cx="{TX + 110}" cy="102" r="13" fill="#212529"/>')
+t(170, 168, "Gravity cable (in the box)", "tiny", "middle")
+notes(16, 206, [
+    "No solder: its cable plugs onto the D8 row at one end and into the module at the other.",
+    "Black → G, red → V, green → S. It has its own transistor, so the pin isn't overloaded.",
+    "Passive buzzer: it plays the pitch the game sends (the proximity beeps rise properly).",
+    "Mount it anywhere near the Uno with two M3 screws or double-sided tape.",
+    "Replaces the kit's buzzer + S8050 circuit (5 joints)."], 17)
 add("</g>")
 
 # H8 LCD -------------------------------------------------------------------------
-panel(COLS[0], R3, PW, PH, "H8  LCD1602 + I2C backpack (I2C #1)", "plug-in", "#495057")
+panel(COLS[0], R3, PW, PH, "H8  LCD1602 + I2C backpack (I2C #1)", "plug-in", PLUGIN)
 ys = header(44, 80, "I2C #1", pins="1234", used="1234", pitch=16)
-for i, (py, (nm, c)) in enumerate(zip(ys, I2C)):
+for py, (nm, c) in zip(ys, I2C):
     line([(60, py), (TX, py)], c, 2.5)
     plugmark(TX + 8, py)
     t(TX + 22, py + 4, nm, "tinyb")
 add(f'<rect x="{TX + 60}" y="64" width="120" height="80" rx="4" fill="#2f9e44"/>')
 add(f'<rect x="{TX + 72}" y="78" width="96" height="40" fill="#8ce99a"/>')
 t(TX + 120, 136, "contrast screw", "tiny", "middle", 'style="fill:#fff"')
-notes(16, 200, [
-    "One 4-pin cable used whole: no cutting, no solder.",
+notes(16, 206, [
+    "One 4-pin ACEBOTT cable used whole: no cutting, no solder.",
     "Match by the labels on the shield header and the backpack. If the orders differ, lift the",
     "little tab on one plug housing, pull the pins out and re-seat them in the right order.",
     "Blank or solid blocks: turn the contrast screw on the backpack.",
-    "Address 0x27 or 0x3F: the sketch finds it."])
+    "Address 0x27 or 0x3F: the sketch finds it."], 17)
 add("</g>")
 
-# H9 haptics ------------------------------------------------------------------------
-panel(COLS[1], R3, PW, PH, "H9  Haptics: DRV2605L + vibration disc", "4 solder")
-ys = header(44, 70, "I2C #2", pins="1234", used="1234", pitch=16)
-bx = 230
-add(f'<rect x="{bx}" y="54" width="110" height="96" rx="6" fill="#1c7ed6"/>')
-t(bx + 55, 104, "DRV2605L", "pin", "middle", 'font-size="12"')
-for py, (nm, c) in zip(ys, I2C):
-    line([(60, py), (bx - 12, py)], c, 2.5)
+# H9 rumble ------------------------------------------------------------------------
+panel(COLS[1], R3, PW, PH, "H9  Rumble: DFRobot Gravity DFR0440 (D5)", "plug-in", PLUGIN)
+ys = header(44, 90, "D5")
+sock = gravity_module(TX, 64, 130, 76, "vibration")
+for py, sy, c in zip(ys, sock, (BLACK, RED, GRAVITY_GREEN)):
+    line([(60, py), (130, py), (200, sy), (TX - 4, sy)], c, 2.5)
     plugmark(70, py)
-t(bx - 6, 46, "STEMMA QT", "tiny", "end")
-add(f'<rect x="{bx - 12}" y="62" width="12" height="60" rx="2" fill="#212529"/>')
-mp = [(84, RED, "Motor +"), (120, BLUE, "Motor −")]
-for (y, c, lab), xx in zip(mp, (425, 455)):
-    joint(bx + 110, y)
-    t(bx + 104, y + 4, lab, "tinyb", "end", 'style="fill:#fff"')
-    line([(bx + 116, y), (xx, y), (xx, 222)], c, 2.5)
-    sleeve(xx, 180, True, 26)
-    joint(xx, 180)
-add('<circle cx="440" cy="236" r="16" fill="#adb5bd" stroke="#495057" stroke-width="2"/>')
-t(416, 240, "disc", "tiny", "end")
-t(bx + 30, 180, "silicone wire, 150–200 mm", "tiny")
-t(bx + 30, 196, "with a slack loop", "tiny")
-notes(16, 268, [
-    "STEMMA QT cable (Adafruit 4397): red VIN, black GND, blue SDA, yellow SCL onto I2C #2.",
-    "Disc leads are thin: splice near the disc, heat-shrink, hot-glue for strain relief.",
-    "Leave a loop of at least 120 mm so the knob slides its full 100 mm."])
+add(f'<circle cx="{TX + 110}" cy="102" r="12" fill="#adb5bd" stroke="#495057" stroke-width="2"/>')
+t(170, 168, "Gravity cable + 3 M–F jumpers, slack loop", "tiny", "middle")
+notes(16, 206, [
+    "No solder. Glue the module to the back of the throttle's reflector plate: it moves with the knob,",
+    "and the sonar only sees the plate's front face. The cable leaves the tunnel at the back.",
+    "Leave a loop of at least 120 mm so the plate slides its full 100 mm without tugging.",
+    "Its 30 cm cable is too short: add 3 male–female jumpers (40 cm) and tape the joins together.",
+    "D5 is a PWM pin: the sketch sets the strength (engine rumble rises with speed, a jolt on hits).",
+    "Too weak through the stem? It can move into the knob later, with its cable down a hollow stem."], 17)
 add("</g>")
 
 # H10 USB -------------------------------------------------------------------------
-panel(COLS[2], R3, PW, PH, "H10  USB and the shield", "plug-in", "#495057")
-add('<rect x="40" y="70" width="140" height="100" rx="8" fill="#0f7291"/>')
-t(110, 112, "Uno + shield", "pin", "middle", 'font-size="12"')
-add('<rect x="28" y="96" width="24" height="24" rx="2" fill="#adb5bd" stroke="#495057"/>')
-line([(28, 108), (10, 108), (10, 200), (300, 200), (300, 120), (330, 120)], GRAY, 6)
+panel(COLS[2], R3, PW, PH, "H10  USB and the shield", "plug-in", PLUGIN)
+add('<rect x="40" y="70" width="160" height="100" rx="8" fill="#0f7291"/>')
+t(120, 112, "Uno + shield", "pin", "middle", 'font-size="12"')
+t(120, 130, "(turned sideways)", "tiny", "middle", 'style="fill:#d0ebff"')
+add('<rect x="200" y="96" width="24" height="24" rx="2" fill="#adb5bd" stroke="#495057"/>')
+line([(224, 108), (300, 108), (300, 120), (330, 120)], GRAY, 6)
 add('<rect x="330" y="96" width="26" height="48" rx="3" fill="#495057"/>')
 add('<rect x="356" y="60" width="16" height="120" fill="#c2a878"/>')
 t(364, 194, "back wall", "tiny", "middle")
-t(372, 124, "socket", "tiny")
+t(380, 124, "socket", "tiny")
 notes(16, 230, [
-    "Panel cable (Adafruit 907): its B plug goes in the Uno, the socket mounts in the 6 mm back wall",
-    "with 2 × M3 screws 29 mm apart. Your PC cable plugs into that socket.",
+    "Panel cable (StarTech USBPNLBFBM1, 30 cm): its B plug goes in the Uno, and the socket",
+    "screws into the 6 mm back wall beside it. Measure its screw spacing before the wall is cut.",
+    "The Uno lies sideways against the back wall so its plugs clear the MENU button's microswitch.",
     "Shield: press it onto the Uno, power jumper on 5V, nothing on SERVO_PWR.",
-    "USB powers everything (500 mA fuse); see the budget in section 4."])
+    "USB powers everything (500 mA fuse); see the budget in section 4."], 17)
 add("</g>")
 
 # =====================================================================
-# 3  NeoPixel chain
+# 3  Light string
 # =====================================================================
 S3 = R3 + PH + 40
-section(S3, "3", "NeoPixel chain (H7)",
-        "16 boards, one data line. This is the hard part: about 94 small joints. Build and test it in three groups.")
+section(S3, "3", "Light string (H7)",
+        "16 LED modules wired together at the factory. You solder only the start, then glue each module behind its hole.")
 NY = S3 + 80
-panel(40, NY, 720, 600, "Start of the chain and the board-to-board link", "94 solder")
-# start circuit
+panel(40, NY, 720, 600, "Start of the string", "4 solder")
 ys = header(44, 110, "D6")
-SC = 12                               # px per mm for the board drawings
-BW, BH = 12.7 * SC, 10.2 * SC
-b1x, b2x = 310, 530
-by = 160                               # board centre y
-pady = [by - 40, by, by + 40]         # GND, +5V, DATA
-names_in, names_out = ("GND", "+5V", "DIN"), ("GND", "+5V", "DOUT")
+SPL = 190
+pin_y = [112, 160, 208]                       # GND, 5V, DIN at the first module
+mods = [(430, 160), (560, 160), (690, 160)]
+for py, ty_, c in zip(ys, pin_y, (BLACK, RED, SIG["D6"])):
+    line([(60, py), (110, py), (140, ty_), (SPL, ty_)], c, 2.5)
+resistor(SPL, pin_y[2], SPL + 60, pin_y[2], "330 Ω", 1)
+for ty_ in pin_y:
+    x_end = SPL + 60 if ty_ == pin_y[2] else SPL
+    line([(x_end, ty_), (mods[0][0] - 40, ty_), (mods[0][0] - 20, 160 + (ty_ - 160) / 4)], STICK_WIRE, 3)
+splice(SPL, pin_y[0])
+splice(SPL, pin_y[1])
+splice(SPL, pin_y[2])
+splice(SPL + 60, pin_y[2])
+# capacitor across 5V / GND at the joins
+cx = SPL + 34
+add(f'<line x1="{cx}" y1="{pin_y[0]}" x2="{cx}" y2="{pin_y[0] + 14}" stroke="#495057" stroke-width="2"/>'
+    f'<path d="M{cx - 9},{pin_y[0] + 16} q9,5 18,0" fill="none" stroke="#212529" stroke-width="3"/>'
+    f'<line x1="{cx - 9}" y1="{pin_y[1] - 16}" x2="{cx + 9}" y2="{pin_y[1] - 16}" stroke="#212529" stroke-width="3"/>'
+    f'<line x1="{cx}" y1="{pin_y[1] - 16}" x2="{cx}" y2="{pin_y[1]}" stroke="#495057" stroke-width="2"/>')
+t(cx + 13, pin_y[1] - 14, "+", "tinyb")
+t(cx + 14, pin_y[0] + 22, "470–1000 µF, stripe (−) to GND", "tiny")
+t(SPL + 150, 100, "string's input lead", "tiny", "middle")
+for i, (mx, my) in enumerate(mods):
+    add(f'<circle cx="{mx}" cy="{my}" r="22" fill="#212529"/><rect x="{mx - 8}" y="{my - 8}" width="16" height="16" '
+        f'rx="2" fill="#fff3bf"/>')
+    t(mx, my + 66, ("module 1 (THR 1)", "module 2", "module 3")[i], "tinyb", "middle")
+    if i < 2:
+        nx = mods[i + 1][0]
+        for dy in (-6, 0, 6):
+            add(f'<path d="M{mx + 22},{my + dy} C{mx + 60},{my + dy + 40} {nx - 60},{my + dy + 40} {nx - 22},{my + dy}" '
+                f'fill="none" stroke="{STICK_WIRE}" stroke-width="2.5"/>')
+t(495, 120, "factory wires, 9–12 cm", "tiny", "middle")
+t(625, 120, "no solder", "tiny", "middle")
+t(60, 278, "4 joints: the three input wires (G, V, and S through the 330 Ω). The capacitor's legs share the G and V joins.", "small")
 
-
-def board(x, label):
-    add(f'<rect x="{x:g}" y="{by - BH / 2:g}" width="{BW:g}" height="{BH:g}" rx="6" fill="#212529"/>')
-    add(f'<rect x="{x + BW / 2 - 18:g}" y="{by - 18:g}" width="36" height="36" rx="4" fill="#f8f9fa" stroke="#adb5bd"/>')
-    add(f'<circle cx="{x + BW / 2:g}" cy="{by:g}" r="11" fill="#fff3bf"/>')
-    t(x + BW / 2, by + BH / 2 + 18, label, "tinyb", "middle")
-    for i in range(3):
-        for px_ in (x + 12, x + BW - 12):
-            add(f'<circle cx="{px_:g}" cy="{pady[i]:g}" r="6" fill="#ced4da" stroke="#868e96"/>')
-
-
-board(b1x, "board 1 (THR 1)")
-board(b2x, "board 2 (THR 2)")
-for i, nm in enumerate(names_in):
-    t(b1x + 22, pady[i] + 4, nm, "tinyb", extra='style="fill:#fff"')
-    t(b2x + 22, pady[i] + 4, nm, "tinyb", extra='style="fill:#fff"')
-for i, nm in enumerate(names_out):
-    t(b1x + BW - 22, pady[i] + 4, nm, "tinyb", "end", 'style="fill:#fff"')
-t(b1x + 12, by - BH / 2 - 8, "IN", "tinyb", "middle")
-t(b1x + BW - 12, by - BH / 2 - 8, "OUT", "tinyb", "middle")
-t(b2x + 12, by - BH / 2 - 8, "IN", "tinyb", "middle")
-t(b2x + BW - 12, by - BH / 2 - 8, "OUT", "tinyb", "middle")
-# shield → board 1
-line([(60, ys[0]), (120, ys[0]), (150, pady[0]), (b1x + 12, pady[0])], BLACK, 2.5)
-line([(60, ys[1]), (110, ys[1]), (150, pady[1]), (b1x + 12, pady[1])], RED, 2.5)
-line([(60, ys[2]), (100, ys[2]), (140, pady[2]), (170, pady[2])], SIG["D6"], 2.5)
-resistor(170, pady[2], 235, pady[2], "330 Ω", 1)
-line([(235, pady[2]), (b1x + 12, pady[2])], SIG["D6"], 2.5)
-sleeve(170, pady[2])
-joint(170, pady[2])
-# 1000 µF across +5V / GND at board 1
-cx = 272
-add(f'<line x1="{cx}" y1="{pady[0]}" x2="{cx}" y2="{pady[0] + 12}" stroke="#495057" stroke-width="2"/>'
-    f'<path d="M{cx - 9},{pady[0] + 14} q9,5 18,0" fill="none" stroke="#212529" stroke-width="3"/>'
-    f'<line x1="{cx - 9}" y1="{pady[1] - 12}" x2="{cx + 9}" y2="{pady[1] - 12}" stroke="#212529" stroke-width="3"/>'
-    f'<line x1="{cx}" y1="{pady[1] - 12}" x2="{cx}" y2="{pady[1]}" stroke="#495057" stroke-width="2"/>')
-t(cx + 13, pady[1] - 10, "+", "tinyb")
-t(cx - 12, pady[0] + 14, "1000 µF", "tiny", "end")
-t(cx - 12, pady[0] + 27, "stripe (−) to GND", "tiny", "end")
-for i in range(3):
-    joint(b1x + 12, pady[i])
-# link board 1 → board 2
-for i, c in enumerate((BLACK, RED, SIG["D6"])):
-    line([(b1x + BW - 12, pady[i]), (b2x + 12, pady[i])], c, 2.5)
-    joint(b1x + BW - 12, pady[i])
-    joint(b2x + 12, pady[i])
-for i, c in enumerate((BLACK, RED, SIG["D6"])):
-    line([(b2x + BW - 12, pady[i]), (b2x + BW + 22, pady[i])], c, 2.5, dash=True)
-t(714, pady[2] + 24, "to 3 …", "tiny", "end")
-t(60, 268, "Board 1: 4 joints (the capacitor legs share the GND and +5V pads). Every link after it:", "small")
-t(60, 286, "3 wires, OUT → next IN, 6 joints. 15 links × 6 + 4 = 94.", "small")
-
-ty = 322
-t(16, ty, "How to build it", "sec")
+ty = 316
+t(16, ty, "How to fit it", "sec")
 notes(16, ty + 22, [
-    "1  Each board is 10.2 × 12.7 mm with 3 holes at each end (0.1 in apart). The pad names are printed on the board:",
-    "    always follow the print. The drawing's pad order is only an example.",
-    "2  Build three groups, each on a carrier strip (card or 3 mm ply) with 5 mm holes at the panel's spacing:",
-    "    throttle bar (8 boards, 12.5 mm apart), warning lights (5, 25 mm apart), shield (3, 13 mm apart).",
-    "    Lay the boards LED-down over the holes and glue them, then wire across the backs.",
-    "3  Throttle bar: the boards are 10.2 mm wide on a 12.5 mm pitch, so turn the pad ends sideways (across the bar).",
-    "4  Use the wire lengths on the right. Twist the three wires of each link together; it keeps them tidy.",
-    "5  Test each group before gluing it in: Adafruit's strandtest sketch, brightness 20, on the bench.",
-    "6  Never swap +5V and GND, even for a moment: it kills the board. Check with the meter before powering.",
-    "7  A board that stays dark stops everything after it: check that board's DIN and the joint before it."], 17)
+    "1  Find the input end: the first module's pads read DIN (or its arrow points away from the input). Data only flows one way.",
+    "2  Test the whole string on the bench before cutting: Adafruit's strandtest sketch, brightness 20, plugged on D6.",
+    "3  Cut the wire between modules 16 and 17 and heat-shrink the 3 cut ends on both sides. The other 34 are spares.",
+    "4  Glue each module LED-side against the underside of the panel, centred on its hole (hot glue round the edge).",
+    "    Throttle bar: 10 mm modules on a 12.5 mm pitch, so they sit 2.5 mm apart. Order on the map →",
+    "5  Fold the spare wire between modules into flat loops and tape or hot-glue them to the panel.",
+    "    Keep them on the outside of the throttle tunnel: the sonar would see anything inside it.",
+    "6  Never connect 5V and GND the wrong way round. Check the joins with the meter before plugging in.",
+    "7  A dead module stops everything after it: cut it out and splice in a spare (6 joints, rare).",
+    "8  The sketch caps brightness at 20 %: plenty behind the panel, and it keeps USB under its limit."], 17)
 add("</g>")
 
-# Panel map with the chain route (compact preset: same numbers as make_cockpit.py)
+# Panel map with the light route (compact preset: same numbers as make_cockpit.py)
 PANEL_W, PANEL_D = 420.0, 245.0
 THR_X, KNOB_W, SENSOR_FACE_Y, NEAR, TRAVEL = 72.0, 42.0, 44.0, 40.0, 100.0
-CENTRE, BIG, MENU, STICK, ARM = 222.0, (222.0, 100.0), (222.0, 160.0), (345.0, 130.0), (140.0, 185.0)
+CENTRE, BIG, MENU, STICK, ARM = 222.0, (222.0, 103.0), (222.0, 160.0), (345.0, 130.0), (140.0, 185.0)
 LCD_Y, ANN_Y = 200.0, 230.0
 STEM_MIN = SENSOR_FACE_Y + NEAR + 25.0
 LED_X = THR_X + KNOB_W / 2 + 15.0
@@ -574,9 +554,9 @@ throttle = [(LED_X, STEM_MIN + TRAVEL / 16 + TRAVEL / 8 * i) for i in range(8)]
 lights = [(CENTRE + d, ANN_Y) for d in (-50.0, -25.0, 0.0, 25.0, 50.0)]
 shield = [(CENTRE + 48.0 + 13.0 * i, LCD_Y) for i in range(3)]
 chain = throttle + lights + shield
-UNO = (PANEL_W / 2, PANEL_D - 6.0 - 40.0)
+UNO = (PANEL_W / 2, PANEL_D - 6.0 - 6.0 - 53.4 / 2)       # turned sideways against the back wall
 
-panel(790, NY, W - 830, 600, "Where the boards sit: top view of the panel", "route", "#e64980")
+panel(790, NY, W - 830, 600, "Where the modules sit: top view of the panel", "route", "#e64980")
 S = 1.35
 MX, MY = 100, 60
 
@@ -591,75 +571,69 @@ add(f'<rect x="{x0}" y="{y0}" width="{PANEL_W * S}" height="{PANEL_D * S}" rx="8
 t(x0 + PANEL_W * S / 2, y0 - 8, "back", "map", "middle")
 t(x0 + PANEL_W * S / 2, y0 + PANEL_D * S + 16, "front (your side)", "map", "middle")
 ux, uy = m(*UNO)
-add(f'<rect x="{ux - 27 * S}" y="{uy - 34 * S}" width="{53.4 * S}" height="{68.6 * S}" rx="4" fill="none" '
+add(f'<rect x="{ux - 34.3 * S}" y="{uy - 26.7 * S}" width="{68.6 * S}" height="{53.4 * S}" rx="4" fill="none" '
     f'stroke="#74c0fc" stroke-width="2" stroke-dasharray="5 4"/>')
-# controls for orientation
+# tunnel, slot and controls for orientation
+tun_y1 = STEM_MIN + TRAVEL - 25.0 + 40.0 + 6.0                 # as make_cockpit.py
+tx0, ty0 = m(THR_X - 30, tun_y1)
+add(f'<rect x="{tx0}" y="{ty0}" width="{60 * S}" height="{(tun_y1 - 30.0) * S}" fill="none" stroke="#ffa94d" stroke-width="1.5" '
+    f'stroke-dasharray="3 3"/>')
 sx_, sy_ = m(THR_X, STEM_MIN + TRAVEL / 2)
 add(f'<rect x="{sx_ - 4 * S}" y="{m(0, STEM_MIN + TRAVEL + 4)[1]}" width="{8 * S}" height="{(TRAVEL + 8) * S}" rx="6" fill="#868e96"/>')
-t(sx_ - 10, sy_, "throttle slot", "map", "end", 'style="fill:#ced4da"')
-for (cx_, cy_), r, lab in ((STICK, 20, "stick"), (BIG, 20, "EMP"), (MENU, 14, "MENU"), (ARM, 6, "ARM")):
+t(tx0 - 6, sy_, "tunnel", "map", "end", 'style="fill:#ffa94d"')
+for (cx_, cy_), r, lab in ((STICK, 20, "stick"), (BIG, 30, "EMP"), (MENU, 14, "MENU"), (ARM, 6, "ARM")):
     px_, py_ = m(cx_, cy_)
     add(f'<circle cx="{px_}" cy="{py_}" r="{r * S}" fill="#495057"/>')
     t(px_, py_ + 4, lab, "map", "middle", 'style="fill:#e9ecef"')
 lx_, ly2 = m(CENTRE - 36, LCD_Y + 12.5)
 add(f'<rect x="{lx_}" y="{ly2}" width="{72 * S}" height="{25 * S}" fill="#2f9e44"/>')
 t(lx_ + 36 * S, ly2 + 12.5 * S + 4, "LCD", "map", "middle", 'style="fill:#fff"')
-# route
 pts = [m(*UNO)] + [m(*p) for p in chain]
 add('<polyline points="' + " ".join(f"{x:g},{y:g}" for x, y in pts) +
     '" fill="none" stroke="#e64980" stroke-width="2.5" stroke-dasharray="7 4" marker-mid="url(#arr)"/>')
 for i, p in enumerate(chain):
     px_, py_ = m(*p)
-    add(f'<rect x="{px_ - 7}" y="{py_ - 7}" width="14" height="14" rx="3" fill="{CHAIN[i]}" stroke="#212529"/>')
-    off = (-14, 4, "end") if i < 8 else ((0, -12, "middle") if i < 13 else (0, 22, "middle"))
+    add(f'<circle cx="{px_}" cy="{py_}" r="{5 * S:g}" fill="{CHAIN[i]}" stroke="#212529"/>')
+    off = (-12, 4, "end") if i < 8 else ((0, -11, "middle") if i < 13 else (0, 22, "middle"))
     t(px_ + off[0], py_ + off[1], str(i + 1), "mapb", off[2], 'style="fill:#fff"')
 mx_, my_ = m(*UNO)
 add(f'<circle cx="{mx_:g}" cy="{my_:g}" r="5" fill="#e64980"/>')
-t(MX, MY + PANEL_D * S + 34, "Dashed blue: the Uno + shield on the floor below. Pink: the data route from D6, through boards 1 to 16.", "map")
+t(MX - 60, MY + PANEL_D * S + 34, "Dashed blue: Uno + shield on the floor below. Orange: throttle tunnel (keep wires out). "
+                                  "Pink: data from D6 through modules 1–16.", "map")
 
-# cut list
 LY = MY + PANEL_D * S + 72
-t(16, LY, "Wire per link (centre to centre + 30 mm slack, rounded up to 5 mm)", "sec")
-
-
-def cut(a, b):
-    return 5 * math.ceil((math.dist(a, b) + 30) / 5)
-
-
-links = [("D6 shield row → 1", cut(UNO, chain[0]) + 80, "silicone wire, spliced onto the D6 cable half")]
-links.append(("1 → 2 … 7 → 8 (throttle)", cut(chain[0], chain[1]), "7 links × 3 wires"))
-links.append(("8 → 9 (throttle → LINK)", cut(chain[7], chain[8]), ""))
-links.append(("9 → 10 … 12 → 13 (lights)", cut(chain[8], chain[9]), "4 links × 3 wires"))
-links.append(("13 → 14 (EMP → shield 1)", cut(chain[12], chain[13]), ""))
-links.append(("14 → 15, 15 → 16 (shield)", cut(chain[13], chain[14]), "2 links × 3 wires"))
-for i, (a, mm, note) in enumerate(links):
-    yy = LY + 22 + i * 17
-    t(16, yy, a, "tiny")
-    t(250, yy, f"{mm} mm", "tinyb")
-    t(310, yy, note, "tiny")
+hops = [math.dist(a, b) for a, b in zip(chain, chain[1:])]
+longest = max(range(len(hops)), key=lambda i: hops[i])
+t(16, LY, "Wire check", "sec")
+notes(16, LY + 22, [
+    f"Longest hop: {longest + 1} → {longest + 2}, {hops[longest]:.0f} mm centre to centre. The factory wire (9–12 cm) reaches it.",
+    f"Throttle hops are {hops[0]:.1f} mm, so each one leaves a 7–10 cm loop to fold flat.",
+    f"D6 to module 1: about {math.dist(UNO, chain[0]) + 40:.0f} mm (with the drop to the floor): the D6 cable half (15 cm)",
+    "plus the string's input lead covers it; splice in extra wire only if yours is short."], 17)
 add("</g>")
 
 # =====================================================================
 # 4  Soldering summary
 # =====================================================================
 S4 = NY + 600 + 40
-section(S4, "4", "Soldering summary, build order and rules", "About 120 joints in all; 94 of them are the NeoPixel chain.")
+section(S4, "4", "Soldering summary, build order and rules",
+        "24 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.")
 TY = S4 + 80
-cols = [56, 330, 430, 1000]
+cols = [56, 400, 500, 1060]
 for x, h in zip(cols, ("Harness", "Joints", "What you solder", "Difficulty")):
     t(x, TY, h, "th")
 add(f'<line x1="40" y1="{TY + 8}" x2="{W - 40}" y2="{TY + 8}" stroke="#adb5bd"/>')
 table = [
-    ("H1  Joystick", "8", "6 pot lugs, 2 splices to the button wires", "Medium: identify the lugs with the meter first"),
-    ("H2  EMP mushroom", "0–2", "Screw terminals (solder only if it has tabs)", "Easy"),
+    ("H1  Joystick", "11", "6 pot lugs (X, Y) + 5 joins (twist, button)", "Medium: keep each lug on its pin"),
+    ("H2  EMP 60 mm dome", "4", "COM and NO tabs + the 2 lamp tabs (or crimp spades)", "Easy"),
     ("H3  MENU button", "2", "COM and NO tabs (or crimp spades)", "Easy: good first practice"),
     ("H4  MASTER ARM", "3", "3 tabs, the 10 kΩ shares two of them", "Easy"),
-    ("H5  Sonar", "4", "Wire-to-wire splices; nothing on the sensor", "Easy"),
-    ("H6  Buzzer + S8050", "5", "Small circuit in the air, heat-shrunk", "Medium: get the transistor legs right"),
-    ("H7  NeoPixel chain", "94", "16 small boards, 0.1 in holes, 3 wires per link", "Hard: slow and fiddly, test as you go"),
-    ("H8  LCD", "0", "Plug-in cable", "None"),
-    ("H9  Haptics", "4", "2 motor pads, 2 splices on thin disc leads", "Medium: thin leads, moving knob"),
-    ("H10  USB", "0", "Plug-in cable, 2 screws", "None"),
+    ("H5  Sonar", "0", "4 single jumpers", "None"),
+    ("H6  Buzzer module", "0", "Gravity cable", "None"),
+    ("H7  Light string", "4", "3 input wires + the 330 Ω; capacitor shares the joins", "Easy: get the input end and 5V/GND right"),
+    ("H8  LCD", "0", "4-pin cable", "None"),
+    ("H9  Rumble module", "0", "Gravity cable + 3 jumpers", "None"),
+    ("H10  USB", "0", "Panel cable, 2 screws", "None"),
 ]
 for i, rowv in enumerate(table):
     yy = TY + 28 + i * 21
@@ -668,29 +642,30 @@ for i, rowv in enumerate(table):
     for x, v in zip(cols, rowv):
         t(x, yy, v, "small")
 BY = TY + 28 + len(table) * 21 + 20
-add(f'<rect x="40" y="{BY - 20}" width="{(W - 100) / 2}" height="250" rx="8" fill="#e7f5ff" stroke="#a5d8ff"/>')
+BH = 230
+add(f'<rect x="40" y="{BY - 20}" width="{(W - 100) / 2}" height="{BH}" rx="8" fill="#e7f5ff" stroke="#a5d8ff"/>')
 t(56, BY + 4, "Build order", "sec")
 notes(56, BY + 28, [
-    "1  Bench test every part first: Uno + shield + kit jumpers, before anything is soldered.",
-    "2  Practise on the easy harnesses: H3, H4, H5, then H2 and H6.",
-    "3  NeoPixel groups on their carrier strips, tested one group at a time.",
-    "4  H1 joystick and H9 haptics once the panel and knob are in hand.",
+    "1  Bench test every part on the shield first: jumpers and Gravity cables, nothing soldered.",
+    "2  Light string: find the input end, test the whole string, then solder the start.",
+    "3  Practise on the tabs: MENU, EMP, then MASTER ARM with its 10 kΩ.",
+    "4  Joystick: solder the X and Y lugs, then splice the twist and button leads.",
     "5  Mount everything, plug each cable on its row (photo of the shield first),",
     "    then run the standby self-test on the LCD: stick, FIRE, distance.",
     "6  A dab of hot glue on each plug stops it working loose."], 19)
 RX0 = 40 + (W - 100) / 2 + 20
-add(f'<rect x="{RX0}" y="{BY - 20}" width="{(W - 100) / 2}" height="250" rx="8" fill="#fff4e6" stroke="#f0c29a"/>')
+add(f'<rect x="{RX0}" y="{BY - 20}" width="{(W - 100) / 2}" height="{BH}" rx="8" fill="#fff4e6" stroke="#f0c29a"/>')
 t(RX0 + 16, BY + 4, "Rules", "sec")
 notes(RX0 + 16, BY + 28, [
-    "Power from USB (500 mA fuse): Uno 50 + LCD 25 + sonar 15 + NeoPixels 145 + haptic 100",
-    "+ buzzer 30 ≈ 365 mA. The sketch caps NeoPixel brightness at 25 % (full white = 576 mA alone).",
+    "Power from USB (500 mA fuse): Uno 50 + LCD 25 + sonar 15 + lights ≤ 180 (16 × ~55 mA × 20 %)",
+    "+ rumble ~80 + buzzer ~30 ≈ 380 mA. The 20 % brightness cap is what keeps it there.",
     "Buttons use the Uno's internal pull-ups: pressed = LOW. MASTER ARM is the exception: armed = HIGH.",
-    "NeoPixels (Adafruit Überguide): 330 Ω on data, 1000 µF at the chain start, 5 V data is fine.",
-    "I2C: LCD at 0x27/0x3F, DRV2605L at 0x5A: no clash. Both boards' pull-ups together are fine.",
-    "Heat-shrink every wire-to-wire joint; tape is not enough inside a moving box.",
-    "Spare pins: A2, A3, D5, D11, D12, D13 (the stick's twist axis can use A2 later)."], 19)
+    "Lights: 330 Ω on data and 470–1000 µF at the start (Adafruit Überguide); 5 V data is fine.",
+    "Sketch: update the lights right before each AX packet and have the game send right after it.",
+    "    Updating 16 lights pauses serial input for ~0.5 ms, so bytes arriving then would be lost.",
+    "Heat-shrink every wire-to-wire join; tape comes loose inside a box."], 19)
 
-H = BY + 250
+H = BY + BH
 svg_head = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H:g}" width="{W}" height="{H:g}" '
             'font-family="Segoe UI, Helvetica, Arial, sans-serif">\n<title>Axiom cockpit controller wiring (v2)</title>')
 o[o.index("@@HEADER@@")] = svg_head

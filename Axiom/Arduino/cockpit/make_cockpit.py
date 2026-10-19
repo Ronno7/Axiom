@@ -24,7 +24,7 @@ PRESET = "roomy" if "--roomy" in sys.argv else "compact"
 # between the throttle hand and the stick hand (width).
 PRESETS = {
     "compact": dict(W=420.0, D=245.0, PALM=65.0, THR_X=72.0, TRAVEL=100.0, NEAR=40.0, SLED=40.0,
-                    KNOB=(42.0, 50.0), STICK=(345.0, 130.0), CENTRE=222.0, BIG_Y=100.0, BTN_Y=160.0,
+                    KNOB=(42.0, 50.0), STICK=(345.0, 130.0), CENTRE=222.0, BIG_Y=103.0, BTN_Y=160.0,
                     ARM=(140.0, 185.0), LCD_Y=200.0, ANN_Y=230.0, WORD_Y=215.0),
     "roomy": dict(W=500.0, D=280.0, PALM=80.0, THR_X=90.0, TRAVEL=120.0, NEAR=50.0, SLED=50.0,
                   KNOB=(46.0, 56.0), STICK=(405.0, 150.0), CENTRE=250.0, BIG_Y=125.0, BTN_Y=185.0,
@@ -47,7 +47,7 @@ LEVER_Y = (STEM_MIN + STEM_MAX) / 2                        # knob shown at cruis
 LED_X = THR_X + KNOB[0] / 2 + 15.0                         # LED bar just clear of the knob
 LED_YS = [STEM_MIN + TRAVEL / 16 + TRAVEL / 8 * i for i in range(8)]   # LED 1 (min) at the front
 
-BIG = (CENTRE, BIG_Y)          # EMP: 40 mm red mushroom, 22 mm hole (menus: confirm / launch)
+BIG = (CENTRE, BIG_Y)          # EMP: 60 mm red dome arcade button, 24 mm hole (menus: confirm / launch)
 MENU = (CENTRE, BTN_Y)         # 30 mm: pause in flight, back in menus
 LCD = (CENTRE, LCD_Y)
 SHIELD_YS, SHIELD_XS = LCD_Y, [CENTRE + 48.0 + 13.0 * i for i in range(3)]
@@ -278,9 +278,9 @@ prism("Back wall", T_WOOD, W - T_WOOD,
       M["ply"])
 for i, (fx, fy) in enumerate(((25, 25), (W - 25, 25), (25, D - 25), (W - 25, D - 25))):
     cyl(f"Foot {i + 1}", fx, fy, 0, 10, FEET, M["rubber"])
-# Panel-mount USB-B on the back wall
-box("USB-B socket", W / 2, D + 1.5, base + 40, 26, 3, 20, M["dark_metal"])
-box("USB-B port", W / 2, D + 3.1, base + 40, 12, 0.4, 11, M["black_plastic"])
+# Panel-mount USB-B on the back wall, beside the Uno (its jack faces this way)
+box("USB-B socket", W / 2 + 70, D + 1.5, base + 40, 26, 3, 20, M["dark_metal"])
+box("USB-B port", W / 2 + 70, D + 3.1, base + 40, 12, 0.4, 11, M["black_plastic"])
 
 # ---------------- Top panel frame: everything mounted on the slope ----------------
 frame = bpy.data.objects.new("Panel frame", None)
@@ -313,7 +313,7 @@ for y in LED_YS:
     cut_cyl(LED_X, y, 2.55)
 for x in SHIELD_XS:
     cut_cyl(x, SHIELD_YS, 2.55)
-cut_cyl(*BIG, 11.0)
+cut_cyl(*BIG, 12.0)    # uxcell 60 mm dome: 23.5 mm hole
 cut_cyl(*MENU, 14.0)    # Happ-style 30 mm button: 28 mm hole
 cut_cyl(*ARM, 6.0)
 cut_box(LCD[0], LCD[1], 72.0, 25.0)
@@ -343,7 +343,7 @@ rounded(box("Palm rest", W / 2, PALM / 2 + 1, 3.5, W - 4, PALM - 2, 7, M["palm"]
 
 # ---------------- Throttle ----------------
 rounded(box("Throttle knob", THR_X, LEVER_Y, 27, KNOB[0], KNOB[1], 30, M["black_plastic"], frame), 9, 6)
-box("Throttle stem", THR_X, LEVER_Y, -12.5, 9.6, 9.6, 53, M["black_plastic"], frame)
+cyl("Throttle stem", THR_X, LEVER_Y, -39.0, 3.0, 53, M["metal"], frame)   # 6 mm rod in the 8 mm slot
 for i, y in enumerate(LED_YS):
     # Example state: slow-zone band (LEDs 1-2) and the lever's own LED at cruise.
     lit = M["led_band"] if i < 2 else M["led_white"] if i == 4 else M["led_off"]
@@ -367,13 +367,12 @@ cyl("Stick FIRE button", sx, sy, 64.0, 6.0, 2.5, M["red"], frame)
 dome("Stick FIRE top", sx, sy, 66.5, 6.0, 1.5, M["red"], frame)
 
 # ---------------- Buttons ----------------
-# EMP: emergency-stop style, a 40 mm red mushroom on a yellow legend plate (momentary, not latching)
-cyl("EMP legend plate", BIG[0], BIG[1], 0, 30.0, 1.2, M["yellow"], frame)
-text("EMP legend", "EMP", BIG[0], BIG[1] + 25.0, 4.6, M["ink"], frame, z=1.25)
-cyl("EMP bezel", BIG[0], BIG[1], 1.2, 13.5, 6.0, M["dark_metal"], frame)
-cyl("EMP stem", BIG[0], BIG[1], 7.2, 11.0, 8.0, M["red"], frame)
-cyl("EMP mushroom", BIG[0], BIG[1], 15.2, 20.0, 5.0, M["red"], frame, r2=20.0)
-dome("EMP mushroom top", BIG[0], BIG[1], 20.2, 20.0, 7.0, M["red"], frame)
+# EMP: 60 mm red dome arcade button (uxcell, momentary microswitch) on a yellow legend ring
+cyl("EMP legend plate", BIG[0], BIG[1], 0, 35.0, 1.2, M["yellow"], frame)
+text("EMP legend", "EMP", BIG[0], BIG[1] + 32.0, 3.6, M["ink"], frame, z=1.25)
+cyl("EMP bezel", BIG[0], BIG[1], 1.2, 30.0, 5.0, M["black_plastic"], frame, r2=29.0)
+cyl("EMP dome skirt", BIG[0], BIG[1], 6.2, 27.5, 3.0, M["red"], frame)
+dome("EMP dome", BIG[0], BIG[1], 9.2, 27.5, 13.0, M["red"], frame)
 for name, (bx, by) in (("MENU", MENU),):
     cyl(f"{name} flange", bx, by, 0, 16.65, 4.7, M["black_plastic"], frame)
     cyl(f"{name} plunger", bx, by, 4.7, 11.3, 4.2, M["white"], frame)
@@ -400,12 +399,12 @@ for label, x, color, lit in ANNUNCIATORS:
     text(f"{label} legend", label, x, ANN_Y, 5.2, mat, frame, z=-1.2)
 for label, x, color, lit in ANNUNCIATORS:
     # Behind each window: a diffuser with the printed legend, a black light box so neighbours
-    # don't bleed into each other, and a NeoPixel at the bottom shining up.
+    # don't bleed into each other, and a pre-wired LED module at the bottom shining up.
     box(f"{label} diffuser", x, ANN_Y, -3.4, 24, 12, 0.8, M["white"], frame, "Internals")
     for dx, dy, sx_, sy_ in ((-12.5, 0, 1.5, 14), (12.5, 0, 1.5, 14), (0, -6.25, 26.5, 1.5), (0, 6.25, 26.5, 1.5)):
         box(f"{label} light box", x + dx, ANN_Y + dy, -3.8 - 7, sx_, sy_, 14, M["black_plastic"], frame, "Internals")
     pixel = material(f"{label} pixel", color, emit=color, strength=12) if lit else M["led_off"]
-    cyl(f"{label} NeoPixel", x, ANN_Y, -3.8 - 14, 2.5, 5.6, pixel, frame, "Internals")
+    cyl(f"{label} LED module", x, ANN_Y, -3.8 - 17, 5.0, 3.0, pixel, frame, "Internals")
 for i, x in enumerate(SHIELD_XS):
     cyl(f"Shield LED {i + 1}", x, SHIELD_YS, -3.0, 2.5, 5.6, M["led_blue"], frame)
     dome(f"Shield LED {i + 1} dome", x, SHIELD_YS, 2.6, 2.5, 2.5, M["led_blue"], frame)
@@ -428,20 +427,24 @@ for dx in (-13.0, 13.0):
 plate_y = LEVER_Y - 25.0
 box("Reflector plate", THR_X, plate_y, under - tun_depth / 2, 48, 3, 36, M["white"], frame, IN)
 box("Sled base", THR_X, plate_y + SLED / 2, under - tun_depth + 2, 48, SLED, 4, M["sled"], frame, IN)
-box("Rumble motor (in knob)", THR_X, LEVER_Y, 22, 10, 10, 3, M["dark_metal"], frame, IN)
+# Gravity vibration module glued to the back of the plate: the sonar only sees the front face
+box("Vibration module", THR_X, plate_y + 1.5 + 4.0, under - tun_depth / 2, 30, 8, 22, M["pcb_blue"], frame, IN)
 box("Stick body", sx, sy, -3 - 12.75, 40.4, 40.4, 25.5, M["black_plastic"], frame, IN)
-box("EMP contact block", BIG[0], BIG[1], -3 - 27, 30, 40, 48, M["black_plastic"], frame, IN)
+cyl("EMP body", BIG[0], BIG[1], -3 - 33, 12, 33, M["black_plastic"], frame, IN)
+box("EMP microswitch", BIG[0], BIG[1], -3 - 33 - 9, 20, 10, 18, M["black_plastic"], frame, IN)
 for name, (bx, by) in (("MENU", MENU),):
     cyl(f"{name} body", bx, by, -3 - 30.3, 14, 30.3, M["black_plastic"], frame, IN)
 cyl("ARM body", ax, ay, -3 - 35, 6, 35, M["dark_metal"], frame, IN)
 box("LCD module", lx, ly, -3 - 7, 80, 36, 8, M["pcb_green"], frame, IN)
-# Uno + screw-terminal shield on the floor near the back (world coordinates)
-ux, uy = W / 2, D - T_WOOD - 40
-box("Arduino Uno", ux, uy, FEET + T_WOOD + 6, 53.4, 68.6, 1.6, M["pcb_blue"], coll=IN)
-box("Screw-terminal shield", ux, uy, FEET + T_WOOD + 20, 53.4, 68.6, 1.6, M["pcb_green"], coll=IN)
+# Uno + Gravity IO shield on the floor against the back wall, turned sideways so its plugs clear
+# the MENU button's microswitch (world coordinates)
+ux, uy = W / 2, D - T_WOOD - 6 - 53.4 / 2
+box("Arduino Uno", ux, uy, FEET + T_WOOD + 6, 68.6, 53.4, 1.6, M["pcb_blue"], coll=IN)
+box("Gravity IO shield", ux, uy, FEET + T_WOOD + 20, 68.6, 53.4, 1.6, M["pcb_green"], coll=IN)
 for side in (-1, 1):
-    box(f"Terminals {'L' if side < 0 else 'R'}", ux + side * 23, uy, FEET + T_WOOD + 25, 7, 60, 9, M["terminal"], coll=IN)
-box("Haptic driver", ux - 60, uy, FEET + T_WOOD + 3, 18, 25, 3, M["pcb_blue"], coll=IN)
+    box(f"Shield headers {'front' if side < 0 else 'back'}", ux, uy + side * 21, FEET + T_WOOD + 25, 60, 8, 9,
+        M["terminal"], coll=IN)
+box("Buzzer module", ux - 60, uy, FEET + T_WOOD + 3, 30, 22, 6, M["pcb_blue"], coll=IN)
 
 # ---------------- Text to meshes (so exports keep them) ----------------
 dg = bpy.context.evaluated_depsgraph_get()
