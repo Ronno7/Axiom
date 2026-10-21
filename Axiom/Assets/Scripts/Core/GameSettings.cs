@@ -12,11 +12,13 @@ namespace GeometricFlight.Core
         private const string SensitivityKey = "axiom.steeringSensitivity";
         private const string InvertVerticalKey = "axiom.invertVertical";
         private const string BuzzerKey = "axiom.buzzerEnabled";
+        private const string ArcadeKey = "axiom.arcadeMode";
 
         private static bool loaded;
         private static float steeringSensitivity = 1f;
         private static bool invertVertical;
         private static bool buzzerEnabled = true;
+        private static bool arcadeMode;
 
         /// <summary>Multiplies steering speed. 1 is the tuned default.</summary>
         public static float SteeringSensitivity
@@ -53,6 +55,18 @@ namespace GeometricFlight.Core
             }
         }
 
+        /// <summary>Vintage arcade-monitor look: phosphor glow, CRT, red fringing and the like.</summary>
+        public static bool ArcadeMode
+        {
+            get { Load(); return arcadeMode; }
+            set
+            {
+                Load();
+                arcadeMode = value;
+                PlayerPrefs.SetInt(ArcadeKey, value ? 1 : 0);
+            }
+        }
+
         public static void Save() => PlayerPrefs.Save();
 
         private static void Load()
@@ -63,6 +77,7 @@ namespace GeometricFlight.Core
                 MinSteeringSensitivity, MaxSteeringSensitivity);
             invertVertical = PlayerPrefs.GetInt(InvertVerticalKey, 0) == 1;
             buzzerEnabled = PlayerPrefs.GetInt(BuzzerKey, 1) == 1;
+            arcadeMode = PlayerPrefs.GetInt(ArcadeKey, 0) == 1;
         }
     }
 }

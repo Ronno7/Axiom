@@ -18,6 +18,9 @@ Version 0.1.9 (prototype). See the [changelog](CHANGELOG.md) for what's changed.
 
 ## Notes
 
+**[UI showcase](https://ronno7.github.io/Axiom/):** an interactive tour of the interface, screen flow,
+post-processing layers and the cockpit controller.
+
 How the systems work: [flight](Axiom/Docs/FLIGHT.md), [combat](Axiom/Docs/COMBAT.md), [UI](Axiom/Docs/UI.md).
 
 Made with Unity (URP), Blender and Arduino.

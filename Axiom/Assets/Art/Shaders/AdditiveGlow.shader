@@ -1,6 +1,8 @@
 // Additive light for the menu atmosphere, unaffected by fog.
 //   Mode 0: horizon band. Brightest along the quad's middle, fading up/down and toward the ends.
 //   Mode 1: soft dot (stars, dust). Vertex colour alpha scales brightness.
+// Depth fade (band only): with ZTest Always the band also lights distant surfaces, fading in between the two
+// depths, so a far floor and the sky behind it glow alike and meet without an edge.
 Shader "GeometricFlight/Additive Glow"
 {
     Properties
@@ -8,6 +10,8 @@ Shader "GeometricFlight/Additive Glow"
         _Color ("Color", Color) = (1, 1, 1, 1)
         _Power ("Falloff", Float) = 2
         _Mode ("Mode (0 band, 1 dot)", Float) = 0
+        _DepthFade ("Depth fade start, end (end 0 = off)", Vector) = (0, 0, 0, 0)
+        [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("ZTest", Float) = 4
     }
     SubShader
     {
@@ -17,17 +21,20 @@ Shader "GeometricFlight/Additive Glow"
             Tags { "LightMode"="SRPDefaultUnlit" }
             Blend One One
             ZWrite Off
+            ZTest [_ZTest]
             Cull Off
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             struct Attributes { float4 positionOS : POSITION; float2 uv : TEXCOORD0; float4 color : COLOR; };
             struct Varyings { float4 positionCS : SV_POSITION; float2 uv : TEXCOORD0; float4 color : COLOR; };
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
                 half _Power;
                 half _Mode;
+                float4 _DepthFade;
             CBUFFER_END
             Varyings Vert(Attributes i)
             {
@@ -45,6 +52,12 @@ Shader "GeometricFlight/Additive Glow"
                     half v = 1.0h - abs(i.uv.y * 2.0h - 1.0h);
                     half u = sin(i.uv.x * 3.14159h);
                     g = pow(saturate(v), _Power) * u * u;
+                    if (_DepthFade.y > 0.0)
+                    {
+                        float2 screenUV = GetNormalizedScreenSpaceUV(i.positionCS);
+                        float sceneDepth = LinearEyeDepth(SampleSceneDepth(screenUV), _ZBufferParams);
+                        g *= smoothstep(_DepthFade.x, _DepthFade.y, sceneDepth);
+                    }
                 }
                 else
                 {

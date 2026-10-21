@@ -68,13 +68,40 @@ namespace GeometricFlight.Tests
             }
         }
 
+        // ---------- Screen effects switch ----------
+
+        [Test]
+        public void ScreenPassRunsOnlyForItsCameraAndOnlyWhileAnEffectIsOn()
+        {
+            var camera = new GameObject("test camera").AddComponent<Camera>();
+            var other = new GameObject("other camera").AddComponent<Camera>();
+            try
+            {
+                ScreenEffects.Set(camera, Vector4.zero, Vector4.zero, Vector4.zero, 0f, Vector4.zero, Color.red);
+                Assert.That(ScreenEffects.ShouldRender(camera), Is.False, "nothing on");
+
+                ScreenEffects.Set(camera, Vector4.zero, Vector4.zero, Vector4.zero, 0f, new Vector4(0f, 0f, 0.02f, 0f), Color.red);
+                Assert.That(ScreenEffects.ShouldRender(camera), Is.True, "static noise on");
+                Assert.That(ScreenEffects.ShouldRender(other), Is.False, "other camera");
+
+                ScreenEffects.Clear();
+                Assert.That(ScreenEffects.ShouldRender(camera), Is.False, "cleared");
+            }
+            finally
+            {
+                ScreenEffects.Clear();
+                Object.DestroyImmediate(camera.gameObject);
+                Object.DestroyImmediate(other.gameObject);
+            }
+        }
+
         // ---------- Stars and dust ----------
 
         [Test]
         public void BillboardsBuildFourVerticesPerDotInsideTheirRanges()
         {
             var eye = new Vector3(0f, 1.2f, 0f);
-            var set = new MenuBillboards("test", new System.Random(7), 50, 10f, new Vector2(2f, 8f), new Vector2(20f, 40f),
+            var set = new GlowBillboards("test", new System.Random(7), 50, 10f, new Vector2(2f, 8f), new Vector2(20f, 40f),
                 new Vector2(0.1f, 0.2f), new Vector2(0.1f, 1f), 3f, eye);
             try
             {
@@ -98,7 +125,7 @@ namespace GeometricFlight.Tests
         public void BillboardsFaceTheEye()
         {
             var eye = Vector3.zero;
-            var set = new MenuBillboards("test", new System.Random(3), 10, 5f, new Vector2(-3f, 3f), new Vector2(10f, 20f),
+            var set = new GlowBillboards("test", new System.Random(3), 10, 5f, new Vector2(-3f, 3f), new Vector2(10f, 20f),
                 new Vector2(0.5f, 0.5f), Vector2.one, 1f, eye);
             try
             {

@@ -6,10 +6,11 @@ using UnityEngine.Rendering.Universal;
 
 namespace GeometricFlight.Presentation
 {
-    /// <summary>URP renderer feature for the menu's screen effects (glitch, palette fringing, CRT). Runs after
-    /// post-processing, and only for the camera <see cref="MenuLook"/> registers while an effect is on, so gameplay,
-    /// the title camera and the Scene view are untouched. The UI draws afterwards and is never affected.</summary>
-    public sealed class MenuScreenFeature : ScriptableRendererFeature
+    /// <summary>URP renderer feature for the screen effects (menu glitch, arcade mode's fringing, CRT and vintage
+    /// extras). Runs after post-processing, and only for the camera registered with <see cref="ScreenEffects"/>
+    /// while an effect is on, so other cameras and the Scene view are untouched. The UI draws afterwards and is
+    /// never affected.</summary>
+    public sealed class ScreenEffectsFeature : ScriptableRendererFeature
     {
         [SerializeField] private Shader shader;
 
@@ -27,7 +28,7 @@ namespace GeometricFlight.Presentation
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            if (!MenuScreen.ShouldRender(renderingData.cameraData.camera)) return;
+            if (!ScreenEffects.ShouldRender(renderingData.cameraData.camera)) return;
             if (material == null)
             {
                 if (shader == null) return;
@@ -54,10 +55,10 @@ namespace GeometricFlight.Presentation
 
                 TextureHandle source = resources.activeColorTexture;
                 TextureDesc desc = renderGraph.GetTextureDesc(source);
-                desc.name = "_MenuScreen";
+                desc.name = "_ScreenEffects";
                 desc.clearBuffer = false;
                 TextureHandle destination = renderGraph.CreateTexture(desc);
-                renderGraph.AddBlitPass(new RenderGraphUtils.BlitMaterialParameters(source, destination, Material, 0), "Menu Screen");
+                renderGraph.AddBlitPass(new RenderGraphUtils.BlitMaterialParameters(source, destination, Material, 0), "Screen Effects");
                 resources.cameraColor = destination;
             }
         }

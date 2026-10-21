@@ -26,7 +26,7 @@ Shader "Hidden/GeometricFlight/Menu Title Glitch"
             float _Tear, _Seed, _Echo, _EchoAmount, _Scan;
             fixed4 _Accent;
 
-            float hash(float2 p)   // sine-free (Hoskins), see Menu Screen
+            float hash(float2 p)   // sine-free (Hoskins), see Screen Effects
             {
                 float3 p3 = frac(float3(p.xyx) * 0.1031);
                 p3 += dot(p3, p3.yzx + 33.33);

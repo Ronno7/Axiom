@@ -898,6 +898,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5475d9f43ab76fe478091e39981708d1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1380,7 +1384,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -3.2, z: 70}
-  m_LocalScale: {x: 40, y: 0.4, z: 170}
+  m_LocalScale: {x: 420, y: 0.4, z: 170}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1625836410}
@@ -1644,19 +1648,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9519abdb01045514793322960c9c1bdb, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9942399
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9519abdb01045514793322960c9c1bdb, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.0444179
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9519abdb01045514793322960c9c1bdb, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.0974423
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9519abdb01045514793322960c9c1bdb, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: -0.004353258
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9519abdb01045514793322960c9c1bdb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1692,7 +1696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9519abdb01045514793322960c9c1bdb, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2049,7 +2053,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
+  m_BackGroundColor: {r: 0.035, g: 0.036, b: 0.04, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -2252,26 +2256,8 @@ MonoBehaviour:
     statusScramble: 1
     snapConstruct: {fileID: 1471925554}
     dropConstruct: {fileID: 968216871}
-  phosphorGlow:
-    enabled: 0
-    threshold: 0.45
-    intensity: 2
-    scatter: 0.65
-  colourFringing:
-    enabled: 0
-    offset: 2.97
-    strength: 1
-  crt:
-    enabled: 0
-    curvature: 0.035
-    scanlines: 0.28
-    scanlinePeriod: 3
-    grille: 0.06
-    tubeEdge: 0.015
-  vignette:
-    enabled: 0
-    intensity: 0.18
-    smoothness: 0.5
+  arcade: {fileID: 11400000, guid: 22c6e87e0f3a90d40ab6a07610b11d05, type: 2}
+  previewArcade: 0
 --- !u!114 &1271952333
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,7 +1,7 @@
 {
     "name": "GeometricFlight.EditorTests",
     "rootNamespace": "GeometricFlight.Tests",
-    "references": ["GeometricFlight.Runtime"],
+    "references": ["GeometricFlight.Runtime", "Unity.RenderPipelines.Core.Runtime", "Unity.RenderPipelines.Universal.Runtime"],
     "includePlatforms": ["Editor"],
     "optionalUnityReferences": ["TestAssemblies"]
 }

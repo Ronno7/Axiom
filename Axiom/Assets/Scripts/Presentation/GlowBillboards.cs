@@ -2,16 +2,17 @@ using UnityEngine;
 
 namespace GeometricFlight.Presentation
 {
-    /// <summary>A set of soft camera-facing dots in one mesh (the menu's stars and dust). Brightness rides in the
-    /// vertex colour's alpha for the Additive Glow shader. Centres can move; call <see cref="Write"/> after.</summary>
-    public sealed class MenuBillboards
+    /// <summary>A set of soft camera-facing dots in one mesh (the stars and dust of <see cref="LookAtmosphere"/>).
+    /// Brightness rides in the vertex colour's alpha for the Additive Glow shader. Centres can move; call
+    /// <see cref="Write"/> after.</summary>
+    public sealed class GlowBillboards
     {
         public readonly Vector3[] Centers;
         public readonly Mesh Mesh;
         private readonly float[] sizes;
         private readonly Vector3[] vertices;
 
-        public MenuBillboards(string name, System.Random random, int count, float spread, Vector2 height, Vector2 depth,
+        public GlowBillboards(string name, System.Random random, int count, float spread, Vector2 height, Vector2 depth,
             Vector2 size, Vector2 brightness, float brightnessCurve, Vector3 eye)
         {
             Centers = new Vector3[count];

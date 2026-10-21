@@ -1,5 +1,7 @@
 # UI
 
+For a visual tour, see the [UI showcase](https://ronno7.github.io/Axiom/) (source in `docs/`).
+
 **Approach:** UI Toolkit (UXML + USS) for menus and the HUD; uGUI world-space canvases are
 reserved for later spatial markers (target brackets). Each scene has one `UIDocument` using
 `Assets/UI/AxiomPanelSettings` (1920×1080 reference, match 0.5) and an `EventSystem` with
@@ -19,7 +21,7 @@ panel switching, quit, and time formatting. UI never owns gameplay rules: `Level
 `LevelFlow`/`PlayerFlight` and calls `Resume`, `Retry`, `Continue`, `ExitToMenu`.
 
 **Options** (`Core/GameSettings`, saved in PlayerPrefs): steering sensitivity (50–150%) and
-invert vertical, controller buzzer, and **Calibrate controller** (`CalibrationPanel`, a step wizard in `CalibrationWizard`). Volume is left out until the game has audio. Screen shake is left out because shake doesn't exist yet.
+invert vertical, controller buzzer, **Arcade mode** (see below), and **Calibrate controller** (`CalibrationPanel`, a step wizard in `CalibrationWizard`). Volume is left out until the game has audio. Screen shake is left out because shake doesn't exist yet.
 
 **Quit** exits a desktop build; in the editor it stops Play Mode.
 
@@ -42,7 +44,9 @@ displays as about 12% grey). The titles are extruded 0.28 m; framing comes from 
 field of view.
 
 **Menu backdrop** (`MenuBackdrop`, `GeometricConstruct`): a hero construct and three simpler
-ones at fixed depths (fog fades the far ones) over a scrolling floor. A construct can combine a
+ones at fixed depths (fog fades the far ones) over a scrolling floor. The floor is 420 m wide and the sky is
+the fog colour, so the floor fades into the background with no visible edge; the horizon glow also lights the
+far floor (depth-faded, beyond about 85 m) to hide the horizon line. A construct can combine a
 counter-rotating star tetrahedron, a golden-ratio cage tumbling under Euler's rigid-body equations,
 a trefoil-knot band, and satellites on Kepler orbits; keep each background one to a single idea.
 
@@ -52,13 +56,34 @@ One Inspector, live in the editor:
 | Section | What it controls |
 | --- | --- |
 | Grade | URP volume on the menu camera: neutral tonemapping, exposure, contrast, bloom, vignette, film grain |
-| Atmosphere | Fog haze colour, horizon band, stars, drifting dust (generated, not saved; `Additive Glow` shader) |
+| Atmosphere | Haze (fog and sky colour, fog range), horizon band, stars, drifting dust (generated, not saved; `Additive Glow` shader) |
 | Interface | Scrim, corner frame, status line (live cockpit link, red LED when not linked), key hints, red focus marker |
 | Glitch | Signal glitch every 8–12 s while idle: tears, red echo, blocks, scanlines, fringe pulse, roll bar, title tear, construct snap/drop, status scramble. **Hold Peak** freezes it for tuning; the component menu has **Play glitch now** |
-| Vector monitor extras | Phosphor glow (replaces the grade's bloom), colour fringing in the accent red only, CRT pass, lighter vignette (replaces the grade's). All off by default |
+| Arcade mode | The shared `ArcadeLook` asset, applied while the player has Arcade Mode on (**Preview Arcade** shows it in the editor) |
 
-The glitch, fringing and CRT run in `MenuScreenFeature` (on `PC_Renderer`, shader `Menu Screen`), only for
-the menu camera and only while one is non-zero; the UI draws afterwards and is never processed. The title's
+**Level look** (`Presentation/LevelLook`; Prototype: `00_CameraAndLighting/LevelLook`) gives a level the menu's
+grade and atmosphere, plus Arcade Mode, with none of the menu-only parts (no glitch or interface details). Its
+Grade and Atmosphere sections match the menu's, tuned per level: in the Prototype the haze runs 45–185 m and the
+horizon sits at 200 m, inside the camera's 240 m far clip. The horizon band and stars travel with the camera; dust
+stays put in the world and wraps around the camera, so it streams past in flight (leave **Dust Drift** at 0). The
+floor is 420 m wide and runs past the far clip, so it fades into the sky like the menu's. Four of the menu's
+constructs (white ones only; red stays for danger) float high beside the course as scenery
+(`20_EnvironmentBlockout/Backdrop`) and emerge from the haze as you approach. Both look components share
+`GradeSettings`/`AtmosphereSettings` and the runtime pieces `LookVolume` and `LookAtmosphere`.
+
+`Foundation Flat` works out fog per pixel: the floor is two huge triangles, and per-vertex fog left its far end
+brighter than the sky.
+
+**Arcade mode** (Options toggle, `GameSettings.ArcadeMode`) gives the menu and the levels a vintage vector-monitor
+look. Its settings live in one asset, `Settings/ArcadeLook` (`ArcadeProfile`), used by `MenuLook` on the menu and
+`LevelLook` in each level. Each part can be switched off: phosphor glow (replaces the normal bloom), colour
+fringing in the accent red only, CRT (curvature, scanlines, monochrome grille, tube edge), colour (exposure and
+contrast added to the scene's grade, saturation, colour filter, hue shift, white balance), a lighter vignette, and
+vintage extras (rounded tube corners, flicker, static, a rolling band, coarser grain). The scene is mostly black
+and white, so saturation mainly sets how hard the accent red burns; hue shift moves the red too.
+
+The glitch, fringing, CRT and vintage extras run in `ScreenEffectsFeature` (on `PC_Renderer`, shader
+`Screen Effects`), only for the registered camera and only while one is non-zero; the UI draws afterwards and is never processed. The title's
 glitch is a separate blit of its render texture (`Menu Title Glitch`). The scrim, frame, footer and roll bar
 are elements in `MainMenu.uxml`/`Axiom.uss` (gradients in `UI/Textures`); red stays reserved for focus and
 problems. Depth of field and URP's chromatic aberration are deliberately not used: the first blurs the thin

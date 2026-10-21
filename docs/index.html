@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Axiom UI Showcase</title>
+<meta name="description" content="How Axiom's interface looks and works in the current prototype: UI types, screen flow, post-processing layers, feedback channels and the cockpit controller.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="showcase.css">
+</head>
+<body>
+<main class="wrap">
+
+<header>
+  <span class="eyebrow">Axiom · UI showcase</span>
+  <h1>How the interface works, as of build 0.1.9</h1>
+  <p class="lede">Axiom is a black-and-white geometric flight shooter, played on a keyboard or a homemade Arduino
+    cockpit. This is a quick tour of its UI: what's on screen, how a frame gets built, and how the game talks back.
+    It's an early prototype, so think of every screenshot here as a snapshot.</p>
+  <p class="meta">Updated 21 Oct 2026 · Unity 6, URP, UI Toolkit ·
+    <a href="https://github.com/Ronno7/Axiom">Repository</a> · <a href="https://github.com/Ronno7/Axiom/blob/main/CHANGELOG.md">Changelog</a></p>
+  <nav aria-label="Sections">
+    <a href="#kinds">Four kinds of UI</a><a href="#flow">Screen flow</a><a href="#frame">Building a frame</a>
+    <a href="#feedback">Feedback</a><a href="#cockpit">Cockpit</a><a href="#history">Then and now</a>
+  </nav>
+</header>
+
+<div class="frame"><img src="img/menu.jpg" alt="Axiom main menu: a leaning 3D title, slanted buttons and wireframe constructs over a hazy floor"></div>
+
+<!-- ============================================================ -->
+<section id="kinds">
+  <header>
+    <span class="eyebrow">01</span>
+    <h2>Four kinds of UI</h2>
+    <p>A handy way to sort game UI is by two questions: is it part of the game's world, and is it drawn in 3D space?
+      That gives four kinds. Pick one to see where it lives in a frame from the first level, just as the ship takes a hit.</p>
+  </header>
+
+  <div class="hotspots" data-img="img/level-hit.jpg" data-alt="The ship flying into a slow zone, with the HUD, floor chevrons and a red damage pulse at the screen edges">
+    <div class="side">
+      <div class="quadrant" role="group" aria-label="Filter by kind">
+        <span></span><span class="axis">In 3D space</span><span class="axis">On the screen</span>
+        <span class="axis row">In the fiction</span>
+        <button class="chip" data-kind="diegetic">Diegetic<small>world, fiction</small></button>
+        <button class="chip" data-kind="meta">Meta<small>screen, fiction</small></button>
+        <span class="axis row">Outside it</span>
+        <button class="chip" data-kind="spatial">Spatial<small>world, not fiction</small></button>
+        <button class="chip" data-kind="non-diegetic">Non-diegetic<small>classic HUD</small></button>
+      </div>
+      <ul class="items">
+        <li class="item" data-kind="diegetic" data-rect="46.6,58.4,6.8,3.4"><b>Shield segments</b><span>Three blue cells on the ship's tail. Take a hit, lose a cell.</span></li>
+        <li class="item" data-kind="diegetic" data-rect="44.8,60.4,10.3,6.1"><b>Engine exhaust</b><span>The jets stretch with the throttle you ask for, before the ship has actually sped up.</span></li>
+        <li class="item" data-kind="spatial" data-rect="48.0,43.8,4.0,10.2"><b>Aim reticles</b><span>Two diamonds at 10 m and 25 m. Line them up on a target and fire.</span></li>
+        <li class="item" data-kind="spatial" data-rect="37.7,57.6,24.6,31.8"><b>Floor chevrons</b><span>Blue chevrons lead you into slow and fast sections.</span></li>
+        <li class="item" data-kind="non-diegetic" data-rect="2.6,3.4,7.4,5.2"><b>Run time</b><span>Ticks up from the start line; par time shows on the results.</span></li>
+        <li class="item" data-kind="non-diegetic" data-rect="82.4,3.4,14.9,5.2"><b>Targets</b><span>How many of the course's targets you've broken.</span></li>
+        <li class="item" data-kind="non-diegetic" data-rect="28.6,10.9,42.8,5.4"><b>Zone banner</b><span>Says what the section wants. Here: slow down.</span></li>
+        <li class="item" data-kind="non-diegetic" data-rect="2.4,85.2,24.9,10.9"><b>Throttle gauge</b><span>Speed bar with the recommended band and a hint, including the key to press.</span></li>
+        <li class="item" data-kind="non-diegetic" data-rect="89.4,92.4,7.9,3.4"><b>Input badge</b><span>Keyboard or controller, and a warning if the throttle sensor drops out.</span></li>
+        <li class="item" data-kind="meta" data-rect="edge"><b>Damage pulse</b><span>Angular red edges flash for half a second on a hit. Shape and timing carry the warning, not just the colour.</span></li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Red is kept for damage and problems, blue for guidance. Nothing important relies on colour alone.
+    (The four categories come from Fagerholt and Lorentzon's <em>Beyond the HUD</em>, 2009.)</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="flow">
+  <header>
+    <span class="eyebrow">02</span>
+    <h2>Screen flow</h2>
+    <p>Two scenes and a handful of panels. The game can pause itself too: losing window focus or unplugging the
+      controller mid-run drops you into the pause menu.</p>
+  </header>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  menu([Main menu]) -- Play --> fly([In flight]) -- "end of course<br>or shield gone" --> res[Results]
+  menu --> opts[Options] --> cal[Calibrate<br>controller]
+  menu --> help[Help]
+  fly -- "Esc or MENU<br>focus lost, unplugged" --> pause[Paused]
+  pause -. Resume .-> fly
+  res -. "Next / Retry" .-> fly
+  pause -. "Main menu" .-> menu
+  res -. "Main menu" .-> menu
+  classDef key stroke:#d61f29,stroke-width:2px
+  class fly key
+</pre>
+  </div>
+  <div class="thumbs">
+    <figure><div class="frame"><img src="img/menu.jpg" alt="Main menu" loading="lazy"></div><figcaption>Main menu</figcaption></figure>
+    <figure><div class="frame"><img src="img/options.jpg" alt="Options panel" loading="lazy"></div><figcaption>Options</figcaption></figure>
+    <figure><div class="frame"><img src="img/level.jpg" alt="In flight" loading="lazy"></div><figcaption>In flight</figcaption></figure>
+    <figure><div class="frame"><img src="img/level-pause.jpg" alt="Pause menu" loading="lazy"></div><figcaption>Paused</figcaption></figure>
+  </div>
+  <p class="note">Options and Help open from both the main menu and the pause menu. Menus are UI Toolkit (UXML and USS) and work with mouse, keyboard or the cockpit. The slanted buttons are
+    drawn in code and lean at the same angle as the title.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="frame">
+  <header>
+    <span class="eyebrow">03</span>
+    <h2>Building a frame</h2>
+    <p>Step through the main menu one layer at a time, from bare geometry to the finished screen.</p>
+  </header>
+
+  <div class="stepper" data-start="0">
+    <ol class="steps">
+      <li data-img="img/layer-1-geometry.jpg"><b>Geometry</b><span>Flat-shaded meshes and nothing else. A hard horizon against pure black.</span></li>
+      <li data-img="img/layer-2-haze.jpg"><b>Haze</b><span>Fog and sky share one dark colour, so distance softens things instead of erasing them, and the floor melts into the sky.</span></li>
+      <li data-img="img/layer-3-atmosphere.jpg"><b>Atmosphere</b><span>A glowing horizon band, stars and slowly drifting dust, all generated when the scene loads.</span></li>
+      <li data-img="img/layer-4-grade.jpg"><b>Grade</b><span>Neutral tonemapping with a small lift in exposure and contrast.</span></li>
+      <li data-img="img/layer-5-bloom.jpg"><b>Bloom</b><span>White geometry starts to glow, so the shapes read as lit rather than painted.</span></li>
+      <li data-img="img/layer-6-finish.jpg"><b>Vignette and grain</b><span>Pulls the eye inward and takes the clean digital edge off.</span></li>
+      <li data-img="img/menu.jpg"><b>Interface</b><span>UI Toolkit on top: the 3D title (rendered to a texture), buttons, a dark scrim behind them, corner brackets and a live status line. It draws after all the post-processing, so text stays crisp.</span></li>
+    </ol>
+  </div>
+
+  <div class="pipeline" aria-label="Render order">
+    <div><b>Scene</b><span>Flat-shaded meshes, per-pixel fog</span></div>
+    <div><b>Atmosphere</b><span>Additive glow: horizon, stars, dust</span></div>
+    <div><b>Post-processing</b><span>Tonemap, colour, bloom, vignette, grain</span></div>
+    <div><b>Screen effects</b><span>Glitch, fringing, CRT (custom pass)</span></div>
+    <div class="ui"><b>UI</b><span>Drawn last, never processed</span></div>
+  </div>
+
+  <div class="sub">
+    <h3>Arcade mode</h3>
+    <p>An Options toggle that turns the screen into an old vector monitor: phosphor glow, scanlines and curvature,
+      red-only colour fringing, flicker, static and a slow rolling band. Look at the level: the HUD stays sharp,
+      because the UI is drawn after every screen effect.</p>
+    <div class="compare" data-labels='["Standard","Arcade mode"]'
+      data-sets='[["Level","img/level.jpg","img/level-arcade.jpg"],["Menu","img/menu.jpg","img/menu-arcade.jpg"]]'></div>
+  </div>
+
+  <div class="sub">
+    <h3>The signal glitch</h3>
+    <div class="grid-2">
+      <figure>
+        <div class="frame"><img src="img/menu-glitch.jpg" alt="The main menu mid-glitch: torn title, red echo, scanlines" loading="lazy"></div>
+        <figcaption>The peak frame: the title tears, a red echo slips sideways and one construct drops out.</figcaption>
+      </figure>
+      <div style="display:grid; gap:14px">
+        <p>Leave the menu alone and every 8 to 12 seconds a short signal glitch rolls through. It's a hand-made
+          18-frame timeline played at 25 fps (0.72 s), and it waits until you've stopped touching anything, so it
+          never gets in the way of picking an option.</p>
+        <div class="chart">
+          <svg class="glitch" role="img" aria-label="Glitch strength per frame: tear, echo and scanlines peak at frame 5 and fade by frame 10"
+            data-frames='[[0,0,0],[0,0,0],[0,0,0.2],[0.15,0.5,0.35],[0.4,0.8,0.5],[0.6,0.9,0.7],[0.3,0.6,0.45],[0.12,0.4,0.3],[0.25,0.5,0.35],[0,0,0.15],[0,0,0.1],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]'></svg>
+          <div class="legend"><span><i style="background:#e9e9ea"></i>Tear</span><span><i style="background:#d61f29"></i>Red echo</span><span><i style="background:#6b6f77"></i>Scanlines</span><span>Frame number, 40 ms each</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="feedback">
+  <header>
+    <span class="eyebrow">04</span>
+    <h2>Feedback on every channel</h2>
+    <p>Every important event is reported in more than one way, so a muted buzzer, keyboard play or a missed colour
+      never hides it. The cockpit adds channels a keyboard player doesn't get, but never ones they need.</p>
+  </header>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Event</th><th>Screen</th><th>World</th><th>Buzzer</th><th>Cockpit LCD</th><th>Lights and rumble</th></tr></thead>
+      <tbody>
+        <tr><th>Shield hit</th>
+          <td><i class="on"></i>Red edge pulse</td><td><i class="on"></i>Ship blinks, a tail cell goes dark</td>
+          <td><i class="on"></i>Short tone, long and low on the last one</td><td><i class="on"></i>SHIELD HIT 2/3</td>
+          <td><i class="off"></i>Shield light out, rumble jolt</td></tr>
+        <tr><th>Throttle zone</th>
+          <td><i class="on"></i>Banner, gauge band, RAISE / LOWER hint</td><td><i class="on"></i>Blue floor chevrons</td>
+          <td><i class="on"></i>High tone for fast, low for slow</td><td><i class="on"></i>Band on the speed bar, arrows</td>
+          <td><i class="off"></i>SLOW / FAST light, range on the throttle lights</td></tr>
+        <tr><th>Collision ahead</th>
+          <td><i class="on"></i>PROXIMITY label pulses</td><td></td>
+          <td><i class="on"></i>Parking-sensor beeps, then a solid tone</td><td><i class="on"></i>! PROXIMITY !</td>
+          <td><i class="off"></i>PROX light blinks with the beeps</td></tr>
+        <tr><th>Engine demand</th>
+          <td><i class="on"></i>Speed readout</td><td><i class="on"></i>Exhaust jets stretch</td>
+          <td></td><td><i class="on"></i>Speed bar and percentage</td>
+          <td><i class="off"></i>Rumble grows with speed, lever light</td></tr>
+        <tr><th>Sensor or link lost</th>
+          <td><i class="on"></i>Warning badge, or a pause with a notice</td><td></td>
+          <td><i class="on"></i>Warning tone</td><td><i class="on"></i>HOLDING CRUISE, RECONNECTED</td>
+          <td><i class="off"></i>LINK light</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="legend"><span><i style="background:var(--ink)"></i>In the game now</span><span><i style="border:1px solid var(--faint)"></i>Built and bench-tested, coming with the cockpit</span></div>
+
+  <figure>
+    <div class="frame"><img src="img/level-proximity.jpg" alt="The ship heading for a barrier with the PROXIMITY warning showing" loading="lazy"></div>
+    <figcaption>Proximity works like a car's parking sensor: the path ahead is projected from your speed and steering,
+      the beeps speed up as a collision gets closer, and the HUD label pulses with each beep. Targets don't count,
+      since flying at them is the point.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================================================ -->
+<section id="cockpit">
+  <header>
+    <span class="eyebrow">05</span>
+    <h2>The cockpit is UI too</h2>
+    <p>The homemade controller has its own outputs: a 16×2 LCD, a string of lights, an EMP lamp, a buzzer and rumble.
+      Every part works on the bench, held together with tape for now while the enclosure gets built.</p>
+  </header>
+
+  <div class="hotspots" data-ratio="5/3" data-img="img/cockpit-top.jpg" data-alt="Top view of the cockpit model: throttle lever, master arm switch, LCD, warning lights, EMP dome and joystick"
+    data-kinds='{"live":"In the game","bench":"Bench-tested"}'>
+    <div class="side">
+      <ul class="items">
+        <li class="item" data-kind="live" data-rect="74.8,38.3,12.4,20.4"><b>Stick and FIRE</b><span>Steer, hold FIRE to shoot. The twist axis is wired; its job is still undecided.</span></li>
+        <li class="item" data-kind="live" data-rect="13.6,28.7,9.8,20"><b>Throttle lever</b><span>Measured by an ultrasonic sensor. Push forward to go faster; cruise sits in the middle.</span></li>
+        <li class="item" data-kind="live" data-rect="44.5,16.9,16.6,9.6"><b>LCD</b><span>A second instrument panel: speed, shield, targets and time, swapping in guidance and warnings.</span></li>
+        <li class="item" data-kind="live" data-rect="49,30.7,7.7,12.9"><b>MENU</b><span>Pause in flight, back in menus.</span></li>
+        <li class="item" data-kind="live"><b>Buzzer</b><span>Tones for hits, zones, proximity and a lost sensor. Can be muted in Options.</span></li>
+        <li class="item" data-kind="bench" data-rect="25.8,19.3,1.8,36"><b>Throttle lights</b><span>A dot at the lever, with the recommended range lit inside a zone.</span></li>
+        <li class="item" data-kind="bench" data-rect="62.8,20.3,7.8,3.2"><b>Shield lights</b><span>One per shield segment.</span></li>
+        <li class="item" data-kind="bench" data-rect="38.9,8.7,27.8,3.6"><b>Warning lights</b><span>LINK, SLOW, FAST, PROX and EMP, each behind a printed label.</span></li>
+        <li class="item" data-kind="bench" data-rect="30.8,20,6.6,15.3"><b>Master arm</b><span>Flip-cover switch: arm it to launch, flip to safe to pause.</span></li>
+        <li class="item" data-kind="bench" data-rect="44.8,45.3,16,26.4"><b>EMP dome</b><span>A once-per-run blast. Its lamp stays lit until you use it.</span></li>
+        <li class="item" data-kind="bench"><b>Rumble</b><span>Engine rumble that grows with speed, plus a jolt on hits.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="lcd-demo">
+      <div class="tabs" role="tablist" aria-label="LCD states">
+        <button data-top="* AXIOM  STANDBY" data-bottom="  CRUISE   100%">Standby</button>
+        <button data-top="█████       100%" data-bottom="▮▮▮ ◆0/3  0:12.4">Cruise</button>
+        <button data-top="█████  ▭▭▭  100%" data-bottom="FAST    →→ RAISE">Fast zone</button>
+        <button data-top="█████       100%" data-bottom=" SHIELD HIT 2/3">Hit</button>
+        <button data-top="█████       100%" data-bottom=" ! PROXIMITY !">Proximity</button>
+        <button data-top="     PAUSED" data-bottom="→ RESUME">Paused</button>
+        <button data-top="◆LEVEL COMPLETE◆" data-bottom="TIME      1:04.2">Results</button>
+      </div>
+    </div>
+    <div style="display:grid; gap:14px">
+      <p>The LCD complements the HUD rather than copying it. The top row is always speed; the bottom row shows shield,
+        targets and time until something matters more (a zone, a hit, a warning). Pause mirrors the selected menu item,
+        and the results page through your stats.</p>
+      <p class="note">Shown here as an approximation; the real display uses a few custom characters for shields and targets.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="history">
+  <header>
+    <span class="eyebrow">06</span>
+    <h2>Then and now</h2>
+    <p>Where the look started, and where it is today.</p>
+  </header>
+  <div class="stepper" data-start="2">
+    <ol class="steps">
+      <li data-img="img/history-menu-1.jpg"><b>Flat title</b><span>The first menu: a text title and plain scene, no post-processing.</span></li>
+      <li data-img="img/history-menu-2.jpg"><b>3D title</b><span>An extruded, chamfered title built in Blender, leaned to match the buttons.</span></li>
+      <li data-img="img/menu.jpg"><b>Full look</b><span>Haze, atmosphere, grade, interface details and the idle glitch.</span></li>
+    </ol>
+  </div>
+  <div class="compare" data-labels='["Before","Now"]'
+    data-sets='[["Level","img/history-level-1.jpg","img/history-level-2.jpg"]]'></div>
+  <p class="note">The level picked up the menu's grade and atmosphere, the floor now runs into the haze, and a few
+    distant constructs keep the two scenes feeling like one world.</p>
+</section>
+
+<footer>
+  <h3>Coming up</h3>
+  <ul>
+    <li>Target brackets as world-space markers.</li>
+    <li>A reduce-motion option for the menu effects.</li>
+    <li>Cockpit lights, rumble, master arm and EMP wired into the game.</li>
+    <li>Checks at aspect ratios other than 16:9.</li>
+  </ul>
+  <p>Screenshots are captured in the engine at 1600×900. Details for each system are in the
+    <a href="https://github.com/Ronno7/Axiom/blob/main/Axiom/Docs/UI.md">UI notes</a>.</p>
+</footer>
+
+</main>
+<script src="showcase.js"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "base",
+    themeVariables: {
+      darkMode: true, background: "#0b0c0e", fontFamily: "Barlow, Segoe UI, sans-serif", fontSize: "15px",
+      primaryColor: "#121317", primaryTextColor: "#e9e9ea", primaryBorderColor: "#3a3d44",
+      lineColor: "#6b6f77", edgeLabelBackground: "#0b0c0e", tertiaryColor: "#121317",
+      clusterBkg: "#0e0f12", clusterBorder: "#23252b", titleColor: "#9a9da4"
+    },
+    flowchart: { curve: "basis", padding: 12 }
+  });
+</script>
+</body>
+</html>

@@ -7,6 +7,22 @@ numbered from the project history.
 
 ## [Unreleased]
 
+### Added
+- Arcade mode (Options): a vintage arcade-monitor look for the menu and levels, with phosphor glow, CRT
+  curvature and scanlines, red colour fringing, rounded tube corners, flicker, static and a rolling band.
+- Arcade mode colour settings: exposure, contrast, saturation, colour filter, hue shift and white balance.
+- UI showcase page (`docs/`, published with GitHub Pages and linked from the README): UI types, screen flow,
+  render layers, Arcade mode, feedback channels and the cockpit, with interactive screenshots.
+- The level now has the main menu's look: colour grade, haze, horizon glow, stars, dust that streams past in
+  flight, and distant constructs beside the course.
+
+### Changed
+- The main-menu floor now fades into the background with no visible edge or horizon line.
+- The level floor runs on into the haze, so it meets the sky without an edge.
+
+### Fixed
+- Fog on large flat surfaces was uneven, leaving the far end of the floor brighter than the sky.
+
 ## [0.1.9] - 2026-10-20 — Main menu presentation
 
 ### Added

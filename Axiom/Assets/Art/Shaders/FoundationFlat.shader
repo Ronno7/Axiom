@@ -21,7 +21,7 @@ Shader "GeometricFlight/Foundation Flat"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             struct Attributes { float4 positionOS : POSITION; float3 normalOS : NORMAL; };
-            struct Varyings { float4 positionCS : SV_POSITION; float3 normalWS : TEXCOORD0; float fogFactor : TEXCOORD1; };
+            struct Varyings { float4 positionCS : SV_POSITION; float3 normalWS : TEXCOORD0; float fogCoord : TEXCOORD1; };
             CBUFFER_START(UnityPerMaterial)
                 half4 _BaseColor;
                 half _ShadeStrength;
@@ -32,7 +32,7 @@ Shader "GeometricFlight/Foundation Flat"
                 Varyings output;
                 output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
                 output.normalWS = TransformObjectToWorldNormal(input.normalOS);
-                output.fogFactor = ComputeFogFactor(output.positionCS.z);
+                output.fogCoord = output.positionCS.z;
                 return output;
             }
 
@@ -42,8 +42,10 @@ Shader "GeometricFlight/Foundation Flat"
                 // This shader does not receive realtime lights or shadows.
                 half light = saturate(dot(normalize(input.normalWS), normalize(float3(-0.4, 0.8, -0.6))));
                 half shade = lerp(1.0h, 0.3h + 0.7h * light, _ShadeStrength);
-                // Scene fog (off unless enabled in Lighting settings) fades distant geometry.
-                return half4(MixFog(_BaseColor.rgb * shade, input.fogFactor), 1.0h);
+                // Scene fog (off unless enabled in Lighting settings) fades distant geometry. Worked out per pixel:
+                // the floor is two huge triangles, and a per-vertex fog factor (clamped at the far vertex) would
+                // leave its distant end brighter than the sky.
+                return half4(MixFog(_BaseColor.rgb * shade, ComputeFogFactor(input.fogCoord)), 1.0h);
             }
             ENDHLSL
         }
