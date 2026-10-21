@@ -5,7 +5,9 @@ using UnityEngine;
 namespace GeometricFlight.Player
 {
     /// <summary>The ship's shield. Enemy shots (IDamageable) and ShipHull collisions call ApplyHit.
-    /// Presentation observes Changed and Depleted; this component owns no visuals.</summary>
+    /// Presentation observes Changed and Depleted; this component owns no visuals. LevelFlow clears
+    /// TakesHits when the run ends, so a late shot can't play hit feedback over the results (the
+    /// protection timer keeps running, so a post-hit blink still ends).</summary>
     [DisallowMultipleComponent]
     public sealed class ShipShield : MonoBehaviour, IDamageable
     {
@@ -18,6 +20,7 @@ namespace GeometricFlight.Player
         public event Action Depleted;
 
         public Shield State { get; private set; }
+        public bool TakesHits { get; set; } = true;
 
         private void Awake() => State = new Shield(segments, protectionAfterHit);
 
@@ -25,7 +28,7 @@ namespace GeometricFlight.Player
 
         public bool ApplyHit(int damage = 1)
         {
-            if (!State.TryHit()) return false;
+            if (!TakesHits || !State.TryHit()) return false;
             Changed?.Invoke(State.Current);
             if (State.IsDepleted) Depleted?.Invoke();
             return true;

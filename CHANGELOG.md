@@ -22,6 +22,14 @@ numbered from the project history.
 
 ### Fixed
 - Fog on large flat surfaces was uneven, leaving the far end of the floor brighter than the sky.
+- A destroyed turret could still fire one last shot while it shattered.
+- The results screen and the controller LCD could show different numbers when a shot landed after the run
+  ended. The first ending is now final, and late hits no longer count.
+- The horizon glow painted over nearby scenery (screen-space ambient occlusion, which had no visible effect,
+  is now off).
+- Controller firmware (kit and cockpit): the LCD could briefly drop to its standby screen mid-game, and the
+  cockpit could run its standby self-test (clicks, lamp) for a moment. Reflash both sketches to get the fix.
+- Editor-only preview switches (Preview Arcade, Hold Peak) can no longer affect a build.
 
 ## [0.1.9] - 2026-10-20 — Main menu presentation
 

@@ -249,17 +249,19 @@ namespace GeometricFlight.UI
 
         private void ShowResults()
         {
-            bool completed = flow.State == RunState.Completed;
+            // The numbers captured when the run ended (the cockpit LCD shows the same ones).
+            RunResults results = flow.Results;
+            bool completed = results.Completed;
             resultsTitle.text = completed ? "LEVEL COMPLETE" : "SHIP DESTROYED";
-            SetStat("result-time", UiScreens.FormatTime(flow.ElapsedTime));
-            SetStat("result-targets", $"{flow.TargetsDestroyed} / {flow.TargetsTotal}");
-            SetStat("result-accuracy", flow.ShotsFired == 0 ? "-" : $"{Mathf.RoundToInt(flow.Accuracy * 100f)}%");
-            SetStat("result-shield", $"{flow.ShieldRemaining} / {flow.ShieldMax}");
+            SetStat("result-time", UiScreens.FormatTime(results.Time));
+            SetStat("result-targets", $"{results.TargetsDestroyed} / {results.TargetsTotal}");
+            SetStat("result-accuracy", results.ShotsFired == 0 ? "-" : $"{Mathf.RoundToInt(results.Accuracy * 100f)}%");
+            SetStat("result-shield", $"{results.ShieldRemaining} / {results.ShieldMax}");
             bool showPar = completed && flow.HasPar;
             parRow.style.display = showPar ? DisplayStyle.Flex : DisplayStyle.None;
             if (showPar)
                 SetStat("result-par", UiScreens.FormatTime(flow.ParTime)
-                    + (flow.ElapsedTime <= flow.ParTime ? "  BEATEN" : "  MISSED"));
+                    + (results.Time <= flow.ParTime ? "  BEATEN" : "  MISSED"));
             bool canContinue = completed && flow.HasNextLevel;
             nextButton.style.display = canContinue ? DisplayStyle.Flex : DisplayStyle.None;
             hud.style.display = DisplayStyle.None;

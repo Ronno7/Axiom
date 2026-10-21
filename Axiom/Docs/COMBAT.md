@@ -63,10 +63,13 @@ Colors: `WeaponProjectile` (cyan) for shots and hit flashes, `DestructionPrimary
 - **Crashes** (`ShipHull`): overlapping scenery or a target costs a segment; the ship flies on.
   The hull `BoxCollider` is on the `Player` layer; player shots and crash checks exclude it.
 - **Enemy fire** (`EnemyTurret` on Target_02/03): a slow red shot at the player every 1.6 s
-  while 12–45 units ahead. It stops when the target breaks.
+  while 12–45 units ahead. It stops the moment the target breaks, not when the shatter effect ends.
 - **Run flow** (`LevelFlow` in 50_Systems): Escape pauses (and so does losing window focus); completes past
   `CourseEnd` (Z=112); fails when the shield depletes (the ship shatters). Retry reloads the scene.
-  Exposes time, targets, shots, accuracy, and shield for the UI.
+  The first ending is final (`RunRecord`): its numbers are captured once in `LevelFlow.Results`, which the
+  results screen and the cockpit LCD both show. Shots already in flight can still shatter a target, but
+  nothing counts after the ending, a second ending is ignored, and the shield takes no more hits
+  (`ShipShield.TakesHits`).
 - Course: `Barrier_Low` (Z=50, fly over) and `Barrier_Left` (Z=88, fly right).
 
 Verified in the editor: 41/41 EditMode tests; fail, complete, pause/resume, and a clean retry in Play Mode.

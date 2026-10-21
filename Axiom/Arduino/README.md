@@ -69,7 +69,9 @@ turn the contrast screw on the backpack.
 - **Pause** mirrors the menu; **results** page through time, par, targets, accuracy and shield.
 
 The game draws every screen (`CockpitDisplay.cs`), so layouts change without reflashing. The sketch
-only stores the 8 custom glyphs and falls back to standby 3 s after the game stops sending.
+only stores the 8 custom glyphs and falls back to standby 3 s after the game stops sending. Each pass of
+`loop()` reads the clock once and stamps incoming rows with that same time, so a row arriving mid-pass can't
+look like a long silence.
 
 ## Calibrating
 

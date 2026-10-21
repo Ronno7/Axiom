@@ -3,8 +3,9 @@ using UnityEngine;
 namespace GeometricFlight.Combat
 {
     /// <summary>Simple enemy attack: while the player approaches within range, periodically fires a
-    /// slow shot at the player's current position. Dodgeable by steering. Stops when this object
-    /// is deactivated (for example when its ShootableTarget breaks).</summary>
+    /// slow shot at the player's current position. Dodgeable by steering. Stops the moment its
+    /// ShootableTarget (if any) breaks, not when the shatter effect later deactivates the object, and
+    /// when this object is deactivated.</summary>
     [DisallowMultipleComponent]
     public sealed class EnemyTurret : MonoBehaviour
     {
@@ -22,10 +23,13 @@ namespace GeometricFlight.Combat
         [SerializeField, Min(1)] private int poolSize = 4;
 
         private ProjectilePool pool;
+        private ShootableTarget target;
         private float cooldown;
 
         private void Awake()
         {
+            target = GetComponent<ShootableTarget>();
+            if (target != null) target.Destroyed += OnTargetDestroyed;
             if (projectilePrefab == null || player == null)
             {
                 Debug.LogError("Assign a projectile prefab and player to EnemyTurret.", this);
@@ -36,7 +40,13 @@ namespace GeometricFlight.Combat
             cooldown = fireInterval * 0.5f;
         }
 
-        private void OnDestroy() => pool?.Dispose();
+        private void OnDestroy()
+        {
+            if (target != null) target.Destroyed -= OnTargetDestroyed;
+            pool?.Dispose();
+        }
+
+        private void OnTargetDestroyed(ShootableTarget _) => enabled = false;
 
         private void Update()
         {

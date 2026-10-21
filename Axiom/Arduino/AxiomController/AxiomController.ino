@@ -83,6 +83,8 @@ void setup() {
   tone(PIN_BUZZER, 880, 60);  // power-on chirp
 }
 
+// One timestamp per pass: commands are stamped with the same `now` the timeouts compare against, so
+// an elapsed time can never be negative (an unsigned underflow would read as a long silence).
 void loop() {
   unsigned long now = millis();
   updateButton(fireButton, now);
@@ -96,7 +98,7 @@ void loop() {
     lastSend = now;
     sendPacket();
   }
-  readCommands();
+  readCommands(now);
   updateLcd(now);
 }
 
@@ -140,7 +142,7 @@ void sendPacket() {
 }
 
 // Collects characters up to a newline, then handles one command.
-void readCommands() {
+void readCommands(unsigned long now) {
   while (Serial.available() > 0) {
     char c = (char)Serial.read();
     if (c == '\r') continue;
@@ -149,12 +151,12 @@ void readCommands() {
       continue;
     }
     command[commandLength] = '\0';
-    handleCommand(command);
+    handleCommand(command, now);
     commandLength = 0;
   }
 }
 
-void handleCommand(char *line) {
+void handleCommand(char *line, unsigned long now) {
   char *star = strrchr(line, '*');
   if (star == NULL) return;
   *star = '\0';
@@ -164,13 +166,13 @@ void handleCommand(char *line) {
   if (sscanf(line, "BZ,%u,%u", &hz, &ms) == 2 && hz >= 31 && ms > 0 && ms <= 2000) {
     tone(PIN_BUZZER, hz, ms);
   } else if (strncmp(line, "LT,", 3) == 0) {
-    handleLcdRow(line + 3);
+    handleLcdRow(line + 3, now);
   }
 }
 
 // "<row>,<text>": one display row, padded with spaces. In the text, \0-\7 are the custom glyphs,
 // \> and \< the display's built-in arrows, and \# a solid block.
-void handleLcdRow(const char *p) {
+void handleLcdRow(const char *p, unsigned long now) {
   if ((p[0] != '0' && p[0] != '1') || p[1] != ',') return;
   uint8_t row = p[0] - '0';
   p += 2;
@@ -188,7 +190,7 @@ void handleLcdRow(const char *p) {
     lcdWant[row][col++] = cell;
   }
   while (col < 16) lcdWant[row][col++] = ' ';
-  lastLcdRow = millis();
+  lastLcdRow = now;
   if (!gameDrivesLcd && lcdAddress) lcdGlyph(7, GLYPHS[7]);  // stop the standby spin
   gameDrivesLcd = true;
 }

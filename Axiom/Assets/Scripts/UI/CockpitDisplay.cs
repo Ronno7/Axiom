@@ -50,9 +50,9 @@ namespace GeometricFlight.UI
                     break;
                 case RunState.Completed:
                 case RunState.Failed:
-                    bool completed = flow.State == RunState.Completed;
+                    bool completed = flow.Results.Completed;
                     top = completed ? $"{LcdGlyph.Target}LEVEL COMPLETE{LcdGlyph.Target}" : LcdGlyph.Center("SHIP DESTROYED");
-                    resultPages ??= ResultPages(completed);
+                    resultPages ??= ResultPages(flow.Results);
                     bottom = resultPages[(int)(now / PageSeconds) % resultPages.Count];
                     break;
                 default:
@@ -86,24 +86,27 @@ namespace GeometricFlight.UI
             return LcdGlyph.Spread(kind, arrows + (guidance < 0 ? " LOWER" : " RAISE"));
         }
 
-        private string Shields()
+        private string Shields() => Shields(flow.ShieldRemaining, flow.ShieldMax);
+
+        private static string Shields(int remaining, int max)
         {
-            var shields = new StringBuilder(flow.ShieldMax);
-            for (int i = 0; i < flow.ShieldMax; i++)
-                shields.Append(i < flow.ShieldRemaining ? LcdGlyph.ShieldUp : LcdGlyph.ShieldDown);
+            var shields = new StringBuilder(max);
+            for (int i = 0; i < max; i++)
+                shields.Append(i < remaining ? LcdGlyph.ShieldUp : LcdGlyph.ShieldDown);
             return shields.ToString();
         }
 
-        // Results are final once shown, so the pages are built once.
-        private List<string> ResultPages(bool completed)
+        // The numbers captured when the run ended (the results screen shows the same ones), so the pages are
+        // built once.
+        private List<string> ResultPages(in RunResults results)
         {
-            var pages = new List<string> { LcdGlyph.Spread("TIME", UiScreens.FormatTime(flow.ElapsedTime)) };
-            if (completed && flow.HasPar)
-                pages.Add(LcdGlyph.Spread("VS PAR", $"{flow.ElapsedTime - flow.ParTime:+0.0;-0.0} s"));
-            pages.Add(LcdGlyph.Spread("TARGETS", $"{flow.TargetsDestroyed}/{flow.TargetsTotal}"));
+            var pages = new List<string> { LcdGlyph.Spread("TIME", UiScreens.FormatTime(results.Time)) };
+            if (results.Completed && flow.HasPar)
+                pages.Add(LcdGlyph.Spread("VS PAR", $"{results.Time - flow.ParTime:+0.0;-0.0} s"));
+            pages.Add(LcdGlyph.Spread("TARGETS", $"{results.TargetsDestroyed}/{results.TargetsTotal}"));
             pages.Add(LcdGlyph.Spread("ACCURACY",
-                flow.ShotsFired == 0 ? "-" : $"{Mathf.RoundToInt(flow.Accuracy * 100f)}%"));
-            pages.Add(LcdGlyph.Spread("SHIELD", Shields()));
+                results.ShotsFired == 0 ? "-" : $"{Mathf.RoundToInt(results.Accuracy * 100f)}%"));
+            pages.Add(LcdGlyph.Spread("SHIELD", Shields(results.ShieldRemaining, results.ShieldMax)));
             return pages;
         }
     }

@@ -125,6 +125,8 @@ void setup() {
   beep(880, 60);  // power-on chirp
 }
 
+// One timestamp per pass: commands and the self-test are stamped with the same `now` the timeouts compare
+// against, so an elapsed time can never be negative (an unsigned underflow would read as a long silence).
 void loop() {
   unsigned long now = millis();
   for (Button *b : buttons) updateButton(*b, now);
@@ -138,9 +140,9 @@ void loop() {
     updateLights(now);
     sendPacket();
   }
-  readCommands();
+  readCommands(now);
   gameActive = lastCommand != 0 && now - lastCommand <= GAME_SILENCE_MS;
-  if (!gameActive) selfTest();
+  if (!gameActive) selfTest(now);
   updateRumble(now);
   bool lampOn = !gameActive || lampMode == 1 || (lampMode == 2 && now % 500 < 250);
   if (empShowAt) lampOn = now - empShowAt < EMP_CHARGE_MS && now % 40 < 20;  // flickers, then out until recharged
@@ -188,7 +190,7 @@ void sendPacket() {
 }
 
 // Collects characters up to a newline, then handles one command.
-void readCommands() {
+void readCommands(unsigned long now) {
   while (Serial.available() > 0) {
     char c = (char)Serial.read();
     if (c == '\r') continue;
@@ -197,18 +199,17 @@ void readCommands() {
       continue;
     }
     command[commandLength] = '\0';
-    handleCommand(command);
+    handleCommand(command, now);
     commandLength = 0;
   }
 }
 
-void handleCommand(char *line) {
+void handleCommand(char *line, unsigned long now) {
   char *star = strrchr(line, '*');
   if (star == NULL) return;
   *star = '\0';
   unsigned int expected = 0;
   if (sscanf(star + 1, "%2X", &expected) != 1 || checksum(line) != expected) return;
-  unsigned long now = millis();
   unsigned int a = 0, b = 0;
   if (sscanf(line, "BZ,%u,%u", &a, &b) == 2) {
     if (a >= 31 && b > 0 && b <= 2000) beep(a, b);
@@ -235,9 +236,8 @@ void handleCommand(char *line) {
 // Without the game: every button press clicks, MASTER ARM chirps up or down, EMP fires the light-show demo,
 // holding EMP runs the motor, and the EMP lamp stays lit (see loop).
 // The game's own rumble always wins, because selfTest only runs while the game is silent.
-void selfTest() {
+void selfTest(unsigned long now) {
   static bool was[4] = { false, false, false, false };
-  unsigned long now = millis();
   for (uint8_t i = 0; i < 4; i++) {
     bool on = buttons[i]->stable;
     if (on != was[i]) {

@@ -12,7 +12,9 @@ namespace GeometricFlight.Core
     public enum PauseReason { None, Player, FocusLost, ControllerLost }
 
     /// <summary>Owns one run of a course: pause, completion at the course end, failure when the
-    /// shield depletes, and run statistics. UI observes StateChanged and calls the public actions.
+    /// shield depletes, and run statistics. The first ending is final: its numbers are captured in
+    /// <see cref="Results"/> before StateChanged fires, and later hits change nothing (<see cref="RunRecord"/>).
+    /// UI observes StateChanged and calls the public actions.
     /// Retry reloads the scene, so no actor or listener survives into the next attempt.</summary>
     [DefaultExecutionOrder(20)] // After PlayerFlight (input) and ShipHull (damage) this frame.
     [DisallowMultipleComponent]
@@ -37,17 +39,18 @@ namespace GeometricFlight.Core
         public RunState State { get; private set; } = RunState.Playing;
         public PauseReason PauseReason { get; private set; }
         public float ElapsedTime { get; private set; }
-        public int TargetsDestroyed { get; private set; }
+        public int TargetsDestroyed => record.TargetsDestroyed;
         public int TargetsTotal { get; private set; }
         public int ShieldRemaining => shield.State.Current;
         public int ShieldMax => shield.State.Max;
-        public int ShotsFired => weapon.ShotsFired;
-        public float Accuracy => weapon.ShotsFired == 0 ? 0f : (float)weapon.Hits / weapon.ShotsFired;
+        /// <summary>The final numbers, valid once the run is Completed or Failed.</summary>
+        public RunResults Results => record.Results;
         public bool HasNextLevel => !string.IsNullOrEmpty(nextScene);
         public float ParTime => parTime;
         public bool HasPar => parTime > 0f;
 
         private ShootableTarget[] targets;
+        private readonly RunRecord record = new RunRecord();
 
         private void Awake()
         {
@@ -114,24 +117,31 @@ namespace GeometricFlight.Core
 
         private void Complete()
         {
+            if (!Finish(true)) return;
             // The ship flies on hands-off; keys now belong to the results menu.
             flight.InputLocked = true;
             weapon.enabled = false;
             hull.enabled = false;
+            shield.TakesHits = false;
             SetState(RunState.Completed);
         }
 
         private void Fail()
         {
+            if (!Finish(false)) return;
             flight.enabled = false;
             weapon.enabled = false;
             hull.enabled = false;
+            shield.TakesHits = false;
             foreach (GameObject go in hideWhenDestroyed) go.SetActive(false);
             if (shipDestruction != null) shipDestruction.Play();
             SetState(RunState.Failed);
         }
 
-        private void CountTarget(ShootableTarget _) => TargetsDestroyed++;
+        private bool Finish(bool completed) => record.TryFinish(new RunResults(completed, ElapsedTime,
+            record.TargetsDestroyed, TargetsTotal, weapon.ShotsFired, weapon.Hits, shield.State.Current, shield.State.Max));
+
+        private void CountTarget(ShootableTarget _) => record.CountTarget();
 
         private void SetState(RunState next)
         {

@@ -49,7 +49,7 @@ namespace GeometricFlight.Presentation
             [Range(0f, 2f)] public float intensity = 1f;
             [Tooltip("Seconds per glitch frame. 0.04 = 25 fps; larger plays slower.")]
             [Range(0.02f, 0.12f)] public float frameTime = 0.04f;
-            [Tooltip("Freeze on the event's peak frame, to tune it. Title, construct and status effects show in Play Mode only.")]
+            [Tooltip("Freeze on the event's peak frame, to tune it (editor only; ignored in builds). Title, construct and status effects show in Play Mode only.")]
             public bool holdPeak;
             [Header("Parts")]
             public bool tears = true;
@@ -87,9 +87,9 @@ namespace GeometricFlight.Presentation
         [SerializeField] private GlitchSettings glitch = new GlitchSettings();
 
         [Header("Arcade mode (player toggle in Options)")]
-        [Tooltip("Shared with the levels' ArcadeScreen, so the look is tuned in one place.")]
+        [Tooltip("Shared with the levels' LevelLook, so the look is tuned in one place.")]
         [SerializeField] private ArcadeProfile arcade;
-        [Tooltip("Show Arcade Mode in the editor whatever the player's Options setting is.")]
+        [Tooltip("Show Arcade Mode in the editor whatever the player's Options setting is (ignored in builds).")]
         [SerializeField] private bool previewArcade;
 
         // ---------------- State ----------------
@@ -168,7 +168,7 @@ namespace GeometricFlight.Presentation
             UpdateStatus(now);
 
             GlitchFrame frameNow = GlitchFrame.Calm;
-            if (glitch.holdPeak)
+            if (HoldPeak)
             {
                 if (!eventPlaying) StartEvent(now);
                 frameNow = MenuGlitchTimeline.Frame(MenuGlitchTimeline.PeakFrame);
@@ -192,10 +192,12 @@ namespace GeometricFlight.Presentation
         [ContextMenu("Play glitch now")]
         public void PlayGlitchNow() => forceEvent = true;
 
-        private bool ArcadeOn => arcade != null && (previewArcade || GameSettings.ArcadeMode);
+        // Editor-only tuning aids: a saved Preview Arcade or Hold Peak never reaches a build.
+        private bool ArcadeOn => arcade != null && ((Application.isEditor && previewArcade) || GameSettings.ArcadeMode);
+        private bool HoldPeak => Application.isEditor && glitch.holdPeak;
 
         private GlitchFrame CurrentPreview() =>
-            glitch.holdPeak ? MenuGlitchTimeline.Frame(MenuGlitchTimeline.PeakFrame) : GlitchFrame.Calm;
+            HoldPeak ? MenuGlitchTimeline.Frame(MenuGlitchTimeline.PeakFrame) : GlitchFrame.Calm;
 
         // ---------------- Apply ----------------
 

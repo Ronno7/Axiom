@@ -58,8 +58,8 @@ One Inspector, live in the editor:
 | Grade | URP volume on the menu camera: neutral tonemapping, exposure, contrast, bloom, vignette, film grain |
 | Atmosphere | Haze (fog and sky colour, fog range), horizon band, stars, drifting dust (generated, not saved; `Additive Glow` shader) |
 | Interface | Scrim, corner frame, status line (live cockpit link, red LED when not linked), key hints, red focus marker |
-| Glitch | Signal glitch every 8–12 s while idle: tears, red echo, blocks, scanlines, fringe pulse, roll bar, title tear, construct snap/drop, status scramble. **Hold Peak** freezes it for tuning; the component menu has **Play glitch now** |
-| Arcade mode | The shared `ArcadeLook` asset, applied while the player has Arcade Mode on (**Preview Arcade** shows it in the editor) |
+| Glitch | Signal glitch every 8–12 s while idle: tears, red echo, blocks, scanlines, fringe pulse, roll bar, title tear, construct snap/drop, status scramble. **Hold Peak** freezes it for tuning (editor only); the component menu has **Play glitch now** |
+| Arcade mode | The shared `ArcadeLook` asset, applied while the player has Arcade Mode on (**Preview Arcade** shows it in the editor; builds ignore it) |
 
 **Level look** (`Presentation/LevelLook`; Prototype: `00_CameraAndLighting/LevelLook`) gives a level the menu's
 grade and atmosphere, plus Arcade Mode, with none of the menu-only parts (no glitch or interface details). Its
@@ -72,7 +72,11 @@ constructs (white ones only; red stays for danger) float high beside the course 
 `GradeSettings`/`AtmosphereSettings` and the runtime pieces `LookVolume` and `LookAtmosphere`.
 
 `Foundation Flat` works out fog per pixel: the floor is two huge triangles, and per-vertex fog left its far end
-brighter than the sky.
+brighter than the sky. The horizon glow's depth fade reads the camera depth texture, which only holds
+`Foundation Flat` geometry when URP copies depth after the opaque pass. Anything that adds a depth prepass
+(for example SSAO set to depth-normals, or depth priming) leaves that geometry out, and the glow then paints
+over foreground objects. SSAO is therefore off on `PC_Renderer`; it had no visible effect on these unlit
+shaders anyway. To use a prepass later, give `Foundation Flat` DepthOnly and DepthNormals passes first.
 
 **Arcade mode** (Options toggle, `GameSettings.ArcadeMode`) gives the menu and the levels a vintage vector-monitor
 look. Its settings live in one asset, `Settings/ArcadeLook` (`ArcadeProfile`), used by `MenuLook` on the menu and

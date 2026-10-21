@@ -115,6 +115,9 @@ so its plugs clear the MENU microswitch, with the USB socket beside it.
 buzzer is driven; 50 = full, 0 = mute, default 10). A0 X (right = high), A1 Y (forward = high), A2 twist (clockwise = high).
 Pull-ups on D2 FIRE, D3 EMP, D4 MENU: pressed = LOW. D7 MASTER ARM: HIGH = armed.
 
+Each pass of `loop()` reads the clock once, and commands and the self-test use that same time, so a command
+arriving mid-pass can't look like the game went silent.
+
 **Standby self-test** (no game running): row 1 shows the distance, X, Y and twist (0–99); row 0 shows
 F E M A for FIRE, EMP, MENU and armed. Each press clicks, MASTER ARM chirps up/down, **holding EMP runs the
 rumble**, and the EMP lamp stays lit. **Pressing EMP plays a 2.2 s demo:** charge (lights, lamp flicker, rising

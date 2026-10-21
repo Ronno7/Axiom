@@ -26,14 +26,15 @@ namespace GeometricFlight.Presentation
         [Header("Arcade mode (player toggle in Options)")]
         [Tooltip("Shared with the main menu, so the look is tuned in one place.")]
         [SerializeField, FormerlySerializedAs("look")] private ArcadeProfile arcade;
-        [Tooltip("Show Arcade Mode in the editor whatever the player's Options setting is.")]
+        [Tooltip("Show Arcade Mode in the editor whatever the player's Options setting is (ignored in builds).")]
         [SerializeField, FormerlySerializedAs("preview")] private bool previewArcade;
 
         private LookVolume look;
         private readonly LookAtmosphere air = new LookAtmosphere();
         private bool atmosphereDirty = true;
 
-        private bool ArcadeOn => arcade != null && (previewArcade || GameSettings.ArcadeMode);
+        // Preview is an editor-only tuning aid: a saved Preview Arcade never reaches a build.
+        private bool ArcadeOn => arcade != null && ((Application.isEditor && previewArcade) || GameSettings.ArcadeMode);
 
         private void OnEnable()
         {
