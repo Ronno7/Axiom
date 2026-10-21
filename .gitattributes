@@ -1,2 +1,16 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Never line-ending-convert binary assets
+*.fbx binary
+*.blend binary
+*.glb binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.otf binary
+*.ttf binary
+*.wav binary
+*.mp3 binary
+*.ogg binary

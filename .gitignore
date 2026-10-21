@@ -73,3 +73,20 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# IDE solution files (Unity regenerates them)
+*.slnx
+
+# Blender autosave/backups
+*.blend1
+*.blend2
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Internal development notes and assistant guidance (local only)
+DevNotes/
+AGENTS.md
+.claude/

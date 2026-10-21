@@ -7,6 +7,8 @@ The 16 lights are one pre-wired LED string, and the buzzer and rumble are plug-i
 has 24 solder joints.
 
 - 3D model: [axiom_cockpit.blend](axiom_cockpit.blend) (built by [make_cockpit.py](make_cockpit.py); `--roomy` for 500 × 280)
+- Top panel: [panel_cut.svg](panel_cut.svg) (1:1 laser-cut outline) and [panel_template.pdf](panel_template.pdf)
+  (1:1 mock-up guide on 4 Letter pages; also `.html`/`.svg`), written by the same script (`-- --panel` for only these)
 - Wiring: [wiring-cockpit.svg](wiring-cockpit.svg) (built by [make_wiring.py](make_wiring.py)): overview, every harness
   terminal by terminal, where the lights go, and a soldering summary
 
@@ -45,7 +47,7 @@ button (HUD toggle), throttle-sensor light, fire-button glow, START light, Ultra
 
 Prices are approximate (October 2026).
 
-**Have** (everything but the lights, as of 2026-10-18)
+**Have** (everything, as of 2026-10-20)
 
 | Part | Notes |
 | --- | --- |
@@ -61,9 +63,7 @@ Prices are approximate (October 2026).
 | Bates heat-shrink kit, capacitor set (470–1000 µF, 10 V+ for the lights), soldering gear, multimeter | |
 | APIELE 22 mm mushroom | Spare, replaced by the 60 mm dome |
 | From the SunFounder kit: Uno R3, HC-SR04, LCD1602 (I2C), resistors (330 Ω, 10 kΩ) | |
-
-**On order:** TOPXCDZ pre-wired WS2812B LED modules, 5 V, 10 cm wire, 2 strings of 50
-([Amazon](https://www.amazon.com/dp/B0B6NVQGJF)). 16 used. Must be **5 V**, not 12 V.
+| TOPXCDZ pre-wired WS2812B LED modules, 10 cm wire, 2 strings of 50 ([Amazon](https://www.amazon.com/dp/B0B6NVQGJF)) | Arrived 2026-10-20. 16 used. Must be **5 V**, not 12 V: check the label |
 
 Optional: 4.8 mm female spade connectors and a crimper, if you'd rather crimp than solder the button tabs.
 
@@ -71,7 +71,7 @@ Optional: 4.8 mm female spade connectors and a crimper, if you'd rather crimp th
 
 | Qty | Part | Link | ≈ | Notes |
 | --- | --- | --- | --- | --- |
-| 1 | Top panel, 3 mm black acrylic, laser cut | [SendCutSend](https://sendcutsend.com/materials/acrylic/) | $40–60 | From the cut file (to come) |
+| 1 | Top panel, 3 mm black acrylic, laser cut | [SendCutSend](https://sendcutsend.com/materials/acrylic/) | $40–60 | `panel_cut.svg`, after the mock-up |
 | 1 | Body, 6 mm Baltic birch plywood, laser cut | [SendCutSend](https://sendcutsend.com/materials/baltic-birch-plywood/) | $40–60 | Sides, front, back, bottom |
 | 1 | Rubber feet, wood glue, M3 screws, adhesive leatherette for the palm rest | Any | $15 | |
 
@@ -81,7 +81,7 @@ Optional: 4.8 mm female spade connectors and a crimper, if you'd rather crimp th
 | --- | --- | --- | --- |
 | Arduino Uno R3 | A4/A5 = I2C; pins ≤ 20 mA; USB ≤ 500 mA | [Arduino store](https://store-usa.arduino.cc/products/arduino-uno-rev3) | OK: no pin drives a load directly (the buzzer and rumble modules switch their own current) |
 | Gravity IO shield V7.1 | Every part on its own G/V/S row, LCD on I2C #1 | [DFRobot wiki](https://wiki.dfrobot.com/IO_Expansion_Shield_for_Arduino_V7_SKU_DFR0265) | OK. **Power jumper on 5V**; SERVO_PWR only feeds D0–D13, leave it empty |
-| JH-D400X-R4 | X pot lugs to A0, Y pot lugs to A1, twist leads to A2 (G/V/S each), button pair to D2 G/S | Seller's lead colours + meter | **Metered**: all three pots 10 kΩ, full sweep, wiper on the middle lug / black lead; button isolated. Lug order: wiring sheet, H1 |
+| JH-D400X-R4 | X pot lugs to A0, Y pot lugs to A1, twist leads to A2 (G/V/S each), button pair to D2 G/S | Seller's lead colours + meter | **Metered**: all three pots 10 kΩ, full sweep, wiper on the middle lug / black lead; button isolated. Lug order: wiring sheet, H1. Twist deferred: leads left long and taped until it has a game use |
 | HC-SR04 | VCC/TRIG/GND on D9, ECHO on D10, single jumpers | [Datasheet](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf) | OK: 5 V part, 5 V echo |
 | LCD1602 I2C backpack | GND/VCC/SDA/SCL to I2C #1 | Kit module (PCF8574) | OK: address 0x27 or 0x3F |
 | Pre-wired LED string | 330 Ω on data, 470–1000 µF at the start, input end first | [Module specs](https://www.ledlightinghut.com/pre-soldered-ws2812b-sk6812-smart-circle-pcb-string.html), [Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide/best-practices) | OK: WS2812B or SK6812, 5 V, GRB, up to ~55 mA each at full white |
@@ -111,16 +111,22 @@ so its plugs clear the MENU microswitch, with the USB socket beside it.
 | PC → controller | `RM,level,ms*HH` | Rumble 0–255. `ms` 0 = steady level, dropped 1.5 s after the last one; `ms` > 0 = a pulse |
 | PC → controller | `LA,mode*HH` | EMP dome lamp: 0 off, 1 on, 2 blink |
 
-`BZ` and `LT` are unchanged. A0 X (right = high), A1 Y (forward = high), A2 twist (clockwise = high).
+`BZ` and `LT` are unchanged. Buzzer loudness: `BUZZER_VOLUME` at the top of the sketch (% of each cycle the
+buzzer is driven; 50 = full, 0 = mute, default 10). A0 X (right = high), A1 Y (forward = high), A2 twist (clockwise = high).
 Pull-ups on D2 FIRE, D3 EMP, D4 MENU: pressed = LOW. D7 MASTER ARM: HIGH = armed.
 
 **Standby self-test** (no game running): row 1 shows the distance, X, Y and twist (0–99); row 0 shows
 F E M A for FIRE, EMP, MENU and armed. Each press clicks, MASTER ARM chirps up/down, **holding EMP runs the
-rumble**, and the EMP lamp stays lit.
+rumble**, and the EMP lamp stays lit. **Pressing EMP plays a 2.2 s demo:** charge (lights, lamp flicker, rising
+pitch), a white shockwave down the string with a low boom and full rumble, then crackling sparks fading out;
+the lamp relights at the end.
 
-Not yet: the D6 lights (GRB, brightness capped at 20 %). Call `show()` right before sending each `AX` packet,
-and have the game send right after receiving one: `show()` pauses interrupts for ~0.5 ms, and serial bytes
-arriving during it are lost.
+**Lights (D6)**, needs the Adafruit NeoPixel library: so far only a standby test. A dot runs along the
+string in red, then green, then blue, at the 20 % brightness cap; off while the game runs. Every frame is
+also dimmed if its estimated draw is over `LIGHT_BUDGET_MA` (180 mA). `LIGHT_COUNT` is 50
+to test a whole uncut string; set it to 16 once the string is cut. No game command yet. `show()` runs right
+before each `AX` packet, and the game should send right after receiving one: `show()` pauses interrupts
+(~0.5 ms for 16), and serial bytes arriving during it are lost.
 
 ## Bench test (before soldering)
 
@@ -131,13 +137,52 @@ arriving during it are lost.
    microswitch's COM to G and NO to S. EMP lamp: + to D12 S, − to D12 G. Joystick: a clip lead per lug.
 5. Check each reading on the LCD. Hold D3 S to G to feel the rumble.
 
+**Upload with Unity out of Play Mode** and the Serial Monitor closed: the game holds COM3, and the upload
+fails with "Access is denied".
+
+## Build progress
+
+- [x] Bench test of the sketch with jumpers (2026-10-18)
+- [x] MENU (D4), EMP (D3) and the EMP lamp (D12): connected (taped), working
+- [x] MASTER ARM (D7, with the 10 kΩ): connected (taped), working
+- [x] Joystick: X (A0), Y (A1) and FIRE (D2): connected (taped), working (2026-10-20)
+- [ ] Twist (A2): deferred, see above
+- [x] Sonar (D9/D10 jumpers): working (2026-10-20)
+- [x] Light string (D6): string test passed on the breadboard (2026-10-20)
+- [ ] Enclosure: cardboard mock-up from the template and measurements (below), then final cut files, order
+- [ ] Solder every harness (all 24 joints) while mounting in the enclosure; until then, joints are taped
+
+**Joystick tips:** cut the A0 and A1 cables long (about 25 cm on the plug side), since the lugs have no leads
+and the stick sits about 20 cm from the Uno; a short harness can be extended with M–F jumpers later. The
+leads are about 28–30 AWG, too thin for most strippers: melt 3–4 mm of insulation back with the iron (or roll
+it under a craft knife), check no strands are cut, tin at once, wrap around the tinned cable wire, solder,
+heat-shrink. Tin the pot lugs first and join in 2–3 s. A dab of hot glue where the leads leave the stick
+body relieves strain. Meter each pot cable before plugging in: G–V a fixed ~10 kΩ (never 0), G–S changes
+with tilt.
+
+## Cardboard mock-up
+
+1. Print `panel_template.pdf` at **100 % / Actual size**; check the 100 mm bar with a ruler. Overlap the shaded
+   strips so the grid lines up, tape, and glue onto stiff cardboard (a box side).
+2. Cut the solid outlines (holes, slot, windows). Dashed lines are part footprints, not cuts.
+3. Make a box for it: 420 × 245 mm, 60 mm tall at the front, 94 mm at the back (8° slope).
+4. Mount the real parts and check: every body fits underneath (EMP dome needs ~60 mm), nothing collides,
+   hand reach, and the throttle travel. Note anything that should move.
+5. **Measure** with calipers or a ruler and send the numbers: joystick top plate and its 4 screw holes
+   (spacing), the hole each part actually needs (EMP, MENU, MASTER ARM, LCD window and its screw holes), the
+   USB socket's screw spacing, and the light modules' diameter.
+
+Then the cut file is updated from the measurements and the body (6 mm plywood) cut file is added.
+
 ## Check when the parts arrive
 
 Done 2026-10-18: joystick wires metered, EMP springs back with NO closing, MASTER ARM's − tab found,
 EMP lamp has its own resistor.
 
-1. **Light string:** find the input end (first module's pads read DIN), run a colour test on the whole string
-   before cutting it after module 16.
+1. **Light string:** each end has a 3-pin plug (usually red 5V, green data, white GND) plus a bare red/white
+   power-injection pair; insulate that pair's ends separately, since it is live. Find the input end (first
+   module's pads read DIN, or the arrows point away from it), run the standby test on the whole string (every
+   module shows red, green, then blue) before cutting it after module 16.
 2. **EMP dome:** check the body plus microswitch is under about 60 mm below the panel (the box has about
    65 mm there).
 3. **Rumble:** with the module taped to the plate, check you can feel it at the knob. If not, it moves into

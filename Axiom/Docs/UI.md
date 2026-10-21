@@ -26,10 +26,43 @@ invert vertical, controller buzzer, and **Calibrate controller** (`CalibrationPa
 **Buttons** are `SlantButton`: drawn as a forward-leaning chevron via Painter2D, styled with
 `--slant-*` USS properties (focus = white fill). The title column leans to match.
 
+**Title** is a 3D mesh: "aXiom" in Earth Orbiter Bold, extruded, leaned 15° to match the buttons, with
+flat chamfers (`Art/Models/AxiomTitle_EarthOrbiter.fbx`). The earlier Furore "AXIOM"
+(`AxiomTitle_Furore.fbx`) is kept as an alternative: in MainMenu, `MenuTitle` holds `Title_EarthOrbiter`
+(active) and `Title_Furore` (inactive); swap which is active. Both are built by
+`ArtSource/Title/make_title.py` in Blender (commands in its header); its options build other fonts, texts
+and shapes, always at the same 3.7 m width so the framing holds. Earth Orbiter is free for non-commercial
+use only (`ArtSource/earth-orbiter/earthorbiter.txt`); Furore's file carries no license. In
+MainMenu, `MenuTitle/TitleCamera` renders only the `Title` layer into `UI/MenuTitle.renderTexture`
+(2048×512, transparent); `MainMenu` sets it as the background of the `game-title` element, so it
+follows the UI layout at any resolution. The main camera excludes the `Title` layer. Shading comes
+from `Title.mat` (`Title Facets` shader: key light from the upper right, a front fill focused on the face, and a
+shadow floor, so the extrusion's visible left walls sit in shadow; values are linear, so a floor of 0.015
+displays as about 12% grey). The titles are extruded 0.28 m; framing comes from the title camera's position and
+field of view.
+
 **Menu backdrop** (`MenuBackdrop`, `GeometricConstruct`): a hero construct and three simpler
 ones at fixed depths (fog fades the far ones) over a scrolling floor. A construct can combine a
 counter-rotating star tetrahedron, a golden-ratio cage tumbling under Euler's rigid-body equations,
 a trefoil-knot band, and satellites on Kepler orbits; keep each background one to a single idea.
+
+**Menu look** (`Presentation/Menu/MenuLook` on the MainMenu `MenuLook` object).
+One Inspector, live in the editor:
+
+| Section | What it controls |
+| --- | --- |
+| Grade | URP volume on the menu camera: neutral tonemapping, exposure, contrast, bloom, vignette, film grain |
+| Atmosphere | Fog haze colour, horizon band, stars, drifting dust (generated, not saved; `Additive Glow` shader) |
+| Interface | Scrim, corner frame, status line (live cockpit link, red LED when not linked), key hints, red focus marker |
+| Glitch | Signal glitch every 8–12 s while idle: tears, red echo, blocks, scanlines, fringe pulse, roll bar, title tear, construct snap/drop, status scramble. **Hold Peak** freezes it for tuning; the component menu has **Play glitch now** |
+| Vector monitor extras | Phosphor glow (replaces the grade's bloom), colour fringing in the accent red only, CRT pass, lighter vignette (replaces the grade's). All off by default |
+
+The glitch, fringing and CRT run in `MenuScreenFeature` (on `PC_Renderer`, shader `Menu Screen`), only for
+the menu camera and only while one is non-zero; the UI draws afterwards and is never processed. The title's
+glitch is a separate blit of its render texture (`Menu Title Glitch`). The scrim, frame, footer and roll bar
+are elements in `MainMenu.uxml`/`Axiom.uss` (gradients in `UI/Textures`); red stays reserved for focus and
+problems. Depth of field and URP's chromatic aberration are deliberately not used: the first blurs the thin
+wireframes, the second splits light into off-palette rainbow colours.
 
 **UI classification so far:** diegetic: shield segments on the hull and throttle-responsive engine exhaust; non-diegetic: HUD
 (time, targets, throttle gauge with zone band and hint), menus, results with par; spatial:

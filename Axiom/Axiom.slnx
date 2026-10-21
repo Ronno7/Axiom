@@ -1,6 +1,0 @@
-﻿<Solution>
-  <Project Path="GeometricFlight.EditorTests.csproj" />
-  <Project Path="GeometricFlight.Runtime.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
-</Solution>

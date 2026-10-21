@@ -3,6 +3,7 @@
 Run with Blender 5.x:
   blender -b --factory-startup --python make_cockpit.py                        (compact: build, save .blend + .glb)
   blender -b --factory-startup --python make_cockpit.py -- --roomy --render    (roomy preset, plus preview renders)
+  blender -b --factory-startup --python make_cockpit.py -- --panel             (only the panel cut file + template)
 
 All sizes are millimetres. Panel coordinates: x from the left edge, y from the front edge measured
 along the sloped top, z up from the top surface. Change the numbers below and rerun.
@@ -55,6 +56,7 @@ ANNUNCIATORS = [("LINK", CENTRE - 50.0, (0.1, 1.0, 0.25), True), ("SLOW", CENTRE
                 ("FAST", CENTRE, (1.0, 0.55, 0.05), False), ("PROX", CENTRE + 25.0, (1.0, 0.08, 0.05), False),
                 ("EMP", CENTRE + 50.0, (1.0, 0.75, 0.05), True)]   # EMP lit = still available this round
 NAME = "axiom_cockpit" if PRESET == "compact" else "axiom_cockpit_roomy"
+SUFFIX = "" if PRESET == "compact" else "_roomy"   # panel cut file and template names
 
 A = math.radians(SLOPE)
 D_SLOPE = D / math.cos(A)      # panel length along the slope
@@ -288,27 +290,38 @@ frame.location = Vector((0, 0, FEET + H_FRONT)) * MM
 frame.rotation_euler = (A, 0, 0)
 COLL["Cockpit"].objects.link(frame)
 
-# Top plate with every opening cut out
+# Top plate with every opening cut out. OPENINGS keeps each one for the cut file and template.
 cut = bmesh.new()
+OPENINGS = []
 
 
-def cut_cyl(cx, cy, r):
+def cut_cyl(cx, cy, r, record=True):
+    if record:
+        OPENINGS.append(("circle", cx, cy, r))
     bmesh.ops.create_cone(cut, cap_ends=True, segments=64, radius1=r, radius2=r, depth=20,
                           matrix=Matrix.Translation((cx, cy, 0)))
 
 
-def cut_box(cx, cy, sx, sy):
+def cut_box(cx, cy, sx, sy, record=True):
+    if record:
+        OPENINGS.append(("rect", cx, cy, sx, sy))
     m = Matrix.Translation((cx, cy, 0)) @ Matrix.Diagonal((sx, sy, 20, 1))
     bmesh.ops.create_cube(cut, size=1.0, matrix=m)
+
+
+def cut_slot(cx, y0, y1, w):
+    """A slot with round ends, y0..y1 overall, recorded as one closed outline."""
+    OPENINGS.append(("slot", cx, y0, y1, w))
+    cut_box(cx, (y0 + y1) / 2, w, y1 - y0 - w, record=False)
+    cut_cyl(cx, y0 + w / 2, w / 2, record=False)
+    cut_cyl(cx, y1 - w / 2, w / 2, record=False)
 
 
 cut_cyl(*STICK, 20.0)
 for dx in (-16.25, 16.25):
     for dy in (-16.25, 16.25):
         cut_cyl(STICK[0] + dx, STICK[1] + dy, 1.4)
-cut_box(THR_X, (SLOT_Y0 + SLOT_Y1) / 2, SLOT_W, SLOT_Y1 - SLOT_Y0 - SLOT_W)
-cut_cyl(THR_X, SLOT_Y0 + SLOT_W / 2, SLOT_W / 2)
-cut_cyl(THR_X, SLOT_Y1 - SLOT_W / 2, SLOT_W / 2)
+cut_slot(THR_X, SLOT_Y0, SLOT_Y1, SLOT_W)
 for y in LED_YS:
     cut_cyl(LED_X, y, 2.55)
 for x in SHIELD_XS:
@@ -322,8 +335,112 @@ for dx in (-37.5, 37.5):
         cut_cyl(LCD[0] + dx, LCD[1] + dy, 1.6)
 for _, x, _, _ in ANNUNCIATORS:
     cut_box(x, ANN_Y, 22.0, 10.0)
-for cx, cy in ((10, 10), (W - 10, 10), (10, D_SLOPE - 10), (W - 10, D_SLOPE - 10), (W / 2, 10), (W / 2, D_SLOPE - 10)):
+# Corner and front-middle screws. No back-middle one: it would sit ~1 mm from the FAST window.
+for cx, cy in ((10, 10), (W - 10, 10), (10, D_SLOPE - 10), (W - 10, D_SLOPE - 10), (W / 2, 10)):
     cut_cyl(cx, cy, 1.6)
+
+
+# ---------------- Panel cut file and printable template ----------------
+def svg_y(y):
+    return D_SLOPE - y                     # SVG y runs down the page, so the front edge is at the bottom
+
+
+def svg_shape(o):
+    if o[0] == "circle":
+        _, cx, cy, r = o
+        return f'<circle cx="{cx:.2f}" cy="{svg_y(cy):.2f}" r="{r:.2f}"/>'
+    if o[0] == "rect":
+        _, cx, cy, sx, sy = o
+        return f'<rect x="{cx - sx / 2:.2f}" y="{svg_y(cy + sy / 2):.2f}" width="{sx:.2f}" height="{sy:.2f}"/>'
+    _, cx, y0, y1, w = o
+    return (f'<rect x="{cx - w / 2:.2f}" y="{svg_y(y1):.2f}" width="{w:.2f}" height="{y1 - y0:.2f}" '
+            f'rx="{w / 2:.2f}"/>')
+
+
+def svg_text(x, y, body, size=3.5, anchor="middle", rot=0, color="#333"):
+    turn = f' transform="rotate({rot} {x:.2f} {svg_y(y):.2f})"' if rot else ""
+    return (f'<text x="{x:.2f}" y="{svg_y(y):.2f}" font-size="{size}" text-anchor="{anchor}" '
+            f'fill="{color}"{turn}>{body}</text>')
+
+
+def write_panel_files():
+    """panel_cut.svg: 1:1 outline + openings for the laser cutter (mm, hairlines, no text).
+    panel_template.svg: the same with part footprints, labels and a 10 mm grid, for a cardboard mock-up.
+    panel_template.html: that template tiled over 4 landscape Letter pages for printing at 100 %."""
+    shapes = "\n".join(svg_shape(o) for o in OPENINGS)
+    outline = f'<rect x="0" y="0" width="{W:g}" height="{D_SLOPE:.2f}"/>'
+    (HERE / f"panel_cut{SUFFIX}.svg").write_text(
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W:g}mm" height="{D_SLOPE:.2f}mm" '
+        f'viewBox="0 0 {W:g} {D_SLOPE:.2f}">\n<g fill="none" stroke="#000" stroke-width="0.1">\n'
+        f'{outline}\n{shapes}\n</g>\n</svg>\n', encoding="utf-8")
+
+    grid = "".join(f'<line x1="{x}" y1="0" x2="{x}" y2="{D_SLOPE:.2f}"/>' for x in range(10, int(W), 10))
+    grid += "".join(f'<line x1="0" y1="{svg_y(y):.2f}" x2="{W:g}" y2="{svg_y(y):.2f}"/>'
+                    for y in range(10, int(D_SLOPE), 10))
+    ax_, ay_ = ARM
+    feet = [  # footprints of the parts above the panel (dashed), from the listings
+        ("circle", STICK[0], STICK[1], 26.75), ("rect", THR_X, LEVER_Y, KNOB[0], KNOB[1]),
+        ("circle", BIG[0], BIG[1], 30.0), ("circle", MENU[0], MENU[1], 16.65),
+        ("rect", ax_, ay_, 28.0, 40.0), ("rect", LCD[0], LCD[1], 80.0, 36.0),
+    ]
+    labels = [
+        svg_text(STICK[0], STICK[1] - 33, "STICK: 40 mm hole, M3 on a 32.5 mm square"),
+        svg_text(THR_X - KNOB[0] / 2 - 5, LEVER_Y, "THROTTLE: 8 mm slot, knob at cruise", rot=-90),
+        svg_text(LED_X + 7, (LED_YS[0] + LED_YS[-1]) / 2, "8 throttle lights", rot=-90),
+        svg_text(BIG[0], BIG[1] - 20, "EMP: 60 mm dome, 24 mm hole"),
+        svg_text(MENU[0] - 20, MENU[1] - 1, "MENU: 28 mm hole", anchor="end"),
+        svg_text(ax_, ay_ - 24, "MASTER ARM: 12 mm hole"),
+        svg_text(LCD[0], LCD[1] - 1.2, "LCD window 72 × 25", size=3),
+        svg_text(SHIELD_XS[1], SHIELD_YS + 5, "SHIELD", size=3),
+        svg_text(W - 60, PALM + 2, f"palm rest ({PALM:g} mm)", color="#888"),
+        svg_text(W / 2, 3, "FRONT EDGE", size=3, color="#888"),
+    ] + [svg_text(x, ANN_Y - 1.2, name, size=3) for name, x, _, _ in ANNUNCIATORS]
+    body = (f'<g stroke="#e4e4e4" stroke-width="0.15">{grid}</g>\n'
+            f'<line x1="0" y1="{svg_y(PALM):.2f}" x2="{W:g}" y2="{svg_y(PALM):.2f}" stroke="#aaa" '
+            f'stroke-width="0.25" stroke-dasharray="3 2"/>\n'
+            f'<g fill="none" stroke="#888" stroke-width="0.25" stroke-dasharray="2 1.5">\n'
+            + "\n".join(svg_shape(f) for f in feet) + '\n</g>\n'
+            f'<g fill="none" stroke="#000" stroke-width="0.3">\n{outline}\n{shapes}\n</g>\n'
+            f'<g font-family="Arial, sans-serif">\n' + "\n".join(labels) + '\n</g>\n')
+    (HERE / f"panel_template{SUFFIX}.svg").write_text(
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W:g}mm" height="{D_SLOPE:.2f}mm" '
+        f'viewBox="0 0 {W:g} {D_SLOPE:.2f}">\n{body}</svg>\n', encoding="utf-8")
+
+    # Four tiles with a 10 mm overlap (shaded), back row first so the pages read like the panel.
+    mid_x, mid_y, lap, pad = W / 2, D_SLOPE / 2, 5.0, 5.0
+    cols = [(-pad, mid_x + lap), (mid_x - lap, W + pad)]
+    rows = [(-pad, mid_y + lap), (mid_y - lap, D_SLOPE + pad)]
+    shade = (f'<rect x="{mid_x - lap:.2f}" y="-5" width="{2 * lap:g}" height="{D_SLOPE + 10:.2f}" fill="#000" '
+             f'fill-opacity="0.06"/><rect x="-5" y="{mid_y - lap:.2f}" width="{W + 10:g}" height="{2 * lap:g}" '
+             f'fill="#000" fill-opacity="0.06"/>')
+    names = ["back left", "back right", "front left", "front right"]
+    pages = []
+    for i, ((y0, y1), (x0, x1)) in enumerate((r, c) for r in rows for c in cols):
+        pages.append(
+            f'<div class="page"><div class="head">Axiom cockpit panel, {PRESET} ({W:g} × {D_SLOPE:.1f} mm): '
+            f'page {i + 1} of 4, {names[i]}. Box: {W:g} × {D:g} mm, front {H_FRONT:g} mm, '
+            f'back {H_FRONT + D * math.tan(A):.0f} mm tall</div>\n'
+            f'<svg width="{x1 - x0:.2f}mm" height="{y1 - y0:.2f}mm" viewBox="{x0:.2f} {y0:.2f} {x1 - x0:.2f} '
+            f'{y1 - y0:.2f}">\n{shade}\n{body}</svg>\n'
+            f'<div class="foot"><span class="bar"></span> must measure 100 mm (print at 100 % / Actual size). '
+            f'Overlap the shaded strips so the grid lines up.</div></div>')
+    (HERE / f"panel_template{SUFFIX}.html").write_text(
+        '<!doctype html>\n<html><head><meta charset="utf-8"><title>Axiom panel template</title>\n<style>\n'
+        '@page { size: 279.4mm 215.9mm; margin: 0 }\n'
+        'body { margin: 0; font-family: Arial, sans-serif; background: #fff; color: #222 }\n'
+        '.page { width: 279.4mm; height: 215.9mm; position: relative; overflow: hidden; break-after: page }\n'
+        '.head { position: absolute; left: 12mm; top: 6mm; font-size: 10pt }\n'
+        '.page svg { position: absolute; left: 12mm; top: 13mm }\n'
+        '.foot { position: absolute; left: 12mm; bottom: 7mm; font-size: 9pt }\n'
+        '.bar { display: inline-block; width: 100mm; height: 2.5mm; background: #000; vertical-align: middle }\n'
+        '</style></head><body>\n' + "\n".join(pages) + '\n</body></html>\n', encoding="utf-8")
+    print(f"Wrote panel_cut{SUFFIX}.svg, panel_template{SUFFIX}.svg, panel_template{SUFFIX}.html")
+
+
+write_panel_files()
+if "--panel" in sys.argv:
+    sys.exit(0)
+
 cutter = mesh_obj("Cutter", cut, None, parent=frame)
 
 top = box("Top panel (3 mm acrylic)", W / 2, D_SLOPE / 2, -T_TOP / 2, W, D_SLOPE, T_TOP, M["acrylic"], frame)

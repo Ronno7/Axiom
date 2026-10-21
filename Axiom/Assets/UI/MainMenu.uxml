@@ -3,16 +3,49 @@
     <ui:Template name="Options" src="OptionsPanel.uxml" />
     <ui:Template name="Help" src="HelpPanel.uxml" />
     <ui:Template name="Calibration" src="CalibrationPanel.uxml" />
+    <!-- Scrim, frame, footer and roll bar are decoration; MenuLook toggles and tunes them. -->
+    <ui:VisualElement name="scrim" class="scrim" picking-mode="Ignore" />
     <ui:VisualElement name="screen" class="screen screen--menu">
         <ui:VisualElement name="title-panel" class="panel panel--bare">
-            <ui:Label text="AXIOM" class="game-title" />
-            <GeometricFlight.UI.SlantButton name="play-button" style="margin-left: 67px;" text="PLAY" class="menu-button menu-button--primary" />
-            <GeometricFlight.UI.SlantButton name="options-button" style="margin-left: 45px;" text="OPTIONS" class="menu-button" />
-            <GeometricFlight.UI.SlantButton name="help-button" style="margin-left: 22px;" text="HELP" class="menu-button" />
-            <GeometricFlight.UI.SlantButton name="quit-button" style="margin-left: 0px;" text="QUIT" class="menu-button" />
+            <ui:VisualElement name="game-title" class="game-title" />
+            <GeometricFlight.UI.SlantButton name="play-button" style="margin-left: 67px;" text="PLAY" class="menu-button menu-button--primary">
+                <ui:VisualElement class="focus-marker" picking-mode="Ignore" />
+            </GeometricFlight.UI.SlantButton>
+            <GeometricFlight.UI.SlantButton name="options-button" style="margin-left: 45px;" text="OPTIONS" class="menu-button">
+                <ui:VisualElement class="focus-marker" picking-mode="Ignore" />
+            </GeometricFlight.UI.SlantButton>
+            <GeometricFlight.UI.SlantButton name="help-button" style="margin-left: 22px;" text="HELP" class="menu-button">
+                <ui:VisualElement class="focus-marker" picking-mode="Ignore" />
+            </GeometricFlight.UI.SlantButton>
+            <GeometricFlight.UI.SlantButton name="quit-button" style="margin-left: 0px;" text="QUIT" class="menu-button">
+                <ui:VisualElement class="focus-marker" picking-mode="Ignore" />
+            </GeometricFlight.UI.SlantButton>
         </ui:VisualElement>
         <ui:Instance template="Options" />
         <ui:Instance template="Help" />
         <ui:Instance template="Calibration" />
     </ui:VisualElement>
+    <ui:VisualElement name="frame" class="frame" picking-mode="Ignore">
+        <ui:VisualElement class="frame__corner" picking-mode="Ignore" />
+        <ui:VisualElement class="frame__corner frame__corner--right" picking-mode="Ignore" />
+        <ui:VisualElement class="frame__corner frame__corner--bottom" picking-mode="Ignore" />
+        <ui:VisualElement class="frame__corner frame__corner--right frame__corner--bottom" picking-mode="Ignore" />
+    </ui:VisualElement>
+    <ui:VisualElement name="menu-footer" class="menu-footer" picking-mode="Ignore">
+        <ui:VisualElement name="status-line" class="status-line" picking-mode="Ignore">
+            <ui:VisualElement name="status-led" class="status-led status-led--offline" picking-mode="Ignore" />
+            <ui:Label name="status-system" text="SYS ONLINE" class="micro micro--ink" picking-mode="Ignore" />
+            <ui:Label text="·" class="micro" picking-mode="Ignore" />
+            <ui:Label name="status-link" text="COCKPIT OFFLINE" class="micro" picking-mode="Ignore" />
+            <ui:Label text="·" class="micro" picking-mode="Ignore" />
+            <ui:Label name="status-build" text="BUILD" class="micro" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="key-hints" class="key-hints" picking-mode="Ignore">
+            <ui:Label text="ENTER" class="micro micro--ink keycap" picking-mode="Ignore" />
+            <ui:Label text="SELECT" class="micro key-verb" picking-mode="Ignore" />
+            <ui:Label text="ESC" class="micro micro--ink keycap" picking-mode="Ignore" />
+            <ui:Label text="BACK" class="micro key-verb" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="roll-bar" class="roll-bar" picking-mode="Ignore" />
 </ui:UXML>

@@ -8,9 +8,10 @@
 // HH is the XOR of every character before '*', as two hex digits.
 //
 // The steady rumble stops RUMBLE_HOLD_MS after the last RM command, so the game resends it while it runs and
-// a crashed or closed game never leaves the motor on. The light string on D6 is not driven yet.
+// a crashed or closed game never leaves the motor on. The light string on D6 only runs a standby test so far.
 
 #include <Wire.h>
+#include <Adafruit_NeoPixel.h>  // Library Manager: "Adafruit NeoPixel"
 
 // ---- Pins (Gravity shield rows). Nothing in Unity depends on them. ----
 const uint8_t PIN_JOY_X  = A0;   // stick left-right, right = high
@@ -19,9 +20,10 @@ const uint8_t PIN_TWIST  = A2;   // stick twist, clockwise = high
 const uint8_t PIN_FIRE   = 2;    // stick top button to GND
 const uint8_t PIN_EMP    = 3;    // 60 mm dome, NO to GND
 const uint8_t PIN_MENU   = 4;    // 30 mm button, NO to GND
-const uint8_t PIN_RUMBLE = 5;    // DFR0440 vibration module (PWM; Timer0, so tone() on D8 doesn't disturb it)
+const uint8_t PIN_LIGHTS = 6;    // WS2812B string DIN, through 330 Ohm
+const uint8_t PIN_RUMBLE = 5;   // DFR0440 vibration module (PWM; Timer0, so beep() on Timer2 doesn't disturb it)
 const uint8_t PIN_ARM    = 7;    // MASTER ARM: +5 V when armed, 10 kOhm pull-down when safe
-const uint8_t PIN_BUZZER = 8;    // DFR0032 passive buzzer
+const uint8_t PIN_BUZZER = 8;    // DFR0032 passive buzzer (PB0: beep()'s interrupts switch it directly)
 const uint8_t PIN_TRIG   = 9;    // HC-SR04 TRIG
 const uint8_t PIN_ECHO   = 10;   // HC-SR04 ECHO
 const uint8_t PIN_LAMP   = 12;   // EMP dome's lamp (12 V part with its own resistor: a few mA at 5 V)
@@ -36,6 +38,14 @@ const unsigned long RUMBLE_HOLD_MS    = 1500;   // steady rumble lasts this long
 const unsigned long STANDBY_FRAME_MS  = 150;
 const uint8_t LCD_CELLS_PER_LOOP      = 4;      // redraw budget, so the display never stalls input
 const uint8_t SELF_TEST_RUMBLE        = 180;    // standby: holding EMP runs the motor at this level
+const uint8_t BUZZER_VOLUME           = 10;     // % of each cycle the buzzer is driven: 50 = full (as tone()), 0 = mute
+const uint8_t LIGHT_COUNT             = 50;     // 50 to test a whole uncut string; 16 once it is cut
+const uint8_t LIGHT_BRIGHTNESS        = 51;     // 20 % cap: keeps 16 lights inside the USB power budget
+const unsigned long LIGHT_STEP_MS     = 40;     // standby test: the dot moves one module per step
+const uint16_t LIGHT_BUDGET_MA        = 180;    // frames estimated above this are dimmed (USB power budget)
+const unsigned long EMP_CHARGE_MS     = 200;    // standby EMP demo: charge, blast, afterglow
+const unsigned long EMP_BLAST_MS      = 1000;
+const unsigned long EMP_SHOW_MS       = 2200;
 
 // ---- LCD glyphs (CGRAM slots 0-7). The game refers to them by slot; keep the order. ----
 const uint8_t GLYPHS[8][8] = {
@@ -70,6 +80,8 @@ Button menuButton = { PIN_MENU, true, false, false, 0 };
 Button armSwitch  = { PIN_ARM,  false, false, false, 0 };
 Button *const buttons[] = { &fireButton, &empButton, &menuButton, &armSwitch };
 
+Adafruit_NeoPixel lights(LIGHT_COUNT, PIN_LIGHTS, NEO_GRB + NEO_KHZ800);
+
 long distanceMm = -1;
 unsigned long lastSend = 0;
 unsigned long lastSonar = 0;
@@ -82,6 +94,8 @@ uint8_t commandLength = 0;
 uint8_t rumbleSteady = 0, rumblePulse = 0, rumbleShown = 0;
 unsigned long rumbleSteadyAt = 0, rumblePulseUntil = 0;
 uint8_t lampMode = 0;            // set by LA while the game runs; standby keeps the lamp lit
+unsigned long empShowAt = 0;     // standby EMP demo start; 0 = not running
+bool empBoomed = false;
 
 // LCD state. lcdWant is what should be on screen; lcdShown is what the LCD has.
 uint8_t lcdAddress = 0;          // 0 = no display found
@@ -103,9 +117,12 @@ void setup() {
   pinMode(PIN_BUZZER, OUTPUT);
   digitalWrite(PIN_TRIG, LOW);
   analogWrite(PIN_RUMBLE, 0);
+  lights.begin();
+  lights.setBrightness(LIGHT_BRIGHTNESS);
+  lights.show();                   // all off
   Serial.begin(115200);
   lcdBegin();
-  tone(PIN_BUZZER, 880, 60);  // power-on chirp
+  beep(880, 60);  // power-on chirp
 }
 
 void loop() {
@@ -118,6 +135,7 @@ void loop() {
   }
   if (now - lastSend >= SEND_INTERVAL_MS) {
     lastSend = now;
+    updateLights(now);
     sendPacket();
   }
   readCommands();
@@ -125,6 +143,7 @@ void loop() {
   if (!gameActive) selfTest();
   updateRumble(now);
   bool lampOn = !gameActive || lampMode == 1 || (lampMode == 2 && now % 500 < 250);
+  if (empShowAt) lampOn = now - empShowAt < EMP_CHARGE_MS && now % 40 < 20;  // flickers, then out until recharged
   digitalWrite(PIN_LAMP, lampOn ? HIGH : LOW);
   updateLcd(now);
 }
@@ -192,7 +211,7 @@ void handleCommand(char *line) {
   unsigned long now = millis();
   unsigned int a = 0, b = 0;
   if (sscanf(line, "BZ,%u,%u", &a, &b) == 2) {
-    if (a >= 31 && b > 0 && b <= 2000) tone(PIN_BUZZER, a, b);
+    if (a >= 31 && b > 0 && b <= 2000) beep(a, b);
   } else if (sscanf(line, "RM,%u,%u", &a, &b) == 2) {
     if (a > 255 || b > 2000) return;
     if (b == 0) {
@@ -213,21 +232,142 @@ void handleCommand(char *line) {
   lastCommand = now;
 }
 
-// Without the game: every button press clicks, MASTER ARM chirps up or down, holding EMP runs the motor, and
-// the EMP lamp stays lit (see loop).
+// Without the game: every button press clicks, MASTER ARM chirps up or down, EMP fires the light-show demo,
+// holding EMP runs the motor, and the EMP lamp stays lit (see loop).
 // The game's own rumble always wins, because selfTest only runs while the game is silent.
 void selfTest() {
   static bool was[4] = { false, false, false, false };
+  unsigned long now = millis();
   for (uint8_t i = 0; i < 4; i++) {
     bool on = buttons[i]->stable;
     if (on != was[i]) {
-      if (buttons[i] == &armSwitch) tone(PIN_BUZZER, on ? 1320 : 660, 80);
-      else if (on) tone(PIN_BUZZER, 1760, 15);
+      if (buttons[i] == &armSwitch) beep(on ? 1320 : 660, 80);
+      else if (on && buttons[i] == &empButton) {
+        empShowAt = now;
+        empBoomed = false;
+      } else if (on) beep(1760, 15);
       was[i] = on;
     }
   }
-  rumblePulse = empButton.stable ? SELF_TEST_RUMBLE : 0;
-  rumblePulseUntil = millis() + 50;
+  rumblePulse = max(empButton.stable ? SELF_TEST_RUMBLE : 0, empShowRumble(now));
+  rumblePulseUntil = now + 50;
+}
+
+// The EMP demo's rumble: builds during the charge, full during the blast, then fades.
+uint8_t empShowRumble(unsigned long now) {
+  if (!empShowAt) return 0;
+  unsigned long t = now - empShowAt;
+  if (t < EMP_CHARGE_MS) return t;
+  if (t < 700) return 255;
+  if (t < 1200) return 255 - (t - 700) / 2;
+  return 0;
+}
+
+// ---- Lights ----
+// Standby test: one dot runs from the input end to the far end in red, then green, then blue, so every module
+// shows each colour once a lap, and a dead module leaves everything after it dark. Pressing EMP plays the demo
+// show instead. While the game runs, the lights are off (no game command yet). Runs just before an AX packet:
+// show() blocks interrupts for ~30 us per module, so it should never overlap the game's commands.
+const uint16_t STEP_OFF = 0xFFFE, STEP_SHOW = 0xFFFD, STEP_NONE = 0xFFFF;
+
+void updateLights(unsigned long now) {
+  static uint16_t shownStep = STEP_NONE;
+  if (empShowAt && (gameActive || now - empShowAt >= EMP_SHOW_MS)) empShowAt = 0;
+  uint16_t step = empShowAt ? STEP_SHOW
+                : gameActive ? STEP_OFF
+                : (uint16_t)((now / LIGHT_STEP_MS) % (LIGHT_COUNT * 3U));
+  if (step == shownStep && step != STEP_SHOW) return;
+  shownStep = step;
+  lights.clear();
+  if (step == STEP_SHOW) {
+    drawEmpShow(now - empShowAt);
+  } else if (step != STEP_OFF) {
+    static const uint32_t COLOURS[3] = { 0xFF0000, 0x00FF00, 0x0000FF };
+    lights.setPixelColor(step % LIGHT_COUNT, COLOURS[step / LIGHT_COUNT]);
+  }
+  limitLightPower();
+  lights.show();
+}
+
+// One frame of the EMP demo, t ms after the press, with its sound.
+//   Charge: the first modules flicker brighter while the pitch rises.
+//   Blast: a white front races down the string with a fading blue wake; a low boom.
+//   Afterglow: blue-white sparks with crackles, fading out.
+void drawEmpShow(unsigned long t) {
+  if (t < EMP_CHARGE_MS) {
+    uint8_t v = t * 255 / EMP_CHARGE_MS;
+    for (uint8_t i = 0; i < 4 && i < LIGHT_COUNT; i++) {
+      if (random(3)) lights.setPixelColor(i, v / 2, v / 2, v);
+    }
+    beep(500 + t * 6, 25);
+  } else if (t < EMP_BLAST_MS) {
+    if (!empBoomed) {
+      beep(90, 350);
+      empBoomed = true;
+    }
+    int16_t front = (t - EMP_CHARGE_MS) * (LIGHT_COUNT + 12L) / (EMP_BLAST_MS - EMP_CHARGE_MS);
+    for (int16_t i = 0; i < LIGHT_COUNT && i <= front; i++) {
+      int16_t d = front - i;  // modules behind the front
+      if (d == 0) lights.setPixelColor(i, 255, 255, 255);
+      else if (d < 12) lights.setPixelColor(i, 0, d < 4 ? 200 - d * 50 : 0, 255 - d * 18);
+      else lights.setPixelColor(i, 20, 0, 40);  // faint violet trail
+    }
+  } else {
+    uint8_t fade = 255 - (t - EMP_BLAST_MS) * 255 / (EMP_SHOW_MS - EMP_BLAST_MS);
+    for (uint8_t i = 0; i < LIGHT_COUNT; i++) {
+      if (random(6) == 0) lights.setPixelColor(i, fade / 2, fade / 2, fade);
+    }
+    if (random(4) == 0) beep(2500 + random(2000), 3);
+  }
+}
+
+// Estimates the string's current (~18 mA per colour channel at full) and dims the frame if it is over
+// LIGHT_BUDGET_MA, so no pattern can overload USB power. The buffer already includes the brightness cap.
+void limitLightPower() {
+  uint8_t *p = lights.getPixels();
+  uint32_t sum = 0;
+  for (uint16_t i = 0; i < LIGHT_COUNT * 3U; i++) sum += p[i];
+  uint32_t ma = sum * 18 / 255;
+  if (ma <= LIGHT_BUDGET_MA) return;
+  for (uint16_t i = 0; i < LIGHT_COUNT * 3U; i++) p[i] = (uint32_t)p[i] * LIGHT_BUDGET_MA / ma;
+}
+
+// ---- Buzzer ----
+// Like tone(), but the buzzer is driven for only BUZZER_VOLUME % of each cycle, which makes it quieter at the
+// same pitch. Timer2 runs once per cycle: COMPA switches the buzzer on, COMPB switches it off. 62 Hz minimum.
+volatile uint32_t beepCycles = 0;
+
+void beep(unsigned int hz, unsigned int ms) {
+  if (BUZZER_VOLUME == 0) return;
+  hz = max(hz, 62u);
+  static const uint16_t PRESCALE[] = { 1, 8, 32, 64, 128, 256, 1024 };
+  uint32_t ticks = F_CPU / hz;
+  uint8_t sel = 0;
+  while (ticks / PRESCALE[sel] > 256) sel++;
+  uint8_t top = ticks / PRESCALE[sel] - 1;
+  uint8_t onTicks = max(1UL, (top + 1UL) * min(BUZZER_VOLUME, 50) / 100);
+  noInterrupts();
+  TCCR2A = _BV(WGM21);   // CTC: count to OCR2A, then restart
+  TCCR2B = sel + 1;      // CS22..CS20 = 1..7 selects the prescaler above
+  OCR2A = top;
+  OCR2B = onTicks;
+  TCNT2 = 0;
+  beepCycles = (uint32_t)hz * ms / 1000 + 1;
+  TIMSK2 = _BV(OCIE2A) | _BV(OCIE2B);
+  interrupts();
+}
+
+ISR(TIMER2_COMPA_vect) {
+  if (beepCycles == 0) {
+    TIMSK2 = 0;
+    return;
+  }
+  beepCycles--;
+  PORTB |= _BV(PORTB0);
+}
+
+ISR(TIMER2_COMPB_vect) {
+  PORTB &= ~_BV(PORTB0);
 }
 
 void updateRumble(unsigned long now) {

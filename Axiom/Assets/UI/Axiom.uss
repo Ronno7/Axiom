@@ -55,12 +55,13 @@
     align-items: flex-start;
 }
 
+/* The 3D title (MenuTitle camera -> MenuTitle.renderTexture, 4:1), set as the background by MainMenu. */
 .game-title {
-    font-size: 150px;
-    letter-spacing: 48px;
-    -unity-font-style: bold;
-    margin-bottom: 56px;
-    padding: 0;
+    width: 960px;
+    height: 240px;
+    margin-left: 10px;
+    margin-bottom: 24px;
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .screen .panel-title {
@@ -129,6 +130,25 @@
     --slant-fill: rgb(235, 235, 235);
     --slant-stroke: rgb(235, 235, 235);
     translate: 14px 0;
+}
+
+/* Red tick beside the focused item; red is reserved for focus and danger. MenuLook can switch it off. */
+.menu-button .focus-marker {
+    display: none;
+    position: absolute;
+    left: -22px;
+    top: 12px;
+    bottom: 12px;
+    width: 6px;
+    background-color: rgb(214, 31, 41);
+}
+
+.menu-button:focus .focus-marker {
+    display: flex;
+}
+
+.no-focus-marker .menu-button:focus .focus-marker {
+    display: none;
 }
 
 .screen .menu-button:active {
@@ -520,4 +540,114 @@
 
 .options-calibrate {
     margin-top: 16px;
+}
+
+/* ---------- Main menu decoration (MenuLook toggles and tunes these) ---------- */
+
+.scrim {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 62%;
+    background-image: url("Textures/ScrimGradient.png");
+}
+
+.frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.35;
+}
+
+.frame__corner {
+    position: absolute;
+    left: 40px;
+    top: 40px;
+    width: 36px;
+    height: 36px;
+    border-color: rgb(235, 235, 235);
+    border-left-width: 2px;
+    border-top-width: 2px;
+}
+
+.frame__corner--right {
+    left: auto;
+    right: 40px;
+    border-left-width: 0;
+    border-right-width: 2px;
+}
+
+.frame__corner--bottom {
+    top: auto;
+    bottom: 40px;
+    border-top-width: 0;
+    border-bottom-width: 2px;
+}
+
+/* The status line starts on the menu column's grid line (x = 160, the QUIT button's edge). */
+.menu-footer {
+    position: absolute;
+    left: 160px;
+    right: 96px;
+    bottom: 52px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-line,
+.key-hints {
+    flex-direction: row;
+    align-items: center;
+}
+
+.status-led {
+    width: 7px;
+    height: 7px;
+    margin-right: 12px;
+    background-color: rgb(235, 235, 235);
+}
+
+.status-led--offline {
+    background-color: rgb(214, 31, 41);
+}
+
+.micro {
+    font-size: 14px;
+    letter-spacing: 4px;
+    -unity-font-style: bold;
+    color: rgb(140, 140, 146);
+    margin: 0 14px 0 0;
+    padding: 0;
+}
+
+.micro--ink {
+    color: rgb(235, 235, 235);
+}
+
+.keycap {
+    border-width: 1px;
+    border-color: rgba(235, 235, 235, 0.5);
+    border-radius: 3px;
+    padding: 3px 4px 3px 8px;
+    margin-right: 10px;
+}
+
+.key-verb {
+    margin-right: 30px;
+}
+
+.roll-bar {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 6%;
+    translate: 0 -50%;
+    background-image: url("Textures/RollBar.png");
+    opacity: 0.08;
 }

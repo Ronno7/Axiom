@@ -11,6 +11,8 @@ namespace GeometricFlight.UI
     public sealed class MainMenu : MonoBehaviour
     {
         [SerializeField] private string firstLevelScene = "Prototype";
+        [Tooltip("The 3D title, rendered by the MenuTitle camera on the Title layer.")]
+        [SerializeField] private RenderTexture titleTexture;
 
         private static readonly string LcdTitle =
             LcdGlyph.Center($"{LcdGlyph.Target} A X I O M {LcdGlyph.Target}");
@@ -33,6 +35,8 @@ namespace GeometricFlight.UI
             calibration = new CalibrationPanel(root.Q("calibration-panel"), ShowOptions);
             playButton = root.Q<Button>("play-button");
             helpBack = root.Q<Button>("help-back");
+            if (titleTexture != null)
+                root.Q("game-title").style.backgroundImage = Background.FromRenderTexture(titleTexture);
 
             playButton.clicked += () => SceneManager.LoadScene(firstLevelScene);
             root.Q<Button>("options-button").clicked += ShowOptions;
