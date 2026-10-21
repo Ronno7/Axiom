@@ -1,207 +1,505 @@
-// Axiom UI showcase: small components driven by data attributes in index.html.
-// Edit the HTML to change content; this file only adds the behaviour.
-
-const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-const el = (tag, cls, html) => {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html != null) e.innerHTML = html;
-  return e;
-};
-
-// ---------- Compare slider ----------
-// <div class="compare" data-labels='["Before","After"]' data-sets='[["Name","a.jpg","b.jpg"], ...]'>
-for (const root of $$(".compare")) {
-  const sets = JSON.parse(root.dataset.sets);
-  const [labelA, labelB] = JSON.parse(root.dataset.labels || '["Before","After"]');
-  const frame = el("div", "frame");
-  const a = el("img", "a"), b = el("img", "b");
-  a.alt = labelA; b.alt = labelB;
-  const range = el("input");
-  Object.assign(range, { type: "range", min: 0, max: 100, value: 50 });
-  range.setAttribute("aria-label", `Slide between ${labelA} and ${labelB}`);
-  frame.append(a, b, el("div", "seam"), range);
-  const labels = el("div", "compare-labels");
-  labels.append(el("span", null, labelA), el("span", null, labelB));
-  const show = i => {
-    a.src = sets[i][1]; b.src = sets[i][2];
-    a.alt = `${sets[i][0]}: ${labelA}`; b.alt = `${sets[i][0]}: ${labelB}`;
+﻿/* Progressive enhancement: static screenshots remain ordinary image links. */
+(() => {
+  "use strict";
+  const all = (s, root = document) => [...root.querySelectorAll(s)];
+  const make = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text != null) node.textContent = text;
+    return node;
   };
-  range.addEventListener("input", () => frame.style.setProperty("--cut", range.value + "%"));
-  if (sets.length > 1) {
-    const tabs = el("div", "tabs");
-    tabs.setAttribute("role", "tablist");
-    sets.forEach((s, i) => {
-      const t = el("button", null, s[0]);
-      t.setAttribute("role", "tab");
-      t.setAttribute("aria-selected", i === 0);
-      t.addEventListener("click", () => {
-        $$("button", tabs).forEach(x => x.setAttribute("aria-selected", x === t));
-        show(i);
-      });
-      tabs.append(t);
+  const button = (text, cls, action) => {
+    const b = make("button", cls, text);
+    b.type = "button";
+    if (action) b.addEventListener("click", action);
+    return b;
+  };
+  const pressed = (buttons, active) =>
+    buttons.forEach((b) =>
+      b.setAttribute("aria-pressed", String(b === active)),
+    );
+  const image = (src, alt) => {
+    const img = make("img");
+    img.src = src;
+    img.alt = alt || "";
+    img.decoding = "async";
+    img.loading = "lazy";
+    return img;
+  };
+  function comparison(entry, expandable) {
+    const root = make("div", "compare");
+    const labels = make("div", "compare-labels");
+    labels.append(
+      make("span", null, entry.labels[0]),
+      make("span", null, entry.labels[1]),
+    );
+    const frame = make("div", "frame");
+    const a = image(entry.a, entry.title + ": " + entry.labels[0]);
+    const b = image(entry.b, entry.title + ": " + entry.labels[1]);
+    b.className = "b";
+    const seam = make("div", "seam");
+    seam.setAttribute("aria-hidden", "true");
+    const range = make("input");
+    Object.assign(range, {
+      type: "range",
+      min: 0,
+      max: 100,
+      value: entry.cut ?? 50,
     });
-    root.append(tabs);
+    range.setAttribute("aria-label", "Compare " + entry.labels.join(" and "));
+    const update = () => {
+      frame.style.setProperty("--cut", range.value + "%");
+      range.setAttribute(
+        "aria-valuetext",
+        range.value + "% " + entry.labels[0],
+      );
+      entry.cut = Number(range.value);
+      if (!expandable) entry.syncInline?.(entry.cut);
+    };
+    if (expandable) {
+      entry.syncInline = (cut) => {
+        range.value = cut;
+        update();
+      };
+    }
+    range.addEventListener("input", update);
+    update();
+    frame.append(a, b, seam, range);
+    if (expandable)
+      frame.append(
+        button("Expand ↗", "expand", (e) =>
+          openViewer([entry], 0, e.currentTarget),
+        ),
+      );
+    root.append(labels, frame);
+    return root;
   }
-  root.append(labels, frame);
-  show(0);
-}
 
-// ---------- Stepper ----------
-// <div class="stepper"><ol class="steps"><li data-img="x.jpg"><b>Title</b><span>Text</span></li>...</ol></div>
-for (const root of $$(".stepper")) {
-  const list = root.querySelector(".steps");
-  const frame = el("div", "frame");
-  root.prepend(frame);
-  const buttons = $$("li", list).map((li, i) => {
-    const img = el("img");
-    img.src = li.dataset.img;
-    img.alt = li.querySelector("b").textContent;
-    img.loading = i < 2 ? "eager" : "lazy";
-    frame.append(img);
-    const button = el("button");
-    button.append(...li.childNodes);
-    li.append(button);
-    button.addEventListener("click", () => select(i));
-    return { button, img };
+  // A single native modal provides focus containment, Escape and an inert background.
+  const dialog = make("dialog", "viewer");
+  dialog.setAttribute("aria-labelledby", "viewer-title");
+  const head = make("div", "viewer-head"),
+    title = make("h2", null, "Image");
+  title.id = "viewer-title";
+  const actions = make("div", "viewer-actions");
+  const previous = button("←", null, () => navigate(-1));
+  previous.setAttribute("aria-label", "Previous image");
+  const next = button("→", null, () => navigate(1));
+  next.setAttribute("aria-label", "Next image");
+  const zoom = button("Actual size", null, () => setZoom(!zoomed));
+  zoom.setAttribute("aria-pressed", "false");
+  const close = button("Close ×", null, () => dialog.close());
+  actions.append(previous, next, zoom, close);
+  head.append(title, actions);
+  const stage = make("div", "viewer-stage");
+  stage.tabIndex = 0;
+  stage.setAttribute(
+    "aria-label",
+    "Image viewer; scroll to pan at actual size",
+  );
+  const foot = make("div", "viewer-foot"),
+    caption = make("p"),
+    count = make("span", "viewer-count");
+  caption.setAttribute("aria-live", "polite");
+  foot.append(caption, count);
+  dialog.append(head, stage, foot);
+  document.body.append(dialog);
+  let entries = [],
+    current = 0,
+    opener = null,
+    zoomed = false,
+    drag = null,
+    moved = false;
+  function setZoom(value) {
+    zoomed = value;
+    stage.classList.toggle("zoomed", value);
+    zoom.textContent = value ? "Fit image" : "Actual size";
+    zoom.setAttribute("aria-pressed", String(value));
+    stage.scrollTop = stage.scrollLeft = 0;
+  }
+  function fitComparison() {
+    const comp = stage.querySelector(".compare");
+    if (!comp) return;
+    // Account for labels and padding so a 16:9 comparison also fits a short viewport.
+    const height = Math.max(100, stage.clientHeight - 76);
+    comp.style.maxWidth = Math.floor((height * 16) / 9) + "px";
+  }
+  function renderViewer() {
+    const entry = entries[current];
+    setZoom(false);
+    title.textContent = entry.title || entry.alt || "Axiom";
+    caption.textContent = entry.caption || "";
+    count.textContent = current + 1 + " / " + entries.length;
+    previous.disabled = current === 0;
+    next.disabled = current === entries.length - 1;
+    previous.hidden = next.hidden = entries.length < 2;
+    zoom.hidden = !!entry.a;
+    stage.replaceChildren(
+      entry.a
+        ? comparison(entry, false)
+        : image(entry.src, entry.alt || entry.title),
+    );
+    requestAnimationFrame(fitComparison);
+  }
+  function navigate(direction) {
+    const target = current + direction;
+    if (target < 0 || target >= entries.length) return;
+    current = target;
+    renderViewer();
+  }
+  function openViewer(items, index, trigger) {
+    if (typeof dialog.showModal !== "function") {
+      window.open(items[index].src || items[index].b, "_blank", "noopener");
+      return;
+    }
+    entries = items;
+    current = index;
+    opener = trigger;
+    renderViewer();
+    document.body.classList.add("viewer-open");
+    dialog.showModal();
+    close.focus();
+  }
+  dialog.addEventListener("close", () => {
+    document.body.classList.remove("viewer-open");
+    stage.replaceChildren();
+    if (opener?.isConnected) opener.focus();
   });
-  const select = i => buttons.forEach((b, j) => {
-    b.img.classList.toggle("on", i === j);
-    if (i === j) b.button.setAttribute("aria-current", "step"); else b.button.removeAttribute("aria-current");
+  dialog.addEventListener("keydown", (e) => {
+    if (e.target.matches('input[type="range"]')) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      navigate(e.key === "ArrowLeft" ? -1 : 1);
+    }
   });
-  list.addEventListener("keydown", e => {
-    const i = buttons.findIndex(b => b.button === document.activeElement);
-    if (i < 0) return;
-    const next = e.key === "ArrowDown" || e.key === "ArrowRight" ? i + 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? i - 1 : -1;
-    if (next < 0 || next >= buttons.length) return;
+  stage.addEventListener("click", (e) => {
+    if (e.target.tagName === "IMG" && !entries[current].a && !moved)
+      setZoom(!zoomed);
+    else if (e.target === stage && !zoomed) dialog.close();
+  });
+  stage.addEventListener("pointerdown", (e) => {
+    moved = false;
+    if (!zoomed || e.pointerType === "touch" || e.button !== 0) return;
+    drag = {
+      x: e.clientX,
+      y: e.clientY,
+      left: stage.scrollLeft,
+      top: stage.scrollTop,
+    };
+    stage.setPointerCapture(e.pointerId);
     e.preventDefault();
-    buttons[next].button.focus();
-    select(next);
   });
-  select(Number(root.dataset.start || 0));
-}
+  stage.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x,
+      dy = e.clientY - drag.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+    stage.scrollLeft = drag.left - dx;
+    stage.scrollTop = drag.top - dy;
+  });
+  const endDrag = () => {
+    drag = null;
+  };
+  stage.addEventListener("pointerup", endDrag);
+  stage.addEventListener("pointercancel", endDrag);
+  stage.addEventListener("dragstart", (e) => e.preventDefault());
+  window.addEventListener("resize", fitComparison);
 
-// ---------- Hotspots ----------
-// <div class="hotspots" data-img="x.jpg" data-ratio="16/9" data-kinds='{"kind":"Label"}'>
-//   <ul class="items"><li class="item" data-kind="kind" data-rect="x,y,w,h"><b>Name</b><span>Text</span></li></ul>
-// data-rect is in percent of the image (left, top, width, height); "edge" outlines the whole frame.
-// Items without data-rect are listed but have no box (parts you can't see in the picture).
-for (const root of $$(".hotspots")) {
-  const side = root.querySelector(".side");
-  const items = $$(".item", root);
-  const stage = el("div", "stage");
-  const frame = el("div", "frame");
-  if (root.dataset.ratio) frame.style.aspectRatio = root.dataset.ratio;
-  const img = el("img");
-  img.src = root.dataset.img;
-  img.alt = root.dataset.alt || "";
-  frame.append(img);
-  const hint = root.dataset.hint || "Hover, tap or tab through the list to see each part.";
-  const detail = el("p", "detail", hint);
-  detail.setAttribute("aria-live", "polite");
-  stage.append(frame, detail);
-  root.prepend(stage);
+  function wireImageLink(link, items, getIndex = () => 0) {
+    link.addEventListener("click", (e) => {
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      openViewer(items, getIndex(), link);
+    });
+  }
+  all("a[data-image]").forEach((link) => {
+    const img = link.querySelector("img");
+    wireImageLink(link, [
+      {
+        src: link.getAttribute("href"),
+        alt: img.alt,
+        title: link.dataset.title || img.alt,
+        caption:
+          link.closest("figure")?.querySelector("figcaption")?.textContent ||
+          "",
+      },
+    ]);
+  });
 
-  const pairs = items.map(item => {
-    item.tabIndex = 0;
-    let box = null;
-    if (item.dataset.rect) {
-      box = el("div", "box");
-      box.dataset.kind = item.dataset.kind;
-      if (item.dataset.rect === "edge") box.classList.add("edge");
-      else {
-        const [x, y, w, h] = item.dataset.rect.split(",").map(Number);
-        Object.assign(box.style, { left: x + "%", top: y + "%", width: w + "%", height: h + "%" });
+  // Screen and feedback galleries share real buttons, not incomplete ARIA tabs.
+  all(".gallery").forEach((root) => {
+    const controls = all(".controls button", root),
+      link = root.querySelector(".image-link"),
+      img = link.querySelector("img");
+    const captionNode = root.querySelector(".caption"),
+      counter = root.querySelector(".counter");
+    const items = controls.map((b) => ({
+      src: b.dataset.img,
+      title: b.textContent.trim(),
+      alt: b.dataset.alt || b.textContent.trim(),
+      caption: b.dataset.caption || "",
+    }));
+    let selected = 0;
+    function select(i) {
+      selected = i;
+      const item = items[i];
+      img.src = item.src;
+      img.alt = item.alt;
+      link.href = item.src;
+      link.setAttribute("aria-label", "Enlarge " + item.title);
+      pressed(controls, controls[i]);
+      if (captionNode) captionNode.textContent = item.caption;
+      if (counter)
+        counter.textContent =
+          String(i + 1).padStart(2, "0") +
+          " / " +
+          String(items.length).padStart(2, "0");
+      all("[data-feedback-channel]", root).forEach((node) => {
+        node.textContent =
+          controls[i].dataset[node.dataset.feedbackChannel] || "";
+      });
+    }
+    controls.forEach((b, i) => b.addEventListener("click", () => select(i)));
+    wireImageLink(link, items, () => selected);
+    select(0);
+  });
+
+  all(".compare[data-sets]").forEach((root) => {
+    const sets = JSON.parse(root.dataset.sets),
+      labels = JSON.parse(root.dataset.labels);
+    const items = sets.map((s) => ({
+      title: s[0],
+      a: s[1],
+      b: s[2],
+      labels,
+      caption: root.dataset.caption || "",
+    }));
+    const controls = make("div", "controls");
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", "Comparison scene");
+    const slot = make("div");
+    const buttons = items.map((entry, i) =>
+      button(entry.title, null, () => select(i)),
+    );
+    function select(i) {
+      pressed(buttons, buttons[i]);
+      slot.replaceChildren(comparison(items[i], true));
+    }
+    if (items.length > 1) {
+      controls.append(...buttons);
+      root.append(controls);
+    }
+    root.append(slot);
+    select(0);
+  });
+
+  all(".stepper").forEach((root) => {
+    const list = root.querySelector(".steps"),
+      rows = all("li", list);
+    const items = rows.map((li) => ({
+      src: li.dataset.img,
+      title: li.querySelector("b").textContent.trim(),
+      caption: li.querySelector("span").textContent,
+    }));
+    const link = make("a", "frame image-link"),
+      img = image(items[0].src, items[0].title);
+    img.loading = "lazy";
+    link.append(img);
+    const description = make("p", "step-description");
+    description.setAttribute("aria-live", "polite");
+    root.prepend(link);
+    root.append(description);
+    let selected = 0;
+    const buttons = rows.map((li, i) => {
+      const b = button(items[i].title, null, () => select(i));
+      li.replaceChildren(b);
+      return b;
+    });
+    function select(i) {
+      selected = i;
+      const item = items[i];
+      img.src = item.src;
+      img.alt = item.title;
+      link.href = item.src;
+      link.setAttribute("aria-label", "Enlarge " + item.title);
+      description.textContent = item.caption;
+      buttons.forEach((b, j) => {
+        if (i === j) b.setAttribute("aria-current", "step");
+        else b.removeAttribute("aria-current");
+      });
+    }
+    list.addEventListener("keydown", (e) => {
+      const i = buttons.indexOf(document.activeElement);
+      if (i < 0) return;
+      let n =
+        e.key === "ArrowRight" || e.key === "ArrowDown"
+          ? i + 1
+          : e.key === "ArrowLeft" || e.key === "ArrowUp"
+            ? i - 1
+            : e.key === "Home"
+              ? 0
+              : e.key === "End"
+                ? buttons.length - 1
+                : -1;
+      if (n < 0 || n >= buttons.length) return;
+      e.preventDefault();
+      buttons[n].focus();
+      select(n);
+    });
+    wireImageLink(link, items, () => selected);
+    select(Number(root.dataset.start || items.length - 1));
+  });
+
+  all(".hotspots").forEach((root) => {
+    const kinds = JSON.parse(root.dataset.kinds),
+      rows = all(".item", root);
+    const stageNode = make("div", "stage"),
+      frame = make("div", "frame"),
+      img = image(root.dataset.img, root.dataset.alt);
+    img.loading = "lazy";
+    frame.style.aspectRatio = root.dataset.ratio || "16/9";
+    frame.append(img);
+    const detail = make(
+      "p",
+      "detail",
+      "Choose a category, then select a marker or label.",
+    );
+    detail.setAttribute("aria-live", "polite");
+    stageNode.append(frame);
+    root.prepend(stageNode);
+    root.append(detail);
+    const overview = button("Overview", "chip", () => filter(null));
+    const chips = make("div", "chip-row");
+    chips.setAttribute("role", "group");
+    chips.setAttribute("aria-label", "Annotation categories");
+    const filters = [
+      [null, overview],
+      ...Object.entries(kinds).map(([kind, label]) => [
+        kind,
+        button(label, "chip", () => filter(kind)),
+      ]),
+    ];
+    chips.append(...filters.map((f) => f[1]));
+    root.prepend(chips);
+    let kind = null;
+    const pairs = rows.map((row, i) => {
+      const name = row.querySelector("b").textContent.trim(),
+        description = row.querySelector("span").textContent;
+      const b = button(null, null, () => select(i));
+      const number = make(
+        "span",
+        "item-number",
+        String(i + 1).padStart(2, "0"),
+      );
+      b.append(number, document.createTextNode(name));
+      b.setAttribute("aria-pressed", "false");
+      row.replaceChildren(b);
+      let box = null,
+        pin = null;
+      if (row.dataset.rect) {
+        box = make("div", "hotspot-box");
+        box.dataset.kind = row.dataset.kind;
+        box.hidden = true;
+        if (row.dataset.rect === "edge") box.classList.add("edge");
+        else {
+          const [x, y, w, h] = row.dataset.rect.split(",").map(Number);
+          Object.assign(box.style, {
+            left: x + "%",
+            top: y + "%",
+            width: w + "%",
+            height: h + "%",
+          });
+        }
+        pin = button(String(i + 1), "pin", () => select(i));
+        pin.setAttribute("aria-label", name);
+        pin.setAttribute("aria-pressed", "false");
+        box.append(pin);
+        frame.append(box);
       }
-      frame.append(box);
+      return { row, b, box, pin, name, description };
+    });
+    function select(i) {
+      pairs.forEach((p, j) => {
+        p.b.setAttribute("aria-pressed", String(i === j));
+        if (p.box) {
+          p.box.hidden = i !== j && (!kind || p.row.dataset.kind !== kind);
+          p.box.classList.toggle("selected", i === j);
+          p.pin.setAttribute("aria-pressed", String(i === j));
+        }
+      });
+      detail.replaceChildren(
+        make("b", null, pairs[i].name),
+        document.createTextNode(pairs[i].description),
+      );
     }
-    return { item, box };
+    function filter(value) {
+      kind = value;
+      filters.forEach(([k, b]) =>
+        b.setAttribute("aria-pressed", String(k === kind)),
+      );
+      pairs.forEach((p) => {
+        p.row.hidden = !!kind && p.row.dataset.kind !== kind;
+        p.b.setAttribute("aria-pressed", "false");
+        if (p.box) {
+          p.box.hidden = !kind || p.row.hidden;
+          p.box.classList.remove("selected");
+          p.pin.setAttribute("aria-pressed", "false");
+        }
+      });
+      detail.textContent = kind
+        ? "Select a marker or label to explore " +
+          kinds[kind].toLowerCase() +
+          "."
+        : "Choose a category, then select a marker or label.";
+    }
+    frame.append(
+      button("Expand ↗", "expand", (e) =>
+        openViewer(
+          [
+            {
+              src: root.dataset.img,
+              title: root.dataset.title || "Interface details",
+              alt: img.alt,
+              caption: detail.textContent,
+            },
+          ],
+          0,
+          e.currentTarget,
+        ),
+      ),
+    );
+    img.style.cursor = "zoom-in";
+    img.addEventListener("click", () => frame.querySelector(".expand").click());
+    filter(null);
   });
 
-  // The selected item stays selected until another is picked, so its caption can be read.
-  let filter = null;
-  const highlight = hot => {
-    pairs.forEach(p => {
-      const visible = !filter || p.item.dataset.kind === filter;
-      p.item.hidden = !visible;
-      p.item.classList.toggle("hot", p === hot);
-      if (!p.box) return;
-      p.box.style.display = visible ? "" : "none";
-      p.box.classList.toggle("hot", p === hot);
-      p.box.classList.toggle("dim", !!hot && p !== hot);
-    });
-    root.classList.toggle("filtered", !!filter);
-    if (hot) {
-      detail.replaceChildren(el("b", null, hot.item.querySelector("b").textContent),
-        document.createTextNode(hot.item.querySelector("span")?.textContent || ""));
-    } else detail.textContent = hint;
-  };
-  for (const p of pairs) {
-    p.item.addEventListener("mouseenter", () => highlight(p));
-    p.item.addEventListener("focus", () => highlight(p));
-    p.item.addEventListener("click", () => highlight(p));
-  }
-
-  // Filters: either a 2x2 quadrant (.quadrant with chips) or a simple chip row built from data-kinds.
-  let chips = $$(".quadrant .chip", root);
-  if (!chips.length && root.dataset.kinds) {
-    const row = el("div", "chip-row");
-    for (const [kind, label] of Object.entries(JSON.parse(root.dataset.kinds))) {
-      const chip = el("button", "chip", label);
-      chip.dataset.kind = kind;
-      row.append(chip);
+  all(".lcd-demo").forEach((root) => {
+    const lcd = make("div", "lcd");
+    lcd.setAttribute("role", "img");
+    const rows = [make("div", "row"), make("div", "row")];
+    rows.forEach((r) => r.setAttribute("aria-hidden", "true"));
+    lcd.append(...rows);
+    root.prepend(lcd);
+    const status = make("span", "sr-only");
+    status.setAttribute("aria-live", "polite");
+    root.append(status);
+    const buttons = all("button", root);
+    function show(b) {
+      pressed(buttons, b);
+      const texts = [b.dataset.top, b.dataset.bottom];
+      rows.forEach((row, i) =>
+        row.replaceChildren(
+          ...Array.from(texts[i].padEnd(16))
+            .slice(0, 16)
+            .map((c) => make("span", "cell", c === " " ? "\u00a0" : c)),
+        ),
+      );
+      const description =
+        b.textContent + ": " + texts.map((t) => t.trim()).join(". ");
+      lcd.setAttribute("aria-label", description);
+      status.textContent = description;
     }
-    side.prepend(row);
-    chips = $$(".chip", row);
-  }
-  for (const chip of chips) {
-    chip.setAttribute("aria-pressed", "false");
-    chip.addEventListener("click", () => {
-      filter = filter === chip.dataset.kind ? null : chip.dataset.kind;
-      chips.forEach(c => c.setAttribute("aria-pressed", c.dataset.kind === filter));
-      highlight(null);
-    });
-  }
-}
-
-// ---------- Cockpit LCD ----------
-// <div class="lcd-demo"><div class="tabs"><button data-top="..." data-bottom="...">State</button>...</div></div>
-for (const root of $$(".lcd-demo")) {
-  const lcd = el("div", "lcd");
-  lcd.setAttribute("aria-live", "polite");
-  const rows = [el("div", "row"), el("div", "row")];
-  lcd.append(...rows);
-  root.prepend(lcd);
-  const write = (row, text) => {
-    const chars = Array.from(text.padEnd(16).slice(0, 16));
-    row.replaceChildren(...chars.map(c => el("span", "cell", c === " " ? "&nbsp;" : c)));
-    row.setAttribute("aria-label", text.trim());
-  };
-  const buttons = $$("button", root);
-  const show = b => {
-    buttons.forEach(x => x.setAttribute("aria-selected", x === b));
-    write(rows[0], b.dataset.top);
-    write(rows[1], b.dataset.bottom);
-  };
-  buttons.forEach(b => b.addEventListener("click", () => show(b)));
-  show(buttons[0]);
-}
-
-// ---------- Glitch timeline chart ----------
-// <svg class="glitch" data-frames='[[tear, echo, scanlines], ...]'>
-for (const svg of $$("svg.glitch")) {
-  const frames = JSON.parse(svg.dataset.frames);
-  const W = 720, H = 160, pad = 24, slot = (W - pad) / frames.length, bar = slot / 4;
-  const colours = ["#e9e9ea", "#d61f29", "#6b6f77"];
-  let out = `<line x1="${pad}" y1="${H - 20}" x2="${W}" y2="${H - 20}" stroke="#23252b"/>`;
-  frames.forEach((f, i) => {
-    const x = pad + i * slot + slot * 0.15;
-    f.forEach((v, k) => {
-      const h = v * (H - 36);
-      out += `<rect x="${x + k * bar}" y="${H - 20 - h}" width="${bar - 1}" height="${h}" fill="${colours[k]}"/>`;
-    });
-    if (i % 3 === 0) out += `<text x="${x}" y="${H - 4}" fill="#5f636b" font-size="11" font-family="IBM Plex Mono, monospace">${i}</text>`;
+    buttons.forEach((b) => b.addEventListener("click", () => show(b)));
+    show(buttons[1] || buttons[0]);
   });
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  svg.innerHTML = out;
-}
+})();

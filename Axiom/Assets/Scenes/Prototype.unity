@@ -7754,7 +7754,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 406706541}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -14356,6 +14356,8 @@ MonoBehaviour:
     dustSize: {x: 0.02, y: 0.06}
     dustBrightness: 0.55
     dustDrift: 0
+  interfaceDocuments:
+  - {fileID: 553250159}
   arcade: {fileID: 11400000, guid: 22c6e87e0f3a90d40ab6a07610b11d05, type: 2}
   previewArcade: 0
 --- !u!114 &1777250321

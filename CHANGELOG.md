@@ -1,35 +1,21 @@
 # Changelog
 
-All notable changes to Axiom. The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
-follow the development stages on the [roadmap](README.md#roadmap): **0.1.x prototype**, 0.2 vertical slice,
-0.5 alpha, 0.9 beta, 1.0 release. Within a stage, each drop is a patch version. Versions before 0.1.9 were
-numbered from the project history.
-
 ## [Unreleased]
 
 ### Added
-- Arcade mode (Options): a vintage arcade-monitor look for the menu and levels, with phosphor glow, CRT
-  curvature and scanlines, red colour fringing, rounded tube corners, flicker, static and a rolling band.
-- Arcade mode colour settings: exposure, contrast, saturation, colour filter, hue shift and white balance.
-- UI showcase page (`docs/`, published with GitHub Pages and linked from the README): UI types, screen flow,
-  render layers, Arcade mode, feedback channels and the cockpit, with interactive screenshots.
-- The level now has the main menu's look: colour grade, haze, horizon glow, stars, dust that streams past in
-  flight, and distant constructs beside the course.
+- Arcade mode (Options): a vintage arcade-monitor look with phosphor glow, CRT curvature and scanlines, red
+  fringing, flicker and static, plus colour settings. The HUD and menus sit on the same screen and stay clickable.
+- The level now has the main menu's look: grade, haze, horizon glow, stars, dust and distant constructs.
+- UI showcase page (`docs/`, linked from the README).
 
 ### Changed
-- The main-menu floor now fades into the background with no visible edge or horizon line.
-- The level floor runs on into the haze, so it meets the sky without an edge.
+- The menu and level floors fade into the sky without an edge.
 
 ### Fixed
-- Fog on large flat surfaces was uneven, leaving the far end of the floor brighter than the sky.
-- A destroyed turret could still fire one last shot while it shattered.
-- The results screen and the controller LCD could show different numbers when a shot landed after the run
-  ended. The first ending is now final, and late hits no longer count.
-- The horizon glow painted over nearby scenery (screen-space ambient occlusion, which had no visible effect,
-  is now off).
-- Controller firmware (kit and cockpit): the LCD could briefly drop to its standby screen mid-game, and the
-  cockpit could run its standby self-test (clicks, lamp) for a moment. Reflash both sketches to get the fix.
-- Editor-only preview switches (Preview Arcade, Hold Peak) can no longer affect a build.
+- A destroyed turret could fire one last shot.
+- The results screen and controller LCD could disagree when a shot landed after the run ended.
+- The horizon glow painted over nearby scenery, and fog on large surfaces was uneven.
+- Controller firmware: the LCD could drop to its standby screen mid-game (reflash both sketches).
 
 ## [0.1.9] - 2026-10-20 — Main menu presentation
 
@@ -107,3 +93,9 @@ numbered from the project history.
 
 ### Added
 - Prototype scene: geometric ship, corridor and camera.
+
+
+All notable changes to Axiom. The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
+follow the development stages on the [roadmap](README.md#roadmap): **0.1.x prototype**, 0.2 vertical slice,
+0.5 alpha, 0.9 beta, 1.0 release. Within a stage, each drop is a patch version. Versions before 0.1.9 were
+numbered from the project history.

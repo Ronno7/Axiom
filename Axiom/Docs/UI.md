@@ -1,6 +1,8 @@
 # UI
 
 For a visual tour, see the [UI showcase](https://ronno7.github.io/Axiom/) (source in `docs/`).
+Images can be enlarged; Standard / Arcade comparisons and layer views are interactive. See
+[`docs/README.md`](../../docs/README.md) for editing and capture guidance.
 
 **Approach:** UI Toolkit (UXML + USS) for menus and the HUD; uGUI world-space canvases are
 reserved for later spatial markers (target brackets). Each scene has one `UIDocument` using
@@ -83,11 +85,19 @@ look. Its settings live in one asset, `Settings/ArcadeLook` (`ArcadeProfile`), u
 `LevelLook` in each level. Each part can be switched off: phosphor glow (replaces the normal bloom), colour
 fringing in the accent red only, CRT (curvature, scanlines, monochrome grille, tube edge), colour (exposure and
 contrast added to the scene's grade, saturation, colour filter, hue shift, white balance), a lighter vignette, and
-vintage extras (rounded tube corners, flicker, static, a rolling band, coarser grain). The scene is mostly black
-and white, so saturation mainly sets how hard the accent red burns; hue shift moves the red too.
+vintage extras (rounded tube corners, flicker, static, a rolling band, coarser grain), and the interface on the
+tube (below). The scene is mostly black and white, so saturation mainly sets how hard the accent red burns; hue
+shift moves the red too.
+
+**Interface on the tube** (`ArcadeProfile` Interface group). In Play Mode with Arcade Mode on, `ArcadeInterface`
+renders the scene's UI documents into a screen-sized texture; the Screen Effects feature lays it into the picture
+after post-processing (with its own glow) and before the CRT pass. Bloom and grade are skipped on purpose (they
+washed out text and shifted the guidance blue). Pointer input follows the curvature
+(`ArcadeInterface.ScreenToTexture`) and keyboard focus survives toggling.
 
 The glitch, fringing, CRT and vintage extras run in `ScreenEffectsFeature` (on `PC_Renderer`, shader
-`Screen Effects`), only for the registered camera and only while one is non-zero; the UI draws afterwards and is never processed. The title's
+`Screen Effects`), only for the registered camera and only while one is non-zero. Outside Arcade Mode's interface
+option, the UI draws afterwards and is never processed. The title's
 glitch is a separate blit of its render texture (`Menu Title Glitch`). The scrim, frame, footer and roll bar
 are elements in `MainMenu.uxml`/`Axiom.uss` (gradients in `UI/Textures`); red stays reserved for focus and
 problems. Depth of field and URP's chromatic aberration are deliberately not used: the first blurs the thin

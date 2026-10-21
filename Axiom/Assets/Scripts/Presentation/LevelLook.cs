@@ -2,6 +2,7 @@ using GeometricFlight.Core;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
+using UnityEngine.UIElements;
 
 namespace GeometricFlight.Presentation
 {
@@ -23,6 +24,9 @@ namespace GeometricFlight.Presentation
         [SerializeField] private GradeSettings grade = new GradeSettings();
         [SerializeField] private AtmosphereSettings atmosphere = new AtmosphereSettings { dustDrift = 0f };
 
+        [Tooltip("The level's interface (HUD and menus), drawn into the picture while Arcade Mode is on.")]
+        [SerializeField] private UIDocument[] interfaceDocuments;
+
         [Header("Arcade mode (player toggle in Options)")]
         [Tooltip("Shared with the main menu, so the look is tuned in one place.")]
         [SerializeField, FormerlySerializedAs("look")] private ArcadeProfile arcade;
@@ -30,6 +34,7 @@ namespace GeometricFlight.Presentation
         [SerializeField, FormerlySerializedAs("preview")] private bool previewArcade;
 
         private LookVolume look;
+        private readonly ArcadeInterface screenInterface = new ArcadeInterface();
         private readonly LookAtmosphere air = new LookAtmosphere();
         private bool atmosphereDirty = true;
 
@@ -49,6 +54,7 @@ namespace GeometricFlight.Presentation
             look?.Dispose();
             look = null;
             air.Dispose();
+            screenInterface.Release();
         }
 
         private void OnValidate()
@@ -76,6 +82,7 @@ namespace GeometricFlight.Presentation
             ArcadeProfile a = ArcadeOn ? arcade : null;
             look.Apply(grade, a, levelCamera);
             LookAtmosphere.ApplyHaze(atmosphere, levelCamera);
+            screenInterface.Apply(a, levelCamera, interfaceDocuments);
             if (levelCamera == null) return;
             if (a != null)
                 ScreenEffects.Set(levelCamera, Vector4.zero, new Vector4(0f, 0f, a.FringeOffset, a.FringeStrength),

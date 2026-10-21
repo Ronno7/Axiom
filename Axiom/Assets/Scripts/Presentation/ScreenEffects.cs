@@ -15,10 +15,30 @@ namespace GeometricFlight.Presentation
         private static readonly int ArcadeId = Shader.PropertyToID("_ScreenArcade");
         private static readonly int AccentId = Shader.PropertyToID("_ScreenAccent");
 
+        private static readonly int InterfaceId = Shader.PropertyToID("_ScreenInterface");
+        private static readonly int InterfaceLookId = Shader.PropertyToID("_ScreenInterfaceLook");
+
         public static Camera Camera { get; private set; }
         public static bool Active { get; private set; }
 
+        /// <summary>The camera whose picture the interface is drawn into (Arcade Mode), or null.</summary>
+        public static Camera InterfaceCamera { get; private set; }
+
         public static bool ShouldRender(Camera camera) => Active && camera != null && camera == Camera;
+
+        public static bool ShouldComposite(Camera camera) => camera != null && camera == InterfaceCamera;
+
+        /// <summary>Draws the interface (rendered into <paramref name="ui"/>) into this camera's picture just before
+        /// the screen effects, with a soft phosphor glow, so the CRT pass bends, scans and fringes it too.</summary>
+        /// <param name="glow">Glow strength (0 = none) and radius in pixels at 1080p.</param>
+        public static void SetInterface(Camera camera, RenderTexture ui, float brightness, Vector2 glow)
+        {
+            InterfaceCamera = ui != null ? camera : null;
+            Shader.SetGlobalTexture(InterfaceId, ui != null ? ui : Texture2D.blackTexture);
+            Shader.SetGlobalVector(InterfaceLookId, new Vector4(brightness, glow.x, glow.y, 0f));
+        }
+
+        public static void ClearInterface() => SetInterface(null, null, 1f, Vector2.zero);
 
         /// <param name="glitch">x tear amount, y seed, z blocks, w event scanlines</param>
         /// <param name="echo">x glitch echo (px), y glitch echo amount, z fringe (px at the edge), w fringe amount</param>
@@ -37,6 +57,8 @@ namespace GeometricFlight.Presentation
             Shader.SetGlobalFloat(CrtEdgeId, crtEdge);
             Shader.SetGlobalVector(ArcadeId, arcade);
             Shader.SetGlobalColor(AccentId, accent);
+            // The effects read the interface's coverage; with none routed it must be clear, not an unset (white) default.
+            if (InterfaceCamera == null) Shader.SetGlobalTexture(InterfaceId, Texture2D.blackTexture);
         }
 
         public static void Clear()

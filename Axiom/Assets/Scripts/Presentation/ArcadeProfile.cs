@@ -52,6 +52,18 @@ namespace GeometricFlight.Presentation
         [Tooltip("White balance: negative is greener, positive more magenta.")]
         [Range(-100f, 100f)] public float tint;
 
+        [Header("Interface")]
+        [Tooltip("The HUD and menus are drawn on the same tube as the game: they bend, scan, fringe, flicker and take " +
+                 "the static with it, with their own phosphor glow. The game's bloom and colour grade stay off them, so " +
+                 "text and colour cues stay readable. Off keeps the interface crisp on top of the effects.")]
+        public bool interfaceOnScreen = true;
+        [Tooltip("Multiplies the interface. 1 = as drawn.")]
+        [Range(0.5f, 2f)] public float interfaceBrightness = 1.1f;
+        [Tooltip("Soft glow around lit strokes, like phosphor bleeding. 0 = none.")]
+        [Range(0f, 1.5f)] public float interfaceGlow = 0.45f;
+        [Tooltip("Glow reach in pixels at 1080p.")]
+        [Range(1f, 8f)] public float interfaceGlowRadius = 2.5f;
+
         [Header("Vignette")]
         [Tooltip("Replaces the normal vignette while Arcade Mode is on.")]
         public bool vignette = true;

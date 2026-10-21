@@ -73,6 +73,27 @@ namespace GeometricFlight.Tests
         }
 
         [Test]
+        public void ArcadePointerFollowsTheCrtCurvature()
+        {
+            var screen = new Vector2(1920f, 1080f);
+            var texture = new Vector2(1920f, 1080f);
+            // Flat tube: the pointer lands where it is; the centre never moves.
+            AssertNear(ArcadeInterface.ScreenToTexture(new Vector2(300f, 200f), screen, texture, 0f), new Vector2(300f, 200f));
+            AssertNear(ArcadeInterface.ScreenToTexture(screen * 0.5f, screen, texture, 0.2f), screen * 0.5f);
+            // Curved tube: off-centre points read further out, as the shader samples them.
+            Vector2 bent = ArcadeInterface.ScreenToTexture(new Vector2(1600f, 900f), screen, texture, 0.035f);
+            Assert.That(bent.x, Is.GreaterThan(1600f));
+            Assert.That(bent.y, Is.GreaterThan(900f));
+            // The black outside the tube is no hit.
+            Assert.That(float.IsNaN(ArcadeInterface.ScreenToTexture(new Vector2(1919f, 1079f), screen, texture, 0.3f).x));
+            // A smaller texture scales the position.
+            AssertNear(ArcadeInterface.ScreenToTexture(new Vector2(960f, 0f), screen, screen * 0.5f, 0f), new Vector2(480f, 0f));
+        }
+
+        private static void AssertNear(Vector2 actual, Vector2 expected) =>
+            Assert.That(Vector2.Distance(actual, expected), Is.LessThan(0.01f), $"{actual} vs {expected}");
+
+        [Test]
         public void DustWrapsIntoItsRangeWhereverTheCameraIs()
         {
             var depth = new Vector2(3f, 40f);

@@ -26,21 +26,25 @@ MonoBehaviour:
   grille: 0.06
   tubeEdge: 0.015
   colour: 1
-  exposure: 0
-  contrast: 10
-  saturation: 15
+  exposure: 0.24
+  contrast: 7.5
+  saturation: -20
   colourFilter: {r: 1, g: 1, b: 1, a: 1}
   hueShift: 0
-  temperature: 0
+  temperature: -15
   tint: 0
+  interfaceOnScreen: 1
+  interfaceBrightness: 1.25
+  interfaceGlow: 0.45
+  interfaceGlowRadius: 2.5
   vignette: 0
   vignetteIntensity: 0.18
   vignetteSmoothness: 0.5
   extras: 1
   cornerRadius: 0.157
   flicker: 0.015
-  staticNoise: 0.02
+  staticNoise: 0.025
   rollingBand: 0.05
   grain: 1
-  grainType: 9
+  grainType: 8
   grainIntensity: 0.7

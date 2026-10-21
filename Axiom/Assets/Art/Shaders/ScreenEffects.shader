@@ -2,7 +2,10 @@
 // Glitch (tears, blocks, red echo, event scanlines), palette fringing (a radial echo in the accent red, so the
 // palette stays black, white and red), a CRT pass (curvature, scanlines, monochrome grille, tube edge) and
 // arcade extras (rounded tube corners, flicker, static, rolling band). Every value is a global set each frame by
-// MenuLook or ArcadeScreen; zero means off, so nothing is stored in a material.
+// MenuLook or LevelLook; zero means off, so nothing is stored in a material.
+// Pass 1 (Interface) runs in Arcade Mode just before pass 0: it lays the interface, rendered into its own texture
+// with premultiplied alpha, over the post-processed picture with a soft phosphor glow, so pass 0 bends, scans and
+// fringes it with the game. It skips URP's bloom and grade, which washed out text and shifted colour cues.
 Shader "Hidden/GeometricFlight/Screen Effects"
 {
     SubShader
@@ -24,6 +27,7 @@ Shader "Hidden/GeometricFlight/Screen Effects"
             float _ScreenCrtEdge;   // tube edge width (0..0.1 of the screen)
             float4 _ScreenArcade;   // x rounded corner radius, y flicker, z static noise, w rolling band
             half4 _ScreenAccent;
+            TEXTURE2D(_ScreenInterface); // Arcade Mode's interface (alpha = where it's opaque); clear otherwise
 
             // Sine-free hash (Hoskins): the sine hash rounds some cells to exactly 0 on GPUs, which made them
             // pass "hash <= 0" and stay displaced with the glitch off.
@@ -65,11 +69,16 @@ Shader "Hidden/GeometricFlight/Screen Effects"
                     col = max(col, _ScreenAccent.rgb * Peak(Sample(uv - float2(_ScreenEcho.x * texel.x, 0.0))) * _ScreenEcho.y);
 
                 // Palette fringing: a radial echo that grows toward the edges, like lens fringing, in the accent only.
+                // Only where the offset copy is brighter than the pixel itself (outside edges), so the inside of a
+                // coloured shape keeps its colour: blue guidance stays blue instead of turning magenta.
                 if (_ScreenEcho.w > 0.0)
                 {
                     float2 dir = c * 2.0;
                     half3 f = Sample(uv - dir * _ScreenEcho.z * texel);
-                    col = max(col, _ScreenAccent.rgb * Peak(f) * _ScreenEcho.w * saturate(length(dir)));
+                    // Much weaker on opaque interface, so dark text on a lit button stays readable.
+                    half inside = SAMPLE_TEXTURE2D(_ScreenInterface, sampler_LinearClamp, uv).a;
+                    col = max(col, _ScreenAccent.rgb * saturate(Peak(f) - Peak(col)) * _ScreenEcho.w * saturate(length(dir))
+                        * (1.0h - 0.8h * inside));
                 }
 
                 float2 px = tube * size;
@@ -106,6 +115,48 @@ Shader "Hidden/GeometricFlight/Screen Effects"
                 if (_ScreenArcade.z > 0.0)
                     col += (Hash(floor(px) + frac(t * 7.31) * 917.0) - 0.5) * _ScreenArcade.z;
                 return half4(col, 1.0);
+            }
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "Interface"
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Frag
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+
+            TEXTURE2D(_ScreenInterface);
+            float4 _ScreenInterfaceLook;   // x brightness, y glow strength, z glow radius (px at 1080p)
+
+            half3 Ui(float2 uv) { return SAMPLE_TEXTURE2D(_ScreenInterface, sampler_LinearClamp, uv).rgb; }
+
+            half4 Frag(Varyings input) : SV_Target
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+                float2 uv = input.texcoord;
+                half4 scene = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, uv);
+                half4 ui = SAMPLE_TEXTURE2D(_ScreenInterface, sampler_LinearClamp, uv);
+                half3 col = scene.rgb * (1.0h - ui.a) + ui.rgb * _ScreenInterfaceLook.x;
+
+                // Phosphor glow: two rings of eight taps around the pixel, so lit strokes bleed softly outward. Only
+                // where the interface is see-through, so text inside a filled button stays crisp.
+                if (_ScreenInterfaceLook.y > 0.0)
+                {
+                    float2 texel = float2(abs(ddx(uv.x)), abs(ddy(uv.y)));
+                    float r = _ScreenInterfaceLook.z * (1.0 / max(texel.y, 1e-6)) / 1080.0;
+                    half3 glow = 0;
+                    [unroll] for (int i = 0; i < 8; i++)
+                    {
+                        float a = i * (TWO_PI / 8.0);
+                        float2 d = float2(cos(a), sin(a)) * texel * r;
+                        glow += Ui(uv + d) + Ui(uv + d * 2.0);
+                    }
+                    col += glow / 16.0 * _ScreenInterfaceLook.y * _ScreenInterfaceLook.x * (1.0h - ui.a);
+                }
+                return half4(col, scene.a);
             }
             ENDHLSL
         }

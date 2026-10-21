@@ -900,7 +900,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 5475d9f43ab76fe478091e39981708d1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1696,7 +1696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9519abdb01045514793322960c9c1bdb, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2207,6 +2207,7 @@ MonoBehaviour:
   atmosphere:
     enabled: 1
     haze: {r: 0.035, g: 0.036, b: 0.04, a: 1}
+    fogRange: {x: 35, y: 135}
     horizon: 1
     horizonColor: {r: 0.3, g: 0.31, b: 0.34, a: 1}
     horizonDistance: 145

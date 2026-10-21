@@ -95,6 +95,8 @@ namespace GeometricFlight.Presentation
         // ---------------- State ----------------
 
         private LookVolume look;
+        private readonly ArcadeInterface screenInterface = new ArcadeInterface();
+        private UIDocument[] interfaceDocuments;
         private readonly LookAtmosphere air = new LookAtmosphere();
         private bool atmosphereDirty = true;
 
@@ -133,6 +135,7 @@ namespace GeometricFlight.Presentation
             look?.Dispose();
             look = null;
             air.Dispose();
+            screenInterface.Release();
             Generated.Release(titleMaterial);
             if (titleGlitchTexture != null) titleGlitchTexture.Release();
             Generated.Release(titleGlitchTexture);
@@ -203,8 +206,11 @@ namespace GeometricFlight.Presentation
 
         private void Apply(in GlitchFrame f)
         {
-            if (look != null) look.Apply(grade, ArcadeOn ? arcade : null, menuCamera);
+            ArcadeProfile a = ArcadeOn ? arcade : null;
+            if (look != null) look.Apply(grade, a, menuCamera);
             LookAtmosphere.ApplyHaze(atmosphere, menuCamera);
+            interfaceDocuments ??= new[] { menuDocument };
+            screenInterface.Apply(a, menuCamera, interfaceDocuments);
             ApplyScreen(f);
             ApplyInterface(f);
         }
