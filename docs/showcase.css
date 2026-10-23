@@ -16,7 +16,10 @@
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 32px;
+}
+/* Anchors clear the sticky masthead; sections already carry enough top padding. */
+main [id]:not(section) {
+  scroll-margin-top: 96px;
 }
 body {
   margin: 0;
@@ -106,30 +109,70 @@ p {
   transform: none;
 }
 .masthead {
-  min-height: 88px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #0b0c0ee8;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.masthead-inner {
+  min-height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  border-bottom: 1px solid var(--line);
+  gap: 32px;
 }
 .wordmark {
+  flex: none;
   font: 500 18px var(--body);
   letter-spacing: 0.28em;
   text-decoration: none;
 }
 .masthead nav {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.masthead nav::-webkit-scrollbar {
+  display: none;
+}
+.masthead nav ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 25px;
+  gap: 24px;
   font-size: 14px;
+  white-space: nowrap;
   color: var(--muted);
 }
 .masthead nav a {
+  position: relative;
+  display: block;
+  padding: 21px 0;
   text-decoration: none;
 }
-.masthead nav a:hover {
+.masthead nav a span {
+  margin-right: 7px;
+  font: 10px var(--mono);
+  color: #6d7177;
+}
+.masthead nav a:hover,
+.masthead nav a[aria-current="location"] {
   color: var(--ink);
+}
+.masthead nav a[aria-current="location"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--red);
+}
+.masthead nav a:focus-visible {
+  outline-offset: -2px;
 }
 .intro {
   padding: 64px 0 32px;
@@ -293,21 +336,120 @@ details[open] > summary {
   color: var(--muted);
   font-size: 16px;
 }
-.flow {
-  display: flex;
-  flex-wrap: wrap;
+/* The screen flow doubles as the gallery's controls: main route on top, side screens below. */
+.controls.flow-map {
+  display: grid;
+  grid-template-columns: repeat(5, auto) 1fr;
+  grid-template-areas:
+    "menu a1 flight a2 results counter"
+    "options . pause . . .";
+  justify-content: start;
   align-items: center;
-  gap: 14px;
-  padding: 20px 0;
+  gap: 6px 12px;
 }
-.flow span {
+.flow-map button,
+.flow-pending {
   border: 1px solid var(--line);
-  padding: 14px 22px;
-  color: var(--ink);
+  text-align: left;
 }
-.flow i {
+.flow-map .branch {
+  justify-self: start;
+  border-color: transparent;
+}
+.flow-map button[aria-pressed="true"] {
+  border-color: #62666c;
+}
+.flow-map .branch::before {
+  content: "↳ ";
+  color: #6d7177;
+}
+.flow-map i {
   font-style: normal;
   color: var(--red);
+  text-align: center;
+}
+.flow-pending {
+  justify-self: start;
+  padding: 10px 15px;
+  min-height: 44px;
+  font-size: 14px;
+  color: var(--muted);
+  border-style: dashed;
+}
+.flow-pending small {
+  margin-left: 6px;
+  font: 10px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6d7177;
+}
+.node-menu {
+  grid-area: menu;
+}
+.node-flight {
+  grid-area: flight;
+}
+.node-results {
+  grid-area: results;
+}
+.node-options {
+  grid-area: options;
+}
+.node-pause {
+  grid-area: pause;
+}
+.arrow-1 {
+  grid-area: a1;
+}
+.arrow-2 {
+  grid-area: a2;
+}
+.flow-map .counter {
+  grid-area: counter;
+  justify-self: end;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.hotspots + .legend {
+  margin-top: 18px;
+}
+.legend + .note {
+  margin-top: 6px;
+}
+.next-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 64px;
+  padding: 22px 0;
+  border-block: 1px solid var(--line);
+  text-decoration: none;
+}
+.next-section .eyebrow {
+  margin: 0;
+}
+.next-section b {
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.next-section b::after {
+  content: " →";
+  display: inline-block;
+  color: var(--red);
+  transition: transform 0.2s;
+}
+.next-section:hover b::after {
+  transform: translateX(4px);
+}
+details + .next-section {
+  margin-top: 40px;
 }
 .hotspots {
   display: grid;
@@ -761,9 +903,25 @@ footer nav {
     width: min(1440px, calc(100% - 128px));
   }
 }
+@media (max-width: 1180px) {
+  .masthead nav a span {
+    display: none;
+  }
+  .masthead nav ol {
+    gap: 20px;
+  }
+}
 @media (max-width: 850px) {
   .wrap {
     width: calc(100% - 40px);
+  }
+  .masthead nav {
+    /* Fade the edge so a clipped section list reads as scrollable. */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .masthead nav ol {
+    padding-right: 28px;
   }
   .intro {
     align-items: start;
@@ -785,6 +943,7 @@ footer nav {
   }
   section {
     padding-top: 72px;
+    scroll-margin-top: 16px;
   }
   .sub-head {
     align-items: start;
@@ -799,15 +958,39 @@ footer nav {
   body {
     font-size: 17px;
   }
-  .masthead {
-    padding-block: 20px;
-    align-items: start;
-    flex-direction: column;
-    gap: 16px;
+  .masthead-inner {
+    min-height: 56px;
+    gap: 20px;
   }
-  .masthead nav {
-    gap: 8px 18px;
+  .wordmark {
+    font-size: 15px;
+  }
+  .masthead nav ol {
+    gap: 16px;
     font-size: 13px;
+  }
+  .masthead nav a {
+    padding-block: 18px;
+  }
+  .controls.flow-map {
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "menu options"
+      "a1 ."
+      "flight pause"
+      "a2 ."
+      "results results";
+    gap: 4px 10px;
+  }
+  .flow-map i {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+  .flow-map .counter {
+    display: none;
+  }
+  .next-section b {
+    font-size: 19px;
   }
   .intro {
     padding-top: 36px;

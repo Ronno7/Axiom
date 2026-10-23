@@ -31,17 +31,25 @@
   </head>
   <body>
     <a class="skip" href="#screens">Skip to the showcase</a>
-    <div class="wrap">
-      <header class="masthead">
+    <header class="masthead">
+      <div class="wrap masthead-inner">
         <a class="wordmark" href="#top" aria-label="Axiom, back to top"
           >AXIOM</a
         >
         <nav aria-label="Sections">
-          <a href="#screens">Screens</a><a href="#in-play">In play</a
-          ><a href="#effects">Effects</a><a href="#cockpit">Cockpit</a
-          ><a href="#evolution">Evolution</a>
+          <ol>
+            <li><a href="#screens"><span>01</span>Screens</a></li>
+            <li><a href="#in-play"><span>02</span>In play</a></li>
+            <li><a href="#feedback"><span>03</span>Feedback</a></li>
+            <li><a href="#arcade"><span>04</span>Arcade</a></li>
+            <li><a href="#rendering"><span>05</span>Rendering</a></li>
+            <li><a href="#cockpit"><span>06</span>Cockpit</a></li>
+            <li><a href="#evolution"><span>07</span>Evolution</a></li>
+          </ol>
         </nav>
-      </header>
+      </div>
+    </header>
+    <div class="wrap">
       <main id="top">
         <div class="intro">
           <div>
@@ -53,87 +61,104 @@
             language.
           </p>
         </div>
-        <div class="gallery" id="screens" aria-label="Game screens">
-          <a
-            class="frame image-link"
-            href="img/menu.jpg"
-            aria-label="Enlarge main menu"
-            ><img
-              src="img/menu.jpg"
-              alt="Axiom's current main menu with the geometric title and angular controls"
-              width="2560"
-              height="1440"
-              fetchpriority="high"
-          /></a>
-          <div class="controls" role="group" aria-label="Choose a screen">
-            <button
-              type="button"
-              data-img="img/menu.jpg"
-              data-caption="The current title, atmosphere and menu."
-            >
-              Main menu
-            </button>
-            <button
-              type="button"
-              data-img="img/level.jpg"
-              data-caption="Guidance in the world. Status at the edges."
-            >
-              In flight
-            </button>
-            <button
-              type="button"
-              data-img="img/level-pause.jpg"
-              data-caption="A clear break in the action, with a direct route back."
-            >
-              Pause
-            </button>
-            <button
-              type="button"
-              data-img="img/options.jpg"
-              data-caption="Flight controls, controller calibration and Arcade Mode."
-            >
-              Options
-            </button>
-            <span class="counter" aria-hidden="true">01 / 04</span>
-          </div>
-          <div class="media-footer">
-            <p class="caption" aria-live="polite">
-              The current title, atmosphere and menu.
-            </p>
-            <span class="caption-meta"
-              >Captured in Unity · click to explore</span
-            >
-          </div>
-        </div>
-        <details>
-          <summary>Screen flow</summary>
-          <div class="details-body">
-            <div
-              class="flow"
-              aria-label="Main menu leads to flight, then results"
-            >
-              <span>Main menu</span><i aria-hidden="true">→</i
-              ><span>In flight</span><i aria-hidden="true">→</i
-              ><span>Results</span>
+        <section id="screens">
+          <header class="section-head">
+            <div>
+              <span class="eyebrow">01 / Screens</span>
+              <h2>One route through the game.</h2>
             </div>
             <p>
-              Pause returns directly to flight. Options and Help open from the
-              main menu or Pause. Options leads to controller calibration.
-              Results offers Retry or Main menu; Continue is available when a
-              next level is configured.
+              Menu, flight, results. Select a screen on the map to see it.
             </p>
-            <p>
-              Losing focus or disconnecting the controller pauses the run. Mouse
-              and keyboard navigate menus; cockpit menu navigation is still in
-              development.
-            </p>
+          </header>
+          <div class="gallery" aria-label="Game screens">
+            <a
+              class="frame image-link"
+              href="img/menu.jpg"
+              aria-label="Enlarge main menu"
+              ><img
+                src="img/menu.jpg"
+                alt="Axiom's current main menu with the geometric title and angular controls"
+                width="2560"
+                height="1440"
+                fetchpriority="high"
+            /></a>
+            <div
+              class="controls flow-map"
+              id="flow"
+              role="group"
+              aria-label="Screen flow: choose a screen"
+            >
+              <button
+                type="button"
+                class="node-menu"
+                data-img="img/menu.jpg"
+                data-caption="The current title, atmosphere and menu."
+              >
+                Main menu
+              </button>
+              <i class="arrow-1" aria-hidden="true">→</i>
+              <button
+                type="button"
+                class="node-flight"
+                data-img="img/level.jpg"
+                data-caption="Guidance in the world. Status at the edges."
+              >
+                In flight
+              </button>
+              <i class="arrow-2" aria-hidden="true">→</i>
+              <span class="flow-pending node-results"
+                >Results <small>capture pending</small></span
+              >
+              <button
+                type="button"
+                class="branch node-options"
+                data-img="img/options.jpg"
+                data-caption="Flight controls, controller calibration and Arcade Mode. Opens from the main menu or Pause."
+              >
+                Options
+              </button>
+              <button
+                type="button"
+                class="branch node-pause"
+                data-img="img/level-pause.jpg"
+                data-caption="A clear break in the action, with a direct route back to flight."
+              >
+                Pause
+              </button>
+              <span class="counter" aria-hidden="true">01 / 04</span>
+            </div>
+            <div class="media-footer">
+              <p class="caption" aria-live="polite">
+                The current title, atmosphere and menu.
+              </p>
+              <span class="caption-meta"
+                >Captured in Unity · click to explore</span
+              >
+            </div>
           </div>
-        </details>
+          <details>
+            <summary>How the screens connect</summary>
+            <div class="details-body">
+              <p>
+                Pause returns directly to flight. Options and Help open from the
+                main menu or Pause. Options leads to controller calibration.
+                Results offers Retry or Main menu; Continue is available when a
+                next level is configured.
+              </p>
+              <p>
+                Losing focus or disconnecting the controller pauses the run. Mouse
+                and keyboard navigate menus; cockpit menu navigation is still in
+                development.
+              </p>
+            </div>
+          </details>
+        </section>
         <section id="in-play">
           <header class="section-head">
             <div>
-              <span class="eyebrow">01 / Read the flight</span>
-              <h2>UI in play.</h2>
+              <span class="eyebrow">02 / In play</span>
+              <h2>Read the flight.</h2>
             </div>
             <p>
               On the ship, in the world, around the screen. Select a layer to
@@ -268,173 +293,186 @@
               </p>
             </div>
           </details>
-          <div class="sub">
-            <div class="sub-head">
-              <h3>Feedback you can read.</h3>
-              <p>One event, more than one cue.</p>
-            </div>
-            <div class="gallery" aria-label="Feedback examples">
-              <a class="frame image-link" href="img/level-hit.jpg"
-                ><img
-                  src="img/level-hit.jpg"
-                  alt="Red screen edges signal a shield hit"
-                  loading="lazy"
-                  width="2560"
-                  height="1440"
-              /></a>
-              <div class="controls" role="group" aria-label="Choose feedback">
-                <button
-                  type="button"
-                  data-img="img/level-hit.jpg"
-                  data-caption="A shield hit: brief, unmistakable, then out of the way."
-                  data-screen="Angular red pulse."
-                  data-world="Ship blink and one lost shield cell."
-                  data-controller="Hit tone and an LCD warning."
-                >
-                  Shield hit
-                </button>
-                <button
-                  type="button"
-                  data-img="img/level-proximity.jpg"
-                  data-caption="A collision warning grows more urgent as the gap closes."
-                  data-screen="A pulsing PROXIMITY label."
-                  data-world="The obstacle stays visible ahead."
-                  data-controller="Parking-sensor beeps and an LCD warning."
-                >
-                  Proximity
-                </button>
-                <button
-                  type="button"
-                  data-img="img/level.jpg"
-                  data-caption="Throttle guidance pairs world cues with a precise readout."
-                  data-screen="Speed, recommended band and a key hint in throttle zones."
-                  data-world="Exhaust responds to throttle; chevrons mark zones."
-                  data-controller="Speed bar, zone guidance and warning tones."
-                >
-                  Throttle
-                </button>
-              </div>
-              <p class="caption" aria-live="polite">
-                A shield hit: brief, unmistakable, then out of the way.
-              </p>
-              <div class="feedback-copy">
-                <p>
-                  <b>Screen</b
-                  ><span data-feedback-channel="screen"
-                    >Angular red pulse.</span
-                  >
-                </p>
-                <p>
-                  <b>World</b
-                  ><span data-feedback-channel="world"
-                    >Ship blink and one lost shield cell.</span
-                  >
-                </p>
-                <p>
-                  <b>Controller</b
-                  ><span data-feedback-channel="controller"
-                    >Hit tone and an LCD warning.</span
-                  >
-                </p>
-              </div>
-            </div>
-            <details>
-              <summary>All feedback channels</summary>
-              <div class="details-body">
-                <div class="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Event</th>
-                        <th>Screen</th>
-                        <th>World</th>
-                        <th>Buzzer</th>
-                        <th>Cockpit LCD</th>
-                        <th>Lights and rumble</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th>Shield hit</th>
-                        <td><i class="on"></i>Red edge pulse</td>
-                        <td>
-                          <i class="on"></i>Ship blinks, a tail cell goes dark
-                        </td>
-                        <td>
-                          <i class="on"></i>Short tone, long and low on the last
-                          one
-                        </td>
-                        <td><i class="on"></i>SHIELD HIT 2/3</td>
-                        <td>
-                          <i class="off"></i>Shield light out, rumble jolt
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Throttle zone</th>
-                        <td>
-                          <i class="on"></i>Banner, gauge band, RAISE / LOWER
-                          hint
-                        </td>
-                        <td><i class="on"></i>Blue floor chevrons</td>
-                        <td>
-                          <i class="on"></i>High tone for fast, low for slow
-                        </td>
-                        <td><i class="on"></i>Band on the speed bar, arrows</td>
-                        <td>
-                          <i class="off"></i>SLOW / FAST light, range on the
-                          throttle lights
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Collision ahead</th>
-                        <td><i class="on"></i>PROXIMITY label pulses</td>
-                        <td></td>
-                        <td>
-                          <i class="on"></i>Parking-sensor beeps, then a solid
-                          tone
-                        </td>
-                        <td><i class="on"></i>! PROXIMITY !</td>
-                        <td>
-                          <i class="off"></i>PROX light blinks with the beeps
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Engine demand</th>
-                        <td><i class="on"></i>Speed readout</td>
-                        <td><i class="on"></i>Exhaust jets stretch</td>
-                        <td></td>
-                        <td><i class="on"></i>Speed bar and percentage</td>
-                        <td>
-                          <i class="off"></i>Rumble grows with speed, lever
-                          light
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Sensor or link lost</th>
-                        <td>
-                          <i class="on"></i>Warning badge, or a pause with a
-                          notice
-                        </td>
-                        <td></td>
-                        <td><i class="on"></i>Warning tone</td>
-                        <td><i class="on"></i>HOLDING CRUISE, RECONNECTED</td>
-                        <td><i class="off"></i>LINK light</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <p class="note">
-                  Filled markers: implemented. Outlined markers: planned game
-                  integration; the hardware has been bench-tested.
-                </p>
-              </div>
-            </details>
-          </div>
         </section>
-        <section id="effects">
+        <section id="feedback">
           <header class="section-head">
             <div>
-              <span class="eyebrow">02 / Change the atmosphere</span>
+              <span class="eyebrow">03 / Feedback</span>
+              <h2>One event.<br />More than one cue.</h2>
+            </div>
+            <p>
+              Every warning reaches the screen, the world and the controller.
+              Choose an event.
+            </p>
+          </header>
+          <div class="gallery" aria-label="Feedback examples">
+            <a class="frame image-link" href="img/level-proximity.jpg"
+              ><img
+                src="img/level-proximity.jpg"
+                alt="A pulsing proximity warning as an obstacle closes in"
+                loading="lazy"
+                width="2560"
+                height="1440"
+            /></a>
+            <div class="controls" role="group" aria-label="Choose feedback">
+              <button
+                type="button"
+                data-img="img/level-proximity.jpg"
+                data-alt="A pulsing proximity warning as an obstacle closes in"
+                data-caption="A collision warning grows more urgent as the gap closes."
+                data-screen="A pulsing PROXIMITY label."
+                data-world="The obstacle stays visible ahead."
+                data-controller="Parking-sensor beeps and an LCD warning."
+              >
+                Proximity
+              </button>
+              <button
+                type="button"
+                data-img="img/level-hit.jpg"
+                data-alt="Red screen edges signal a shield hit"
+                data-caption="A shield hit: brief, unmistakable, then out of the way."
+                data-screen="Angular red pulse."
+                data-world="Ship blink and one lost shield cell."
+                data-controller="Hit tone and an LCD warning."
+              >
+                Shield hit
+              </button>
+              <button
+                type="button"
+                data-img="img/level.jpg"
+                data-alt="The throttle gauge and floor chevrons in a throttle zone"
+                data-caption="Throttle guidance pairs world cues with a precise readout."
+                data-screen="Speed, recommended band and a key hint in throttle zones."
+                data-world="Exhaust responds to throttle; chevrons mark zones."
+                data-controller="Speed bar, zone guidance and warning tones."
+              >
+                Throttle
+              </button>
+            </div>
+            <p class="caption" aria-live="polite">
+              A collision warning grows more urgent as the gap closes.
+            </p>
+            <div class="feedback-copy">
+              <p>
+                <b>Screen</b
+                ><span data-feedback-channel="screen"
+                  >A pulsing PROXIMITY label.</span
+                >
+              </p>
+              <p>
+                <b>World</b
+                ><span data-feedback-channel="world"
+                  >The obstacle stays visible ahead.</span
+                >
+              </p>
+              <p>
+                <b>Controller</b
+                ><span data-feedback-channel="controller"
+                  >Parking-sensor beeps and an LCD warning.</span
+                >
+              </p>
+            </div>
+          </div>
+          <details id="feedback-channels">
+            <summary>All feedback channels</summary>
+            <div class="details-body">
+              <p class="legend">
+                <span><i class="on"></i>Implemented</span
+                ><span><i class="off"></i>Planned</span>
+              </p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Event</th>
+                      <th>Screen</th>
+                      <th>World</th>
+                      <th>Buzzer</th>
+                      <th>Cockpit LCD</th>
+                      <th>Lights and rumble</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th>Shield hit</th>
+                      <td><i class="on"></i>Red edge pulse</td>
+                      <td>
+                        <i class="on"></i>Ship blinks, a tail cell goes dark
+                      </td>
+                      <td>
+                        <i class="on"></i>Short tone, long and low on the last
+                        one
+                      </td>
+                      <td><i class="on"></i>SHIELD HIT 2/3</td>
+                      <td>
+                        <i class="off"></i>Shield light out, rumble jolt
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Throttle zone</th>
+                      <td>
+                        <i class="on"></i>Banner, gauge band, RAISE / LOWER
+                        hint
+                      </td>
+                      <td><i class="on"></i>Blue floor chevrons</td>
+                      <td>
+                        <i class="on"></i>High tone for fast, low for slow
+                      </td>
+                      <td><i class="on"></i>Band on the speed bar, arrows</td>
+                      <td>
+                        <i class="off"></i>SLOW / FAST light, range on the
+                        throttle lights
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Collision ahead</th>
+                      <td><i class="on"></i>PROXIMITY label pulses</td>
+                      <td></td>
+                      <td>
+                        <i class="on"></i>Parking-sensor beeps, then a solid
+                        tone
+                      </td>
+                      <td><i class="on"></i>! PROXIMITY !</td>
+                      <td>
+                        <i class="off"></i>PROX light blinks with the beeps
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Engine demand</th>
+                      <td><i class="on"></i>Speed readout</td>
+                      <td><i class="on"></i>Exhaust jets stretch</td>
+                      <td></td>
+                      <td><i class="on"></i>Speed bar and percentage</td>
+                      <td>
+                        <i class="off"></i>Rumble grows with speed, lever
+                        light
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Sensor or link lost</th>
+                      <td>
+                        <i class="on"></i>Warning badge, or a pause with a
+                        notice
+                      </td>
+                      <td></td>
+                      <td><i class="on"></i>Warning tone</td>
+                      <td><i class="on"></i>HOLDING CRUISE, RECONNECTED</td>
+                      <td><i class="off"></i>LINK light</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="note">
+                Planned items are waiting on game integration; the hardware has
+                been bench-tested.
+              </p>
+            </div>
+          </details>
+        </section>
+        <section id="arcade">
+          <header class="section-head">
+            <div>
+              <span class="eyebrow">04 / Arcade</span>
               <h2>Same world.<br />Different screen.</h2>
             </div>
             <p>
@@ -454,56 +492,80 @@
               <a href="img/level-arcade.jpg">View Arcade flight</a>
             </p></noscript
           >
-          <p class="caption">Drag to compare. Expand for a closer look.</p>
-          <div class="sub">
-            <div class="sub-head">
-              <h3>Visual layers.</h3>
-              <p>Start with the finished frame. Peel it back.</p>
+          <p class="caption">
+            Matching views from the same frozen camera. Drag to compare; expand
+            for a closer look.
+          </p>
+          <details>
+            <summary>How the CRT pass works</summary>
+            <div class="details-body">
+              <p>
+                Standard Mode draws UI after scene effects. Arcade Mode
+                composites the interface before the CRT pass, so menus and HUD
+                curve with the image. Pointer positions are mapped to the curved
+                controls.
+              </p>
             </div>
-            <div class="stepper" data-start="6">
-              <ol class="steps">
-                <li data-img="img/layer-1-geometry.jpg">
-                  <b>Geometry</b
-                  ><span>Flat-shaded constructs against a dark sky.</span>
-                </li>
-                <li data-img="img/layer-2-haze.jpg">
-                  <b>Haze</b
-                  ><span
-                    >Fog and sky share a colour, softening the distant
-                    floor.</span
-                  >
-                </li>
-                <li data-img="img/layer-3-atmosphere.jpg">
-                  <b>Atmosphere</b
-                  ><span>Horizon glow, stars and drifting dust add depth.</span>
-                </li>
-                <li data-img="img/layer-4-grade.jpg">
-                  <b>Grade</b
-                  ><span
-                    >Tonemapping, exposure and contrast bring the scene
-                    together.</span
-                  >
-                </li>
-                <li data-img="img/layer-5-bloom.jpg">
-                  <b>Bloom</b
-                  ><span
-                    >Bright geometry spills a little light into the dark.</span
-                  >
-                </li>
-                <li data-img="img/layer-6-finish.jpg">
-                  <b>Finish</b><span>Vignette and grain finish the image.</span>
-                </li>
-                <li data-img="img/menu.jpg">
-                  <b>Interface</b
-                  ><span
-                    >The title, controls and status line complete the
-                    standard-mode frame.</span
-                  >
-                </li>
-              </ol>
+          </details>
+        </section>
+        <section id="rendering">
+          <header class="section-head">
+            <div>
+              <span class="eyebrow">05 / Rendering</span>
+              <h2>Build the frame.</h2>
             </div>
+            <p>
+              Start with the finished frame and peel it back, then watch the
+              title break up.
+            </p>
+          </header>
+          <div class="sub-head" id="layers">
+            <h3>Visual layers.</h3>
+            <p>Seven steps from bare geometry to the finished menu.</p>
           </div>
-          <div class="sub split">
+          <div class="stepper" data-start="5">
+            <ol class="steps">
+              <li data-img="img/layer-1-geometry.jpg">
+                <b>Geometry</b
+                ><span>Flat-shaded constructs against a dark sky.</span>
+              </li>
+              <li data-img="img/layer-2-haze.jpg">
+                <b>Haze</b
+                ><span
+                  >Fog and sky share a colour, softening the distant
+                  floor.</span
+                >
+              </li>
+              <li data-img="img/layer-3-atmosphere.jpg">
+                <b>Atmosphere</b
+                ><span>Horizon glow, stars and drifting dust add depth.</span>
+              </li>
+              <li data-img="img/layer-4-grade.jpg">
+                <b>Grade</b
+                ><span
+                  >Tonemapping, exposure and contrast bring the scene
+                  together.</span
+                >
+              </li>
+              <li data-img="img/layer-5-bloom.jpg">
+                <b>Bloom</b
+                ><span
+                  >Bright geometry spills a little light into the dark.</span
+                >
+              </li>
+              <li data-img="img/layer-6-finish.jpg">
+                <b>Finish</b><span>Vignette and grain finish the image.</span>
+              </li>
+              <li data-img="img/menu.jpg">
+                <b>Interface</b
+                ><span
+                  >The title, controls and status line complete the
+                  standard-mode frame.</span
+                >
+              </li>
+            </ol>
+          </div>
+          <div class="sub split" id="glitch">
             <figure>
               <a
                 class="frame image-link"
@@ -526,17 +588,11 @@
                 waits until you stop interacting.
               </p>
               <details>
-                <summary>Timing &amp; rendering</summary>
+                <summary>Timing</summary>
                 <div class="details-body">
                   <p>
                     An 18-frame sequence at 25 fps: 0.72 seconds, scheduled
                     every 8–12 seconds while idle.
-                  </p>
-                  <p>
-                    Standard Mode draws UI after scene effects. Arcade Mode
-                    composites the interface before the CRT pass, so menus and
-                    HUD curve with the image. Pointer positions are mapped to
-                    the curved controls.
                   </p>
                 </div>
               </details>
@@ -546,7 +602,7 @@
         <section id="cockpit">
           <header class="section-head">
             <div>
-              <span class="eyebrow">03 / Beyond the screen</span>
+              <span class="eyebrow">06 / Cockpit</span>
               <h2>A physical interface.</h2>
             </div>
             <p>
@@ -560,7 +616,7 @@
             data-ratio="5/3"
             data-img="img/cockpit-top.jpg"
             data-alt="Top view of the cockpit model: throttle lever, master arm switch, LCD, warning lights, EMP dome and joystick"
-            data-kinds='{"live":"Implemented inputs & feedback","bench":"Planned integration"}'
+            data-kinds='{"live":"Implemented","bench":"Planned"}'
           >
             <div class="side">
               <ul class="items">
@@ -651,11 +707,15 @@
               </ul>
             </div>
           </div>
-          <p class="note">
-            Enclosure concept render. Components are bench-tested; the enclosure
-            and remaining game integrations are in progress.
+          <p class="legend">
+            <span><i class="on"></i>Implemented: working in the game</span
+            ><span><i class="off"></i>Planned: bench-tested, integration in
+              progress</span>
           </p>
-          <div class="sub split">
+          <p class="note">
+            Enclosure concept render. The enclosure itself is still in progress.
+          </p>
+          <div class="sub split" id="lcd">
             <div class="lcd-demo">
               <div class="tabs" role="group" aria-label="LCD states">
                 <button
@@ -716,11 +776,17 @@
         <section id="evolution">
           <header class="section-head">
             <div>
-              <span class="eyebrow">04 / The process</span>
-              <h2>Evolution.</h2>
+              <span class="eyebrow">07 / Evolution</span>
+              <h2>From blockout to now.</h2>
             </div>
-            <p>From the first blockout to the current visual language.</p>
+            <p>
+              Archive captures beside the current build. Step through each
+              stage.
+            </p>
           </header>
+          <div class="sub-head">
+            <h3>The menu.</h3>
+          </div>
           <div class="stepper" data-start="2">
             <ol class="steps">
               <li data-img="img/history-menu-1.jpg">
@@ -746,14 +812,33 @@
             </ol>
           </div>
           <div class="sub">
-            <div class="sub-head"><h3>The level, then and now.</h3></div>
-            <div
-              class="compare"
-              data-labels='["Blockout","Current"]'
-              data-sets='[["Level evolution","img/history-level-1.jpg","img/level.jpg"]]'
-              data-caption="An archival view and the current level. Camera positions differ; this is a design comparison, not an effects-only test."
-            ></div>
-            <p class="caption">Different captures, one evolving world.</p>
+            <div class="sub-head">
+              <h3>The level.</h3>
+            </div>
+            <div class="stepper" data-start="2">
+              <ol class="steps">
+                <li data-img="img/history-level-1.jpg">
+                  <b>Blockout</b
+                  ><span
+                    >Archive: flat grey geometry against a black sky.</span
+                  >
+                </li>
+                <li data-img="img/history-level-2.jpg">
+                  <b>Atmosphere</b
+                  ><span
+                    >Archive: haze, horizon glow and stars, from the same
+                    camera.</span
+                  >
+                </li>
+                <li data-img="img/level.jpg">
+                  <b>Current</b
+                  ><span
+                    >The current level with its HUD. The camera differs from
+                    the archive captures.</span
+                  >
+                </li>
+              </ol>
+            </div>
           </div>
         </section>
       </main>
@@ -761,12 +846,13 @@
         <div>
           <a class="wordmark" href="#top">AXIOM</a>
           <p>
-            Prototype 0.1.9 · Updated 21 Oct 2026<br />Unity 6 · URP · UI
+            Prototype 0.1.9 · Updated 23 Oct 2026<br />Unity 6 · URP · UI
             Toolkit · Arduino
           </p>
         </div>
         <nav aria-label="Project links">
-          <a href="https://github.com/Ronno7/Axiom">Repository ↗</a
+          <a href="#top">Back to top ↑</a
+          ><a href="https://github.com/Ronno7/Axiom">Repository ↗</a
           ><a href="https://github.com/Ronno7/Axiom/blob/main/Axiom/Docs/UI.md"
             >Design notes ↗</a
           ><a href="https://github.com/Ronno7/Axiom/blob/main/CHANGELOG.md"

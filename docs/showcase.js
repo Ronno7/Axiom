@@ -502,4 +502,62 @@
     buttons.forEach((b) => b.addEventListener("click", () => show(b)));
     show(buttons[1] || buttons[0]);
   });
+
+  // The masthead marks the section in view, and each section ends with a link onward.
+  const nav = document.querySelector(".masthead nav");
+  const sections = all("a", nav)
+    .map((link) => ({
+      link,
+      section: document.querySelector(link.getAttribute("href")),
+    }))
+    .filter((s) => s.section);
+  sections.forEach(({ section }, i) => {
+    const next = sections[i + 1];
+    if (!next) return;
+    const link = make("a", "next-section");
+    link.href = next.link.getAttribute("href");
+    link.append(
+      make("span", "eyebrow", "Next · " + next.link.firstChild.textContent),
+      make("b", null, next.link.lastChild.textContent),
+    );
+    section.append(link);
+  });
+  const smooth = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let activeLink = null,
+    queued = false;
+  function markCurrent() {
+    queued = false;
+    const line = innerHeight * 0.35,
+      atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+    let active = null;
+    sections.forEach((s) => {
+      if (s.section.getBoundingClientRect().top <= line) active = s.link;
+    });
+    // A short final section can never reach the line, so the page end selects it.
+    if (atEnd) active = sections[sections.length - 1].link;
+    if (active === activeLink) return;
+    activeLink?.removeAttribute("aria-current");
+    activeLink = active;
+    if (!active) return;
+    active.setAttribute("aria-current", "location");
+    // Centre the link in a scrolling nav without moving the page.
+    const a = active.getBoundingClientRect(),
+      n = nav.getBoundingClientRect();
+    nav.scrollBy({
+      left: a.left - n.left - (n.width - a.width) / 2,
+      behavior: smooth ? "smooth" : "auto",
+    });
+  }
+  if (sections.length) {
+    addEventListener(
+      "scroll",
+      () => {
+        if (!queued) requestAnimationFrame(markCurrent);
+        queued = true;
+      },
+      { passive: true },
+    );
+    addEventListener("resize", markCurrent);
+    markCurrent();
+  }
 })();
