@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+<linearGradient id="g-level" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3440"/><stop offset="0.46" stop-color="#46505c"/>
+      <stop offset="0.47" stop-color="#1a1d22"/><stop offset="1" stop-color="#0b0c0e"/></linearGradient>
+<clipPath id="frame-clip"><rect width="1920" height="1080"/></clipPath>
+</defs>
+<g clip-path="url(#frame-clip)">
+  <g id="Paused">
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#g-level)"/>
+    <g id="screen">
+      <rect x="0" y="0" width="1920" height="1080" fill="#000000" fill-opacity="0.72"/>
+      <g id="panel">
+        <rect x="570" y="206" width="780" height="668" fill="#060606" fill-opacity="0.97"/>
+        <rect x="571" y="207" width="778" height="666" fill="none" stroke="#ebebeb" stroke-width="2"/>
+        <g id="panel-title · PAUSED">
+          <text x="624" y="296.56" font-family="Inter" font-size="46" font-weight="700" letter-spacing="14" fill="#ebebeb" xml:space="preserve">PAUSED</text>
+        </g>
+        <g id="body-text · Controller disconnected.">
+          <rect x="624" y="340" width="4" height="58" fill="#2ca0ff"/>
+          <text x="642" y="363.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Controller disconnected. Reconnect it, or resume with the</text>
+          <text x="642" y="392.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">keyboard.</text>
+        </g>
+        <g id="menu-button · RESUME">
+          <g transform="translate(638 426)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#ebebeb" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · RESUME">
+            <text x="678" y="469.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#000000" xml:space="preserve">RESUME</text>
+          </g>
+        </g>
+        <g id="menu-button · RESTART LEVEL">
+          <g transform="translate(624 508)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · RESTART LEVEL">
+            <text x="664" y="551.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">RESTART LEVEL</text>
+          </g>
+        </g>
+        <g id="menu-button · OPTIONS">
+          <g transform="translate(624 590)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · OPTIONS">
+            <text x="664" y="633.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">OPTIONS</text>
+          </g>
+        </g>
+        <g id="menu-button · HELP">
+          <g transform="translate(624 672)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · HELP">
+            <text x="664" y="715.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">HELP</text>
+          </g>
+        </g>
+        <g id="menu-button · MAIN MENU">
+          <g transform="translate(624 754)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · MAIN MENU">
+            <text x="664" y="797.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">MAIN MENU</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>

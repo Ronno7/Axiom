@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+<radialGradient id="g-menu" cx="0.72" cy="0.5" r="0.75">
+      <stop offset="0" stop-color="#3a3f48"/><stop offset="0.55" stop-color="#121417"/>
+      <stop offset="1" stop-color="#000000"/></radialGradient>
+<linearGradient id="g-scrim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.92"/><stop offset="0.45" stop-color="#000" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+<clipPath id="frame-clip"><rect width="1920" height="1080"/></clipPath>
+</defs>
+<g clip-path="url(#frame-clip)">
+  <g id="Calibration">
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#g-menu)"/>
+    <g id="scrim">
+      <rect x="0" y="0" width="1190.39" height="1080" fill="url(#g-scrim)"/>
+    </g>
+    <g id="screen">
+      <g id="panel">
+        <rect x="160" y="142" width="1180" height="796" fill="#060606" fill-opacity="0.97"/>
+        <rect x="161" y="143" width="1178" height="794" fill="none" stroke="#ebebeb" stroke-width="2"/>
+        <g id="panel-title · CONTROLLER CALIBRATION">
+          <text x="214" y="232.56" font-family="Inter" font-size="46" font-weight="700" letter-spacing="14" fill="#ebebeb" xml:space="preserve">CONTROLLER CALIBRATION</text>
+        </g>
+        <g id="hint · Controller connected on ">
+          <text x="216" y="313.38" font-family="Inter" font-size="20" font-weight="400" fill="#969696" xml:space="preserve">Controller connected on COM4</text>
+        </g>
+        <g id="section-title · CHECK">
+          <text x="214" y="359.25" font-family="Inter" font-size="24" font-weight="400" letter-spacing="8" fill="#969696" xml:space="preserve">CHECK</text>
+        </g>
+        <g id="body-text · Check it: the dot should">
+          <text x="214" y="404.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Check it: the dot should follow the stick and the bar should follow the throttle. Use the invert</text>
+          <text x="214" y="433.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">switches if an axis runs backwards, then save.</text>
+        </g>
+        <g id="calibration-live">
+          <g id="calibration-stick">
+            <rect x="215" y="472" width="198" height="198" fill="none" stroke="#ebebeb" stroke-width="2"/>
+            <g id="calibration-cross">
+              <rect x="216" y="571" width="196" height="1" fill="#464646"/>
+            </g>
+            <g id="calibration-cross">
+              <rect x="314" y="473" width="1" height="196" fill="#464646"/>
+            </g>
+            <g id="calibration-stick-dot">
+              <rect x="332.44" y="538.47" width="18" height="18" rx="9" fill="#2ca0ff"/>
+            </g>
+          </g>
+          <g id="calibration-throttle">
+            <g id="section-title · THROTTLE">
+              <text x="462" y="502.25" font-family="Inter" font-size="24" font-weight="400" letter-spacing="8" fill="#969696" xml:space="preserve">THROTTLE</text>
+            </g>
+            <g id="throttle-track">
+              <rect x="463" y="535" width="822" height="22" fill="none" stroke="#ebebeb" stroke-width="2"/>
+              <g id="throttle-fill">
+                <rect x="464" y="536" width="508.39" height="20" fill="#969696"/>
+              </g>
+            </g>
+            <g id="hint · Stick 612, 455   ·   Dis">
+              <text x="464" y="605.38" font-family="Inter" font-size="20" font-weight="400" fill="#969696" xml:space="preserve">Stick 612, 455   ·   Distance 148 mm   ·   Fire released</text>
+            </g>
+            <g id="div">
+              <g id="option">
+                <g id="field-label · Invert stick left / righ">
+                  <text x="482" y="671.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Invert stick left / right</text>
+                </g>
+                <g id="checkmark">
+                  <rect x="841" y="647.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+                </g>
+              </g>
+              <g id="option">
+                <g id="field-label · Invert stick up / down">
+                  <text x="482" y="754.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Invert stick up / down</text>
+                </g>
+                <g id="checkmark">
+                  <rect x="840" y="729.5" width="30" height="30" fill="#ebebeb"/>
+                  <rect x="841" y="730.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+                  <g transform="translate(845 734.5)"><path d="M3 10.5 L8 15 L17 4.5" fill="none" stroke="#000" stroke-width="3"></path></g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g id="calibration-buttons">
+          <g id="menu-button · SAVE">
+            <g transform="translate(228 818)"><polygon points="19,1 277,1 290,33 259,65 1,65" fill="#ebebeb" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+            <g id="span · SAVE">
+              <text x="268" y="861.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#000000" xml:space="preserve">SAVE</text>
+            </g>
+          </g>
+          <g id="menu-button · START OVER">
+            <g transform="translate(530 818)"><polygon points="19,1 321,1 334,33 303,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+            <g id="span · START OVER">
+              <text x="570" y="861.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">START OVER</text>
+            </g>
+          </g>
+          <g id="menu-button · CANCEL">
+            <g transform="translate(889.7 818)"><polygon points="19,1 277,1 290,33 259,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+            <g id="span · CANCEL">
+              <text x="929.7" y="861.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">CANCEL</text>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>

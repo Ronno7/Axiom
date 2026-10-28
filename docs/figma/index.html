@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Axiom UI: Figma import sheet</title>
+<!--
+  HTML rebuild of Axiom/Assets/UI (UXML + Axiom.uss) for importing into Figma as editable layers.
+  Every screen is a 1920x1080 frame. Values are copied from Axiom.uss; SlantButton shapes are drawn
+  as inline SVG by the script at the bottom (same path as SlantButton.Draw).
+  Import with the html.to.design plugin (see docs/figma/README.md).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: rgb(235, 235, 235);
+    --dim: rgb(150, 150, 150);
+    --soft: rgb(200, 200, 200);
+    --micro: rgb(140, 140, 146);
+    --rule: rgb(70, 70, 70);
+    --stroke: rgb(90, 90, 90);
+    --panel: rgba(6, 6, 6, 0.97);
+    --red: rgb(214, 31, 41);
+    --blue: rgb(44, 160, 255);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1e1e1e;
+    font-family: Inter, "Segoe UI", sans-serif;
+    color: var(--ink);
+    padding: 80px;
+  }
+  /* UI Toolkit elements are flex columns by default. */
+  .ve { display: flex; flex-direction: column; position: relative; }
+  .label { display: block; padding: 2px; white-space: pre; }
+
+  .sheet-title { font-size: 48px; font-weight: 700; letter-spacing: 6px; margin-bottom: 8px; }
+  .sheet-sub { font-size: 20px; color: var(--dim); margin-bottom: 64px; }
+  .frame-caption { font-size: 24px; color: var(--dim); letter-spacing: 4px; margin: 0 0 16px; }
+  .frame-block { margin-bottom: 120px; }
+
+  /* ---------- 1920x1080 frames ---------- */
+  .frame-1920 {
+    width: 1920px; height: 1080px; overflow: hidden; position: relative;
+    background: #000;
+  }
+  /* Stand-in scenery so the overlay reads like it does in game. */
+  .bg-level { background: linear-gradient(180deg, #2b3440 0%, #46505c 46%, #1a1d22 47%, #0b0c0e 100%); }
+  .bg-menu  { background: radial-gradient(ellipse at 72% 50%, #3a3f48 0%, #121417 55%, #000 100%); }
+
+  .screen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: var(--ink);
+  }
+  .screen--dimmed { background-color: rgba(0, 0, 0, 0.72); }
+  .screen--menu { align-items: flex-start; padding-left: 160px; }
+
+  /* ---------- Panels ---------- */
+  .panel {
+    width: 780px; padding: 44px 52px;
+    background-color: var(--panel);
+    border: 2px solid var(--ink);
+  }
+  .panel--wide { width: 1180px; }
+  .panel--bare { background: transparent; border: 0; padding: 0; width: auto; align-items: flex-start; }
+
+  .game-title {
+    width: 960px; height: 240px; margin-left: 10px; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px dashed rgba(235, 235, 235, 0.25);
+    font-size: 150px; font-weight: 700; letter-spacing: 40px; padding-left: 40px;
+  }
+
+  .panel-title { font-size: 46px; letter-spacing: 14px; font-weight: 700; margin-bottom: 32px; padding: 0; }
+  .section-title { font-size: 24px; letter-spacing: 8px; color: var(--dim); margin: 8px 0 16px 0; padding: 0; }
+  .hint { font-size: 20px; color: var(--dim); margin: 16px 0 8px 0; white-space: pre-wrap; }
+  .body-text { font-size: 24px; white-space: pre-wrap; margin-bottom: 14px; padding: 0; }
+
+  /* ---------- SlantButton ---------- */
+  .menu-button {
+    position: relative; display: flex; align-items: center; align-self: flex-start;
+    height: 66px; min-width: 440px; margin: 8px 0; padding: 0 48px 0 40px;
+    font-size: 28px; letter-spacing: 8px; font-weight: 700; white-space: nowrap;
+    color: var(--ink);
+    --slant-fill: rgba(0, 0, 0, 0.55);
+    --slant-stroke: rgb(90, 90, 90);
+  }
+  .menu-button > svg { position: absolute; left: 0; top: 0; overflow: visible; }
+  .menu-button > span { position: relative; }
+  .menu-button.is-hover { --slant-stroke: rgb(235, 235, 235); }
+  .menu-button.is-focus {
+    color: #000; --slant-fill: rgb(235, 235, 235); --slant-stroke: rgb(235, 235, 235);
+    transform: translateX(14px);
+  }
+  .menu-button.is-active { --slant-fill: rgb(170, 170, 170); --slant-stroke: rgb(170, 170, 170); }
+  .menu-button.is-disabled { opacity: 0.5; }
+  .menu-button--primary { height: 78px; min-width: 480px; font-size: 34px; }
+  .focus-marker {
+    position: absolute; left: -22px; top: 12px; bottom: 12px; width: 6px;
+    background-color: var(--red);
+  }
+
+  /* ---------- Options (slider, toggle) ---------- */
+  .option {
+    display: flex; flex-direction: row; align-items: center;
+    margin: 10px 0; padding: 12px 16px; border: 2px solid transparent;
+  }
+  .option--focused { border-color: var(--ink); }
+  .option .field-label { font-size: 26px; min-width: 360px; padding: 2px; }
+  .checkmark { width: 30px; height: 30px; border: 2px solid var(--ink); position: relative; }
+  .checkmark.is-on { background: var(--ink); }
+  .checkmark.is-on svg { position: absolute; left: 3px; top: 3px; }
+  .slider { flex-grow: 1; height: 30px; position: relative; display: flex; align-items: center; }
+  .slider .tracker { width: 100%; height: 8px; background: rgb(40, 40, 40); border: 1px solid var(--dim); }
+  .slider .dragger { position: absolute; top: 1px; width: 18px; height: 28px; margin-left: -9px; background: var(--ink); }
+
+  /* ---------- Help ---------- */
+  .help-columns { display: flex; flex-direction: row; margin-bottom: 20px; }
+  .help-column { flex: 1 1 0; margin-right: 48px; }
+  .help-column--controls { flex-grow: 1.3; }
+  .key-row { display: flex; flex-direction: row; align-items: center; margin-bottom: 14px; }
+  .key {
+    min-width: 230px; font-size: 22px; font-weight: 700; letter-spacing: 2px; text-align: center;
+    padding: 6px 10px; margin-right: 18px; border: 2px solid var(--ink);
+  }
+  .key-action { font-size: 24px; flex-shrink: 1; white-space: pre-wrap; padding: 0; }
+
+  /* ---------- Results ---------- */
+  .stat-row {
+    display: flex; flex-direction: row; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--rule); padding: 10px 0;
+  }
+  .stat-name { font-size: 26px; letter-spacing: 4px; color: var(--dim); padding: 0; }
+  .stat-value { font-size: 30px; font-weight: 700; padding: 0; }
+  .results-buttons { margin-top: 28px; }
+
+  /* ---------- HUD ---------- */
+  .hud { position: absolute; inset: 0; }
+  .hud .label { text-shadow: 0 0 8px rgba(0, 0, 0, 0.95); }
+  .hud-readout { font-size: 36px; letter-spacing: 4px; font-weight: 700; padding: 0; }
+  .hud-time { position: absolute; left: 56px; top: 40px; }
+  .hud-targets { position: absolute; right: 56px; top: 40px; }
+  .throttle { position: absolute; left: 56px; bottom: 48px; width: 460px; }
+  .hud-caption { font-size: 20px; letter-spacing: 6px; color: var(--soft); padding: 0; }
+  .throttle-track { position: relative; height: 18px; margin: 10px 0; border: 2px solid var(--ink); }
+  .throttle-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 50%; background: var(--dim); }
+  .throttle-cruise { position: absolute; top: -6px; bottom: -6px; width: 2px; margin-left: -1px; background: var(--stroke); }
+  .throttle-setpoint { position: absolute; top: -10px; bottom: -10px; width: 6px; margin-left: -3px; background: var(--ink); }
+  .throttle-band {
+    position: absolute; top: -4px; bottom: -4px;
+    background: rgba(44, 160, 255, 0.45); border-left: 2px solid var(--blue); border-right: 2px solid var(--blue);
+  }
+  .throttle-readouts { display: flex; flex-direction: row; justify-content: space-between; }
+  .throttle-speed { font-size: 26px; }
+  .throttle-hint { font-size: 26px; margin-left: 24px; color: var(--blue); }
+  .throttle--guided .hud-caption { color: var(--blue); }
+  .throttle--in-band .throttle-hint { color: var(--ink); }
+  .zone-banner {
+    position: absolute; top: 120px; left: 0; right: 0; text-align: center;
+    font-size: 40px; letter-spacing: 10px; color: var(--blue);
+  }
+  .hud-controller {
+    position: absolute; right: 56px; bottom: 48px; padding: 4px 10px;
+    font-size: 22px; letter-spacing: 6px; color: var(--soft);
+  }
+  .hud-controller--warning, .hud-proximity--pulse {
+    color: #000 !important; background: var(--ink); text-shadow: none !important;
+  }
+  .hud-proximity {
+    position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+    padding: 4px 14px; font-size: 26px; letter-spacing: 8px; color: var(--ink);
+  }
+  .pause-notice { border-left: 4px solid var(--blue); padding-left: 14px; margin-bottom: 20px; }
+
+  /* ---------- Calibration ---------- */
+  .calibration-instruction { min-height: 64px; }
+  .calibration-live { display: flex; flex-direction: row; align-items: flex-start; margin: 12px 0 8px 0; }
+  .calibration-stick { position: relative; flex: none; width: 200px; height: 200px; margin-right: 48px; border: 2px solid var(--ink); }
+  .calibration-cross { position: absolute; background: var(--rule); }
+  .calibration-cross--h { left: 0; right: 0; top: 50%; height: 1px; }
+  .calibration-cross--v { top: 0; bottom: 0; left: 50%; width: 1px; }
+  .calibration-stick-dot {
+    position: absolute; width: 18px; height: 18px; margin-left: -9px; margin-top: -9px;
+    border-radius: 9px; background: var(--blue);
+  }
+  .calibration-throttle { flex-grow: 1; }
+  .calibration-throttle-track { width: 100%; height: 24px; }
+  .calibration-buttons { display: flex; flex-direction: row; margin-top: 16px; }
+  .calibration-buttons .menu-button { min-width: 300px; margin-right: 16px; }
+  .options-calibrate { margin-top: 16px; }
+
+  /* ---------- Main menu decoration ---------- */
+  .scrim {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 62%;
+    background: linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0) 100%);
+  }
+  .frame-deco { position: absolute; inset: 0; opacity: 0.35; }
+  .frame__corner { position: absolute; width: 36px; height: 36px; border-color: var(--ink); border-style: solid; border-width: 0; }
+  .c-tl { left: 40px; top: 40px; border-left-width: 2px; border-top-width: 2px; }
+  .c-tr { right: 40px; top: 40px; border-right-width: 2px; border-top-width: 2px; }
+  .c-bl { left: 40px; bottom: 40px; border-left-width: 2px; border-bottom-width: 2px; }
+  .c-br { right: 40px; bottom: 40px; border-right-width: 2px; border-bottom-width: 2px; }
+  .menu-footer {
+    position: absolute; left: 160px; right: 96px; bottom: 52px;
+    display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+  }
+  .status-line, .key-hints { display: flex; flex-direction: row; align-items: center; }
+  .status-led { width: 7px; height: 7px; margin-right: 12px; background: var(--ink); }
+  .status-led--offline { background: var(--red); }
+  .micro { font-size: 14px; letter-spacing: 4px; font-weight: 700; color: var(--micro); margin: 0 14px 0 0; padding: 0; }
+  .micro--ink { color: var(--ink); }
+  .keycap { border: 1px solid rgba(235, 235, 235, 0.5); border-radius: 3px; padding: 3px 4px 3px 8px; margin-right: 10px; }
+  .key-verb { margin-right: 30px; }
+
+  /* ---------- Components sheet ---------- */
+  .components { width: 1920px; background: #0a0a0a; padding: 80px; display: flex; flex-direction: column; gap: 72px; }
+  .comp-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 48px; align-items: flex-start; }
+  .comp-cell { display: flex; flex-direction: column; gap: 14px; }
+  .comp-cap { font-size: 16px; letter-spacing: 3px; color: var(--micro); }
+  .swatch { width: 160px; height: 96px; border: 1px solid #333; }
+  .type-row { display: flex; flex-direction: row; align-items: baseline; gap: 32px; }
+  .type-row .comp-cap { width: 320px; flex: none; }
+</style>
+</head>
+<body>
+
+<div class="sheet-title">AXIOM UI</div>
+<div class="sheet-sub">Rebuilt from Axiom/Assets/UI (UXML + Axiom.uss) for Figma. Frames are 1920×1080. Backgrounds are stand-ins for the 3D scene.</div>
+
+<!-- ============ 1. Main menu ============ -->
+<div class="frame-block">
+  <div class="frame-caption">01 · MAIN MENU</div>
+  <div class="frame-1920 bg-menu" data-name="Main Menu">
+    <div class="scrim"></div>
+    <div class="screen screen--menu">
+      <div class="ve panel panel--bare">
+        <div class="game-title">AXIOM</div>
+        <div class="menu-button menu-button--primary slant is-focus" style="margin-left: 67px;"><div class="focus-marker"></div><span>PLAY</span></div>
+        <div class="menu-button slant" style="margin-left: 45px;"><span>OPTIONS</span></div>
+        <div class="menu-button slant" style="margin-left: 22px;"><span>HELP</span></div>
+        <div class="menu-button slant" style="margin-left: 0px;"><span>QUIT</span></div>
+      </div>
+    </div>
+    <div class="frame-deco">
+      <div class="frame__corner c-tl"></div><div class="frame__corner c-tr"></div>
+      <div class="frame__corner c-bl"></div><div class="frame__corner c-br"></div>
+    </div>
+    <div class="menu-footer">
+      <div class="status-line">
+        <div class="status-led status-led--offline"></div>
+        <span class="label micro micro--ink">SYS ONLINE</span>
+        <span class="label micro">·</span>
+        <span class="label micro">COCKPIT OFFLINE</span>
+        <span class="label micro">·</span>
+        <span class="label micro">BUILD 0.4.2</span>
+      </div>
+      <div class="key-hints">
+        <span class="label micro micro--ink keycap">ENTER</span>
+        <span class="label micro key-verb">SELECT</span>
+        <span class="label micro micro--ink keycap">ESC</span>
+        <span class="label micro key-verb">BACK</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 2. Options ============ -->
+<div class="frame-block">
+  <div class="frame-caption">02 · OPTIONS</div>
+  <div class="frame-1920 bg-menu" data-name="Options">
+    <div class="scrim"></div>
+    <div class="screen screen--menu">
+      <div class="ve panel">
+        <span class="label panel-title">OPTIONS</span>
+        <div class="option option--focused">
+          <span class="field-label">Steering sensitivity</span>
+          <div class="slider"><div class="tracker"></div><div class="dragger" style="left: 50%;"></div></div>
+        </div>
+        <div class="option"><span class="field-label">Invert vertical steering</span><div class="checkmark"></div></div>
+        <div class="option"><span class="field-label">Controller buzzer</span><div class="checkmark is-on"></div></div>
+        <div class="option"><span class="field-label">Arcade mode</span><div class="checkmark"></div></div>
+        <div class="menu-button slant options-calibrate"><span>CALIBRATE CONTROLLER</span></div>
+        <div class="menu-button slant"><span>BACK</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3. Help ============ -->
+<div class="frame-block">
+  <div class="frame-caption">03 · HELP</div>
+  <div class="frame-1920 bg-menu" data-name="Help">
+    <div class="scrim"></div>
+    <div class="screen screen--menu">
+      <div class="ve panel panel--wide">
+        <span class="label panel-title">HELP</span>
+        <div class="help-columns">
+          <div class="ve help-column help-column--controls">
+            <span class="label section-title">CONTROLS</span>
+            <div class="key-row"><span class="label key">WASD / ARROWS</span><span class="label key-action">Steer</span></div>
+            <div class="key-row"><span class="label key">Q / E</span><span class="label key-action">Lower / raise throttle. It stays where you leave it.</span></div>
+            <div class="key-row"><span class="label key">SPACE (HOLD)</span><span class="label key-action">Fire</span></div>
+            <div class="key-row"><span class="label key">ESC</span><span class="label key-action">Pause</span></div>
+          </div>
+          <div class="ve help-column">
+            <span class="label section-title">MISSION</span>
+            <span class="label body-text">Fly to the end of the level. Destroy targets along the way for a better result.</span>
+            <span class="label body-text">Your shield is the three blue blocks on the back of your ship.</span>
+            <span class="label body-text">Blue floor markings call for a throttle change. The throttle gauge shows the target speed.</span>
+            <span class="label body-text">Lose every segment and the run ends. Beat the par time by flying fast where it is safe.</span>
+          </div>
+        </div>
+        <div class="menu-button slant is-focus"><span>BACK</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 4. Calibration ============ -->
+<div class="frame-block">
+  <div class="frame-caption">04 · CONTROLLER CALIBRATION (CHECK STEP)</div>
+  <div class="frame-1920 bg-menu" data-name="Calibration">
+    <div class="scrim"></div>
+    <div class="screen screen--menu">
+      <div class="ve panel panel--wide">
+        <span class="label panel-title">CONTROLLER CALIBRATION</span>
+        <span class="label hint">Controller connected on COM4</span>
+        <span class="label section-title">CHECK</span>
+        <span class="label body-text calibration-instruction">Check it: the dot should follow the stick and the bar should follow the throttle. Use the invert switches if an axis runs backwards, then save.</span>
+        <div class="calibration-live">
+          <div class="calibration-stick">
+            <div class="calibration-cross calibration-cross--h"></div>
+            <div class="calibration-cross calibration-cross--v"></div>
+            <div class="calibration-stick-dot" style="left: 64%; top: 38%;"></div>
+          </div>
+          <div class="ve calibration-throttle">
+            <span class="label section-title">THROTTLE</span>
+            <div class="throttle-track calibration-throttle-track"><div class="throttle-fill" style="width: 62%;"></div></div>
+            <span class="label hint">Stick 612, 455   ·   Distance 148 mm   ·   Fire released</span>
+            <div class="ve">
+              <div class="option"><span class="field-label">Invert stick left / right</span><div class="checkmark"></div></div>
+              <div class="option"><span class="field-label">Invert stick up / down</span><div class="checkmark is-on"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="calibration-buttons">
+          <div class="menu-button slant is-focus"><span>SAVE</span></div>
+          <div class="menu-button slant"><span>START OVER</span></div>
+          <div class="menu-button slant"><span>CANCEL</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 5. HUD ============ -->
+<div class="frame-block">
+  <div class="frame-caption">05 · HUD (CRUISING)</div>
+  <div class="frame-1920 bg-level" data-name="HUD">
+    <div class="screen">
+      <div class="hud">
+        <span class="label hud-readout hud-time">1:12.4</span>
+        <span class="label hud-readout hud-targets">TARGETS 9/18</span>
+        <span class="label hud-readout hud-controller">KEYBOARD</span>
+        <div class="ve throttle">
+          <span class="label hud-caption">THROTTLE</span>
+          <div class="throttle-track">
+            <div class="throttle-fill" style="width: 50%;"></div>
+            <div class="throttle-cruise" style="left: 50%;"></div>
+            <div class="throttle-setpoint" style="left: 50%;"></div>
+          </div>
+          <div class="throttle-readouts">
+            <span class="label hud-readout throttle-speed">SPEED 100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 6. HUD guided ============ -->
+<div class="frame-block">
+  <div class="frame-caption">06 · HUD (SLOW ZONE, PROXIMITY, CONTROLLER WARNING)</div>
+  <div class="frame-1920 bg-level" data-name="HUD Alerts">
+    <div class="screen">
+      <div class="hud">
+        <span class="label hud-readout hud-time">1:31.8</span>
+        <span class="label hud-readout hud-targets">TARGETS 12/18</span>
+        <span class="label hud-readout zone-banner">SLOW ZONE  ·  LOWER THROTTLE</span>
+        <span class="label hud-readout hud-proximity hud-proximity--pulse">PROXIMITY</span>
+        <span class="label hud-readout hud-controller hud-controller--warning">CONTROLLER LOST</span>
+        <div class="ve throttle throttle--guided">
+          <span class="label hud-caption">THROTTLE · SLOW ZONE</span>
+          <div class="throttle-track">
+            <div class="throttle-fill" style="width: 72%;"></div>
+            <div class="throttle-band" style="left: 22%; width: 18%;"></div>
+            <div class="throttle-cruise" style="left: 50%;"></div>
+            <div class="throttle-setpoint" style="left: 72%;"></div>
+          </div>
+          <div class="throttle-readouts">
+            <span class="label hud-readout throttle-speed">SPEED 144%</span>
+            <span class="label hud-readout throttle-hint">LOWER  [Q]</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 7. Pause ============ -->
+<div class="frame-block">
+  <div class="frame-caption">07 · PAUSED</div>
+  <div class="frame-1920 bg-level" data-name="Paused">
+    <div class="screen screen--dimmed">
+      <div class="ve panel">
+        <span class="label panel-title">PAUSED</span>
+        <span class="label body-text pause-notice">Controller disconnected. Reconnect it, or resume with the keyboard.</span>
+        <div class="menu-button slant is-focus"><span>RESUME</span></div>
+        <div class="menu-button slant is-hover"><span>RESTART LEVEL</span></div>
+        <div class="menu-button slant"><span>OPTIONS</span></div>
+        <div class="menu-button slant"><span>HELP</span></div>
+        <div class="menu-button slant"><span>MAIN MENU</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 8. Results ============ -->
+<div class="frame-block">
+  <div class="frame-caption">08 · RESULTS</div>
+  <div class="frame-1920 bg-level" data-name="Results">
+    <div class="screen screen--dimmed">
+      <div class="ve panel">
+        <span class="label panel-title">LEVEL COMPLETE</span>
+        <div class="stat-row"><span class="label stat-name">TIME</span><span class="label stat-value">1:42.6</span></div>
+        <div class="stat-row"><span class="label stat-name">TARGETS</span><span class="label stat-value">14 / 18</span></div>
+        <div class="stat-row"><span class="label stat-name">ACCURACY</span><span class="label stat-value">78%</span></div>
+        <div class="stat-row"><span class="label stat-name">SHIELD</span><span class="label stat-value">2 / 3</span></div>
+        <div class="stat-row"><span class="label stat-name">PAR</span><span class="label stat-value">1:50.0</span></div>
+        <div class="ve results-buttons">
+          <div class="menu-button slant is-focus"><span>NEXT LEVEL</span></div>
+          <div class="menu-button slant"><span>RETRY</span></div>
+          <div class="menu-button slant"><span>MAIN MENU</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 9. Components ============ -->
+<div class="frame-block">
+  <div class="frame-caption">09 · COMPONENTS &amp; TOKENS</div>
+  <div class="components" data-name="Components">
+
+    <div class="comp-row">
+      <div class="comp-cell"><div class="swatch" style="background: rgb(235,235,235)"></div><span class="comp-cap">INK · 235,235,235</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgb(200,200,200)"></div><span class="comp-cap">SOFT · 200,200,200</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgb(150,150,150)"></div><span class="comp-cap">DIM · 150,150,150</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgb(140,140,146)"></div><span class="comp-cap">MICRO · 140,140,146</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgb(90,90,90)"></div><span class="comp-cap">STROKE · 90,90,90</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgb(70,70,70)"></div><span class="comp-cap">RULE · 70,70,70</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgba(6,6,6,0.97)"></div><span class="comp-cap">PANEL · 6,6,6 @97%</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgb(214,31,41)"></div><span class="comp-cap">RED · FOCUS/DANGER</span></div>
+      <div class="comp-cell"><div class="swatch" style="background: rgb(44,160,255)"></div><span class="comp-cap">BLUE · GUIDANCE</span></div>
+    </div>
+
+    <div class="ve" style="gap: 20px;">
+      <div class="type-row"><span class="comp-cap">PANEL TITLE · 46 / 14 / BOLD</span><span class="label panel-title" style="margin:0">PAUSED</span></div>
+      <div class="type-row"><span class="comp-cap">ZONE BANNER · 40 / 10</span><span class="label zone-banner" style="position:static">FAST ZONE  ·  FULL THROTTLE</span></div>
+      <div class="type-row"><span class="comp-cap">HUD READOUT · 36 / 4 / BOLD</span><span class="label hud-readout">TARGETS 9/18</span></div>
+      <div class="type-row"><span class="comp-cap">BUTTON · 28 / 8 / BOLD</span><span class="label" style="font-size:28px;letter-spacing:8px;font-weight:700">OPTIONS</span></div>
+      <div class="type-row"><span class="comp-cap">STAT VALUE · 30 / BOLD</span><span class="label stat-value">1:42.6</span></div>
+      <div class="type-row"><span class="comp-cap">OPTION LABEL · 26</span><span class="label" style="font-size:26px">Steering sensitivity</span></div>
+      <div class="type-row"><span class="comp-cap">BODY · 24</span><span class="label body-text" style="margin:0">Fly to the end of the level.</span></div>
+      <div class="type-row"><span class="comp-cap">SECTION TITLE · 24 / 8</span><span class="label section-title" style="margin:0">CONTROLS</span></div>
+      <div class="type-row"><span class="comp-cap">HINT · 20</span><span class="label hint" style="margin:0">Waiting for data…</span></div>
+      <div class="type-row"><span class="comp-cap">MICRO · 14 / 4 / BOLD</span><span class="label micro micro--ink">SYS ONLINE</span></div>
+    </div>
+
+    <div class="comp-row">
+      <div class="comp-cell"><span class="comp-cap">DEFAULT</span><div class="menu-button slant"><span>OPTIONS</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">HOVER</span><div class="menu-button slant is-hover"><span>OPTIONS</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">FOCUS (+14PX, RED TICK)</span><div class="menu-button slant is-focus" style="margin-left: 22px;"><div class="focus-marker"></div><span>OPTIONS</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">ACTIVE</span><div class="menu-button slant is-active"><span>OPTIONS</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">DISABLED</span><div class="menu-button slant is-disabled"><span>CAPTURE</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">PRIMARY</span><div class="menu-button menu-button--primary slant"><span>PLAY</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">PRIMARY · FOCUS</span><div class="menu-button menu-button--primary slant is-focus" style="margin-left: 22px;"><div class="focus-marker"></div><span>PLAY</span></div></div>
+    </div>
+
+    <div class="comp-row">
+      <div class="comp-cell" style="width: 680px"><span class="comp-cap">TOGGLE · OFF / ON / FOCUSED</span>
+        <div class="option"><span class="field-label">Arcade mode</span><div class="checkmark"></div></div>
+        <div class="option"><span class="field-label">Controller buzzer</span><div class="checkmark is-on"></div></div>
+        <div class="option option--focused"><span class="field-label">Invert vertical steering</span><div class="checkmark"></div></div>
+      </div>
+      <div class="comp-cell" style="width: 680px"><span class="comp-cap">SLIDER · DEFAULT / FOCUSED</span>
+        <div class="option"><span class="field-label">Steering sensitivity</span><div class="slider"><div class="tracker"></div><div class="dragger" style="left: 30%;"></div></div></div>
+        <div class="option option--focused"><span class="field-label">Steering sensitivity</span><div class="slider"><div class="tracker"></div><div class="dragger" style="left: 50%;"></div></div></div>
+      </div>
+    </div>
+
+    <div class="comp-row">
+      <div class="comp-cell" style="width: 460px"><span class="comp-cap">THROTTLE · CRUISE</span>
+        <div class="ve throttle" style="position: static">
+          <span class="label hud-caption">THROTTLE</span>
+          <div class="throttle-track"><div class="throttle-fill"></div><div class="throttle-cruise" style="left:50%"></div><div class="throttle-setpoint" style="left:50%"></div></div>
+          <div class="throttle-readouts"><span class="label hud-readout throttle-speed">SPEED 100%</span></div>
+        </div>
+      </div>
+      <div class="comp-cell" style="width: 460px"><span class="comp-cap">THROTTLE · GUIDED, IN BAND</span>
+        <div class="ve throttle throttle--guided throttle--in-band" style="position: static">
+          <span class="label hud-caption">THROTTLE · FAST ZONE</span>
+          <div class="throttle-track"><div class="throttle-fill" style="width:88%"></div><div class="throttle-band" style="left:80%;width:20%"></div><div class="throttle-cruise" style="left:50%"></div><div class="throttle-setpoint" style="left:88%"></div></div>
+          <div class="throttle-readouts"><span class="label hud-readout throttle-speed">SPEED 176%</span><span class="label hud-readout throttle-hint">HOLD</span></div>
+        </div>
+      </div>
+      <div class="comp-cell"><span class="comp-cap">HUD TAGS</span>
+        <div style="display:flex; gap: 24px; align-items:center;">
+          <span class="label hud-readout" style="font-size:22px;letter-spacing:6px;color:var(--soft);padding:4px 10px">KEYBOARD</span>
+          <span class="label hud-readout hud-controller--warning" style="font-size:22px;letter-spacing:6px;padding:4px 10px">CONTROLLER LOST</span>
+          <span class="label hud-readout hud-proximity--pulse" style="font-size:26px;letter-spacing:8px;padding:4px 14px">PROXIMITY</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-row">
+      <div class="comp-cell"><span class="comp-cap">KEY ROW</span><div class="key-row" style="margin:0"><span class="label key">Q / E</span><span class="label key-action">Lower / raise throttle</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">KEYCAPS</span><div class="key-hints"><span class="label micro micro--ink keycap">ENTER</span><span class="label micro key-verb">SELECT</span><span class="label micro micro--ink keycap">ESC</span><span class="label micro key-verb">BACK</span></div></div>
+      <div class="comp-cell"><span class="comp-cap">STATUS LED · ONLINE / OFFLINE</span><div class="status-line"><div class="status-led"></div><span class="label micro micro--ink">COCKPIT ONLINE</span><div class="status-led status-led--offline" style="margin-left:24px"></div><span class="label micro">COCKPIT OFFLINE</span></div></div>
+      <div class="comp-cell" style="width: 560px"><span class="comp-cap">NOTICE</span><span class="label body-text pause-notice" style="margin:0">Controller reconnected. Resume when ready.</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Same outline as SlantButton.Draw: lean the top edge forward, chevron point on the right.
+  function drawSlant(button) {
+    const w = button.offsetWidth, h = button.offsetHeight;
+    const style = getComputedStyle(button);
+    const lean = 18, point = 22, stroke = 2, i = stroke / 2;
+    const pts = [
+      [lean + i, i],
+      [w - point - i, i],
+      [w - lean * 0.5 - i, h * 0.5],
+      [w - lean - point - i, h - i],
+      [i, h - i],
+    ].map(p => p.join(',')).join(' ');
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    const poly = document.createElementNS(ns, 'polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('fill', style.getPropertyValue('--slant-fill').trim());
+    poly.setAttribute('stroke', style.getPropertyValue('--slant-stroke').trim());
+    poly.setAttribute('stroke-width', stroke);
+    poly.setAttribute('stroke-linejoin', 'miter');
+    svg.appendChild(poly);
+    button.prepend(svg);
+  }
+
+  // Unity's checkmark is a tinted tick image; draw an equivalent black tick.
+  function drawTick(box) {
+    box.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M3 10.5 L8 15 L17 4.5" fill="none" stroke="#000" stroke-width="3"/></svg>';
+  }
+
+  document.fonts.ready.then(() => {
+    document.querySelectorAll('.slant').forEach(drawSlant);
+    document.querySelectorAll('.checkmark.is-on').forEach(drawTick);
+  });
+
+  // index.html#svg adds a bar for downloading each frame as an SVG (Figma imports SVG natively).
+  if (location.hash === '#svg') {
+    const s = document.createElement('script');
+    s.src = 'svg-export.js';
+    document.body.appendChild(s);
+  }
+</script>
+</body>
+</html>

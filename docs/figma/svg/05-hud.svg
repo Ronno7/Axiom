@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+<linearGradient id="g-level" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3440"/><stop offset="0.46" stop-color="#46505c"/>
+      <stop offset="0.47" stop-color="#1a1d22"/><stop offset="1" stop-color="#0b0c0e"/></linearGradient>
+<filter id="halo" x="-20%" y="-50%" width="140%" height="200%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#000" flood-opacity="0.95"/></filter>
+<clipPath id="frame-clip"><rect width="1920" height="1080"/></clipPath>
+</defs>
+<g clip-path="url(#frame-clip)">
+  <g id="HUD">
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#g-level)"/>
+    <g id="screen">
+      <g id="hud">
+        <g id="hud-readout · 1:12.4">
+          <text x="56" y="74.88" font-family="Inter" font-size="36" font-weight="700" letter-spacing="4" fill="#ebebeb" filter="url(#halo)" xml:space="preserve">1:12.4</text>
+        </g>
+        <g id="hud-readout · TARGETS 9/18">
+          <text x="1563.52" y="74.88" font-family="Inter" font-size="36" font-weight="700" letter-spacing="4" fill="#ebebeb" filter="url(#halo)" xml:space="preserve">TARGETS 9/18</text>
+        </g>
+        <g id="hud-readout · KEYBOARD">
+          <text x="1683.39" y="1023.31" font-family="Inter" font-size="22" font-weight="700" letter-spacing="6" fill="#c8c8c8" filter="url(#halo)" xml:space="preserve">KEYBOARD</text>
+        </g>
+        <g id="throttle">
+          <g id="hud-caption · THROTTLE">
+            <text x="56" y="958.38" font-family="Inter" font-size="20" font-weight="400" letter-spacing="6" fill="#c8c8c8" filter="url(#halo)" xml:space="preserve">THROTTLE</text>
+          </g>
+          <g id="throttle-track">
+            <rect x="57" y="974" width="458" height="16" fill="none" stroke="#ebebeb" stroke-width="2"/>
+            <g id="throttle-fill">
+              <rect x="58" y="975" width="228" height="14" fill="#969696"/>
+            </g>
+            <g id="throttle-cruise">
+              <rect x="285" y="969" width="2" height="26" fill="#5a5a5a"/>
+            </g>
+            <g id="throttle-setpoint">
+              <rect x="283" y="965" width="6" height="34" fill="#ebebeb"/>
+            </g>
+          </g>
+          <g id="throttle-readouts">
+            <g id="hud-readout · SPEED 100%">
+              <text x="56" y="1026.19" font-family="Inter" font-size="26" font-weight="700" letter-spacing="4" fill="#ebebeb" filter="url(#halo)" xml:space="preserve">SPEED 100%</text>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>

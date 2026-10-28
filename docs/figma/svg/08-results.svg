@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+<linearGradient id="g-level" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3440"/><stop offset="0.46" stop-color="#46505c"/>
+      <stop offset="0.47" stop-color="#1a1d22"/><stop offset="1" stop-color="#0b0c0e"/></linearGradient>
+<clipPath id="frame-clip"><rect width="1920" height="1080"/></clipPath>
+</defs>
+<g clip-path="url(#frame-clip)">
+  <g id="Results">
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#g-level)"/>
+    <g id="screen">
+      <rect x="0" y="0" width="1920" height="1080" fill="#000000" fill-opacity="0.72"/>
+      <g id="panel">
+        <rect x="570" y="170.5" width="780" height="739" fill="#060606" fill-opacity="0.97"/>
+        <rect x="571" y="171.5" width="778" height="737" fill="none" stroke="#ebebeb" stroke-width="2"/>
+        <g id="panel-title · LEVEL COMPLETE">
+          <text x="624" y="261.06" font-family="Inter" font-size="46" font-weight="700" letter-spacing="14" fill="#ebebeb" xml:space="preserve">LEVEL COMPLETE</text>
+        </g>
+        <g id="stat-row">
+          <rect x="624" y="360.5" width="672" height="1" fill="#464646"/>
+          <g id="stat-name · TIME">
+            <text x="624" y="343.69" font-family="Inter" font-size="26" font-weight="400" letter-spacing="4" fill="#969696" xml:space="preserve">TIME</text>
+          </g>
+          <g id="stat-value · 1:42.6">
+            <text x="1205.22" y="343.56" font-family="Inter" font-size="30" font-weight="700" fill="#ebebeb" xml:space="preserve">1:42.6</text>
+          </g>
+        </g>
+        <g id="stat-row">
+          <rect x="624" y="417.5" width="672" height="1" fill="#464646"/>
+          <g id="stat-name · TARGETS">
+            <text x="624" y="400.69" font-family="Inter" font-size="26" font-weight="400" letter-spacing="4" fill="#969696" xml:space="preserve">TARGETS</text>
+          </g>
+          <g id="stat-value · 14 / 18">
+            <text x="1204.45" y="400.56" font-family="Inter" font-size="30" font-weight="700" fill="#ebebeb" xml:space="preserve">14 / 18</text>
+          </g>
+        </g>
+        <g id="stat-row">
+          <rect x="624" y="474.5" width="672" height="1" fill="#464646"/>
+          <g id="stat-name · ACCURACY">
+            <text x="624" y="457.69" font-family="Inter" font-size="26" font-weight="400" letter-spacing="4" fill="#969696" xml:space="preserve">ACCURACY</text>
+          </g>
+          <g id="stat-value · 78%">
+            <text x="1228.97" y="457.56" font-family="Inter" font-size="30" font-weight="700" fill="#ebebeb" xml:space="preserve">78%</text>
+          </g>
+        </g>
+        <g id="stat-row">
+          <rect x="624" y="531.5" width="672" height="1" fill="#464646"/>
+          <g id="stat-name · SHIELD">
+            <text x="624" y="514.69" font-family="Inter" font-size="26" font-weight="400" letter-spacing="4" fill="#969696" xml:space="preserve">SHIELD</text>
+          </g>
+          <g id="stat-value · 2 / 3">
+            <text x="1231.88" y="514.56" font-family="Inter" font-size="30" font-weight="700" fill="#ebebeb" xml:space="preserve">2 / 3</text>
+          </g>
+        </g>
+        <g id="stat-row">
+          <rect x="624" y="588.5" width="672" height="1" fill="#464646"/>
+          <g id="stat-name · PAR">
+            <text x="624" y="571.69" font-family="Inter" font-size="26" font-weight="400" letter-spacing="4" fill="#969696" xml:space="preserve">PAR</text>
+          </g>
+          <g id="stat-value · 1:50.0">
+            <text x="1205.64" y="571.56" font-family="Inter" font-size="30" font-weight="700" fill="#ebebeb" xml:space="preserve">1:50.0</text>
+          </g>
+        </g>
+        <g id="results-buttons">
+          <g id="menu-button · NEXT LEVEL">
+            <g transform="translate(638 625.5)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#ebebeb" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+            <g id="span · NEXT LEVEL">
+              <text x="678" y="668.63" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#000000" xml:space="preserve">NEXT LEVEL</text>
+            </g>
+          </g>
+          <g id="menu-button · RETRY">
+            <g transform="translate(624 707.5)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+            <g id="span · RETRY">
+              <text x="664" y="750.63" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">RETRY</text>
+            </g>
+          </g>
+          <g id="menu-button · MAIN MENU">
+            <g transform="translate(624 789.5)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+            <g id="span · MAIN MENU">
+              <text x="664" y="832.63" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">MAIN MENU</text>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>

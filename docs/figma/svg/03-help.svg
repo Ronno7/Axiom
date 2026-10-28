@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+<radialGradient id="g-menu" cx="0.72" cy="0.5" r="0.75">
+      <stop offset="0" stop-color="#3a3f48"/><stop offset="0.55" stop-color="#121417"/>
+      <stop offset="1" stop-color="#000000"/></radialGradient>
+<linearGradient id="g-scrim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.92"/><stop offset="0.45" stop-color="#000" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+<clipPath id="frame-clip"><rect width="1920" height="1080"/></clipPath>
+</defs>
+<g clip-path="url(#frame-clip)">
+  <g id="Help">
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#g-menu)"/>
+    <g id="scrim">
+      <rect x="0" y="0" width="1190.39" height="1080" fill="url(#g-scrim)"/>
+    </g>
+    <g id="screen">
+      <g id="panel">
+        <rect x="160" y="185" width="1180" height="710" fill="#060606" fill-opacity="0.97"/>
+        <rect x="161" y="186" width="1178" height="708" fill="none" stroke="#ebebeb" stroke-width="2"/>
+        <g id="panel-title · HELP">
+          <text x="214" y="275.56" font-family="Inter" font-size="46" font-weight="700" letter-spacing="14" fill="#ebebeb" xml:space="preserve">HELP</text>
+        </g>
+        <g id="help-columns">
+          <g id="help-column">
+            <g id="section-title · CONTROLS">
+              <text x="214" y="350.25" font-family="Inter" font-size="24" font-weight="400" letter-spacing="8" fill="#969696" xml:space="preserve">CONTROLS</text>
+            </g>
+            <g id="key-row">
+              <g id="key · WASD / ARROWS">
+                <rect x="215" y="373" width="233.42" height="40" fill="none" stroke="#ebebeb" stroke-width="2"/>
+                <text x="226" y="401.31" font-family="Inter" font-size="22" font-weight="700" letter-spacing="2" fill="#ebebeb" xml:space="preserve">WASD / ARROWS</text>
+              </g>
+              <g id="key-action · Steer">
+                <text x="467.42" y="401.75" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Steer</text>
+              </g>
+            </g>
+            <g id="key-row">
+              <g id="key · Q / E">
+                <rect x="215" y="437" width="228" height="40" fill="none" stroke="#ebebeb" stroke-width="2"/>
+                <text x="299.28" y="465.31" font-family="Inter" font-size="22" font-weight="700" letter-spacing="2" fill="#ebebeb" xml:space="preserve">Q / E</text>
+              </g>
+              <g id="key-action · Lower / raise throttle. ">
+                <text x="462" y="451.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Lower / raise throttle. It</text>
+                <text x="462" y="480.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">stays where you leave it.</text>
+              </g>
+            </g>
+            <g id="key-row">
+              <g id="key · SPACE (HOLD)">
+                <rect x="215" y="501" width="228" height="40" fill="none" stroke="#ebebeb" stroke-width="2"/>
+                <text x="239.05" y="529.31" font-family="Inter" font-size="22" font-weight="700" letter-spacing="2" fill="#ebebeb" xml:space="preserve">SPACE (HOLD)</text>
+              </g>
+              <g id="key-action · Fire">
+                <text x="462" y="529.75" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Fire</text>
+              </g>
+            </g>
+            <g id="key-row">
+              <g id="key · ESC">
+                <rect x="215" y="557" width="228" height="40" fill="none" stroke="#ebebeb" stroke-width="2"/>
+                <text x="303.97" y="585.31" font-family="Inter" font-size="22" font-weight="700" letter-spacing="2" fill="#ebebeb" xml:space="preserve">ESC</text>
+              </g>
+              <g id="key-action · Pause">
+                <text x="462" y="585.75" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Pause</text>
+              </g>
+            </g>
+          </g>
+          <g id="help-column">
+            <g id="section-title · MISSION">
+              <text x="813.66" y="350.25" font-family="Inter" font-size="24" font-weight="400" letter-spacing="8" fill="#969696" xml:space="preserve">MISSION</text>
+            </g>
+            <g id="body-text · Fly to the end of the le">
+              <text x="813.66" y="395.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Fly to the end of the level. Destroy</text>
+              <text x="813.66" y="424.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">targets along the way for a better</text>
+              <text x="813.66" y="453.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">result.</text>
+            </g>
+            <g id="body-text · Your shield is the three">
+              <text x="813.66" y="496.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Your shield is the three blue blocks</text>
+              <text x="813.66" y="525.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">on the back of your ship.</text>
+            </g>
+            <g id="body-text · Blue floor markings call">
+              <text x="813.66" y="568.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Blue floor markings call for a throttle</text>
+              <text x="813.66" y="597.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">change. The throttle gauge shows</text>
+              <text x="813.66" y="626.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">the target speed.</text>
+            </g>
+            <g id="body-text · Lose every segment and t">
+              <text x="813.66" y="669.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Lose every segment and the run</text>
+              <text x="813.66" y="698.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">ends. Beat the par time by flying fast</text>
+              <text x="813.66" y="727.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">where it is safe.</text>
+            </g>
+          </g>
+        </g>
+        <g id="menu-button · BACK">
+          <g transform="translate(228 775)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#ebebeb" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · BACK">
+            <text x="268" y="818.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#000000" xml:space="preserve">BACK</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>

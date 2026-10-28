@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+<radialGradient id="g-menu" cx="0.72" cy="0.5" r="0.75">
+      <stop offset="0" stop-color="#3a3f48"/><stop offset="0.55" stop-color="#121417"/>
+      <stop offset="1" stop-color="#000000"/></radialGradient>
+<linearGradient id="g-scrim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.92"/><stop offset="0.45" stop-color="#000" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+<clipPath id="frame-clip"><rect width="1920" height="1080"/></clipPath>
+</defs>
+<g clip-path="url(#frame-clip)">
+  <g id="Options">
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#g-menu)"/>
+    <g id="scrim">
+      <rect x="0" y="0" width="1190.39" height="1080" fill="url(#g-scrim)"/>
+    </g>
+    <g id="screen">
+      <g id="panel">
+        <rect x="160" y="198" width="780" height="684" fill="#060606" fill-opacity="0.97"/>
+        <rect x="161" y="199" width="778" height="682" fill="none" stroke="#ebebeb" stroke-width="2"/>
+        <g id="panel-title · OPTIONS">
+          <text x="214" y="288.56" font-family="Inter" font-size="46" font-weight="700" letter-spacing="14" fill="#ebebeb" xml:space="preserve">OPTIONS</text>
+        </g>
+        <g id="option">
+          <rect x="215" y="343" width="670" height="61" fill="none" stroke="#ebebeb" stroke-width="2"/>
+          <g id="field-label · Steering sensitivity">
+            <text x="234" y="383.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Steering sensitivity</text>
+          </g>
+          <g id="slider">
+            <g id="tracker">
+              <rect x="592" y="369.5" width="276" height="8" fill="#282828"/>
+              <rect x="592.5" y="370" width="275" height="7" fill="none" stroke="#969696" stroke-width="1"/>
+            </g>
+            <g id="dragger">
+              <rect x="721" y="359.5" width="18" height="28" fill="#ebebeb"/>
+            </g>
+          </g>
+        </g>
+        <g id="option">
+          <g id="field-label · Invert vertical steering">
+            <text x="234" y="466.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Invert vertical steering</text>
+          </g>
+          <g id="checkmark">
+            <rect x="593" y="442.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+          </g>
+        </g>
+        <g id="option">
+          <g id="field-label · Controller buzzer">
+            <text x="234" y="549.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Controller buzzer</text>
+          </g>
+          <g id="checkmark">
+            <rect x="592" y="524.5" width="30" height="30" fill="#ebebeb"/>
+            <rect x="593" y="525.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+            <g transform="translate(597 529.5)"><path d="M3 10.5 L8 15 L17 4.5" fill="none" stroke="#000" stroke-width="3"></path></g>
+          </g>
+        </g>
+        <g id="option">
+          <g id="field-label · Arcade mode">
+            <text x="234" y="632.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Arcade mode</text>
+          </g>
+          <g id="checkmark">
+            <rect x="593" y="608.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+          </g>
+        </g>
+        <g id="menu-button · CALIBRATE CONTROLLER">
+          <g transform="translate(214 680)"><polygon points="19,1 577,1 590,33 559,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · CALIBRATE CONTROLLER">
+            <text x="254" y="723.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">CALIBRATE CONTROLLER</text>
+          </g>
+        </g>
+        <g id="menu-button · BACK">
+          <g transform="translate(214 762)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · BACK">
+            <text x="254" y="805.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">BACK</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>

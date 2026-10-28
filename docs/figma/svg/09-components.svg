@@ -1,0 +1,475 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="2590" viewBox="0 0 1920 2590">
+<defs>
+<clipPath id="frame-clip"><rect width="1920" height="2590"/></clipPath>
+</defs>
+<g clip-path="url(#frame-clip)">
+  <g id="Components">
+    <rect x="0" y="0" width="1920" height="2590" fill="#0a0a0a"/>
+    <g id="comp-row">
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="80" y="80" width="160" height="96" fill="#ebebeb"/>
+          <rect x="80.5" y="80.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · INK · 235,235,235">
+          <text x="80" y="205.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">INK · 235,235,235</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="315.47" y="80" width="160" height="96" fill="#c8c8c8"/>
+          <rect x="315.97" y="80.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · SOFT · 200,200,200">
+          <text x="315.47" y="205.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">SOFT · 200,200,200</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="571.59" y="80" width="160" height="96" fill="#969696"/>
+          <rect x="572.09" y="80.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · DIM · 150,150,150">
+          <text x="571.59" y="205.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">DIM · 150,150,150</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="798.42" y="80" width="160" height="96" fill="#8c8c92"/>
+          <rect x="798.92" y="80.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · MICRO · 140,140,146">
+          <text x="798.42" y="205.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">MICRO · 140,140,146</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="1056.28" y="80" width="160" height="96" fill="#5a5a5a"/>
+          <rect x="1056.78" y="80.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · STROKE · 90,90,90">
+          <text x="1056.28" y="205.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">STROKE · 90,90,90</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="1300.55" y="80" width="160" height="96" fill="#464646"/>
+          <rect x="1301.05" y="80.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · RULE · 70,70,70">
+          <text x="1300.55" y="205.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">RULE · 70,70,70</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="1512.67" y="80" width="160" height="96" fill="#060606" fill-opacity="0.97"/>
+          <rect x="1513.17" y="80.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · PANEL · 6,6,6 @97%">
+          <text x="1512.67" y="205.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">PANEL · 6,6,6 @97%</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="80" y="258" width="160" height="96" fill="#d61f29"/>
+          <rect x="80.5" y="258.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · RED · FOCUS/DANGER">
+          <text x="80" y="383.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">RED · FOCUS/DANGER</text>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="swatch">
+          <rect x="354.33" y="258" width="160" height="96" fill="#2ca0ff"/>
+          <rect x="354.83" y="258.5" width="159" height="95" fill="none" stroke="#333333" stroke-width="1"/>
+        </g>
+        <g id="comp-cap · BLUE · GUIDANCE">
+          <text x="354.33" y="383.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">BLUE · GUIDANCE</text>
+        </g>
+      </g>
+    </g>
+    <g id="div">
+      <g id="type-row">
+        <g id="comp-cap · PANEL TITLE · 46 / 14 / ">
+          <text x="80" y="504.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">PANEL TITLE · 46 / 14 / BOLD</text>
+        </g>
+        <g id="panel-title · PAUSED">
+          <text x="432" y="504.56" font-family="Inter" font-size="46" font-weight="700" letter-spacing="14" fill="#ebebeb" xml:space="preserve">PAUSED</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · ZONE BANNER · 40 / 10">
+          <text x="80" y="576.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">ZONE BANNER · 40 / 10</text>
+        </g>
+        <g id="zone-banner · FAST ZONE  ·  FULL THROT">
+          <text x="434" y="576.75" font-family="Inter" font-size="40" font-weight="400" letter-spacing="10" fill="#2ca0ff" xml:space="preserve">FAST ZONE  ·  FULL THROTTLE</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · HUD READOUT · 36 / 4 / B">
+          <text x="80" y="643.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">HUD READOUT · 36 / 4 / BOLD</text>
+        </g>
+        <g id="hud-readout · TARGETS 9/18">
+          <text x="432" y="643.88" font-family="Inter" font-size="36" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">TARGETS 9/18</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · BUTTON · 28 / 8 / BOLD">
+          <text x="80" y="701.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">BUTTON · 28 / 8 / BOLD</text>
+        </g>
+        <g id="span · OPTIONS">
+          <text x="434" y="702.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">OPTIONS</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · STAT VALUE · 30 / BOLD">
+          <text x="80" y="759.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">STAT VALUE · 30 / BOLD</text>
+        </g>
+        <g id="stat-value · 1:42.6">
+          <text x="432" y="760.06" font-family="Inter" font-size="30" font-weight="700" fill="#ebebeb" xml:space="preserve">1:42.6</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · OPTION LABEL · 26">
+          <text x="80" y="813.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">OPTION LABEL · 26</text>
+        </g>
+        <g id="span · Steering sensitivity">
+          <text x="434" y="814.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Steering sensitivity</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · BODY · 24">
+          <text x="80" y="864.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">BODY · 24</text>
+        </g>
+        <g id="body-text · Fly to the end of the le">
+          <text x="432" y="865.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Fly to the end of the level.</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · SECTION TITLE · 24 / 8">
+          <text x="80" y="913.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">SECTION TITLE · 24 / 8</text>
+        </g>
+        <g id="section-title · CONTROLS">
+          <text x="432" y="914.25" font-family="Inter" font-size="24" font-weight="400" letter-spacing="8" fill="#969696" xml:space="preserve">CONTROLS</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · HINT · 20">
+          <text x="80" y="960.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">HINT · 20</text>
+        </g>
+        <g id="hint · Waiting for data…">
+          <text x="434" y="961.38" font-family="Inter" font-size="20" font-weight="400" fill="#969696" xml:space="preserve">Waiting for data…</text>
+        </g>
+      </g>
+      <g id="type-row">
+        <g id="comp-cap · MICRO · 14 / 4 / BOLD">
+          <text x="80" y="1003.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">MICRO · 14 / 4 / BOLD</text>
+        </g>
+        <g id="micro · SYS ONLINE">
+          <text x="432" y="1003.56" font-family="Inter" font-size="14" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">SYS ONLINE</text>
+        </g>
+      </g>
+    </g>
+    <g id="comp-row">
+      <g id="comp-cell">
+        <g id="comp-cap · DEFAULT">
+          <text x="80" y="1095.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">DEFAULT</text>
+        </g>
+        <g id="menu-button · OPTIONS">
+          <g transform="translate(80 1122)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · OPTIONS">
+            <text x="120" y="1165.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">OPTIONS</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · HOVER">
+          <text x="568" y="1095.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">HOVER</text>
+        </g>
+        <g id="menu-button · OPTIONS">
+          <g transform="translate(568 1122)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · OPTIONS">
+            <text x="608" y="1165.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">OPTIONS</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · FOCUS (+14PX, RED TICK)">
+          <text x="1056" y="1095.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">FOCUS (+14PX, RED TICK)</text>
+        </g>
+        <g id="menu-button · OPTIONS">
+          <g transform="translate(1092 1122)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#ebebeb" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="focus-marker">
+            <rect x="1070" y="1134" width="6" height="42" fill="#d61f29"/>
+          </g>
+          <g id="span · OPTIONS">
+            <text x="1132" y="1165.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#000000" xml:space="preserve">OPTIONS</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · ACTIVE">
+          <text x="80" y="1259.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">ACTIVE</text>
+        </g>
+        <g id="menu-button · OPTIONS">
+          <g transform="translate(80 1286)"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#aaaaaa" stroke="#aaaaaa" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · OPTIONS">
+            <text x="120" y="1329.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">OPTIONS</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · DISABLED">
+          <text x="568" y="1259.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">DISABLED</text>
+        </g>
+        <g id="menu-button · CAPTURE">
+          <g transform="translate(568 1286)" opacity="0.5"><polygon points="19,1 417,1 430,33 399,65 1,65" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · CAPTURE">
+            <text x="608" y="1329.13" font-family="Inter" font-size="28" font-weight="700" letter-spacing="8" fill="#ebebeb" fill-opacity="0.5" xml:space="preserve">CAPTURE</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · PRIMARY">
+          <text x="1056" y="1259.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">PRIMARY</text>
+        </g>
+        <g id="menu-button · PLAY">
+          <g transform="translate(1056 1286)"><polygon points="19,1 457,1 470,39 439,77 1,77" fill="#000000" fill-opacity="0.55" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="span · PLAY">
+            <text x="1096" y="1337.44" font-family="Inter" font-size="34" font-weight="700" letter-spacing="8" fill="#ebebeb" xml:space="preserve">PLAY</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · PRIMARY · FOCUS">
+          <text x="80" y="1435.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">PRIMARY · FOCUS</text>
+        </g>
+        <g id="menu-button · PLAY">
+          <g transform="translate(116 1462)"><polygon points="19,1 457,1 470,39 439,77 1,77" fill="#ebebeb" stroke="#ebebeb" stroke-width="2" stroke-linejoin="miter"></polygon></g>
+          <g id="focus-marker">
+            <rect x="94" y="1474" width="6" height="54" fill="#d61f29"/>
+          </g>
+          <g id="span · PLAY">
+            <text x="156" y="1513.44" font-family="Inter" font-size="34" font-weight="700" letter-spacing="8" fill="#000000" xml:space="preserve">PLAY</text>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="comp-row">
+      <g id="comp-cell">
+        <g id="comp-cap · TOGGLE · OFF / ON / FOCU">
+          <text x="80" y="1635.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">TOGGLE · OFF / ON / FOCUSED</text>
+        </g>
+        <g id="option">
+          <g id="field-label · Arcade mode">
+            <text x="100" y="1705.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Arcade mode</text>
+          </g>
+          <g id="checkmark">
+            <rect x="459" y="1681.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+          </g>
+        </g>
+        <g id="option">
+          <g id="field-label · Controller buzzer">
+            <text x="100" y="1802.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Controller buzzer</text>
+          </g>
+          <g id="checkmark">
+            <rect x="458" y="1777.5" width="30" height="30" fill="#ebebeb"/>
+            <rect x="459" y="1778.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+            <g transform="translate(463 1782.5)"><path d="M3 10.5 L8 15 L17 4.5" fill="none" stroke="#000" stroke-width="3"></path></g>
+          </g>
+        </g>
+        <g id="option">
+          <rect x="81" y="1859" width="678" height="61" fill="none" stroke="#ebebeb" stroke-width="2"/>
+          <g id="field-label · Invert vertical steering">
+            <text x="100" y="1899.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Invert vertical steering</text>
+          </g>
+          <g id="checkmark">
+            <rect x="459" y="1875.5" width="28" height="28" fill="none" stroke="#ebebeb" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · SLIDER · DEFAULT / FOCUS">
+          <text x="808" y="1635.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">SLIDER · DEFAULT / FOCUSED</text>
+        </g>
+        <g id="option">
+          <g id="field-label · Steering sensitivity">
+            <text x="828" y="1705.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Steering sensitivity</text>
+          </g>
+          <g id="slider">
+            <g id="tracker">
+              <rect x="1186" y="1691.5" width="284" height="8" fill="#282828"/>
+              <rect x="1186.5" y="1692" width="283" height="7" fill="none" stroke="#969696" stroke-width="1"/>
+            </g>
+            <g id="dragger">
+              <rect x="1262.19" y="1681.5" width="18" height="28" fill="#ebebeb"/>
+            </g>
+          </g>
+        </g>
+        <g id="option">
+          <rect x="809" y="1762" width="678" height="61" fill="none" stroke="#ebebeb" stroke-width="2"/>
+          <g id="field-label · Steering sensitivity">
+            <text x="828" y="1802.19" font-family="Inter" font-size="26" font-weight="400" fill="#ebebeb" xml:space="preserve">Steering sensitivity</text>
+          </g>
+          <g id="slider">
+            <g id="tracker">
+              <rect x="1186" y="1788.5" width="284" height="8" fill="#282828"/>
+              <rect x="1186.5" y="1789" width="283" height="7" fill="none" stroke="#969696" stroke-width="1"/>
+            </g>
+            <g id="dragger">
+              <rect x="1319" y="1778.5" width="18" height="28" fill="#ebebeb"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="comp-row">
+      <g id="comp-cell">
+        <g id="comp-cap · THROTTLE · CRUISE">
+          <text x="80" y="2018.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">THROTTLE · CRUISE</text>
+        </g>
+        <g id="throttle">
+          <g id="hud-caption · THROTTLE">
+            <text x="80" y="2056.38" font-family="Inter" font-size="20" font-weight="400" letter-spacing="6" fill="#c8c8c8" xml:space="preserve">THROTTLE</text>
+          </g>
+          <g id="throttle-track">
+            <rect x="81" y="2072" width="458" height="16" fill="none" stroke="#ebebeb" stroke-width="2"/>
+            <g id="throttle-fill">
+              <rect x="82" y="2073" width="228" height="14" fill="#969696"/>
+            </g>
+            <g id="throttle-cruise">
+              <rect x="309" y="2067" width="2" height="26" fill="#5a5a5a"/>
+            </g>
+            <g id="throttle-setpoint">
+              <rect x="307" y="2063" width="6" height="34" fill="#ebebeb"/>
+            </g>
+          </g>
+          <g id="throttle-readouts">
+            <g id="hud-readout · SPEED 100%">
+              <text x="80" y="2124.19" font-family="Inter" font-size="26" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">SPEED 100%</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · THROTTLE · GUIDED, IN BA">
+          <text x="588" y="2018.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">THROTTLE · GUIDED, IN BAND</text>
+        </g>
+        <g id="throttle">
+          <g id="hud-caption · THROTTLE · FAST ZONE">
+            <text x="588" y="2056.38" font-family="Inter" font-size="20" font-weight="400" letter-spacing="6" fill="#2ca0ff" xml:space="preserve">THROTTLE · FAST ZONE</text>
+          </g>
+          <g id="throttle-track">
+            <rect x="589" y="2072" width="458" height="16" fill="none" stroke="#ebebeb" stroke-width="2"/>
+            <g id="throttle-fill">
+              <rect x="590" y="2073" width="401.27" height="14" fill="#969696"/>
+            </g>
+            <g id="throttle-band">
+              <rect x="954.8" y="2069" width="91.19" height="22" fill="#2ca0ff" fill-opacity="0.45"/>
+              <rect x="1043.99" y="2069" width="2" height="22" fill="#2ca0ff"/>
+              <rect x="954.8" y="2069" width="2" height="22" fill="#2ca0ff"/>
+            </g>
+            <g id="throttle-cruise">
+              <rect x="817" y="2067" width="2" height="26" fill="#5a5a5a"/>
+            </g>
+            <g id="throttle-setpoint">
+              <rect x="988.27" y="2063" width="6" height="34" fill="#ebebeb"/>
+            </g>
+          </g>
+          <g id="throttle-readouts">
+            <g id="hud-readout · SPEED 176%">
+              <text x="588" y="2124.19" font-family="Inter" font-size="26" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">SPEED 176%</text>
+            </g>
+            <g id="hud-readout · HOLD">
+              <text x="959.06" y="2124.19" font-family="Inter" font-size="26" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">HOLD</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · HUD TAGS">
+          <text x="80" y="2193.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">HUD TAGS</text>
+        </g>
+        <g id="div">
+          <g id="hud-readout · KEYBOARD">
+            <text x="90" y="2239.81" font-family="Inter" font-size="22" font-weight="700" letter-spacing="6" fill="#c8c8c8" xml:space="preserve">KEYBOARD</text>
+          </g>
+          <g id="hud-readout · CONTROLLER LOST">
+            <rect x="294.61" y="2214.5" width="321.67" height="34" fill="#ebebeb"/>
+            <text x="304.61" y="2239.81" font-family="Inter" font-size="22" font-weight="700" letter-spacing="6" fill="#000000" xml:space="preserve">CONTROLLER LOST</text>
+          </g>
+          <g id="hud-readout · PROXIMITY">
+            <rect x="640.28" y="2212" width="247.2" height="39" fill="#ebebeb"/>
+            <text x="654.28" y="2241.19" font-family="Inter" font-size="26" font-weight="700" letter-spacing="8" fill="#000000" xml:space="preserve">PROXIMITY</text>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="comp-row">
+      <g id="comp-cell">
+        <g id="comp-cap · KEY ROW">
+          <text x="80" y="2338.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">KEY ROW</text>
+        </g>
+        <g id="key-row">
+          <g id="key · Q / E">
+            <rect x="81" y="2358" width="228" height="40" fill="none" stroke="#ebebeb" stroke-width="2"/>
+            <text x="165.28" y="2386.31" font-family="Inter" font-size="22" font-weight="700" letter-spacing="2" fill="#ebebeb" xml:space="preserve">Q / E</text>
+          </g>
+          <g id="key-action · Lower / raise throttle">
+            <text x="328" y="2386.75" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Lower / raise throttle</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · KEYCAPS">
+          <text x="610.23" y="2338.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">KEYCAPS</text>
+        </g>
+        <g id="key-hints">
+          <g id="micro · ENTER">
+            <rect x="610.73" y="2357.5" width="79.22" height="24" rx="3" fill="none" stroke="#ebebeb" stroke-width="1" stroke-opacity="0.5"/>
+            <text x="619.23" y="2374.56" font-family="Inter" font-size="14" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">ENTER</text>
+          </g>
+          <g id="micro · SELECT">
+            <text x="700.45" y="2374.56" font-family="Inter" font-size="14" font-weight="700" letter-spacing="4" fill="#8c8c92" xml:space="preserve">SELECT</text>
+          </g>
+          <g id="micro · ESC">
+            <rect x="808.75" y="2357.5" width="53.03" height="24" rx="3" fill="none" stroke="#ebebeb" stroke-width="1" stroke-opacity="0.5"/>
+            <text x="817.25" y="2374.56" font-family="Inter" font-size="14" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">ESC</text>
+          </g>
+          <g id="micro · BACK">
+            <text x="872.28" y="2374.56" font-family="Inter" font-size="14" font-weight="700" letter-spacing="4" fill="#8c8c92" xml:space="preserve">BACK</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · STATUS LED · ONLINE / OF">
+          <text x="1005.84" y="2338.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">STATUS LED · ONLINE / OFFLINE</text>
+        </g>
+        <g id="status-line">
+          <g id="status-led">
+            <rect x="1005.84" y="2362" width="7" height="7" fill="#ebebeb"/>
+          </g>
+          <g id="micro · COCKPIT ONLINE">
+            <text x="1024.84" y="2370.56" font-family="Inter" font-size="14" font-weight="700" letter-spacing="4" fill="#ebebeb" xml:space="preserve">COCKPIT ONLINE</text>
+          </g>
+          <g id="status-led">
+            <rect x="1238.56" y="2362" width="7" height="7" fill="#d61f29"/>
+          </g>
+          <g id="micro · COCKPIT OFFLINE">
+            <text x="1257.56" y="2370.56" font-family="Inter" font-size="14" font-weight="700" letter-spacing="4" fill="#8c8c92" xml:space="preserve">COCKPIT OFFLINE</text>
+          </g>
+        </g>
+      </g>
+      <g id="comp-cell">
+        <g id="comp-cap · NOTICE">
+          <text x="80" y="2462.5" font-family="Inter" font-size="16" font-weight="400" letter-spacing="3" fill="#8c8c92" xml:space="preserve">NOTICE</text>
+        </g>
+        <g id="body-text · Controller reconnected. ">
+          <rect x="80" y="2481" width="4" height="29" fill="#2ca0ff"/>
+          <text x="98" y="2504.25" font-family="Inter" font-size="24" font-weight="400" fill="#ebebeb" xml:space="preserve">Controller reconnected. Resume when ready.</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>
