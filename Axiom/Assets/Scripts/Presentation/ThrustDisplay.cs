@@ -10,7 +10,7 @@ namespace GeometricFlight.Presentation
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public sealed class ThrustDisplay : MonoBehaviour
     {
-        [SerializeField] private PlayerFlight flight;
+        [SerializeField] private ShipFlight flight;
         [SerializeField] private Vector3 leftPort = new Vector3(-0.85f, 0f, -1.64f);
         [SerializeField] private Vector3 rightPort = new Vector3(0.85f, 0f, -1.64f);
         [Tooltip("Jet length at minimum and maximum throttle, in aircraft-local units.")]
@@ -27,7 +27,7 @@ namespace GeometricFlight.Presentation
 
         private void OnEnable()
         {
-            if (flight == null) flight = GetComponentInParent<PlayerFlight>();
+            if (flight == null) flight = GetComponentInParent<ShipFlight>();
             jetRenderer = GetComponent<MeshRenderer>();
             jetRenderer.shadowCastingMode = ShadowCastingMode.Off;
             jetRenderer.receiveShadows = false;

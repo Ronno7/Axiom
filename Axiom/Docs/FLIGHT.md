@@ -92,3 +92,66 @@ V-chevrons pointing back mean slow down, forward chevrons mean speed up.
 
 Par (`LevelFlow`, 35 s) sits between "follow the cues" (~38 s) and "also boost in open
 stretches" (~33 s). Gates are sized so the whole flight area passes through them.
+
+## Arena flight (grey box)
+
+Open `Assets/Scenes/Arena.unity` and press Play: a round arena 960 m across and 240 m high over a lit grid
+floor. Glass towers outlined in light, a light gate in the middle to fly through, and a slow-patrolling
+Recognizer-style construct overhead give it landmarks and scale; white light columns ring the edge and a city
+skyline stands beyond it. Sixteen turrets and four drones (see `COMBAT.md`). No score, waves or results yet:
+the scene tests whether flying and shooting are fun on their own.
+
+**Controls.** The ship always flies forward. **M** switches flight mode in flight:
+
+- **Full rotation** (default): the stick rolls (left/right) and pitches (forward dives, back climbs) the ship
+  about its own axes, and nothing levels it. Hold it over for a barrel roll, back for a loop, forward for an
+  outside loop; to turn, roll and pull. The camera turns with the ship.
+- **Arcade:** stick left/right banks the ship and the bank turns it; centred, the ship levels out. The camera
+  follows a quarter of the bank.
+
+In both, the twist is a flat rudder for small aiming corrections (Z and C on the keyboard), and stick forward
+dives (`Push To Dive`; the Options invert setting flips it). The throttle sets speed and how hard the ship turns:
+quickest on cruise, smallest circle at the brake end. Until the lever has its physical detent, a soft notch counts
+the middle 8 % of travel as cruise exactly; the readout at the bottom left says CRUISE there. Near the edge the
+ship turns itself back toward the middle; it can't leave the arena or go below 2 m or above the ceiling. Escape or
+MENU pauses.
+
+**Energy and stall** are built but off (Gravity 0): with Gravity above 0, climbs cost speed, dives build it (up to
+1.4× full speed), and a steep climb stalls the ship below 13 m/s (soft controls, nose falls, buzzer beeps) until
+speed is back above 17.5 m/s. Off, speed follows the throttle only.
+
+**Tuning** (`ArenaFlight` on `10_Player`; starting values to tune in Play Mode):
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| Cruise Speed | 30 | m/s on the detent; Throttle Multipliers 0.6–1.5 give 18–45 m/s |
+| Roll Rate / Loop Rate / Full Twist Yaw Rate | 220 / 100 / 40 | Full rotation, degrees per second: a barrel roll takes 1.6 s, a loop 3.6 s (radius ≈ 17 m at cruise) |
+| Turn Rate / Turn At Throttle Ends | 90 / 0.85, 0.65 | Turn rate on the detent, and relative to it at minimum and maximum throttle (both modes) |
+| Max Bank / Bank Response | 65° / 0.15 s | Arcade: how far and how quickly the ship rolls into a turn |
+| Pitch Rate / Max Pitch / Pitch Level Time | 75 / 65° / 1.2 s | Arcade: pitch speed, limit, and how quickly a released nose levels |
+| Twist Yaw Rate | 27 | Arcade rudder, degrees per second |
+| Stick Expo / Twist Expo | 1.7 / 2 | Response curves: finer control near the centre |
+| Cruise Snap | 0.08 | The soft cruise notch |
+| Gravity / Thrust Response / Drag Response | 0 / 0.7 / 0.3 | Energy (0 = off; try 15) |
+| Stall Speed / Stall Recovery / Stall Control / Stall Nose Drop | 13 / 1.35 / 0.2 / 70 | Stall, when energy is on |
+
+`ArenaBounds` (on `20_Arena`) sets the radius, lowest height and ceiling, and draws the edge: posts, a floor and a
+top ring, and a translucent wall (`ArenaWall` material) that is faint from afar and lights up with horizontal scan
+bands within about 200 m of the ship. The edge turn starts when the ship, heading outward, is within about twice
+the room it needs to turn away, and is full strength at that room.
+
+`ChaseCamera` (on the Main Camera) sits 7.5 m behind and 2 m above the ship and springs after it (0.15 s, at most
+2 m behind its ideal spot), looking 20 m ahead. In full rotation it turns with the ship, easing after it over
+0.06 s; in arcade it doesn't lag in rotation and rolls with a quarter of the bank. The field of view widens from
+62° by up to 10° above cruise.
+
+**Components.** `ShipFlight` is what weapons and presentation read from any flying ship (input snapshot, speed,
+velocity); `PlayerFlight` (rail) and `ArenaFlight` both derive from it. `ArenaFlightModel` holds the stateless
+flight maths (EditMode tests: loop, barrel roll, edge turn, containment, mode switching, energy, stall).
+`ArenaSession` handles pause, the M switch, target respawns, the restart after the ship is destroyed and the stall
+beep, and draws temporary off-screen markers and the readout.
+
+**Verified** (2026-10-28): EditMode 138/138; Play Mode with the simulated controller (both modes, loops, firing,
+autopilot combat) and a clean Console. Flown by the owner on the cockpit: arcade (passed the five-minute test),
+then full rotation with lasers and energy (energy then switched off). The light-sheet wall and target brackets
+have not been flown yet.

@@ -73,3 +73,24 @@ Colors: `WeaponProjectile` (cyan) for shots and hit flashes, `DestructionPrimary
 - Course: `Barrier_Low` (Z=50, fly over) and `Barrier_Left` (Z=88, fly right).
 
 Verified in the editor: 41/41 EditMode tests; fail, complete, pause/resume, and a clean retry in Play Mode.
+
+## Arena combat (grey box)
+
+- **Lasers:** the arena gun fires `PlayerLaser` at 14 shots a second: 260 m/s plus the ship's own velocity, 1.1 s
+  life (about 300 m), a thin cyan beam that grows out of the muzzle to 12 m (`Projectile` → Streak, Streak Length).
+  The rail level keeps its original bolts.
+- **Shots inherit the ship's full velocity** (`WeaponRules.ShotVelocity` with a velocity vector), so they fly true
+  from a turning ship; on the rail this is the same forward speed as before.
+- **Aim assist** (`PlayerWeapon` → Aim Assist Cone and Range; off on the rail, 4° and 280 m in the arena): a shot
+  goes straight through the target nearest the firing line, allowing for the ship's own motion
+  (`WeaponRules.ShotVelocityThrough`). Cyan corner brackets (`AimAssistMarker`) frame that target. The assist is
+  instant; a timed "acquiring" display belongs to the LOCK missiles, not the gun.
+- **Turrets** (sixteen) use `EnemyTurret` → Measure Distance: they fire while the player is 20–180 m away in any
+  direction, 40 m/s shots every 2.2 s, Lead 0.5 (aim halfway to where the player is heading).
+- **Lissajous drones** (four, `LissajousPatrol`) fly a 3D Lissajous figure around their start point
+  (x = A·sin(a·ωt + δ), y = B·sin(b·ωt), z = C·sin(c·ωt)) with the whole path drawn faintly, so the player can
+  read where they will be. The Recognizer-style construct uses the same motion, much slower.
+- **Drop lines** (`DropLine`) run from every enemy to the floor with a ring where they land.
+- **Session:** destroyed targets come back after 6 s; losing the shield shatters the ship, which restarts at the
+  spawn point with a full shield after 1.5 s.
+- Enemies use the Grid's orange (`ProgramOrange` materials); hits flash white-hot.

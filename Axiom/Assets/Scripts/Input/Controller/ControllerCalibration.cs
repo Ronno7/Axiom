@@ -14,6 +14,10 @@ namespace GeometricFlight.Input
         [Range(0f, 0.5f)] public float stickDeadzone = 0.12f;
         public bool invertStickX;
         public bool invertStickY;
+        /// <summary>Twist rest position (cockpit only), captured with the stick centre.</summary>
+        public int twistCenter = 512;
+        [Range(0f, 0.5f)] public float twistDeadzone = 0.12f;
+        public bool invertTwist;
         /// <summary>Sensor distance at minimum and maximum throttle. Either order works.</summary>
         public int throttleMinMm = 60;
         public int throttleMaxMm = 300;
@@ -27,6 +31,16 @@ namespace GeometricFlight.Input
             if (magnitude <= stickDeadzone) return Vector2.zero;
             float scaled = Mathf.Clamp01((magnitude - stickDeadzone) / (1f - stickDeadzone));
             return v / magnitude * scaled;
+        }
+
+        /// <summary>Raw twist to -1…+1. Twist pots drift and rest unevenly, so it gets its own, larger
+        /// deadzone, scaled so output starts from zero at the deadzone edge.</summary>
+        public float NormalizeTwist(int raw)
+        {
+            float value = Axis(raw, twistCenter, invertTwist);
+            float magnitude = Mathf.Abs(value);
+            if (magnitude <= twistDeadzone) return 0f;
+            return Mathf.Sign(value) * Mathf.Clamp01((magnitude - twistDeadzone) / (1f - twistDeadzone));
         }
 
         /// <summary>Distance to a throttle setpoint: -1 at the minimum position, +1 at the maximum.</summary>

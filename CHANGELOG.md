@@ -3,26 +3,25 @@
 ## [Unreleased]
 
 ### Added
-- Arcade mode (Options): a vintage arcade-monitor look with phosphor glow, CRT curvature and scanlines, red
-  fringing, flicker and static, plus colour settings. The HUD and menus sit on the same screen and stay clickable.
-- The level now has the main menu's look: grade, haze, horizon glow, stars, dust and distant constructs.
-- UI showcase page (`docs/`, linked from the README).
-- Editor: F11 in Play Mode (Window → General → Fullscreen Game View) opens a borderless Game view
-  that covers the whole monitor, taskbar included. F11 again or leaving Play Mode closes it.
-- Project `.mcp.json` for the MCP for Unity server, so Claude Code finds it whatever case the drive letter is.
+- Arena test: free flight in a large Grid arena with lasers, turrets and drones.
+- Full rotation flight (loops, rolls) with an arcade mode on M.
+- Cockpit twist axis in the game.
+- Gun aim assist with target brackets.
+- Arcade mode (Options): CRT look, with the HUD and menus on the same screen.
+- UI showcase page (`docs/`).
+- Editor: F11 fullscreen Game view in Play Mode.
 
 ### Changed
-- The menu and level floors fade into the sky without an edge.
-- UI showcase: a sticky section bar marks the section in view, and each section links to the next.
-  The page now has seven numbered sections (Screens, In play, Feedback, Arcade, Rendering, Cockpit,
-  Evolution). The screen gallery became a flow map, Implemented / Planned is shown the same way everywhere,
-  and Evolution adds a three-step level history.
+- MASTER ARM's pull down resistor moves into its cable (wiring sheet).
+- Menu and level floors fade into the sky.
+- UI showcase: section bar, flow map and level history.
 
 ### Fixed
+- Shots fly straight from a turning ship.
 - A destroyed turret could fire one last shot.
-- The results screen and controller LCD could disagree when a shot landed after the run ended.
-- The horizon glow painted over nearby scenery, and fog on large surfaces was uneven.
-- Controller firmware: the LCD could drop to its standby screen mid-game (reflash both sketches).
+- Results screen and LCD could disagree after a late hit.
+- Horizon glow painted over nearby scenery; uneven fog.
+- Controller LCD could drop to standby mid game (reflash both sketches).
 
 ## [0.1.9] - 2026-10-20 — Main menu presentation
 

@@ -169,7 +169,7 @@ t(1330, ly + 4, "H1–H10: see section 2", "small")
 # 1  Overview
 # =====================================================================
 S1 = 140
-section(S1, "1", "Overview", "Which shield row each part plugs into. 24 solder joints in the whole build; "
+section(S1, "1", "Overview", "Which shield row each part plugs into. 26 solder joints in the whole build; "
                              "the buzzer, rumble, sonar, LCD and USB just plug in.")
 
 LX, RX = 640, 920
@@ -231,7 +231,7 @@ cable("L", ly_["D12"], PX, [("G", BLACK), ("S", SIG["D12"])])
 ov_box(40, TOP + 350, PX - 40, 64, "H3  MENU: 30 mm arcade button", ["Microswitch COM → G, NO → S"], "2 solder")
 cable("L", ly_["D4"], PX, [("G", BLACK), ("S", SIG["D4"])])
 ov_box(40, TOP + 432, PX - 40, 80, "H4  MASTER ARM (DaierTek flip-cover toggle)", [
-    "+1 → V, +2 → S, − → G", "10 kΩ across +2 and −"], "3 solder")
+    "+1 → V, +2 → S, − → G", "10 kΩ from S to G, spliced into the cable"], "5 solder")
 cable("L", ly_["D7"], PX, [("G", BLACK), ("V", RED), ("S", SIG["D7"])])
 ov_box(40, TOP + 530, PX - 40, 90, "H5  HC-SR04 throttle sonar (kit)", [
     "4 single jumpers: VCC → V, TRIG → S, GND → G (D9)", "ECHO → S (D10)"], "plug-in", PLUGIN)
@@ -278,7 +278,7 @@ t(RX - 10, TOP + 565, "USB-B", "pin", "end")
 line([(RX + 30, TOP + 560), (QX, TOP + 560)], GRAY, 6)
 ov_box(QX, TOP + 530, W - 40 - QX, 60, "H10  Panel USB cable (StarTech USBPNLBFBM1)", ["Uno to a socket in the back wall"],
        "plug-in", PLUGIN)
-t(QX + 12, TOP + 615, "Free: A3, D11, D13 and I2C #2.", "tiny")
+t(QX + 12, TOP + 615, "D11: reserved for LOCK (planned). Free: A3, D13 and I2C #2.", "tiny")
 
 # =====================================================================
 # 2  Harness details
@@ -366,25 +366,30 @@ notes(16, 206, [
 add("</g>")
 
 # H4 MASTER ARM ----------------------------------------------------------------
-panel(COLS[0], R2, PW, PH, "H4  MASTER ARM: flip-cover toggle (D7)", "3 solder")
+panel(COLS[0], R2, PW, PH, "H4  MASTER ARM: flip-cover toggle (D7)", "5 solder")
 ys = header(44, 74, "D7")
 targets = [(ys[0], 70, BLACK, "− (side tab)"), (ys[1], 120, RED, "+1 (power)"), (ys[2], 170, SIG["D7"], "+2 (load)")]
+RXS = 215   # where the 10 kΩ joins the cable
+add(f'<rect x="{RXS - 18}" y="54" width="36" height="132" rx="8" fill="#495057" opacity=".12"/>')
+line([(RXS, 70), (RXS, 170)], "#495057", 2)
+add(f'<rect x="{RXS - 6}" y="78" width="12" height="34" rx="3" fill="#e9dcc3" stroke="#8a7757"/>')
+t(RXS + 12, 99, "10 kΩ", "tiny")
 for py, ty_, c, lab in targets:
     pts = [(60, py), (150, py), (175, ty_), (TX, ty_)] if py != ty_ else [(60, py), (TX, ty_)]
     line(pts, c, 2.5)
     joint(TX, ty_)
     t(TX - 10, ty_ - 8, lab, "tinyb", "end")
+splice(RXS, 70)
+splice(RXS, 170)
 add(f'<rect x="{TX + 6}" y="50" width="70" height="140" rx="6" fill="#495057"/>')
 t(TX + 41, 210, "switch tabs", "tiny", "middle")
-line([(TX, 70), (TX + 110, 70)], "#495057", 2)
-line([(TX, 170), (TX + 110, 170)], "#495057", 2)
-resistor(TX + 110, 70, TX + 110, 170, "10 kΩ", 1)
 notes(16, 240, [
-    "Solder the 10 kΩ straight across the − and +2 tabs, sharing their joints.",
+    "The 10 kΩ goes in the cable, 4–5 cm from the switch: cut S and G there and splice",
+    "each back together with one resistor leg. One wire per tab, and no bare leg near +1 (5 V).",
+    "Heat-shrink first: a small piece on S and on G, and a larger one over the whole cable.",
     "Armed = HIGH (the switch feeds +5 V to +2). Safe = LOW (the 10 kΩ pulls it down).",
-    "− is the tab on the side; +1 and +2 are the two pins underneath (DaierTek's diagram). LED lit = armed.",
-    "DaierTek's LED is rated 12 V, so at 5 V it may be dim. Hole: 12 mm.",
-    "You have two: keep the second as a spare."], 17)
+    "− is the tab on the side; +1 and +2 are the two pins underneath (DaierTek's diagram).",
+    "LED lit = armed; rated 12 V, so it may be dim at 5 V. Hole: 12 mm. The second is a spare."], 17)
 add("</g>")
 
 # H5 sonar -----------------------------------------------------------------------
@@ -617,7 +622,7 @@ add("</g>")
 # =====================================================================
 S4 = NY + 600 + 40
 section(S4, "4", "Soldering summary, build order and rules",
-        "24 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.")
+        "26 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.")
 TY = S4 + 80
 cols = [56, 400, 500, 1060]
 for x, h in zip(cols, ("Harness", "Joints", "What you solder", "Difficulty")):
@@ -627,7 +632,7 @@ table = [
     ("H1  Joystick", "11", "6 pot lugs (X, Y) + 5 joins (twist, button)", "Medium: keep each lug on its pin"),
     ("H2  EMP 60 mm dome", "4", "COM and NO tabs + the 2 lamp tabs (or crimp spades)", "Easy"),
     ("H3  MENU button", "2", "COM and NO tabs (or crimp spades)", "Easy: good first practice"),
-    ("H4  MASTER ARM", "3", "3 tabs, the 10 kΩ shares two of them", "Easy"),
+    ("H4  MASTER ARM", "5", "3 tabs + 2 splices for the 10 kΩ in the cable", "Easy"),
     ("H5  Sonar", "0", "4 single jumpers", "None"),
     ("H6  Buzzer module", "0", "Gravity cable", "None"),
     ("H7  Light string", "4", "3 input wires + the 330 Ω; capacitor shares the joins", "Easy: get the input end and 5V/GND right"),

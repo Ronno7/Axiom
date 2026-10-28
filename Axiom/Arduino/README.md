@@ -78,7 +78,7 @@ look like a long silence.
 **Options → Calibrate controller** (from the main menu or the pause menu). Press FIRE on the controller,
 or the on-screen CAPTURE button, at each step:
 
-1. Let go of the stick (records its resting centre).
+1. Let go of the stick (records its resting centre, and the twist's on the cockpit).
 2. Slide the throttle to its minimum.
 3. Slide it to its maximum. Either end can be the nearer one; they must be at least 30 mm apart.
 4. Check the live dot and bar, flip the invert switches if an axis runs backwards, then **Save**.

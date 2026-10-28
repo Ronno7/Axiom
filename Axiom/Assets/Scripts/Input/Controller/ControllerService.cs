@@ -15,10 +15,13 @@ namespace GeometricFlight.Input
         public readonly bool Fire;
         /// <summary>Joystick switch press edge (used as pause).</summary>
         public readonly bool StickButtonPressed;
+        /// <summary>Stick twist, -1 to +1 (cockpit only; 0 on the kit controller).</summary>
+        public readonly float Twist;
 
         public ControllerState(bool connected, Vector2 stick, float throttle, bool throttleValid, bool fire,
-            bool stickButtonPressed)
+            bool stickButtonPressed, float twist = 0f)
         {
+            Twist = twist;
             Connected = connected;
             Stick = stick;
             Throttle = throttle;
@@ -143,7 +146,8 @@ namespace GeometricFlight.Input
             State = new ControllerState(connected,
                 connected ? Calibration.NormalizeStick(p.StickX, p.StickY) : Vector2.zero,
                 Throttle.Setpoint, connected && !Throttle.SignalLost, connected && p.Fire,
-                stickButton && !previousStickButton);
+                stickButton && !previousStickButton,
+                connected && p.IsCockpit ? Calibration.NormalizeTwist(p.Twist) : 0f);
             previousStickButton = stickButton;
 
             if (connected != wasConnected)

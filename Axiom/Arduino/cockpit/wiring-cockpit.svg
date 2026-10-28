@@ -32,7 +32,7 @@
 <text x="1330" y="108" class="small" text-anchor="start" >H1–H10: see section 2</text>
 <rect x="40" y="140" width="1520" height="3" fill="#212529"/>
 <text x="40" y="174" class="title2" text-anchor="start" >1  Overview</text>
-<text x="40" y="196" class="small" text-anchor="start" >Which shield row each part plugs into. 24 solder joints in the whole build; the buzzer, rumble, sonar, LCD and USB just plug in.</text>
+<text x="40" y="196" class="small" text-anchor="start" >Which shield row each part plugs into. 26 solder joints in the whole build; the buzzer, rumble, sonar, LCD and USB just plug in.</text>
 <rect x="640" y="220" width="280" height="640" rx="14" fill="#0f7291"/>
 <text x="780" y="252" class="pin" text-anchor="middle" font-size="19">ARDUINO UNO R3 (kit)</text>
 <text x="780" y="272" class="pin" text-anchor="middle" font-size="13">+ DFRobot Gravity IO Shield V7.1 on top</text>
@@ -159,9 +159,9 @@
 <rect x="40" y="652" width="460" height="80" rx="8" fill="#f8f9fa" stroke="#adb5bd"/>
 <text x="52" y="674" class="part" text-anchor="start" >H4  MASTER ARM (DaierTek flip-cover toggle)</text>
 <rect x="426.8" y="660" width="63.2" height="22" rx="11" fill="#f08c00"/>
-<text x="458.4" y="675" class="chip" text-anchor="middle" >3 solder</text>
+<text x="458.4" y="675" class="chip" text-anchor="middle" >5 solder</text>
 <text x="52" y="694" class="small" text-anchor="start" >+1 → V, +2 → S, − → G</text>
-<text x="52" y="711" class="small" text-anchor="start" >10 kΩ across +2 and −</text>
+<text x="52" y="711" class="small" text-anchor="start" >10 kΩ from S to G, spliced into the cable</text>
 <polyline class="halo" points="500,680 618,680"/><polyline points="500,680 618,680" fill="none" stroke="#1f1f1f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="510" cy="680" r="5.5" fill="#f08c00" stroke="#7a4300" stroke-width="1.5"/>
 <polyline class="halo" points="500,690 618,690"/><polyline points="500,690 618,690" fill="none" stroke="#d62828" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -314,7 +314,7 @@
 <rect x="1493.7" y="758" width="56.3" height="22" rx="11" fill="#495057"/>
 <text x="1521.85" y="773" class="chip" text-anchor="middle" >plug-in</text>
 <text x="1012" y="792" class="small" text-anchor="start" >Uno to a socket in the back wall</text>
-<text x="1012" y="835" class="tiny" text-anchor="start" >Free: A3, D11, D13 and I2C #2.</text>
+<text x="1012" y="835" class="tiny" text-anchor="start" >D11: reserved for LOCK (planned). Free: A3, D13 and I2C #2.</text>
 <rect x="40" y="900" width="1520" height="3" fill="#212529"/>
 <text x="40" y="934" class="title2" text-anchor="start" >2  Harness by harness</text>
 <text x="40" y="956" class="small" text-anchor="start" >Where a 3-pin cable is cut in half, the plug goes on the shield row and the cut end is soldered to the part. Strip 5 mm, tin both ends, slide the heat-shrink on first.</text>
@@ -483,7 +483,7 @@
 <rect width="490" height="360" rx="10" fill="#f8f9fa" stroke="#ced4da"/>
 <text x="16" y="28" class="part" text-anchor="start" >H4  MASTER ARM: flip-cover toggle (D7)</text>
 <rect x="412.8" y="11" width="63.2" height="22" rx="11" fill="#f08c00"/>
-<text x="444.4" y="26" class="chip" text-anchor="middle" >3 solder</text>
+<text x="444.4" y="26" class="chip" text-anchor="middle" >5 solder</text>
 <rect x="44" y="66" width="16" height="40" rx="3" fill="#212529"/>
 <rect x="49" y="71" width="6" height="6" fill="#ced4da"/>
 <text x="39" y="78" class="tinyb" text-anchor="end" >G</text>
@@ -492,6 +492,10 @@
 <rect x="49" y="95" width="6" height="6" fill="#ced4da"/>
 <text x="39" y="102" class="tinyb" text-anchor="end" >S</text>
 <text x="52" y="60" class="rowname" text-anchor="middle" >D7</text>
+<rect x="197" y="54" width="36" height="132" rx="8" fill="#495057" opacity=".12"/>
+<polyline class="halo" points="215,70 215,170"/><polyline points="215,70 215,170" fill="none" stroke="#495057" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="209" y="78" width="12" height="34" rx="3" fill="#e9dcc3" stroke="#8a7757"/>
+<text x="227" y="99" class="tiny" text-anchor="start" >10 kΩ</text>
 <polyline class="halo" points="60,74 150,74 175,70 300,70"/><polyline points="60,74 150,74 175,70 300,70" fill="none" stroke="#1f1f1f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="300" cy="70" r="5.5" fill="#f08c00" stroke="#7a4300" stroke-width="1.5"/>
 <text x="290" y="62" class="tinyb" text-anchor="end" >− (side tab)</text>
@@ -501,18 +505,18 @@
 <polyline class="halo" points="60,98 150,98 175,170 300,170"/><polyline points="60,98 150,98 175,170 300,170" fill="none" stroke="#a61e4d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="300" cy="170" r="5.5" fill="#f08c00" stroke="#7a4300" stroke-width="1.5"/>
 <text x="290" y="162" class="tinyb" text-anchor="end" >+2 (load)</text>
+<rect x="200" y="64" width="30" height="12" rx="4" fill="#495057" opacity=".22"/>
+<circle cx="215" cy="70" r="5.5" fill="#f08c00" stroke="#7a4300" stroke-width="1.5"/>
+<rect x="200" y="164" width="30" height="12" rx="4" fill="#495057" opacity=".22"/>
+<circle cx="215" cy="170" r="5.5" fill="#f08c00" stroke="#7a4300" stroke-width="1.5"/>
 <rect x="306" y="50" width="70" height="140" rx="6" fill="#495057"/>
 <text x="341" y="210" class="tiny" text-anchor="middle" >switch tabs</text>
-<polyline class="halo" points="300,70 410,70"/><polyline points="300,70 410,70" fill="none" stroke="#495057" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline class="halo" points="300,170 410,170"/><polyline points="300,170 410,170" fill="none" stroke="#495057" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline class="halo" points="410,70 410,170"/><polyline points="410,70 410,170" fill="none" stroke="#495057" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="404" y="103" width="12" height="34" rx="3" fill="#e9dcc3" stroke="#8a7757"/>
-<text x="422" y="124" class="tiny" text-anchor="start" >10 kΩ</text>
-<text x="16" y="240" class="tiny" text-anchor="start" >Solder the 10 kΩ straight across the − and +2 tabs, sharing their joints.</text>
-<text x="16" y="257" class="tiny" text-anchor="start" >Armed = HIGH (the switch feeds +5 V to +2). Safe = LOW (the 10 kΩ pulls it down).</text>
-<text x="16" y="274" class="tiny" text-anchor="start" >− is the tab on the side; +1 and +2 are the two pins underneath (DaierTek's diagram). LED lit = armed.</text>
-<text x="16" y="291" class="tiny" text-anchor="start" >DaierTek's LED is rated 12 V, so at 5 V it may be dim. Hole: 12 mm.</text>
-<text x="16" y="308" class="tiny" text-anchor="start" >You have two: keep the second as a spare.</text>
+<text x="16" y="240" class="tiny" text-anchor="start" >The 10 kΩ goes in the cable, 4–5 cm from the switch: cut S and G there and splice</text>
+<text x="16" y="257" class="tiny" text-anchor="start" >each back together with one resistor leg. One wire per tab, and no bare leg near +1 (5 V).</text>
+<text x="16" y="274" class="tiny" text-anchor="start" >Heat-shrink first: a small piece on S and on G, and a larger one over the whole cable.</text>
+<text x="16" y="291" class="tiny" text-anchor="start" >Armed = HIGH (the switch feeds +5 V to +2). Safe = LOW (the 10 kΩ pulls it down).</text>
+<text x="16" y="308" class="tiny" text-anchor="start" >− is the tab on the side; +1 and +2 are the two pins underneath (DaierTek's diagram).</text>
+<text x="16" y="325" class="tiny" text-anchor="start" >LED lit = armed; rated 12 V, so it may be dim at 5 V. Hole: 12 mm. The second is a spare.</text>
 </g>
 <g transform="translate(555,1364)">
 <rect width="490" height="360" rx="10" fill="#f8f9fa" stroke="#ced4da"/>
@@ -807,7 +811,7 @@
 </g>
 <rect x="40" y="2868" width="1520" height="3" fill="#212529"/>
 <text x="40" y="2902" class="title2" text-anchor="start" >4  Soldering summary, build order and rules</text>
-<text x="40" y="2924" class="small" text-anchor="start" >24 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.</text>
+<text x="40" y="2924" class="small" text-anchor="start" >26 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.</text>
 <text x="56" y="2948" class="th" text-anchor="start" >Harness</text>
 <text x="400" y="2948" class="th" text-anchor="start" >Joints</text>
 <text x="500" y="2948" class="th" text-anchor="start" >What you solder</text>
@@ -828,8 +832,8 @@
 <text x="500" y="3018" class="small" text-anchor="start" >COM and NO tabs (or crimp spades)</text>
 <text x="1060" y="3018" class="small" text-anchor="start" >Easy: good first practice</text>
 <text x="56" y="3039" class="small" text-anchor="start" >H4  MASTER ARM</text>
-<text x="400" y="3039" class="small" text-anchor="start" >3</text>
-<text x="500" y="3039" class="small" text-anchor="start" >3 tabs, the 10 kΩ shares two of them</text>
+<text x="400" y="3039" class="small" text-anchor="start" >5</text>
+<text x="500" y="3039" class="small" text-anchor="start" >3 tabs + 2 splices for the 10 kΩ in the cable</text>
 <text x="1060" y="3039" class="small" text-anchor="start" >Easy</text>
 <rect x="40" y="3045" width="1520" height="21" fill="#f1f3f5"/>
 <text x="56" y="3060" class="small" text-anchor="start" >H5  Sonar</text>

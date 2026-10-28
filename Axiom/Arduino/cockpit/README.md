@@ -4,7 +4,7 @@ One sloped box (compact preset 420 × 245 mm): throttle lever with 8 lights on t
 with FIRE on top on the right, LCD, shield lights and LINK/SLOW/FAST/PROX/EMP warning lights in the
 middle, a 60 mm red dome EMP button (with its own lamp), a MENU button and a flip-cover MASTER ARM switch.
 The 16 lights are one pre-wired LED string, and the buzzer and rumble are plug-in modules, so the whole build
-has 24 solder joints.
+has 26 solder joints.
 
 - 3D model: [axiom_cockpit.blend](axiom_cockpit.blend) (built by [make_cockpit.py](make_cockpit.py); `--roomy` for 500 × 280)
 - Top panel: [panel_cut.svg](panel_cut.svg) (1:1 laser-cut outline) and [panel_template.pdf](panel_template.pdf)
@@ -20,13 +20,14 @@ Decided 2026-09-30. Only the parts marked ✓ are in the game so far; the rest i
 
 | Control | In flight | In menus |
 | --- | --- | --- |
-| Stick | Steer ✓ | Move the selection |
+| Stick | Steer ✓ (arena: roll and pitch, or bank and turn; push to dive ✓) | Move the selection |
 | FIRE (stick top) | Hold to fire ✓ | Capture in calibration ✓ |
 | Throttle lever | Push forward = faster, cruise detent in the middle ✓ | |
 | EMP (60 mm dome) | Once per run: destroys all enemies near the ship. Its lamp is lit while the EMP is unused | Confirm; **LAUNCH** once armed; continue/retry on results |
 | MENU | Pause ✓ | Back |
 | MASTER ARM | Flipping to SAFE pauses | A run waits until armed: flip ARM (the cockpit lights wake), then EMP to launch |
-| Twist | Undecided: barrel roll or visual banking | |
+| LOCK (D11, 30 mm button) | Planned (design only, 2026-10-27): lock on and fire missiles. Not placed, wired or coded yet | |
+| Twist | Arena: rudder for fine aim ✓ (rail: unused; a barrel-roll flick is an idea to test) | |
 
 Without the cockpit, runs start as now and the keyboard gets an EMP key.
 
@@ -81,13 +82,13 @@ Optional: 4.8 mm female spade connectors and a crimper, if you'd rather crimp th
 | --- | --- | --- | --- |
 | Arduino Uno R3 | A4/A5 = I2C; pins ≤ 20 mA; USB ≤ 500 mA | [Arduino store](https://store-usa.arduino.cc/products/arduino-uno-rev3) | OK: no pin drives a load directly (the buzzer and rumble modules switch their own current) |
 | Gravity IO shield V7.1 | Every part on its own G/V/S row, LCD on I2C #1 | [DFRobot wiki](https://wiki.dfrobot.com/IO_Expansion_Shield_for_Arduino_V7_SKU_DFR0265) | OK. **Power jumper on 5V**; SERVO_PWR only feeds D0–D13, leave it empty |
-| JH-D400X-R4 | X pot lugs to A0, Y pot lugs to A1, twist leads to A2 (G/V/S each), button pair to D2 G/S | Seller's lead colours + meter | **Metered**: all three pots 10 kΩ, full sweep, wiper on the middle lug / black lead; button isolated. Lug order: wiring sheet, H1. Twist deferred: leads left long and taped until it has a game use |
+| JH-D400X-R4 | X pot lugs to A0, Y pot lugs to A1, twist leads to A2 (G/V/S each), button pair to D2 G/S | Seller's lead colours + meter | **Metered**: all three pots 10 kΩ, full sweep, wiper on the middle lug / black lead; button isolated. Lug order: wiring sheet, H1. Twist soldered 2026-10-27 |
 | HC-SR04 | VCC/TRIG/GND on D9, ECHO on D10, single jumpers | [Datasheet](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf) | OK: 5 V part, 5 V echo |
 | LCD1602 I2C backpack | GND/VCC/SDA/SCL to I2C #1 | Kit module (PCF8574) | OK: address 0x27 or 0x3F |
 | Pre-wired LED string | 330 Ω on data, 470–1000 µF at the start, input end first | [Module specs](https://www.ledlightinghut.com/pre-soldered-ws2812b-sk6812-smart-circle-pcb-string.html), [Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide/best-practices) | OK: WS2812B or SK6812, 5 V, GRB, up to ~55 mA each at full white |
 | Gravity buzzer DFR0032 | Its cable on D8 | [DFRobot](https://www.dfrobot.com/product-84.html) | OK: passive (plays the sent pitch), 3.3–5 V, cable included |
 | Gravity vibration DFR0440 | Its cable + 3 M–F jumpers on D5 (PWM) | [DFRobot](https://www.dfrobot.com/product-1542.html) | OK: 5 V, on/off or PWM strength, 30 × 22 mm, 30 cm cable included |
-| MASTER ARM (DaierTek) | +1 to 5V, +2 to D7, − (side tab) to GND, 10 kΩ +2→− | [DaierTek](https://daiertek.net/led-toggle-switch-12v/) | OK: 12 mm hole. **Reads HIGH when armed**. 12 V LED: may be dim at 5 V |
+| MASTER ARM (DaierTek) | +1 to 5V, +2 to D7, − (side tab) to GND, 10 kΩ from D7 S to G spliced into the cable | [DaierTek](https://daiertek.net/led-toggle-switch-12v/) | OK: 12 mm hole. **Reads HIGH when armed**. 12 V LED: may be dim at 5 V |
 | EMP: uxcell 60 mm dome | Microswitch COM to GND, NO to D3; lamp + to D12 S, − to D12 G | [Listing](https://www.amazon.com/uxcell-Button-Illuminated-Switch-Arcade/dp/B07XYV5NNP) | OK: momentary, 1 NO, 23.5 mm hole. The lamp's own resistor keeps it to a few mA at 5 V |
 | 30 mm buttons | Microswitch COM to GND, NO to the pin | [EG STARTS listing](https://www.amazon.com/dp/B07GBSJX2H) | OK: **28 mm hole**, not 30 |
 | Panel USB (StarTech USBPNLBFBM1) | Uno to the back wall | [Datasheet](https://media.startech.com/cms/pdfs/usbpnlbfbm1_datasheet.pdf) | OK: B socket to B plug, 30 cm, screw mount. Hole spacing not published: **measure** before the back wall is cut |
@@ -146,14 +147,14 @@ fails with "Access is denied".
 ## Build progress
 
 - [x] Bench test of the sketch with jumpers (2026-10-18)
-- [x] MENU (D4), EMP (D3) and the EMP lamp (D12): connected (taped), working
-- [x] MASTER ARM (D7, with the 10 kΩ): connected (taped), working
-- [x] Joystick: X (A0), Y (A1) and FIRE (D2): connected (taped), working (2026-10-20)
-- [ ] Twist (A2): deferred, see above
+- [x] MENU (D4), EMP (D3) and the EMP lamp (D12): soldered, long leads (2026-10-27)
+- [x] MASTER ARM (D7, 10 kΩ spliced into the cable): soldered, long leads (2026-10-27)
+- [x] Joystick: X (A0), Y (A1) and FIRE (D2): soldered, long leads, working (2026-10-27)
+- [x] Twist (A2): soldered (2026-10-27); no game use yet
 - [x] Sonar (D9/D10 jumpers): working (2026-10-20)
 - [x] Light string (D6): string test passed on the breadboard (2026-10-20)
 - [ ] Enclosure: cardboard mock-up from the template and measurements (below), then final cut files, order
-- [ ] Solder every harness (all 24 joints) while mounting in the enclosure; until then, joints are taped
+- [ ] Solder the light string's start (4 joints); leads stay long until the enclosure sets their lengths
 
 **Joystick tips:** cut the A0 and A1 cables long (about 25 cm on the plug side), since the lugs have no leads
 and the stick sits about 20 cm from the Uno; a short harness can be extended with M–F jumpers later. The

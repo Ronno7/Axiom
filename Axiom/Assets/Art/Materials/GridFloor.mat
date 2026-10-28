@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GridFloor
+  m_Shader: {fileID: 4800000, guid: d1da3470f940d7f4d8f9b1a2d40566c2, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _MajorSpacing: 50
+    - _MajorWidth: 2.2
+    - _MinorSpacing: 10
+    - _MinorStrength: 0.4
+    - _MinorWidth: 1.2
+    m_Colors:
+    - _BaseColor: {r: 0.0235, g: 0.039, b: 0.061, a: 0.5}
+    - _Fade: {r: 150, g: 1100, b: 0, a: 0}
+    - _LineColor: {r: 0.783, g: 1.377, b: 1.5749999, a: 1.8}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

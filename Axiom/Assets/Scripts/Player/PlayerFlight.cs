@@ -4,8 +4,10 @@ using UnityEngine;
 
 namespace GeometricFlight.Player
 {
+    /// <summary>Flight along the straight rail course: constant travel along world +Z with bounded
+    /// X/Y steering. Free flight in arenas is ArenaFlight.</summary>
     [DisallowMultipleComponent]
-    public sealed class PlayerFlight : MonoBehaviour
+    public sealed class PlayerFlight : ShipFlight
     {
         [SerializeField] private FlightInputSource inputSource;
         [Tooltip("Cruising speed in world units per second.")]
@@ -21,15 +23,14 @@ namespace GeometricFlight.Player
 
         private Vector3 startPosition;
         private float currentSpeed;
-        public float CurrentSpeed => currentSpeed;
-        /// <summary>Raw input snapshot for this frame (before player options are applied).</summary>
-        public FlightInput CurrentInput { get; private set; }
-        public float CruiseSpeed => SpeedAt(0f);
-        public float MinSpeed => SpeedAt(-1f);
-        public float MaxSpeed => SpeedAt(1f);
-        public float TargetSpeed => SpeedAt(CurrentInput.Throttle);
-        /// <summary>When locked, input is ignored: no steering, cruise throttle, no fire or pause.</summary>
-        public bool InputLocked { get; set; }
+        public override float CurrentSpeed => currentSpeed;
+        // Shots inherit forward travel only, as they always have on the rail: steering is a screen-space
+        // slide, and the reticle travels with the ship.
+        public override Vector3 Velocity => Vector3.forward * currentSpeed;
+        public override float CruiseSpeed => SpeedAt(0f);
+        public override float MinSpeed => SpeedAt(-1f);
+        public override float MaxSpeed => SpeedAt(1f);
+        public override float TargetSpeed => SpeedAt(CurrentInput.Throttle);
 
         private void Awake()
         {

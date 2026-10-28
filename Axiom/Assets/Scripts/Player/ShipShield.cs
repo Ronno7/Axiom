@@ -26,6 +26,13 @@ namespace GeometricFlight.Player
 
         private void Update() => State.Tick(Time.deltaTime);
 
+        /// <summary>Back to full strength (arena restarts after the ship is destroyed).</summary>
+        public void Restore()
+        {
+            State = new Shield(segments, protectionAfterHit);
+            Changed?.Invoke(State.Current);
+        }
+
         public bool ApplyHit(int damage = 1)
         {
             if (!TakesHits || !State.TryHit()) return false;

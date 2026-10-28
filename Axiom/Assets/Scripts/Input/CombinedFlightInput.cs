@@ -23,15 +23,16 @@ namespace GeometricFlight.Input
 
     public static class FlightInputMerge
     {
-        /// <summary>Without a controller, keyboard input passes through. With one: its stick steers
-        /// unless a steering key is held, its sonar sets the throttle (easing to cruise if the sensor is
-        /// lost), and fire or pause come from either device.</summary>
+        /// <summary>Without a controller, keyboard input passes through. With one: its stick (and twist)
+        /// steers unless a steering (or twist) key is held, its sonar sets the throttle (easing to cruise if
+        /// the sensor is lost), and fire or pause come from either device.</summary>
         public static FlightInput Merge(FlightInput keyboard, ControllerState controller)
         {
             if (!controller.Connected) return keyboard;
             Vector2 steering = keyboard.Steering.sqrMagnitude > 0.0001f ? keyboard.Steering : controller.Stick;
+            float twist = Mathf.Abs(keyboard.Twist) > 0.0001f ? keyboard.Twist : controller.Twist;
             return new FlightInput(steering, controller.Throttle,
-                keyboard.FireHeld || controller.Fire, keyboard.PausePressed || controller.StickButtonPressed);
+                keyboard.FireHeld || controller.Fire, keyboard.PausePressed || controller.StickButtonPressed, twist);
         }
     }
 }

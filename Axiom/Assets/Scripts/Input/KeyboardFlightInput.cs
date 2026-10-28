@@ -11,7 +11,10 @@ namespace GeometricFlight.Input
         [SerializeField] private string raiseThrottleBinding = "<Keyboard>/e";
         [SerializeField] private string fireBinding = "<Keyboard>/space";
         [SerializeField] private string pauseBinding = "<Keyboard>/escape";
+        [SerializeField] private string twistLeftBinding = "<Keyboard>/z";
+        [SerializeField] private string twistRightBinding = "<Keyboard>/c";
         private InputAction steering;
+        private InputAction twist;
         private InputAction throttle;
         private InputAction fire;
         private InputAction pause;
@@ -34,6 +37,10 @@ namespace GeometricFlight.Input
             throttle.AddCompositeBinding("1DAxis")
                 .With("Negative", lowerThrottleBinding)
                 .With("Positive", raiseThrottleBinding);
+            twist = new InputAction("Flight Twist", InputActionType.Value);
+            twist.AddCompositeBinding("1DAxis")
+                .With("Negative", twistLeftBinding)
+                .With("Positive", twistRightBinding);
             fire = new InputAction("Flight Fire", InputActionType.Button, fireBinding);
             pause = new InputAction("Flight Pause", InputActionType.Button, pauseBinding);
         }
@@ -43,6 +50,7 @@ namespace GeometricFlight.Input
             throttleSetting = 0f;
             steering.Enable();
             throttle.Enable();
+            twist.Enable();
             fire.Enable();
             pause.Enable();
         }
@@ -51,6 +59,7 @@ namespace GeometricFlight.Input
         {
             steering?.Disable();
             throttle?.Disable();
+            twist?.Disable();
             fire?.Disable();
             pause?.Disable();
         }
@@ -59,6 +68,7 @@ namespace GeometricFlight.Input
         {
             steering?.Dispose();
             throttle?.Dispose();
+            twist?.Dispose();
             fire?.Dispose();
             pause?.Dispose();
         }
@@ -69,7 +79,7 @@ namespace GeometricFlight.Input
             throttleSetting = Mathf.Clamp(throttleSetting + throttle.ReadValue<float>()
                 * Mathf.Max(0f, throttleChangeRate) * Mathf.Max(0f, deltaTime), -1f, 1f);
             return new FlightInput(steering.ReadValue<Vector2>(), throttleSetting,
-                fire.IsPressed(), pause.WasPressedThisFrame());
+                fire.IsPressed(), pause.WasPressedThisFrame(), twist.ReadValue<float>());
         }
     }
 }

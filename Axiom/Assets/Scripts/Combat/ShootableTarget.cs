@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GeometricFlight.Combat
@@ -20,6 +21,13 @@ namespace GeometricFlight.Combat
         public bool IsDestroyed { get; private set; }
         public int RemainingHitPoints { get; private set; }
 
+        private static readonly List<ShootableTarget> active = new List<ShootableTarget>();
+        /// <summary>Enabled targets that can still be hit (for aim assist and off-screen markers).</summary>
+        public static IReadOnlyList<ShootableTarget> Active => active;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatic() => active.Clear();
+
         private Renderer[] visuals;
         private Collider[] colliders;
         private MaterialPropertyBlock flashBlock;
@@ -33,6 +41,13 @@ namespace GeometricFlight.Combat
             flashBlock = new MaterialPropertyBlock();
             flashBlock.SetColor(BaseColorId, hitFlashColor);
         }
+
+        private void OnEnable()
+        {
+            if (!IsDestroyed && !active.Contains(this)) active.Add(this);
+        }
+
+        private void OnDisable() => active.Remove(this);
 
         /// <summary>Returns false if the target was already destroyed.</summary>
         public bool ApplyHit(int damage = 1)
@@ -61,6 +76,7 @@ namespace GeometricFlight.Combat
         private void Break()
         {
             IsDestroyed = true;
+            active.Remove(this);
             SetFlash(false);
             foreach (Collider c in colliders) c.enabled = false;
             foreach (Renderer visual in visuals) visual.enabled = false;
