@@ -52,20 +52,25 @@ namespace GeometricFlight.Presentation
             block ??= new MaterialPropertyBlock();
             ghostMaterial = LookAtmosphere.GlowMaterial(glowShader, AxiomPalette.Light, 3f, 0f, 2.5f);
             rail.HoopScored += OnScored;
+            RingGate.Passed += OnGate;
         }
 
         private void OnDisable()
         {
             if (rail != null) rail.HoopScored -= OnScored;
+            RingGate.Passed -= OnGate;
             foreach (Flash flash in active) End(flash);
             active.Clear();
             while (spare.Count > 0) { LineRenderer line = spare.Pop(); if (line != null) Destroy(line.gameObject); }
             if (ghostMaterial != null) Destroy(ghostMaterial);
         }
 
-        private void OnScored(int index)
+        private void OnScored(int index) => Show(rail.Hoop(index));
+
+        private void OnGate(RingGate gate) => Show(gate.transform);
+
+        private void Show(Transform ring)
         {
-            Transform ring = rail.Hoop(index);
             var renderer = ring != null ? ring.GetComponent<Renderer>() : null;
             if (renderer == null) return;
             MeshFilter filter = ring.GetComponent<MeshFilter>();

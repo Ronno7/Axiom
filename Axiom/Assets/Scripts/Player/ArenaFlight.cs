@@ -84,7 +84,9 @@ namespace GeometricFlight.Player
         public void Respawn(Vector3 position)
         {
             BoostState boost = state.Boost;
+            bool fullRotation = state.FullRotation;
             state = spawn;
+            state.SetFullRotation(fullRotation); // Keep the handling mode the player is flying.
             state.Position = position;
             state.Boost = boost;
             state.Boost.Remaining = 0f;

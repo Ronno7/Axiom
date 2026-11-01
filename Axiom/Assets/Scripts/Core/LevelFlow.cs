@@ -34,6 +34,8 @@ namespace GeometricFlight.Core
         [SerializeField] private string nextScene = "";
         [Tooltip("Target completion time in seconds, shown on results. 0 hides it.")]
         [SerializeField, Min(0f)] private float parTime;
+        [Tooltip("Results title for a completed run.")]
+        [SerializeField] private string completedTitle = "LEVEL COMPLETE";
         [Tooltip("Opt-in entry study: keep input and pause live, but hold flight and run time until admission.")]
         [SerializeField] private bool waitForEntry;
 
@@ -50,6 +52,7 @@ namespace GeometricFlight.Core
         public bool HasNextLevel => !string.IsNullOrEmpty(nextScene);
         public float ParTime => parTime;
         public bool HasPar => parTime > 0f;
+        public string CompletedTitle => completedTitle;
         public bool EntryHeld { get; private set; }
         public bool EntryStarted { get; private set; }
         /// <summary>Set by a course with checkpoints. Returning true takes over a destroyed ship (shattered and
@@ -166,7 +169,8 @@ namespace GeometricFlight.Core
         public void ExitToMenu() => Load(menuScene);
         public void Continue() => Load(HasNextLevel ? nextScene : menuScene);
 
-        private void Complete()
+        /// <summary>Ends the run as completed: at the course end, or when a tutorial finishes itself.</summary>
+        public void Complete()
         {
             if (!Finish(true)) return;
             // The ship flies on hands-off; keys now belong to the results menu.
@@ -204,6 +208,14 @@ namespace GeometricFlight.Core
             record.TargetsDestroyed, TargetsTotal, weapon.ShotsFired, weapon.Hits, shield.State.Current, shield.State.Max));
 
         private void CountTarget(ShootableTarget _) => record.CountTarget();
+
+        /// <summary>Adds targets that weren't in the scene at the start (a tutorial's completed steps) to the results.</summary>
+        public void CountTargets(int destroyed, int total)
+        {
+            if (record.Finished) return;
+            TargetsTotal += Mathf.Max(0, total);
+            for (int i = 0; i < destroyed; i++) record.CountTarget();
+        }
 
         private void SetState(RunState next)
         {

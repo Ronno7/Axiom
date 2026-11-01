@@ -6,7 +6,8 @@ using UnityEngine;
 namespace GeometricFlight.Core
 {
     /// <summary>Owns one authored arena wave. Original scene targets are hidden only at runtime and serve
-    /// as templates, preserving their tuning and scene references. Disable before Play for free practice.</summary>
+    /// as templates, preserving their tuning and scene references (inactive templates work too). Disable before
+    /// Play for free practice. With Start On Play off, the wave waits for <see cref="Restart"/> (the tutorial).</summary>
     [DefaultExecutionOrder(-20), DisallowMultipleComponent]
     public sealed class ArenaEncounter : MonoBehaviour
     {
@@ -22,6 +23,8 @@ namespace GeometricFlight.Core
         [SerializeField] private Spawn[] spawns;
         [SerializeField, Min(0.1f)] private float warningTime = 3f;
         [SerializeField, Min(0.1f)] private float recoveryTime = 6f;
+        [Tooltip("Off: stays inactive until Restart is called (the tutorial starts its waves).")]
+        [SerializeField] private bool startOnPlay = true;
         private readonly List<ShootableTarget> live = new List<ShootableTarget>();
         private Transform waveRoot;
         private int generation;
@@ -30,13 +33,15 @@ namespace GeometricFlight.Core
         public event Action WaveCleared;
         public int SpawnCount => spawns == null ? 0 : spawns.Length;
         public Vector3 SpawnPosition(int index) => spawns[index].point.position;
+        /// <summary>This wave's spawned enemies, including ones already destroyed.</summary>
+        public IReadOnlyList<ShootableTarget> Live => live;
 
         private void Awake()
         {
             if (!enabled) return;
-            if (SpawnCount == 0 || practiceTargets == null || practiceTargets.Length == 0)
+            if (SpawnCount == 0)
             {
-                Debug.LogError("Assign practice targets and spawn points to ArenaEncounter.", this);
+                Debug.LogError("Assign spawn points to ArenaEncounter.", this);
                 enabled = false;
                 return;
             }
@@ -47,13 +52,17 @@ namespace GeometricFlight.Core
                     enabled = false;
                     return;
                 }
-            foreach (ShootableTarget target in practiceTargets) if (target != null) target.gameObject.SetActive(false);
+            if (practiceTargets != null)
+                foreach (ShootableTarget target in practiceTargets) if (target != null) target.gameObject.SetActive(false);
             State = new ArenaWaveState(SpawnCount, warningTime, recoveryTime);
             waveRoot = new GameObject("EncounterEnemies").transform;
             waveRoot.SetParent(transform, false);
         }
 
-        private void Start() => State?.Restart();
+        private void Start()
+        {
+            if (startOnPlay) State?.Restart();
+        }
 
         private void Update()
         {
@@ -101,6 +110,13 @@ namespace GeometricFlight.Core
         {
             ClearWave();
             State?.Restart();
+        }
+
+        /// <summary>Ends the encounter: no next round is scheduled and any remaining enemies are removed.</summary>
+        public void Stop()
+        {
+            State?.Stop();
+            ClearWave();
         }
 
         private void ClearEnemyShots()

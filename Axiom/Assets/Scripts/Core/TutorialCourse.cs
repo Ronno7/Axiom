@@ -21,7 +21,7 @@ namespace GeometricFlight.Core
         {
             [Tooltip("World Z where the caption appears.")]
             public float z;
-            [Tooltip("{fire}, {arm}, {lower}, {raise} and {boost} name the right control for keyboard or cockpit.")]
+            [Tooltip("{fire}, {arm}, {lower}, {raise}, {boost} and {lock} name the right control (TutorialCaptions).")]
             public string caption;
             [Tooltip("Optional: shown instead while weapons are SAFE.")]
             public string whenSafe;
@@ -45,6 +45,8 @@ namespace GeometricFlight.Core
         [SerializeField] private PlayerWeapon weapon;
         [Tooltip("Shows the tutorial-only rings readout.")]
         [SerializeField] private LevelUi levelUi;
+        [Tooltip("The arena steps after the rail; arena retries rebuild at their checkpoint.")]
+        [SerializeField] private ArenaLessons arena;
         [Tooltip("Height of the flight line, where retries rebuild the ship.")]
         [SerializeField] private float flightLineY = 16f;
         [Tooltip("Before the first checkpoint, a retry rebuilds the ship here (the start of the clear lead-in).")]
@@ -88,10 +90,12 @@ namespace GeometricFlight.Core
         }
 
         private bool OnRail => !flow.EntryHeld && !rail.Released;
+        private bool InArenaLessons => !flow.EntryHeld && rail.Released && arena != null && arena.Active;
 
         private bool TakeOverDestroyedShip()
         {
-            if (!OnRail) return false;
+            if (!OnRail && !InArenaLessons) return false;
+            if (!OnRail) arena.ShipDestroyed();
             flight.InputLocked = true;
             weapon?.ClearProjectiles();
             rebuildAt = Time.time + rebuildDelay;
@@ -123,7 +127,7 @@ namespace GeometricFlight.Core
                 Cue cue = cues[nextCue++];
                 string text = authority != null && !authority.Armed && !string.IsNullOrEmpty(cue.whenSafe)
                     ? cue.whenSafe : cue.caption;
-                if (!string.IsNullOrEmpty(text)) entry.Announce(Keys(text), cue.seconds);
+                if (!string.IsNullOrEmpty(text)) entry.Announce(TutorialCaptions.Resolve(text, authority), cue.seconds);
             }
         }
 
@@ -137,20 +141,14 @@ namespace GeometricFlight.Core
             levelUi.SetRingsReadout(text);
         }
 
-        private string Keys(string caption)
-        {
-            bool keyboard = !ControllerService.Instance.State.Connected;
-            bool keyThrottle = keyboard || GameSettings.KeyboardThrottleWithController;
-            return caption.Replace("{fire}", keyboard ? "SPACE" : "FIRE")
-                .Replace("{lower}", keyThrottle ? "Q" : "THROTTLE BACK")
-                .Replace("{raise}", keyThrottle ? "E" : "THROTTLE FORWARD")
-                .Replace("{boost}", keyThrottle ? "HOLD E" : "TO THE FINAL STOP")
-                .Replace("{arm}", authority != null && authority.HasPhysicalSwitch ? "MASTER ARM" : "T");
-        }
-
         private void Rebuild()
         {
             rebuildAt = -1f;
+            if (rail.Released)
+            {
+                RebuildInArena();
+                return;
+            }
             float z = RetryZ;
             flight.Respawn(new Vector3(0f, flightLineY, z));
             flow.SetShipDestroyed(false);
@@ -167,6 +165,23 @@ namespace GeometricFlight.Core
             nextCue = 0;
             while (nextCue < cues.Length && cues[nextCue].z < z) nextCue++;
             entry.Announce(reached < 0 ? "REBUILT" : "REBUILT AT CHECKPOINT", 2f);
+        }
+
+        /// <summary>An arena retry: rebuilt at the step's arena checkpoint with a full shield, missile bank and EMP (as
+        /// an arena death always restored), and the current step started again. The rail stays sealed.</summary>
+        private void RebuildInArena()
+        {
+            flight.Respawn(arena.RetryPosition);
+            flow.SetShipDestroyed(false);
+            shield.Restore();
+            flight.GetComponent<LockOnWeapon>()?.ResetBank();
+            flight.GetComponent<EmpWeapon>()?.ResetCharge();
+            weapon?.ClearProjectiles();
+            authority?.RequireRelease();
+            flight.InputLocked = false;
+            chase?.ResetToTarget();
+            arena.RestartStep();
+            entry.Announce("REBUILT AT CHECKPOINT", 2f);
         }
     }
 }

@@ -28,8 +28,13 @@ namespace GeometricFlight.Combat
         [SerializeField, Min(1f)] private float outerApothem = 11f;
         [Tooltip("Blade twist over a full close, degrees.")]
         [SerializeField] private float twist = 50f;
+        [Tooltip("Closed by a script (Close) instead of a trigger line, and never judges a crossing: a seal, not an "
+               + "obstacle.")]
+        [SerializeField] private bool manual;
 
         public float TriggerZ => transform.position.z - triggerDistance;
+        public bool Manual => manual;
+        public float OuterApothem => outerApothem;
         public float Apothem { get; private set; }
         public float Rotation { get; private set; }
         public bool Closing { get; private set; }
@@ -57,8 +62,27 @@ namespace GeometricFlight.Combat
             if (rimMesh != null) Destroy(rimMesh);
         }
 
+        /// <summary>Starts a scripted close over <paramref name="seconds"/> (manual irises).</summary>
+        public void Close(float seconds)
+        {
+            if (Closing) return;
+            closeDuration = Mathf.Max(0.05f, seconds);
+            elapsed = 0f;
+            Closing = true;
+        }
+
         private void Update()
         {
+            if (manual)
+            {
+                if (!Closing || Time.deltaTime <= 0f || elapsed >= closeDuration) return;
+                elapsed += Time.deltaTime;
+                float shut = Mathf.Clamp01(elapsed / closeDuration);
+                Apothem = openApothem * (1f - shut);
+                Rotation = twist * shut;
+                Rebuild();
+                return;
+            }
             if (ship == null || Time.deltaTime <= 0f) return;
             Matrix4x4 worldToIris = transform.worldToLocalMatrix;
             // Trigger distance remains world metres even when the reused iris geometry is scaled.

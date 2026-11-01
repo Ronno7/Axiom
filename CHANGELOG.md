@@ -3,25 +3,36 @@
 ## [Unreleased]
 
 ### Added
-- Arena test: free flight in a large Grid arena with lasers, turrets and drones.
-- Full rotation flight (loops, rolls) with an arcade mode on M.
-- Cockpit twist axis in the game.
-- Gun aim assist with target brackets.
-- Arcade mode (Options): CRT look, with the HUD and menus on the same screen.
+- Authored opening: menu, tutorial rail and first arena as one continuous flight.
+- Entry sequence that builds the passage, ship and HUD around the camera while terminals print the build.
+- One endless grid under the whole opening, beneath a dark cloud deck.
+- Tutorial rail with seven lessons, checkpoints, lethal walls and electrified obstacles.
+- First arena that seals the rail behind the ship and teaches LOCK and the EMP.
+- Tutorial guidance with a target flag, instruction card and key chips.
+- Nose led rail flight with proximity warnings.
+- Rechargeable boost on the throttle's final travel.
+- Free flight arena with full rotation flight, lasers, gun aim assist and repeating encounters.
+- LOCK missiles for 90–650 m targets, on Left Shift or the cockpit's D11 button (reflash `AxiomCockpit`).
+- EMP on the cockpit dome or R: one destructive 180 m pulse per life.
+- CRT display option that includes the HUD and menus.
+- Twelve color palette across art and UI.
+- Keyboard throttle option for use with the cockpit.
+- Swept Dart player ship in Blender, not yet in the game.
 - UI showcase page (`docs/`).
-- Editor: F11 fullscreen Game view in Play Mode.
 
 ### Changed
-- MASTER ARM's pull down resistor moves into its cable (wiring sheet).
+- Roadmap: 0.2 is the playable opening, 0.3 the procedural loop and 0.4 the vertical slice.
+- Throttle gauge has eight segments with speed in m/s.
+- Cockpit stick and mouse hover drive menus like the keyboard.
 - Menu and level floors fade into the sky.
-- UI showcase: section bar, flow map and level history.
 
 ### Fixed
-- Shots fly straight from a turning ship.
-- A destroyed turret could fire one last shot.
-- Results screen and LCD could disagree after a late hit.
-- Horizon glow painted over nearby scenery; uneven fog.
-- Controller LCD could drop to standby mid game (reflash both sketches).
+- Cockpit: LCD standby mid game (reflash both sketches) and a paused run dismissed on reconnect.
+- HUD, results and LCD could miss updates or disagree.
+- Slanted menu buttons misdrew their captions and focus markers.
+- Shots flew crooked from a turning ship, and destroyed turrets could fire once more.
+- Closing iris ignored the ship's rotated hull.
+- Horizon glow painted over nearby scenery, and fog was uneven.
 
 ## [0.1.9] - 2026-10-20 — Main menu presentation
 
@@ -102,6 +113,6 @@
 
 
 All notable changes to Axiom. The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
-follow the development stages on the [roadmap](README.md#roadmap): **0.1.x prototype**, 0.2 vertical slice,
-0.5 alpha, 0.9 beta, 1.0 release. Within a stage, each drop is a patch version. Versions before 0.1.9 were
+follow the development stages on the [roadmap](README.md#roadmap): **0.1.x prototype**, 0.2 playable opening,
+0.3 procedural loop, 0.4 vertical slice, 0.5 alpha, 0.9 beta, 1.0 release. Within a stage, each drop is a patch version. Versions before 0.1.9 were
 numbered from the project history.

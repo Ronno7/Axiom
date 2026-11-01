@@ -80,5 +80,18 @@ namespace GeometricFlight.Tests
             var controller = new ControllerState(false, Vector2.zero, 0, true, false, false, empHeld: true);
             Assert.IsFalse(FlightInputMerge.Merge(default, controller).EmpHeld);
         }
+
+        /// <summary>The tutorial's EMP prompt counts a drone as inside the pulse when its patrol centre plus its reach
+        /// is within the radius. That holds only if no point of the patrol is farther than the reach.</summary>
+        [TestCase(14f, 5f, 14f, 1, 2, 1, 0f)]
+        [TestCase(84f, 21.84f, 84f, 1, 2, 3, 0f)]
+        [TestCase(105f, 32.5f, 75f, 2, 3, 4, 45f)]
+        public void DroneNeverLeavesItsReach(float ax, float ay, float az, int rx, int ry, int rz, float phase)
+        {
+            var amplitude = new Vector3(ax, ay, az);
+            for (int i = 0; i <= 1000; i++)
+                Assert.That(LissajousPatrol.Point(i / 1000f, amplitude, new Vector3Int(rx, ry, rz), phase).magnitude,
+                    Is.LessThanOrEqualTo(amplitude.magnitude + 1e-3f));
+        }
     }
 }

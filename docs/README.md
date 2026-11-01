@@ -61,17 +61,6 @@ stats. Keep planned cockpit effects distinguished from working integration.
 
 ## Verification
 
-The refresh passed 22 DOM interaction checks covering galleries, viewer navigation/zoom/focus restoration,
-comparison sliders, layers, annotations and LCD states. JavaScript syntax and asset references were checked.
-DOM tests simulate the dialog API; they do not verify browser rendering or native modal behavior.
-
-Layout was then checked in headless Chrome at 320, 390, 768 and 1440 px: no horizontal page overflow (only the
-feedback table scrolls inside its own box) and no console errors. Still to check in a real browser before
-publishing: dialog focus and Escape, image zoom and panning, touch comparisons, reduced motion, and fonts unavailable.
-
-The section restructure (23 Oct 2026) was checked in headless Chrome over the DevTools protocol at the same
-four widths. Every masthead link kept the masthead on top, landed its heading below it, and marked the right
-section; the marked link stays visible in the scrolling mobile nav. The page also passed checks for no
-horizontal overflow, no section marked at the intro, Evolution marked at the page end, flow-map selection,
-feedback defaults, steppers, next links, the viewer opening, unique ids, every image reference loading, and
-no console errors. Scrolling by touch or trackpad was not tested.
+Interactions and asset references were checked with DOM tests, and layout in headless Chrome at 320, 390, 768
+and 1440 px. Still to check in a real browser before publishing: dialog focus and Escape, image zoom and panning,
+touch comparisons and scrolling, reduced motion, and fonts unavailable.

@@ -27,6 +27,9 @@ namespace GeometricFlight.Combat
         private ShootableTarget target;
         private LineRenderer path;
         public Vector3 InitialOffset => Point(0f, amplitude, ratio, phase);
+        /// <summary>The centre of the figure, and the farthest the drone ever is from it.</summary>
+        public Vector3 Anchor => anchor;
+        public float Reach => amplitude.magnitude;
 
         public static Vector3 Point(float t01, Vector3 amplitude, Vector3Int ratio, float phaseDegrees)
         {

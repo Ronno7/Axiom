@@ -71,8 +71,9 @@ namespace GeometricFlight.Editor
                     Mathf.Max(0.5f, (to - from) * 0.5f - ShipHalfSpan)));
             }
             foreach (ClosingIris iris in Object.FindObjectsByType<ClosingIris>(FindObjectsSortMode.None))
-                gates.Add(new RailCourseCheck.Gate(iris.name, iris.transform.position, 2f, 0f, iris.TriggerDistance,
-                    iris.ArrivalWindow()));
+                if (!iris.Manual) // A manual iris is a seal, not a timed obstacle.
+                    gates.Add(new RailCourseCheck.Gate(iris.name, iris.transform.position, 2f, 0f, iris.TriggerDistance,
+                        iris.ArrivalWindow()));
             return gates;
         }
     }

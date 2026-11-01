@@ -28,7 +28,7 @@ namespace GeometricFlight.UI
         private BoostStatus shownBoost = (BoostStatus)(-1);
         private Label controllerStatus, pauseNotice, proximityLabel;
         private string shownController;
-        private Button resumeButton, nextButton, retryButton, helpBack;
+        private Button resumeButton, nextButton, retryButton, resultsMenuButton, helpBack;
         private OptionsPanel options;
         private CalibrationPanel calibration;
         private CockpitDisplay cockpit;
@@ -172,7 +172,8 @@ namespace GeometricFlight.UI
             helpBack.clicked += ShowPause;
             nextButton.clicked += flow.Continue;
             retryButton.clicked += Retry;
-            root.Q<Button>("results-menu-button").clicked += flow.ExitToMenu;
+            resultsMenuButton = root.Q<Button>("results-menu-button");
+            resultsMenuButton.clicked += flow.ExitToMenu;
 
             BuildThrottleTrack();
             zones = FindObjectsByType<ThrottleZone>(FindObjectsSortMode.None);
@@ -396,7 +397,7 @@ namespace GeometricFlight.UI
             // The numbers captured when the run ended (the cockpit LCD shows the same ones).
             RunResults results = flow.Results;
             bool completed = results.Completed;
-            resultsTitle.text = completed ? "LEVEL COMPLETE" : "SHIP DESTROYED";
+            resultsTitle.text = completed ? flow.CompletedTitle : "SHIP DESTROYED";
             SetStat("result-time", UiScreens.FormatTime(results.Time));
             SetStat("result-targets", $"{results.TargetsDestroyed} / {results.TargetsTotal}");
             SetStat("result-accuracy", results.ShotsFired == 0 ? "-" : $"{Mathf.RoundToInt(results.Accuracy * 100f)}%");
@@ -409,7 +410,8 @@ namespace GeometricFlight.UI
             bool canContinue = completed && flow.HasNextLevel;
             nextButton.style.display = canContinue ? DisplayStyle.Flex : DisplayStyle.None;
             hud.style.display = DisplayStyle.None;
-            ShowOverlay(resultsPanel, canContinue ? nextButton : retryButton);
+            // The last completed level (or a finished tutorial) offers the menu first, not a replay.
+            ShowOverlay(resultsPanel, canContinue ? nextButton : completed ? resultsMenuButton : retryButton);
         }
 
         private void SetStat(string name, string value) => resultsPanel.Q<Label>(name).text = value;

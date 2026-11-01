@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1780" viewBox="0 0 1800 1780" role="img" aria-labelledby="title description">
+<title id="title">Axiom art and interface palette</title>
+<desc id="description">Twelve exact sRGB swatches with semantic roles, interface examples, contrast values and derivation rules. Generated from palette.json.</desc>
+<rect x="0" y="0" width="1800" height="1780" fill="#060A0C" stroke="none" stroke-width="1"/>
+<rect x="0" y="0" width="12" height="1780" fill="#DF740C" stroke="none" stroke-width="1"/>
+<text x="72" y="90" font-family="Segoe UI, Arial, sans-serif" font-size="60" font-weight="700" fill="#E6FFFF">AXIOM</text>
+<text x="74" y="130" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">ART + INTERFACE / PALETTE 01</text>
+<text x="1250" y="80" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" fill="#E6FFFF">12 SWATCHES / ONE WORLD</text>
+<text x="1250" y="114" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#8198A6">Authored sRGB · exact source values</text>
+<text x="74" y="176" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#B7C9D1">Dark mass. Selective light. A cool player signal against warm system energy.</text>
+<line x1="72" y1="200" x2="1728" y2="200" stroke="#3A5362" stroke-width="1"/>
+<rect x="72" y="228" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="73" y="229" width="394" height="100" fill="#060A0C" stroke="none" stroke-width="1"/>
+<text x="92" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">VOID</text>
+<text x="316" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#060A0C</text>
+<text x="92" y="407" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Sky, recesses and scrims</text>
+<rect x="492" y="228" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="493" y="229" width="394" height="100" fill="#0C141F" stroke="none" stroke-width="1"/>
+<text x="512" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">STRUCTURE</text>
+<text x="736" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#0C141F</text>
+<text x="512" y="407" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Dark architecture and craft bodies</text>
+<rect x="912" y="228" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="913" y="229" width="394" height="100" fill="#102931" stroke="none" stroke-width="1"/>
+<text x="932" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">PANEL</text>
+<text x="1156" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#102931</text>
+<text x="932" y="407" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Raised panels and secondary planes</text>
+<rect x="1332" y="228" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="1333" y="229" width="394" height="100" fill="#3A5362" stroke="none" stroke-width="1"/>
+<text x="1352" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">EDGE</text>
+<text x="1576" y="368" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#3A5362</text>
+<text x="1352" y="407" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Quiet outlines and inactive tracks</text>
+<rect x="72" y="460" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="73" y="461" width="394" height="100" fill="#8198A6" stroke="none" stroke-width="1"/>
+<text x="92" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">MUTED</text>
+<text x="316" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#8198A6</text>
+<text x="92" y="639" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Secondary readable text and labels</text>
+<rect x="492" y="460" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="493" y="461" width="394" height="100" fill="#B7C9D1" stroke="none" stroke-width="1"/>
+<text x="512" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">TEXT</text>
+<text x="736" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#B7C9D1</text>
+<text x="512" y="639" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Body text and neutral outlines</text>
+<rect x="912" y="460" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="913" y="461" width="394" height="100" fill="#E6FFFF" stroke="none" stroke-width="1"/>
+<text x="932" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">LIGHT</text>
+<text x="1156" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#E6FFFF</text>
+<text x="932" y="639" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Title, focus fill and player core</text>
+<rect x="1332" y="460" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="1333" y="461" width="394" height="100" fill="#6FC3DF" stroke="none" stroke-width="1"/>
+<text x="1352" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">CYAN</text>
+<text x="1576" y="600" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#6FC3DF</text>
+<text x="1352" y="639" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Player systems, shield and cool energy</text>
+<rect x="72" y="692" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="73" y="693" width="394" height="100" fill="#DF740C" stroke="none" stroke-width="1"/>
+<text x="92" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">ORANGE</text>
+<text x="316" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#DF740C</text>
+<text x="92" y="871" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Program energy and selection accent</text>
+<rect x="492" y="692" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="493" y="693" width="394" height="100" fill="#FF410D" stroke="none" stroke-width="1"/>
+<text x="512" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">EMBER</text>
+<text x="736" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#FF410D</text>
+<text x="512" y="871" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Fault, damage and attack escalation</text>
+<rect x="912" y="692" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="913" y="693" width="394" height="100" fill="#FFE64D" stroke="none" stroke-width="1"/>
+<text x="932" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">GOLD</text>
+<text x="1156" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#FFE64D</text>
+<text x="932" y="871" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Reserved boss and authority signature</text>
+<rect x="1332" y="692" width="396" height="208" fill="#0C141F" stroke="#3A5362" stroke-width="1"/>
+<rect x="1333" y="693" width="394" height="100" fill="#FFF2D9" stroke="none" stroke-width="1"/>
+<text x="1352" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#E6FFFF">HOT</text>
+<text x="1576" y="832" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#6FC3DF">#FFF2D9</text>
+<text x="1352" y="871" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#B7C9D1">Warm impact core and warning text</text>
+<text x="72" y="972" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" fill="#E6FFFF">INTERFACE LANGUAGE</text>
+<text x="1050" y="972" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#8198A6">Color supports shape, text and motion.</text>
+<rect x="72" y="1000" width="536" height="240" fill="#102931" stroke="none" stroke-width="1"/>
+<rect x="632" y="1000" width="536" height="240" fill="#102931" stroke="none" stroke-width="1"/>
+<rect x="1192" y="1000" width="536" height="240" fill="#102931" stroke="none" stroke-width="1"/>
+<text x="98" y="1037" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#8198A6">SELECTED</text>
+<polygon points="126,1063 524,1063 541,1101 511,1139 108,1139" fill="#E6FFFF" stroke="none" stroke-width="1"/>
+<line x1="98" y1="1077" x2="85" y2="1126" stroke="#DF740C" stroke-width="6"/>
+<text x="147" y="1114" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="700" fill="#060A0C">PLAY</text>
+<text x="98" y="1200" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Inversion + warm focus marker</text>
+<text x="658" y="1037" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#8198A6">SYSTEM STATE</text>
+<text x="659" y="1093" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700" fill="#6FC3DF">READY</text>
+<text x="931" y="1093" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700" fill="#8198A6">SPENT</text>
+<rect x="660" y="1120" width="32" height="10" fill="#6FC3DF" stroke="none" stroke-width="1"/>
+<rect x="934" y="1120" width="32" height="10" fill="#102931" stroke="#3A5362" stroke-width="2"/>
+<rect x="704" y="1120" width="32" height="10" fill="#6FC3DF" stroke="none" stroke-width="1"/>
+<rect x="978" y="1120" width="32" height="10" fill="#102931" stroke="#3A5362" stroke-width="2"/>
+<rect x="748" y="1120" width="32" height="10" fill="#6FC3DF" stroke="none" stroke-width="1"/>
+<rect x="1022" y="1120" width="32" height="10" fill="#102931" stroke="#3A5362" stroke-width="2"/>
+<rect x="792" y="1120" width="32" height="10" fill="#6FC3DF" stroke="none" stroke-width="1"/>
+<rect x="1066" y="1120" width="32" height="10" fill="#102931" stroke="#3A5362" stroke-width="2"/>
+<text x="658" y="1200" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">State words + filled / empty geometry</text>
+<text x="1218" y="1037" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#8198A6">CRITICAL</text>
+<polygon points="1246,1063 1274,1113 1218,1113" fill="#FF410D" stroke="none" stroke-width="1"/>
+<text x="1238" y="1103" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#060A0C">!</text>
+<text x="1296" y="1103" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="700" fill="#FFF2D9">HULL CRITICAL</text>
+<line x1="1218" y1="1140" x2="1702" y2="1140" stroke="#FF410D" stroke-width="3"/>
+<text x="1218" y="1200" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Hot text + Ember fault shape</text>
+<text x="72" y="1301" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" fill="#E6FFFF">RULES THAT HOLD THE WORLD TOGETHER</text>
+<line x1="72" y1="1328" x2="608" y2="1328" stroke="#3A5362" stroke-width="1"/>
+<text x="72" y="1370" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#6FC3DF">VALUE + MATERIAL</text>
+<line x1="632" y1="1328" x2="1168" y2="1328" stroke="#3A5362" stroke-width="1"/>
+<text x="632" y="1370" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#6FC3DF">READABLE CONTRAST</text>
+<line x1="1192" y1="1328" x2="1728" y2="1328" stroke="#3A5362" stroke-width="1"/>
+<text x="1192" y="1370" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#6FC3DF">CONTROLLED DERIVATION</text>
+<text x="72" y="1410" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Most surfaces stay dark and substantial.</text>
+<text x="72" y="1444" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Light describes selected seams and openings.</text>
+<text x="72" y="1478" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Orange is system / Program energy.</text>
+<text x="72" y="1512" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Threats also need a clear shape or telegraph.</text>
+<text x="72" y="1546" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Gold stays rare: bosses and authority.</text>
+<text x="72" y="1580" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">The menu band uses restrained Orange.</text>
+<text x="632" y="1410" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#8198A6">Muted</text>
+<text x="830" y="1410" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">5.04:1 on Panel</text>
+<text x="632" y="1444" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Text</text>
+<text x="830" y="1444" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">8.88:1 on Panel</text>
+<text x="632" y="1478" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#6FC3DF">Cyan</text>
+<text x="830" y="1478" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">7.62:1 on Panel</text>
+<text x="632" y="1512" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#DF740C">Orange</text>
+<text x="830" y="1512" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">4.80:1 on Panel</text>
+<text x="632" y="1546" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#FFF2D9">Hot</text>
+<text x="830" y="1546" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">13.70:1 on Panel</text>
+<text x="632" y="1580" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Small critical text uses Hot, not Ember.</text>
+<text x="1192" y="1410" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Alpha, shade and emission are separate.</text>
+<text x="1192" y="1444" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Convert sRGB once at the shader boundary.</text>
+<text x="1192" y="1478" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Scale RGB for HDR; keep alpha independent.</text>
+<text x="1192" y="1512" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Use explicit ramps; reserve Gold identity.</text>
+<text x="1192" y="1546" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">No arbitrary hue shifts or new accent colors.</text>
+<text x="1192" y="1580" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#B7C9D1">Lit pixels remain continuous, not quantized.</text>
+<line x1="72" y1="1640" x2="1728" y2="1640" stroke="#3A5362" stroke-width="1"/>
+<rect x="72" y="1672" width="28" height="28" fill="#000000" stroke="#3A5362" stroke-width="1"/>
+<rect x="110" y="1672" width="28" height="28" fill="#FFFFFF" stroke="none" stroke-width="1"/>
+<text x="156" y="1694" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#8198A6">Black / White / Clear are technical mask and blending values.</text>
+<text x="72" y="1737" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#8198A6">Axiom&#x27;s project palette · not certified film production colors · generated from ArtSource/Palette/palette.json</text>
+</svg>

@@ -70,8 +70,9 @@ namespace GeometricFlight.Presentation
             VisualElement root = document.rootVisualElement;
             if (root == null) return;
             if (overlay == null || overlay.parent != root) Build(root);
-            overlay.style.display = encounter.isActiveAndEnabled ? DisplayStyle.Flex : DisplayStyle.None;
             ArenaWaveState wave = encounter.State;
+            overlay.style.display = encounter.isActiveAndEnabled && wave.Phase != ArenaWavePhase.Inactive
+                ? DisplayStyle.Flex : DisplayStyle.None;
             bool incoming = wave.Phase == ArenaWavePhase.Incoming;
             Color accent = incoming ? Orange : Cyan;
             title.style.color = accent;
