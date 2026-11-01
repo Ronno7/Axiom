@@ -4,11 +4,12 @@ One sloped box (compact preset 420 × 245 mm): throttle lever with 8 lights on t
 with FIRE on top on the right, LCD, shield lights and LINK/SLOW/FAST/PROX/EMP warning lights in the
 middle, a 60 mm red dome EMP button (with its own lamp), a MENU button and a flip-cover MASTER ARM switch.
 The 16 lights are one pre-wired LED string, and the buzzer and rumble are plug-in modules, so the whole build
-has 26 solder joints.
+has 28 solder joints including the added LOCK button.
 
 - 3D model: [axiom_cockpit.blend](axiom_cockpit.blend) (built by [make_cockpit.py](make_cockpit.py); `--roomy` for 500 × 280)
 - Top panel: [panel_cut.svg](panel_cut.svg) (1:1 laser-cut outline) and [panel_template.pdf](panel_template.pdf)
   (1:1 mock-up guide on 4 Letter pages; also `.html`/`.svg`), written by the same script (`-- --panel` for only these)
+  The current panel/model does not include LOCK yet; confirm its position beside the throttle in cardboard.
 - Wiring: [wiring-cockpit.svg](wiring-cockpit.svg) (built by [make_wiring.py](make_wiring.py)): overview, every harness
   terminal by terminal, where the lights go, and a soldering summary
 
@@ -16,20 +17,29 @@ has 26 solder joints.
 
 ## In the game
 
-Decided 2026-09-30. Only the parts marked ✓ are in the game so far; the rest is for M4.
+Only the parts marked ✓ are in the game so far; the rest is planned. MASTER ARM is introduced at the tutorial's
+first weapons lesson, and SAFE inhibits all weapons while flight continues. An already armed switch needs no
+extra cycle. It works in the [shared entry study](../../Docs/SHARED_ENTRY_STUDY.md) and the earlier opening
+prototype, with T as the keyboard equivalent; the original Prototype and Arena scenes don't use it.
+EMP's separate menu-confirm role remains under review.
+
+Until the throttle lever is installed, select **Options > Keyboard throttle with controller (Q / E)**.
+The keyboard holds the throttle setpoint; the cockpit keeps steering, FIRE, LOCK, EMP and MASTER ARM
+(where implemented). Turn the option off to use the physical throttle. No firmware change is needed.
 
 | Control | In flight | In menus |
 | --- | --- | --- |
-| Stick | Steer ✓ (arena: roll and pitch, or bank and turn; push to dive ✓) | Move the selection |
-| FIRE (stick top) | Hold to fire ✓ | Capture in calibration ✓ |
+| Stick | Steer ✓ (arena: roll and pitch, or bank and turn; push to dive ✓) | Move the selection ✓ |
+| FIRE (stick top) | Hold to fire ✓ | Select ✓; capture in calibration ✓ |
 | Throttle lever | Push forward = faster, cruise detent in the middle ✓ | |
-| EMP (60 mm dome) | Once per run: destroys all enemies near the ship. Its lamp is lit while the EMP is unused | Confirm; **LAUNCH** once armed; continue/retry on results |
+| EMP (60 mm dome) | Arena: one 180 m destructive pulse per life; clears nearby enemies and hostile shots. Lamp lit while ready, off when spent; rumble on discharge ✓ | Confirm/retry role under review; original ARM-then-EMP launch plan superseded |
 | MENU | Pause ✓ | Back |
-| MASTER ARM | Flipping to SAFE pauses | A run waits until armed: flip ARM (the cockpit lights wake), then EMP to launch |
-| LOCK (D11, 30 mm button) | Planned (design only, 2026-10-27): lock on and fire missiles. Not placed, wired or coded yet | |
+| MASTER ARM | Shared entry study ✓: ARM enables guns, LOCK and EMP; SAFE inhibits weapons while flight continues | Position shown as status ✓; does not start a run |
+| LOCK (D11, 30 mm button) | Hold to paint up to four distinct targets at 90–650 m; release to fire missiles in the arena ✓. Gun stops while held | |
 | Twist | Arena: rudder for fine aim ✓ (rail: unused; a barrel-roll flick is an idea to test) | |
 
-Without the cockpit, runs start as now and the keyboard gets an EMP key.
+Without the cockpit, runs start as now; **R** fires the arena EMP. No additional menu role for EMP is selected.
+EMP gameplay uses the existing D3 packet and D12 lamp commands; no additional firmware update is needed.
 
 - **Rumble:** engine rumble that grows with speed, plus a jolt when the shield is hit.
 - **Buzzer and LCD:** as on the kit controller (hits, zones, lost sensor, proximity beeps; [../README.md](../README.md)).
@@ -38,8 +48,8 @@ Without the cockpit, runs start as now and the keyboard gets an EMP key.
 - **Shield (3, blue):** one per segment.
 - **Warning lights,** each behind a printed label so nothing relies on colour alone: **LINK** connected to the
   game, **SLOW / FAST** a zone coming up or active, **PROX** blinks with the proximity beeps, **EMP** still available.
-- **Preflight check** (closes M4): arm MASTER ARM, match the throttle to the lit light, follow the stick prompts
-  on the LCD, press FIRE.
+- **Commissioning:** MASTER ARM is introduced in the tutorial's first weapons lesson. Throttle and stick
+  calibration prompts are still to be designed. Returning runs won't need repeated preflight arming.
 
 Rejected, so not to be revived: ghost-hand best-run light, underglow, fan, target tally, lit buttons, a second
 button (HUD toggle), throttle-sensor light, fire-button glow, START light, UltraStik.
@@ -90,7 +100,7 @@ Optional: 4.8 mm female spade connectors and a crimper, if you'd rather crimp th
 | Gravity vibration DFR0440 | Its cable + 3 M–F jumpers on D5 (PWM) | [DFRobot](https://www.dfrobot.com/product-1542.html) | OK: 5 V, on/off or PWM strength, 30 × 22 mm, 30 cm cable included |
 | MASTER ARM (DaierTek) | +1 to 5V, +2 to D7, − (side tab) to GND, 10 kΩ from D7 S to G spliced into the cable | [DaierTek](https://daiertek.net/led-toggle-switch-12v/) | OK: 12 mm hole. **Reads HIGH when armed**. 12 V LED: may be dim at 5 V |
 | EMP: uxcell 60 mm dome | Microswitch COM to GND, NO to D3; lamp + to D12 S, − to D12 G | [Listing](https://www.amazon.com/uxcell-Button-Illuminated-Switch-Arcade/dp/B07XYV5NNP) | OK: momentary, 1 NO, 23.5 mm hole. The lamp's own resistor keeps it to a few mA at 5 V |
-| 30 mm buttons | Microswitch COM to GND, NO to the pin | [EG STARTS listing](https://www.amazon.com/dp/B07GBSJX2H) | OK: **28 mm hole**, not 30 |
+| 30 mm buttons | COM to G, NO to S: MENU on D4, LOCK on D11. Leave V and NC unused | [EG STARTS listing](https://www.amazon.com/dp/B07GBSJX2H) | OK: **28 mm hole**, not 30. Internal pull-ups; no external resistor |
 | Panel USB (StarTech USBPNLBFBM1) | Uno to the back wall | [Datasheet](https://media.startech.com/cms/pdfs/usbpnlbfbm1_datasheet.pdf) | OK: B socket to B plug, 30 cm, screw mount. Hole spacing not published: **measure** before the back wall is cut |
 
 **Power from USB (500 mA fuse):** Uno 50 + LCD 25 + HC-SR04 15 + lights ≤ 180 (16 × ~55 mA at a 20 %
@@ -108,19 +118,23 @@ so its plugs clear the MENU microswitch, with the USB socket beside it.
 
 | Direction | Message | Fields |
 | --- | --- | --- |
-| Controller → PC, every 20 ms | `AX,x,y,mm,fire,menu,twist,emp,arm*HH` | The first six as in v1 (MENU in the pause slot); twist 0–1023, emp/arm 0/1 |
+| Controller → PC, every 20 ms | `AX,x,y,mm,fire,menu,twist,emp,arm,lock*HH` | The first six as in v1 (MENU in the pause slot); twist 0–1023, emp/arm/lock 0/1 |
 | PC → controller | `RM,level,ms*HH` | Rumble 0–255. `ms` 0 = steady level, dropped 1.5 s after the last one; `ms` > 0 = a pulse |
 | PC → controller | `LA,mode*HH` | EMP dome lamp: 0 off, 1 on, 2 blink |
 
 `BZ` and `LT` are unchanged. Buzzer loudness: `BUZZER_VOLUME` at the top of the sketch (% of each cycle the
 buzzer is driven; 50 = full, 0 = mute, default 10). A0 X (right = high), A1 Y (forward = high), A2 twist (clockwise = high).
-Pull-ups on D2 FIRE, D3 EMP, D4 MENU: pressed = LOW. D7 MASTER ARM: HIGH = armed.
+Pull-ups on D2 FIRE, D3 EMP, D4 MENU and D11 LOCK: pressed = LOW, debounced for 15 ms.
+D7 MASTER ARM: HIGH = armed. Unity also accepts the original nine-field cockpit packet without LOCK and
+the six-field kit packet; those use Left Shift for missiles. Update the game alongside the new firmware:
+older game parsers reject the added field. Holding either keyboard Shift or hardware LOCK keeps painting;
+both must be released to launch. Losing the controller while LOCK is held cancels the volley.
 
 Each pass of `loop()` reads the clock once, and commands and the self-test use that same time, so a command
 arriving mid-pass can't look like the game went silent.
 
 **Standby self-test** (no game running): row 1 shows the distance, X, Y and twist (0–99); row 0 shows
-F E M A for FIRE, EMP, MENU and armed. Each press clicks, MASTER ARM chirps up/down, **holding EMP runs the
+F E M A K for FIRE, EMP, MENU, armed and LOCK. Each press clicks, MASTER ARM chirps up/down, **holding EMP runs the
 rumble**, and the EMP lamp stays lit. **Pressing EMP plays a 2.2 s demo:** charge (lights, lamp flicker, rising
 pitch), a white shockwave down the string with a low boom and full rumble, then crackling sparks fading out;
 the lamp relights at the end.
@@ -137,7 +151,7 @@ before each `AX` packet, and the game should send right after receiving one: `sh
 1. Shield on the Uno, power jumper on **5V**. Upload `AxiomCockpit` (board: Arduino Uno).
 2. Plug on the LCD (I2C #1), the buzzer (D8), the rumble module (D5) and the sonar (D9/D10 jumpers).
 3. **D7 floats without the switch:** put a jumper from D7 S to D7 G, or the A flickers.
-4. Buttons: touch a jumper between a row's S and G pins (D2 FIRE, D3 EMP, D4 MENU), or wire the real
+4. Buttons: touch a jumper between a row's S and G pins (D2 FIRE, D3 EMP, D4 MENU, D11 LOCK), or wire the real
    microswitch's COM to G and NO to S. EMP lamp: + to D12 S, − to D12 G. Joystick: a clip lead per lug.
 5. Check each reading on the LCD. Hold D3 S to G to feel the rumble.
 
@@ -148,9 +162,10 @@ fails with "Access is denied".
 
 - [x] Bench test of the sketch with jumpers (2026-10-18)
 - [x] MENU (D4), EMP (D3) and the EMP lamp (D12): soldered, long leads (2026-10-27)
+- [x] LOCK (D11): soldered and connected; firmware uploaded, standby K responds while held (2026-10-29)
 - [x] MASTER ARM (D7, 10 kΩ spliced into the cable): soldered, long leads (2026-10-27)
 - [x] Joystick: X (A0), Y (A1) and FIRE (D2): soldered, long leads, working (2026-10-27)
-- [x] Twist (A2): soldered (2026-10-27); no game use yet
+- [x] Twist (A2): soldered (2026-10-27); the arena rudder
 - [x] Sonar (D9/D10 jumpers): working (2026-10-20)
 - [x] Light string (D6): string test passed on the breadboard (2026-10-20)
 - [ ] Enclosure: cardboard mock-up from the template and measurements (below), then final cut files, order

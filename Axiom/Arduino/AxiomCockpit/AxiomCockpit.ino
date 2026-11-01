@@ -1,6 +1,6 @@
 // Axiom cockpit controller (v2) firmware for Arduino Uno on a Gravity IO shield. Wiring: ../cockpit/README.md.
-// Protocol v2 extends v1 (../README.md); the first six AX fields mean the same, so the game's v1 code still works.
-// Sends one packet every 20 ms:   AX,<x>,<y>,<mm>,<fire>,<menu>,<twist>,<emp>,<arm>*HH
+// Protocol v2 extends v1 (../README.md); Unity accepts v1, the original v2, and this version with LOCK appended.
+// Sends one packet every 20 ms:   AX,<x>,<y>,<mm>,<fire>,<menu>,<twist>,<emp>,<arm>,<lock>*HH
 // Accepts buzzer commands:        BZ,<hz>,<ms>*HH
 // Accepts LCD rows:               LT,<row>,<text>*HH
 // Accepts rumble:                 RM,<level 0-255>,<ms>*HH   ms = 0 sets the steady level; ms > 0 is a pulse
@@ -26,6 +26,7 @@ const uint8_t PIN_ARM    = 7;    // MASTER ARM: +5 V when armed, 10 kOhm pull-do
 const uint8_t PIN_BUZZER = 8;    // DFR0032 passive buzzer (PB0: beep()'s interrupts switch it directly)
 const uint8_t PIN_TRIG   = 9;    // HC-SR04 TRIG
 const uint8_t PIN_ECHO   = 10;   // HC-SR04 ECHO
+const uint8_t PIN_LOCK   = 11;   // missile button, COM to GND and NO to D11
 const uint8_t PIN_LAMP   = 12;   // EMP dome's lamp (12 V part with its own resistor: a few mA at 5 V)
 
 // ---- Timing ----
@@ -77,8 +78,10 @@ struct Button {
 Button fireButton = { PIN_FIRE, true, false, false, 0 };
 Button empButton  = { PIN_EMP,  true, false, false, 0 };
 Button menuButton = { PIN_MENU, true, false, false, 0 };
+Button lockButton = { PIN_LOCK, true, false, false, 0 };
 Button armSwitch  = { PIN_ARM,  false, false, false, 0 };
-Button *const buttons[] = { &fireButton, &empButton, &menuButton, &armSwitch };
+Button *const buttons[] = { &fireButton, &empButton, &menuButton, &armSwitch, &lockButton };
+const uint8_t BUTTON_COUNT = sizeof(buttons) / sizeof(buttons[0]);
 
 Adafruit_NeoPixel lights(LIGHT_COUNT, PIN_LIGHTS, NEO_GRB + NEO_KHZ800);
 
@@ -109,6 +112,7 @@ void setup() {
   pinMode(PIN_FIRE, INPUT_PULLUP);
   pinMode(PIN_EMP, INPUT_PULLUP);
   pinMode(PIN_MENU, INPUT_PULLUP);
+  pinMode(PIN_LOCK, INPUT_PULLUP);
   pinMode(PIN_ARM, INPUT);         // external 10 kOhm pull-down
   pinMode(PIN_RUMBLE, OUTPUT);
   pinMode(PIN_LAMP, OUTPUT);
@@ -180,10 +184,11 @@ uint8_t checksum(const char *body) {
 
 void sendPacket() {
   char body[48];
-  snprintf(body, sizeof(body), "AX,%d,%d,%ld,%d,%d,%d,%d,%d",
+  snprintf(body, sizeof(body), "AX,%d,%d,%ld,%d,%d,%d,%d,%d,%d",
            analogRead(PIN_JOY_X), analogRead(PIN_JOY_Y), distanceMm,
            fireButton.stable ? 1 : 0, menuButton.stable ? 1 : 0,
-           analogRead(PIN_TWIST), empButton.stable ? 1 : 0, armSwitch.stable ? 1 : 0);
+           analogRead(PIN_TWIST), empButton.stable ? 1 : 0, armSwitch.stable ? 1 : 0,
+           lockButton.stable ? 1 : 0);
   char frame[56];
   snprintf(frame, sizeof(frame), "%s*%02X", body, checksum(body));
   Serial.println(frame);
@@ -237,8 +242,8 @@ void handleCommand(char *line, unsigned long now) {
 // holding EMP runs the motor, and the EMP lamp stays lit (see loop).
 // The game's own rumble always wins, because selfTest only runs while the game is silent.
 void selfTest(unsigned long now) {
-  static bool was[4] = { false, false, false, false };
-  for (uint8_t i = 0; i < 4; i++) {
+  static bool was[BUTTON_COUNT] = {};
+  for (uint8_t i = 0; i < BUTTON_COUNT; i++) {
     bool on = buttons[i]->stable;
     if (on != was[i]) {
       if (buttons[i] == &armSwitch) beep(on ? 1320 : 660, 80);
@@ -492,9 +497,9 @@ void drawStandby(unsigned long now) {
   lcdGlyph(7, SPIN[spinFrame]);
 
   char text[17];
-  snprintf(text, sizeof(text), "  AXIOM     %c%c%c%c",
+  snprintf(text, sizeof(text), "  AXIOM    %c%c%c%c%c",
            fireButton.stable ? 'F' : '.', empButton.stable ? 'E' : '.',
-           menuButton.stable ? 'M' : '.', armSwitch.stable ? 'A' : '.');
+           menuButton.stable ? 'M' : '.', armSwitch.stable ? 'A' : '.', lockButton.stable ? 'K' : '.');
   lcdText(0, text);
   lcdWant[0][0] = 7;
   int x = (int)(analogRead(PIN_JOY_X) * 99L / 1023);

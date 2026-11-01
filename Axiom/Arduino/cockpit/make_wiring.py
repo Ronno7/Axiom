@@ -278,7 +278,8 @@ t(RX - 10, TOP + 565, "USB-B", "pin", "end")
 line([(RX + 30, TOP + 560), (QX, TOP + 560)], GRAY, 6)
 ov_box(QX, TOP + 530, W - 40 - QX, 60, "H10  Panel USB cable (StarTech USBPNLBFBM1)", ["Uno to a socket in the back wall"],
        "plug-in", PLUGIN)
-t(QX + 12, TOP + 615, "D11: reserved for LOCK (planned). Free: A3, D13 and I2C #2.", "tiny")
+t(QX + 12, TOP + 610, "D11 LOCK: COM → G, NO → S; V and NC unused. Same wiring as H3.", "tiny")
+t(QX + 12, TOP + 628, "Free: A3, D13 and I2C #2.", "tiny")
 
 # =====================================================================
 # 2  Harness details
@@ -348,7 +349,7 @@ notes(16, 214, [
 add("</g>")
 
 # H3 MENU ------------------------------------------------------------------
-panel(COLS[2], R1, PW, PH, "H3  MENU: 30 mm arcade button (D4)", "2 solder")
+panel(COLS[2], R1, PW, PH, "H3  MENU / LOCK buttons (D4 / D11)", "2 each")
 ys = header(44, 90, "D4", used="GS")
 add(f'<rect x="{TX + 6}" y="62" width="110" height="84" rx="5" fill="#495057"/>')
 t(TX + 61, 108, "microswitch", "pin", "middle", 'font-size="12"')
@@ -359,6 +360,7 @@ for py, c, lab in ((ys[0], BLACK, "COM"), (ys[2], SIG["D4"], "NO")):
 pad(TX, 138, None, used=False)
 t(TX - 10, 142, "NC (unused)", "tinyb", "end")
 notes(16, 206, [
+    "Shown: MENU on D4. Wire LOCK identically on D11; leave V and NC unused.",
     "Tabs are 4.8 mm (3/16 in): solder to them, or crimp 4.8 mm female spade connectors instead.",
     "Find COM and NO with the meter: COM–NC reads 0 Ω at rest, COM–NO only when pressed.",
     "The microswitch clips off the button: wire it first, then clip it back on.",
@@ -622,7 +624,7 @@ add("</g>")
 # =====================================================================
 S4 = NY + 600 + 40
 section(S4, "4", "Soldering summary, build order and rules",
-        "26 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.")
+        "28 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.")
 TY = S4 + 80
 cols = [56, 400, 500, 1060]
 for x, h in zip(cols, ("Harness", "Joints", "What you solder", "Difficulty")):
@@ -631,7 +633,7 @@ add(f'<line x1="40" y1="{TY + 8}" x2="{W - 40}" y2="{TY + 8}" stroke="#adb5bd"/>
 table = [
     ("H1  Joystick", "11", "6 pot lugs (X, Y) + 5 joins (twist, button)", "Medium: keep each lug on its pin"),
     ("H2  EMP 60 mm dome", "4", "COM and NO tabs + the 2 lamp tabs (or crimp spades)", "Easy"),
-    ("H3  MENU button", "2", "COM and NO tabs (or crimp spades)", "Easy: good first practice"),
+    ("H3  MENU + LOCK buttons", "4", "COM and NO tabs on each button (or crimp spades)", "Easy: good first practice"),
     ("H4  MASTER ARM", "5", "3 tabs + 2 splices for the 10 kΩ in the cable", "Easy"),
     ("H5  Sonar", "0", "4 single jumpers", "None"),
     ("H6  Buzzer module", "0", "Gravity cable", "None"),
