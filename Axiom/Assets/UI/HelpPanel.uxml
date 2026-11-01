@@ -24,8 +24,8 @@
             <ui:VisualElement class="help-column">
                 <ui:Label text="MISSION" class="section-title"/>
                 <ui:Label text="Fly to the end of the level. Destroy targets along the way for a better result." class="body-text"/>
-                <ui:Label text="Your shield is the three blue blocks on the back of your ship." class="body-text"/>
-                <ui:Label text="Blue floor markings call for a throttle change. The throttle gauge shows the target speed." class="body-text"/>
+                <ui:Label text="Your shield is the three lit blocks on the back of your ship." class="body-text"/>
+                <ui:Label text="Cyan floor markings call for a throttle change. The throttle gauge shows the target speed." class="body-text"/>
                 <ui:Label text="Lose every segment and the run ends. Beat the par time by flying fast where it is safe." class="body-text"/>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -15,16 +15,16 @@ namespace GeometricFlight.UI
     /// </summary>
     public sealed class CockpitDisplay
     {
-        private const int BarCells = 11;
+        private const int BarCells = 10;
         private const float PageSeconds = 2f;
 
         private readonly LevelFlow flow;
-        private readonly PlayerFlight flight;
+        private readonly ShipFlight flight;
         private int lastShield;
         private float hitUntil;
         private List<string> resultPages;
 
-        public CockpitDisplay(LevelFlow flow, PlayerFlight flight)
+        public CockpitDisplay(LevelFlow flow, ShipFlight flight)
         {
             this.flow = flow;
             this.flight = flight;
@@ -56,10 +56,10 @@ namespace GeometricFlight.UI
                     bottom = resultPages[(int)(now / PageSeconds) % resultPages.Count];
                     break;
                 default:
-                    float speedFraction = Mathf.InverseLerp(flight.MinSpeed, flight.MaxSpeed, flight.CurrentSpeed);
-                    int speedPercent = Mathf.RoundToInt(flight.CurrentSpeed / flight.CruiseSpeed * 100f);
+                    float speedFraction = ThrottleGauge.SpeedFraction(flight, flight.CurrentSpeed);
+                    int speed = Mathf.RoundToInt(flight.CurrentSpeed);
                     top = (zone == null ? LcdGlyph.Bar(speedFraction, BarCells) : LcdGlyph.Bar(speedFraction, BarCells, band.x, band.y))
-                        + $" {speedPercent,3}%";
+                        + $" {speed,2}M/S";
                     bottom = Status(zone, guidance, proximity, blink, now);
                     break;
             }
@@ -69,7 +69,7 @@ namespace GeometricFlight.UI
         private string Status(ThrottleZone zone, int guidance, ProximityAlarm proximity, bool blink, float now)
         {
             ControllerState controller = ControllerService.Instance.State;
-            if (controller.Connected && !controller.ThrottleValid)
+            if (controller.Connected && !GameSettings.KeyboardThrottleWithController && !controller.ThrottleValid)
                 return LcdGlyph.Center(now % 1f < 0.5f ? "THROTTLE NO ECHO" : "HOLDING CRUISE");
             if (proximity.Active)
                 return LcdGlyph.Center(proximity.Pulse ? "! PROXIMITY !" : "");

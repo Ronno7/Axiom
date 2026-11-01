@@ -68,6 +68,9 @@ namespace GeometricFlight.Player
         [Tooltip("A soft notch: throttle this close to the middle counts as cruise exactly.")]
         [Range(0f, 0.3f)] public float cruiseSnap = 0.08f;
 
+        [Header("Boost")]
+        public BoostTuning boost = new BoostTuning();
+
         [Header("Response curves")]
         [Tooltip("1 = linear. Higher gives finer control near the centre.")]
         [Range(1f, 3f)] public float stickExpo = 1.7f;
@@ -107,6 +110,8 @@ namespace GeometricFlight.Player
         /// here; Yaw, Pitch and Bank are then read back from it for display only.</summary>
         public bool FullRotation;
         public Quaternion Attitude;
+        /// <summary>The throttle-end burst (charge, time left, armed).</summary>
+        public BoostState Boost;
 
         /// <summary>Level direction of travel without bank (arcade); the attitude itself in full rotation.</summary>
         public Quaternion Heading => FullRotation ? Attitude : Quaternion.Euler(-Pitch, Yaw, 0f);
@@ -147,17 +152,22 @@ namespace GeometricFlight.Player
 
         /// <summary>Speed with energy: the engine pulls toward the throttle's setting (at most Acceleration),
         /// and gravity takes speed away in a climb and adds it in a dive (<paramref name="climb"/> is the nose's
-        /// vertical component, -1 to +1). With gravity 0 this is the plain constant-rate ramp. Returns the frame's
+        /// vertical component, -1 to +1). With gravity 0 this is the plain constant-rate ramp. While
+        /// <paramref name="boosting"/>, the target is the boost speed at the boost acceleration. Returns the frame's
         /// average speed.</summary>
-        public static float Energy(ref float speed, float throttle, float climb, ArenaFlightTuning t, float deltaTime)
+        public static float Energy(ref float speed, float throttle, float climb, ArenaFlightTuning t, float deltaTime,
+            bool boosting = false)
         {
-            float target = FlightMovement.TargetSpeed(throttle, t.cruiseSpeed, t.throttleMultipliers);
-            if (t.gravity <= 0f) return FlightMovement.Accelerate(ref speed, target, t.acceleration, deltaTime);
+            float target = boosting ? t.boost.speed
+                : FlightMovement.TargetSpeed(throttle, t.cruiseSpeed, t.throttleMultipliers);
+            float acceleration = boosting ? t.boost.acceleration : t.acceleration;
+            if (t.gravity <= 0f) return FlightMovement.Accelerate(ref speed, target, acceleration, deltaTime);
             if (deltaTime <= 0f) return speed;
             float previous = speed;
             float response = speed > target ? t.dragResponse : t.thrustResponse;
-            float thrust = Mathf.Clamp((target - speed) * response, -t.acceleration, t.acceleration);
-            float top = t.cruiseSpeed * Mathf.Max(1f, t.throttleMultipliers.y) * t.diveSpeedLimit;
+            float thrust = Mathf.Clamp((target - speed) * response, -acceleration, acceleration);
+            float top = Mathf.Max(t.cruiseSpeed * Mathf.Max(1f, t.throttleMultipliers.y) * t.diveSpeedLimit,
+                boosting ? t.boost.speed : 0f);
             speed = Mathf.Clamp(speed + (thrust - t.gravity * climb) * deltaTime, t.minSpeed, top);
             return (previous + speed) * 0.5f;
         }
@@ -190,7 +200,10 @@ namespace GeometricFlight.Player
         {
             if (deltaTime <= 0f) return;
 
-            float averageSpeed = Energy(ref s.Speed, throttle, Mathf.Sin(s.Pitch * Mathf.Deg2Rad), t, deltaTime);
+            bool boosting = ThrottleBoost.Step(ref s.Boost, throttle, t.boost, deltaTime);
+            throttle = ThrottleBoost.Lever(throttle, t.boost);
+            float averageSpeed = Energy(ref s.Speed, throttle, Mathf.Sin(s.Pitch * Mathf.Deg2Rad), t, deltaTime,
+                boosting);
             s.Stalled = UpdateStall(s.Stalled, s.Speed, t);
             float x = Shape(stick.x, t.stickExpo);
             float y = Shape(stick.y, t.stickExpo);
@@ -255,7 +268,10 @@ namespace GeometricFlight.Player
             if (deltaTime <= 0f) return;
             if (s.Attitude == default) s.Attitude = Quaternion.Euler(-s.Pitch, s.Yaw, -s.Bank);
 
-            float averageSpeed = Energy(ref s.Speed, throttle, (s.Attitude * Vector3.forward).y, t, deltaTime);
+            bool boosting = ThrottleBoost.Step(ref s.Boost, throttle, t.boost, deltaTime);
+            throttle = ThrottleBoost.Lever(throttle, t.boost);
+            float averageSpeed = Energy(ref s.Speed, throttle, (s.Attitude * Vector3.forward).y, t, deltaTime,
+                boosting);
             float x = Shape(stick.x, t.stickExpo);
             float y = Shape(stick.y, t.stickExpo);
             float rudder = Shape(twist, t.twistExpo);

@@ -13,12 +13,16 @@ namespace GeometricFlight.Core
         private const string InvertVerticalKey = "axiom.invertVertical";
         private const string BuzzerKey = "axiom.buzzerEnabled";
         private const string ArcadeKey = "axiom.arcadeMode";
+        private const string KeyboardThrottleKey = "axiom.keyboardThrottleWithController";
+        private const string ReducedEntryKey = "axiom.reducedEntryAnimation";
 
         private static bool loaded;
         private static float steeringSensitivity = 1f;
         private static bool invertVertical;
         private static bool buzzerEnabled = true;
         private static bool arcadeMode;
+        private static bool keyboardThrottleWithController;
+        private static bool reducedEntryAnimation;
 
         /// <summary>Multiplies steering speed. 1 is the tuned default.</summary>
         public static float SteeringSensitivity
@@ -67,6 +71,31 @@ namespace GeometricFlight.Core
             }
         }
 
+        /// <summary>Use the latched Q/E throttle while retaining the connected cockpit's stick,
+        /// buttons and MASTER ARM. Useful before the physical throttle is installed.</summary>
+        public static bool KeyboardThrottleWithController
+        {
+            get { Load(); return keyboardThrottleWithController; }
+            set
+            {
+                Load();
+                keyboardThrottleWithController = value;
+                PlayerPrefs.SetInt(KeyboardThrottleKey, value ? 1 : 0);
+            }
+        }
+
+        /// <summary>Quiet entry preference shared by first and returning players.</summary>
+        public static bool ReducedEntryAnimation
+        {
+            get { Load(); return reducedEntryAnimation; }
+            set
+            {
+                Load();
+                reducedEntryAnimation = value;
+                PlayerPrefs.SetInt(ReducedEntryKey, value ? 1 : 0);
+            }
+        }
+
         public static void Save() => PlayerPrefs.Save();
 
         private static void Load()
@@ -78,6 +107,8 @@ namespace GeometricFlight.Core
             invertVertical = PlayerPrefs.GetInt(InvertVerticalKey, 0) == 1;
             buzzerEnabled = PlayerPrefs.GetInt(BuzzerKey, 1) == 1;
             arcadeMode = PlayerPrefs.GetInt(ArcadeKey, 0) == 1;
+            keyboardThrottleWithController = PlayerPrefs.GetInt(KeyboardThrottleKey, 0) == 1;
+            reducedEntryAnimation = PlayerPrefs.GetInt(ReducedEntryKey, 0) == 1;
         }
     }
 }

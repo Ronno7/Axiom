@@ -16,11 +16,11 @@ namespace GeometricFlight.Core
     /// <see cref="Results"/> before StateChanged fires, and later hits change nothing (<see cref="RunRecord"/>).
     /// UI observes StateChanged and calls the public actions.
     /// Retry reloads the scene, so no actor or listener survives into the next attempt.</summary>
-    [DefaultExecutionOrder(20)] // After PlayerFlight (input) and ShipHull (damage) this frame.
+    [DefaultExecutionOrder(20)] // After the ship's flight input and ShipHull damage this frame.
     [DisallowMultipleComponent]
     public sealed class LevelFlow : MonoBehaviour
     {
-        [SerializeField] private PlayerFlight flight;
+        [SerializeField] private ShipFlight flight;
         [SerializeField] private PlayerWeapon weapon;
         [SerializeField] private ShipShield shield;
         [SerializeField] private ShipHull hull;
@@ -34,6 +34,8 @@ namespace GeometricFlight.Core
         [SerializeField] private string nextScene = "";
         [Tooltip("Target completion time in seconds, shown on results. 0 hides it.")]
         [SerializeField, Min(0f)] private float parTime;
+        [Tooltip("Opt-in entry study: keep input and pause live, but hold flight and run time until admission.")]
+        [SerializeField] private bool waitForEntry;
 
         public event Action<RunState> StateChanged;
         public RunState State { get; private set; } = RunState.Playing;
@@ -48,31 +50,51 @@ namespace GeometricFlight.Core
         public bool HasNextLevel => !string.IsNullOrEmpty(nextScene);
         public float ParTime => parTime;
         public bool HasPar => parTime > 0f;
+        public bool EntryHeld { get; private set; }
+        public bool EntryStarted { get; private set; }
+        /// <summary>Set by a course with checkpoints. Returning true takes over a destroyed ship (shattered and
+        /// hidden here; the course rebuilds it with <see cref="SetShipDestroyed"/>) instead of ending the run.</summary>
+        public Func<bool> CheckpointRecovery { get; set; }
 
         private ShootableTarget[] targets;
         private readonly RunRecord record = new RunRecord();
+        private int controllerConnectedFrame = -1;
 
         private void Awake()
         {
             Time.timeScale = 1f;
+            if (waitForEntry && flight is ArenaFlight arenaFlight)
+            {
+                EntryHeld = true;
+                arenaFlight.HoldForEntry();
+            }
             targets = FindObjectsByType<ShootableTarget>(FindObjectsSortMode.None);
             TargetsTotal = targets.Length;
             foreach (ShootableTarget target in targets) target.Destroyed += CountTarget;
             shield.Depleted += Fail;
             ControllerService.Instance.Disconnected += OnControllerLost;
+            ControllerService.Instance.Connected += OnControllerConnected;
         }
 
         private void OnDestroy()
         {
             foreach (ShootableTarget target in targets) if (target != null) target.Destroyed -= CountTarget;
             if (shield != null) shield.Depleted -= Fail;
-            if (ControllerService.Current != null) ControllerService.Current.Disconnected -= OnControllerLost;
+            if (ControllerService.Current != null)
+            {
+                ControllerService.Current.Disconnected -= OnControllerLost;
+                ControllerService.Current.Connected -= OnControllerConnected;
+            }
             Time.timeScale = 1f;
         }
 
-        private void Update()
+        private void Update() => Step(Time.deltaTime);
+
+        private void Step(float deltaTime)
         {
-            bool pausePressed = flight.isActiveAndEnabled && flight.CurrentInput.PausePressed;
+            if (EntryHeld && !EntryStarted) return;
+            bool pausePressed = flight.isActiveAndEnabled && flight.CurrentInput.PausePressed
+                && Time.frameCount != controllerConnectedFrame;
             if (State == RunState.Paused)
             {
                 if (pausePressed) Resume();
@@ -80,7 +102,13 @@ namespace GeometricFlight.Core
             }
             if (State != RunState.Playing) return;
 
-            ElapsedTime += Time.deltaTime;
+            if (EntryHeld)
+            {
+                if (pausePressed) Pause();
+                return;
+            }
+
+            ElapsedTime += deltaTime;
             if (pausePressed) Pause();
             else if (flight.transform.position.z >= courseEnd.position.z) Complete();
         }
@@ -93,11 +121,15 @@ namespace GeometricFlight.Core
         // Safe response to losing the controller mid-run: stop, and say so.
         private void OnControllerLost() => Pause(PauseReason.ControllerLost);
 
+        // ControllerService runs before flight input. Its first reconnect packet can turn a held MENU
+        // into a press edge; only a later deliberate press may resume the paused run.
+        private void OnControllerConnected() => controllerConnectedFrame = Time.frameCount;
+
         public void Pause() => Pause(PauseReason.Player);
 
         private void Pause(PauseReason reason)
         {
-            if (State != RunState.Playing) return;
+            if (State != RunState.Playing || (EntryHeld && !EntryStarted)) return;
             PauseReason = reason;
             Time.timeScale = 0f;
             SetState(RunState.Paused);
@@ -109,6 +141,25 @@ namespace GeometricFlight.Core
             PauseReason = PauseReason.None;
             Time.timeScale = 1f;
             SetState(RunState.Playing);
+        }
+
+        /// <summary>Accepts PLAY for an opt-in held entry. Native pause and recovery now own the run.</summary>
+        public bool BeginEntry()
+        {
+            if (!EntryHeld || EntryStarted || State != RunState.Playing) return false;
+            EntryStarted = true;
+            return true;
+        }
+
+        /// <summary>Commits the staged actor after the entry presenter has matched its camera and HUD.
+        /// A pause on this frame keeps the entry held. Normal movement and scored time begin next Update.</summary>
+        public bool TryBeginEntryRun()
+        {
+            if (!EntryHeld || !EntryStarted || State != RunState.Playing || !(flight is ArenaFlight arenaFlight))
+                return false;
+            arenaFlight.ReleaseEntry();
+            EntryHeld = false;
+            return true;
         }
 
         public void Retry() => Load(SceneManager.GetActiveScene().name);
@@ -128,14 +179,25 @@ namespace GeometricFlight.Core
 
         private void Fail()
         {
+            if (State == RunState.Playing && !EntryHeld && CheckpointRecovery != null && CheckpointRecovery())
+            {
+                SetShipDestroyed(true);
+                return;
+            }
             if (!Finish(false)) return;
-            flight.enabled = false;
-            weapon.enabled = false;
-            hull.enabled = false;
-            shield.TakesHits = false;
-            foreach (GameObject go in hideWhenDestroyed) go.SetActive(false);
-            if (shipDestruction != null) shipDestruction.Play();
+            SetShipDestroyed(true);
             SetState(RunState.Failed);
+        }
+
+        /// <summary>Shatters and hides the ship, or brings it back for a checkpoint retry.</summary>
+        public void SetShipDestroyed(bool destroyed)
+        {
+            flight.enabled = !destroyed;
+            weapon.enabled = !destroyed;
+            hull.enabled = !destroyed;
+            shield.TakesHits = !destroyed;
+            foreach (GameObject go in hideWhenDestroyed) go.SetActive(!destroyed);
+            if (destroyed && shipDestruction != null) shipDestruction.Play();
         }
 
         private bool Finish(bool completed) => record.TryFinish(new RunResults(completed, ElapsedTime,
@@ -152,6 +214,17 @@ namespace GeometricFlight.Core
         private static void Load(string scene)
         {
             Time.timeScale = 1f;
+#if UNITY_EDITOR
+            // Isolated studies are intentionally absent from release build settings. Retry only the
+            // currently open scene by its known path; menu/continue keep their normal build lookup.
+            Scene current = SceneManager.GetActiveScene();
+            if (!Application.CanStreamedLevelBeLoaded(scene) && scene == current.name)
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(current.path,
+                    new LoadSceneParameters(LoadSceneMode.Single));
+                return;
+            }
+#endif
             SceneManager.LoadScene(scene);
         }
     }

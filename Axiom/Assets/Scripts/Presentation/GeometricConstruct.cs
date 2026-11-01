@@ -12,6 +12,7 @@ namespace GeometricFlight.Presentation
     /// </summary>
     [ExecuteAlways]
     [DisallowMultipleComponent]
+    [SelectionBase] // Clicking a generated (hidden) part selects this object.
     public sealed class GeometricConstruct : MonoBehaviour
     {
         public enum CageShape { None, Icosahedron, Dodecahedron }
@@ -68,6 +69,24 @@ namespace GeometricFlight.Presentation
         private Quaternion knotTilt;
         private float timeOffset;
         private bool rebuildRequested;
+        private bool presentationClock;
+        private float presentationTime, presentationDelta;
+
+        /// <summary>Repeatable presentation-only playback; rebuilding restores seeded tumble state.</summary>
+        public void ResetPresentationClock()
+        {
+            presentationClock = true;
+            presentationTime = presentationDelta = 0f;
+            Build();
+        }
+
+        public void SetPresentationTime(float elapsed, float deltaTime)
+        {
+            presentationTime = elapsed;
+            presentationDelta = Mathf.Max(0f, deltaTime);
+        }
+
+        public void ReleasePresentationClock() => presentationClock = false;
 
         private void OnEnable() => Build();
         private void OnDisable() => Release();
@@ -78,7 +97,7 @@ namespace GeometricFlight.Presentation
             if (rebuildRequested) Build();
             if (pivot == null) return;
 
-            float t = (Application.isPlaying ? Time.time : Time.realtimeSinceStartup) + timeOffset;
+            float t = (presentationClock ? presentationTime : Application.isPlaying ? Time.time : Time.realtimeSinceStartup) + timeOffset;
             pivot.localPosition = new Vector3(0f, bob * Mathf.Sin(t * 1.19f), bob * 0.5f * Mathf.Sin(t * 0.83f));
 
             Vector3 coreAxis = Vector3.one.normalized;
@@ -87,7 +106,7 @@ namespace GeometricFlight.Presentation
 
             if (cageTransform != null)
             {
-                if (Application.isPlaying) tumble.Step(Time.deltaTime);
+                if (Application.isPlaying) tumble.Step(presentationClock ? presentationDelta : Time.deltaTime);
                 cageTransform.localRotation = tumble.Orientation;
                 cageTransform.localScale = Vector3.one * (1f + 0.03f * Mathf.Sin(t * 1.7f));
             }
@@ -155,7 +174,8 @@ namespace GeometricFlight.Presentation
 
         private Transform Part(string partName, Mesh mesh, Material material, Transform parent)
         {
-            var go = new GameObject(partName) { hideFlags = HideFlags.HideAndDontSave };
+            // Shown (greyed, never saved) so a Scene view click can select it; [SelectionBase] then selects the owner.
+            var go = new GameObject(partName) { hideFlags = HideFlags.DontSave | HideFlags.NotEditable };
             go.transform.SetParent(parent, false);
             if (mesh != null)
             {

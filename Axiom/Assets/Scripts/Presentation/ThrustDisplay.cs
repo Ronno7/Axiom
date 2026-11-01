@@ -16,13 +16,18 @@ namespace GeometricFlight.Presentation
         [Tooltip("Jet length at minimum and maximum throttle, in aircraft-local units.")]
         [SerializeField] private Vector2 lengthRange = new Vector2(0.45f, 2.6f);
         [SerializeField, Min(0.1f)] private float response = 12f;
+        [Tooltip("Extra jet length during a boost burst, relative to full throttle.")]
+        [SerializeField, Min(0f)] private float boostFlare = 0.6f;
+        [Tooltip("Optional: played once when a boost burst fires.")]
+        [SerializeField] private AudioSource burstSound;
 
         // Two jets, each with an outer diamond, a core and three travelling diamonds.
         private readonly Vector3[] vertices = new Vector3[240];
         private readonly Color[] colors = new Color[240];
         private Mesh mesh;
         private MeshRenderer jetRenderer;
-        private float throttle, phase;
+        private float throttle, flare, phase;
+        private bool wasBoosting;
         private int cursor;
 
         private void OnEnable()
@@ -36,6 +41,8 @@ namespace GeometricFlight.Presentation
             GetComponent<MeshFilter>().sharedMesh = mesh;
             throttle = flight != null ? Mathf.InverseLerp(flight.MinSpeed, flight.MaxSpeed, flight.CruiseSpeed) : 0.44f;
             phase = 0f;
+            flare = 0f;
+            wasBoosting = false;
             DrawJets();
             var indices = new int[vertices.Length];
             for (int i = 0; i < indices.Length; i++) indices[i] = i;
@@ -53,6 +60,11 @@ namespace GeometricFlight.Presentation
                 if (Time.deltaTime <= 0f) return;
                 float target = Mathf.InverseLerp(flight.MinSpeed, flight.MaxSpeed, flight.TargetSpeed);
                 throttle = Mathf.Lerp(throttle, target, 1f - Mathf.Exp(-response * Time.deltaTime));
+                bool boosting = flight.Boost == BoostStatus.Active;
+                if (boosting && !wasBoosting && burstSound != null) burstSound.Play();
+                wasBoosting = boosting;
+                // The flare lights at once and dies away over about half a second.
+                flare = boosting ? 1f : Mathf.MoveTowards(flare, 0f, Time.deltaTime * 2f);
                 phase = Mathf.Repeat(phase + Time.deltaTime * Mathf.Lerp(1.4f, 3.2f, throttle), 1f);
             }
             DrawJets();
@@ -71,10 +83,12 @@ namespace GeometricFlight.Presentation
         private void DrawJet(Vector3 port, float offset)
         {
             float pulse = Mathf.Sin((phase + offset) * Mathf.PI * 2f);
-            float length = Mathf.Lerp(lengthRange.x, lengthRange.y, throttle) * (1f + pulse * 0.035f);
-            float width = Mathf.Lerp(0.12f, 0.22f, throttle);
-            Diamond(port, length, width, 0.16f, new Color(0.72f, 0.78f, 0.82f, 0.3f));
-            Diamond(port, length * 0.72f, width * 0.56f, 0.18f, new Color(1f, 1f, 1f, 0.95f));
+            float length = Mathf.Lerp(lengthRange.x, lengthRange.y, throttle) * (1f + pulse * 0.035f)
+                * (1f + boostFlare * flare);
+            float width = Mathf.Lerp(0.12f, 0.22f, throttle) * (1f + 0.3f * flare);
+            // The exhaust shader reads mesh colors directly, so author the hue in sRGB and convert once.
+            Diamond(port, length, width, 0.16f, AxiomPalette.ShaderColor(AxiomPalette.Cyan, 1f, 0.3f));
+            Diamond(port, length * 0.72f, width * 0.56f, 0.18f, AxiomPalette.ShaderColor(AxiomPalette.Light, 1f, 0.95f));
             for (int i = 0; i < 3; i++)
             {
                 float travel = Mathf.Repeat(phase + offset + i / 3f, 1f);
@@ -82,7 +96,7 @@ namespace GeometricFlight.Presentation
                 Vector3 origin = port + Vector3.back * length * (0.6f + travel * 0.85f);
                 float size = Mathf.Lerp(0.025f, 0.09f, throttle) * fade;
                 Diamond(origin, size * 4f, size, 0.5f,
-                    new Color(0.9f, 0.94f, 0.96f, fade * Mathf.Lerp(0.12f, 0.65f, throttle)));
+                    AxiomPalette.ShaderColor(AxiomPalette.Light, 1f, fade * Mathf.Lerp(0.12f, 0.65f, throttle)));
             }
         }
 

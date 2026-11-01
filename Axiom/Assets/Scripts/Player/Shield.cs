@@ -30,6 +30,16 @@ namespace GeometricFlight.Player
             return true;
         }
 
+        /// <summary>Removes every segment at once, ignoring protection (lethal contact).
+        /// Returns true if this depleted the shield.</summary>
+        public bool Deplete()
+        {
+            if (IsDepleted) return false;
+            Current = 0;
+            ProtectionRemaining = 0f;
+            return true;
+        }
+
         /// <summary>Advance protection time. Zero or negative time (paused) changes nothing.</summary>
         public void Tick(float deltaTime)
         {

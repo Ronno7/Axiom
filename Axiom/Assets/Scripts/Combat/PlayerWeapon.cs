@@ -33,12 +33,16 @@ namespace GeometricFlight.Combat
 
         public int ShotsFired { get; private set; }
         public int Hits { get; private set; }
+        public Transform AimPoint => aimPoint;
+        public Transform[] Muzzles => muzzles;
+        public LayerMask HitLayers => hitLayers;
         /// <summary>The target aim assist will send shots through this frame, or null (assist off, or nothing
         /// near the firing line). Presentation shows it so the player knows what a shot will hit.</summary>
         public ShootableTarget AssistTarget { get; private set; }
 
         private ProjectilePool pool;
         private ShipFlight flight;
+        private LockOnWeapon missiles;
         private Vector3[] assistPoints = new Vector3[16];
         private Action countHit;
         private float cooldown;
@@ -47,6 +51,7 @@ namespace GeometricFlight.Combat
         private void Awake()
         {
             flight = GetComponent<ShipFlight>();
+            missiles = GetComponent<LockOnWeapon>();
             countHit = () => Hits++;
             if (projectilePrefab == null || aimPoint == null || muzzles == null || muzzles.Length == 0)
             {
@@ -58,11 +63,13 @@ namespace GeometricFlight.Combat
         }
 
         private void OnDestroy() => pool?.Dispose();
+        public void ClearProjectiles() => pool?.Clear();
 
         private void Update()
         {
-            AssistTarget = PickAssistTarget();
-            bool fireHeld = flight.isActiveAndEnabled && flight.CurrentInput.FireHeld;
+            bool painting = missiles != null && missiles.isActiveAndEnabled && missiles.SuppressGun;
+            AssistTarget = painting ? null : PickAssistTarget();
+            bool fireHeld = !painting && flight.isActiveAndEnabled && flight.CurrentInput.FireHeld;
             int shots = WeaponRules.ShotsThisFrame(ref cooldown, fireHeld, Time.deltaTime, shotInterval);
             for (int i = 0; i < shots; i++) Fire();
         }

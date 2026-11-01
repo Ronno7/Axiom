@@ -17,9 +17,16 @@ namespace GeometricFlight.Input
         public readonly bool StickButtonPressed;
         /// <summary>Stick twist, -1 to +1 (cockpit only; 0 on the kit controller).</summary>
         public readonly float Twist;
+        public readonly bool LockHeld, HasLock;
+        public readonly bool EmpHeld;
+        /// <summary>Cockpit switch capability and physical position; kit controllers have neither.</summary>
+        public readonly bool HasMasterArm, Armed;
+        /// <summary>One frame when a held hardware LOCK is lost with the link or packet capability.</summary>
+        public readonly bool LockCancelled;
 
         public ControllerState(bool connected, Vector2 stick, float throttle, bool throttleValid, bool fire,
-            bool stickButtonPressed, float twist = 0f)
+            bool stickButtonPressed, float twist = 0f, bool lockHeld = false, bool hasLock = false,
+            bool lockCancelled = false, bool empHeld = false, bool hasMasterArm = false, bool armed = false)
         {
             Twist = twist;
             Connected = connected;
@@ -28,6 +35,12 @@ namespace GeometricFlight.Input
             ThrottleValid = throttleValid;
             Fire = fire;
             StickButtonPressed = stickButtonPressed;
+            LockHeld = lockHeld;
+            EmpHeld = empHeld;
+            HasLock = hasLock;
+            LockCancelled = lockCancelled;
+            HasMasterArm = hasMasterArm;
+            Armed = armed;
         }
     }
 
@@ -78,6 +91,8 @@ namespace GeometricFlight.Input
         private bool wasConnected;
         private bool wasThrottleLost;
         private bool previousStickButton;
+        private ControllerProtocol.Lamp? empLamp;
+        private bool empNeedsRelease = true;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatic() => instance = null;
@@ -117,6 +132,15 @@ namespace GeometricFlight.Input
             if (GameSettings.BuzzerEnabled && link != null) link.Send(ControllerProtocol.FormatTone(hz, milliseconds));
         }
 
+        public void SetEmpLamp(ControllerProtocol.Lamp mode)
+        {
+            if (!State.Connected || empLamp == mode) return;
+            link?.Send(ControllerProtocol.FormatLamp(mode));
+            empLamp = mode;
+        }
+
+        public void PulseRumble(int level, int milliseconds) => link?.Send(ControllerProtocol.FormatRumble(level, milliseconds));
+
         private void StartLink(SimulatedLineTransport simulator)
         {
             link?.Dispose();
@@ -142,17 +166,24 @@ namespace GeometricFlight.Input
             Throttle.Update(Time.unscaledDeltaTime, fresh, fresh ? snapshot.Packet.DistanceMm : -1, Calibration);
 
             ControllerPacket p = snapshot.Packet;
+            if (!connected || !wasConnected) empNeedsRelease = true;
+            if (connected && !p.Emp) empNeedsRelease = false;
             bool stickButton = connected && p.StickButton;
+            bool lockCancelled = State.LockHeld && (!connected || !p.HasLock);
             State = new ControllerState(connected,
                 connected ? Calibration.NormalizeStick(p.StickX, p.StickY) : Vector2.zero,
                 Throttle.Setpoint, connected && !Throttle.SignalLost, connected && p.Fire,
                 stickButton && !previousStickButton,
-                connected && p.IsCockpit ? Calibration.NormalizeTwist(p.Twist) : 0f);
+                connected && p.IsCockpit ? Calibration.NormalizeTwist(p.Twist) : 0f,
+                connected && p.HasLock && p.LockHeld, connected && p.HasLock, lockCancelled,
+                connected && p.IsCockpit && p.Emp && !empNeedsRelease,
+                connected && p.IsCockpit, connected && p.IsCockpit && p.Armed);
             previousStickButton = stickButton;
 
             if (connected != wasConnected)
             {
                 wasConnected = connected;
+                empLamp = null;
                 if (connected)
                 {
                     if (Simulator == null) PlayerPrefs.SetString(PortKey, snapshot.PortName);
@@ -165,7 +196,7 @@ namespace GeometricFlight.Input
             }
 
             bool throttleLost = connected && Throttle.SignalLost;
-            if (throttleLost && !wasThrottleLost) PlayTone(330, 250);
+            if (throttleLost && !wasThrottleLost && !GameSettings.KeyboardThrottleWithController) PlayTone(330, 250);
             wasThrottleLost = throttleLost;
         }
 

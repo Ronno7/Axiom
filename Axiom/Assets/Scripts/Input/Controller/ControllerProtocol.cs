@@ -17,12 +17,14 @@ namespace GeometricFlight.Input
         public readonly bool IsCockpit;
         public readonly int Twist;
         public readonly bool Emp, Armed;
+        /// <summary>Extended cockpit packet includes the D11 LOCK button; older packets have no LOCK.</summary>
+        public readonly bool HasLock, LockHeld;
 
         public ControllerPacket(int stickX, int stickY, int distanceMm, bool fire, bool stickButton)
             : this(stickX, stickY, distanceMm, fire, stickButton, false, 512, false, false) { }
 
         public ControllerPacket(int stickX, int stickY, int distanceMm, bool fire, bool stickButton,
-            bool isCockpit, int twist, bool emp, bool armed)
+            bool isCockpit, int twist, bool emp, bool armed, bool lockHeld = false, bool hasLock = false)
         {
             StickX = stickX;
             StickY = stickY;
@@ -33,6 +35,8 @@ namespace GeometricFlight.Input
             Twist = twist;
             Emp = emp;
             Armed = armed;
+            LockHeld = lockHeld;
+            HasLock = hasLock;
         }
     }
 
@@ -40,7 +44,7 @@ namespace GeometricFlight.Input
     /// Serial protocol v1 (Arduino/README.md). ASCII lines ending in newline, 115200 baud, with an
     /// NMEA-style checksum: XOR of every character before '*', written as two hex digits.
     ///   controller → PC, ~50 Hz:  AX,&lt;x 0-1023&gt;,&lt;y 0-1023&gt;,&lt;mm or -1&gt;,&lt;fire 0/1&gt;,&lt;stick 0/1&gt;*HH
-    ///   cockpit (v2) appends:     ...,&lt;twist 0-1023&gt;,&lt;emp 0/1&gt;,&lt;arm 0/1&gt;*HH
+    ///   cockpit (v2) appends:     ...,&lt;twist 0-1023&gt;,&lt;emp 0/1&gt;,&lt;arm 0/1&gt;[,&lt;lock 0/1&gt;]*HH
     ///   PC → controller:          BZ,&lt;hz&gt;,&lt;ms&gt;*HH   (buzzer tone)
     ///   PC → controller:          LT,&lt;row 0/1&gt;,&lt;text&gt;*HH   (one LCD row, see FormatLcdRow)
     ///   PC → cockpit:             RM,&lt;level 0-255&gt;,&lt;ms&gt;*HH   (rumble, see FormatRumble)
@@ -66,7 +70,7 @@ namespace GeometricFlight.Input
                 return false;
 
             string[] f = body.Split(',');
-            if ((f.Length != 6 && f.Length != 9) || f[0] != "AX") return false;
+            if ((f.Length != 6 && f.Length != 9 && f.Length != 10) || f[0] != "AX") return false;
             if (!TryInt(f[1], 0, 1023, out int x) || !TryInt(f[2], 0, 1023, out int y)
                 || !TryInt(f[3], -1, MaxDistanceMm, out int mm)
                 || !TryInt(f[4], 0, 1, out int fire) || !TryInt(f[5], 0, 1, out int stick))
@@ -80,7 +84,10 @@ namespace GeometricFlight.Input
             if (!TryInt(f[6], 0, 1023, out int twist) || !TryInt(f[7], 0, 1, out int emp)
                 || !TryInt(f[8], 0, 1, out int arm))
                 return false;
-            packet = new ControllerPacket(x, y, mm, fire == 1, stick == 1, true, twist, emp == 1, arm == 1);
+            int missileLock = 0;
+            if (f.Length == 10 && !TryInt(f[9], 0, 1, out missileLock)) return false;
+            packet = new ControllerPacket(x, y, mm, fire == 1, stick == 1, true, twist, emp == 1, arm == 1,
+                missileLock == 1, f.Length == 10);
             return true;
         }
 

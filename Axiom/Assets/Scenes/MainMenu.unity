@@ -15,18 +15,18 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.035, g: 0.036, b: 0.04, a: 1}
+  m_FogColor: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.01
   m_LinearFogStart: 35
   m_LinearFogEnd: 135
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
-  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
-  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientSkyColor: {r: 0.226163, g: 0.226163, b: 0.226163, a: 1}
+  m_AmbientEquatorColor: {r: 0.122623004, g: 0.122623004, b: 0.122623004, a: 1}
+  m_AmbientGroundColor: {r: 0.043284, g: 0.043284, b: 0.043284, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_AmbientMode: 3
+  m_SubtractiveShadowColor: {r: 0.477644, g: 0.477644, b: 0.477644, a: 1}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -1802,7 +1802,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.GeometricConstruct
   primary: {fileID: 2100000, guid: 4ccad562d2185b3e7c4bac0b18de6c3e, type: 2}
   secondary: {fileID: 2100000, guid: 4a0c90af00cbbe6104dc82492627b1cf, type: 2}
-  tertiary: {fileID: 2100000, guid: faf5e6eb8b566c54db4b1bfcb4a5fa80, type: 2}
+  tertiary: {fileID: 2100000, guid: 801ee7aac627fbf419b5a7540e66fb59, type: 2}
   coreRadius: 1
   coreSpin: 35
   cage: 1
@@ -1812,7 +1812,7 @@ MonoBehaviour:
   cageSpin: 0.8
   knot: 1
   knotScale: 1
-  knotThickness: 0.06
+  knotThickness: 0.025
   knotSpin: 50
   knotTurn: 7
   satellites: 0
@@ -1980,7 +1980,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.MenuBackdrop
   viewCamera: {fileID: 1244182477}
-  scrollSpeed: 4
+  scrollSpeed: 5
   floorMarkers:
   - {fileID: 2024994510}
   - {fileID: 335629253}
@@ -2053,7 +2053,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.035, g: 0.036, b: 0.04, a: 1}
+  m_BackGroundColor: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -2188,7 +2188,7 @@ MonoBehaviour:
   titleTexture: {fileID: 8400000, guid: cd385a4e656a6c946a24cce7099d5e8e, type: 2}
   glowShader: {fileID: 4800000, guid: 996ff6a1f898e3346b4600ffb8d42c33, type: 3}
   titleGlitchShader: {fileID: 4800000, guid: dec165839a656794aa4973259e63dc55, type: 3}
-  accent: {r: 0.84, g: 0.12, b: 0.16, a: 1}
+  accent: {r: 0.8745098, g: 0.45490196, b: 0.047058824, a: 1}
   grade:
     enabled: 1
     exposure: 0.15
@@ -2206,10 +2206,10 @@ MonoBehaviour:
     grainResponse: 0.8
   atmosphere:
     enabled: 1
-    haze: {r: 0.035, g: 0.036, b: 0.04, a: 1}
+    haze: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
     fogRange: {x: 35, y: 135}
     horizon: 1
-    horizonColor: {r: 0.3, g: 0.31, b: 0.34, a: 1}
+    horizonColor: {r: 0.0627451, g: 0.16078432, b: 0.19215687, a: 1}
     horizonDistance: 145
     horizonSize: {x: 420, y: 34}
     horizonFalloff: 2.2
@@ -2228,7 +2228,7 @@ MonoBehaviour:
     dustDepth: {x: 3, y: 30}
     dustSize: {x: 0.02, y: 0.06}
     dustBrightness: 0.55
-    dustDrift: 4
+    dustDrift: 5
   ui:
     scrim: 1
     scrimOpacity: 1

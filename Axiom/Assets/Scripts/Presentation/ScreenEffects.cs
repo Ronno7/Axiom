@@ -56,7 +56,8 @@ namespace GeometricFlight.Presentation
             Shader.SetGlobalVector(CrtId, crt);
             Shader.SetGlobalFloat(CrtEdgeId, crtEdge);
             Shader.SetGlobalVector(ArcadeId, arcade);
-            Shader.SetGlobalColor(AccentId, accent);
+            // Global color setters do not convert sRGB; this shader consumes working-space RGB.
+            Shader.SetGlobalVector(AccentId, AxiomPalette.ShaderColor(accent));
             // The effects read the interface's coverage; with none routed it must be clear, not an unset (white) default.
             if (InterfaceCamera == null) Shader.SetGlobalTexture(InterfaceId, Texture2D.blackTexture);
         }

@@ -10,6 +10,7 @@ namespace GeometricFlight.Input
         [SerializeField] private string lowerThrottleBinding = "<Keyboard>/q";
         [SerializeField] private string raiseThrottleBinding = "<Keyboard>/e";
         [SerializeField] private string fireBinding = "<Keyboard>/space";
+        [SerializeField] private string lockBinding = "<Keyboard>/leftShift";
         [SerializeField] private string pauseBinding = "<Keyboard>/escape";
         [SerializeField] private string twistLeftBinding = "<Keyboard>/z";
         [SerializeField] private string twistRightBinding = "<Keyboard>/c";
@@ -17,6 +18,8 @@ namespace GeometricFlight.Input
         private InputAction twist;
         private InputAction throttle;
         private InputAction fire;
+        private InputAction missileLock;
+        private InputAction emp;
         private InputAction pause;
         private float throttleSetting;
 
@@ -42,6 +45,8 @@ namespace GeometricFlight.Input
                 .With("Negative", twistLeftBinding)
                 .With("Positive", twistRightBinding);
             fire = new InputAction("Flight Fire", InputActionType.Button, fireBinding);
+            missileLock = new InputAction("Missile Lock", InputActionType.Button, lockBinding);
+            emp = new InputAction("EMP", InputActionType.Button, "<Keyboard>/r");
             pause = new InputAction("Flight Pause", InputActionType.Button, pauseBinding);
         }
 
@@ -52,6 +57,8 @@ namespace GeometricFlight.Input
             throttle.Enable();
             twist.Enable();
             fire.Enable();
+            missileLock.Enable();
+            emp.Enable();
             pause.Enable();
         }
 
@@ -61,6 +68,8 @@ namespace GeometricFlight.Input
             throttle?.Disable();
             twist?.Disable();
             fire?.Disable();
+            missileLock?.Disable();
+            emp?.Disable();
             pause?.Disable();
         }
 
@@ -70,7 +79,15 @@ namespace GeometricFlight.Input
             throttle?.Dispose();
             twist?.Dispose();
             fire?.Dispose();
+            missileLock?.Dispose();
+            emp?.Dispose();
             pause?.Dispose();
+        }
+
+        public override bool LimitThrottle(float setpoint)
+        {
+            throttleSetting = Mathf.Min(throttleSetting, setpoint);
+            return true;
         }
 
         public override FlightInput ReadInput(float deltaTime)
@@ -79,7 +96,8 @@ namespace GeometricFlight.Input
             throttleSetting = Mathf.Clamp(throttleSetting + throttle.ReadValue<float>()
                 * Mathf.Max(0f, throttleChangeRate) * Mathf.Max(0f, deltaTime), -1f, 1f);
             return new FlightInput(steering.ReadValue<Vector2>(), throttleSetting,
-                fire.IsPressed(), pause.WasPressedThisFrame(), twist.ReadValue<float>());
+                fire.IsPressed(), pause.WasPressedThisFrame(), twist.ReadValue<float>(), missileLock.IsPressed(),
+                empHeld: emp.IsPressed());
         }
     }
 }

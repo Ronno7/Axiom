@@ -17,7 +17,7 @@ namespace GeometricFlight.Presentation
         [Range(0f, 1f)] public float glowScatter = 0.65f;
 
         [Header("Colour fringing")]
-        [Tooltip("Lens-style fringing in the accent red only, so the palette stays black, white and red.")]
+        [Tooltip("Lens-style fringing in the shared palette accent, without introducing extra hues.")]
         public bool fringing = true;
         [Tooltip("Offset at the screen edge, in pixels; zero at the centre.")]
         [Range(0f, 12f)] public float fringeOffset = 2.97f;
@@ -41,15 +41,15 @@ namespace GeometricFlight.Presentation
         [Range(-2f, 2f)] public float exposure;
         [Tooltip("Added to the grade's contrast.")]
         [Range(-100f, 100f)] public float contrast = 10f;
-        [Tooltip("The scene is mostly black and white, so this mainly sets how hard the accent red burns.")]
+        [Tooltip("Changes color strength while retaining the palette's cool and warm hue families.")]
         [Range(-100f, 100f)] public float saturation = 15f;
-        [Tooltip("Multiplies the picture; white leaves it unchanged.")]
+        [Tooltip("Legacy value retained for asset compatibility. LookVolume uses white to preserve the project palette.")]
         [ColorUsage(false, true)] public Color colourFilter = Color.white;
-        [Tooltip("Moves every hue, the accent red included.")]
+        [Tooltip("Legacy value retained for asset compatibility. Hue rotation is disabled to preserve the project palette.")]
         [Range(-180f, 180f)] public float hueShift;
-        [Tooltip("White balance: negative is cooler (bluish whites, like an old 9300 K monitor), positive warmer.")]
+        [Tooltip("Legacy value retained for asset compatibility. White balance is neutral to preserve the project palette.")]
         [Range(-100f, 100f)] public float temperature;
-        [Tooltip("White balance: negative is greener, positive more magenta.")]
+        [Tooltip("Legacy value retained for asset compatibility. Tint is neutral to preserve the project palette.")]
         [Range(-100f, 100f)] public float tint;
 
         [Header("Interface")]

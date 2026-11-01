@@ -7,20 +7,25 @@ using UnityEngine.UIElements;
 namespace GeometricFlight.UI
 {
     /// <summary>In-level UI: HUD readouts, pause menu (with Options and Help), results, and the
-    /// controller LCD. Observes LevelFlow and PlayerFlight; owns no gameplay rules.</summary>
+    /// controller LCD. Observes LevelFlow and ShipFlight; owns no gameplay rules.</summary>
+    [DefaultExecutionOrder(100)] // Read shield/run state only after the gameplay components initialize.
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UIDocument))]
     public sealed class LevelUi : MonoBehaviour
     {
         [SerializeField] private LevelFlow flow;
-        [SerializeField] private PlayerFlight flight;
+        [SerializeField] private ShipFlight flight;
         [Tooltip("Lets the ship's destruction play before the results appear.")]
         [SerializeField, Min(0f)] private float failedResultsDelay = 1.4f;
         [SerializeField, Min(0f)] private float completedResultsDelay = 0.6f;
 
         private VisualElement screen, hud, pausePanel, resultsPanel, helpPanel;
-        private VisualElement throttle, throttleFill, throttleSetpoint, throttleCruise, throttleBand, parRow;
-        private Label timeLabel, targetsLabel, speedLabel, throttleCaption, throttleHint, zoneBanner, resultsTitle;
+        private VisualElement throttle, throttleTrack, throttleReadouts, throttleFill, throttleSetpoint, throttleCruise,
+            throttleBand, throttleBoostZone, throttleReserve, throttleReserveFill, parRow;
+        private Label timeLabel, targetsLabel, speedLabel, throttleCaption, throttleHint, zoneBanner, resultsTitle,
+            throttleReserveState;
+        private string shownSpeedWord;
+        private BoostStatus shownBoost = (BoostStatus)(-1);
         private Label controllerStatus, pauseNotice, proximityLabel;
         private string shownController;
         private Button resumeButton, nextButton, retryButton, helpBack;
@@ -38,6 +43,79 @@ namespace GeometricFlight.UI
         private int guidance;
         private string shownHint;
         private IVisualElementScheduledItem hideBanner;
+        private float entryVisibility = 1f, throttleBuild = 1f, controllerBuild = 1f;
+        private InstrumentBuild timeBuild, targetsBuild, controllerTag, ringsBuild;
+        private Label ringsLabel;
+
+        /// <summary>Opt-in shared-menu handoff. The level remains bound while the menu owns the LCD.</summary>
+        public bool CockpitEnabled { get; set; } = true;
+
+        /// <summary>Existing instruments have received a current state sample and are fully visible.</summary>
+        public bool EntryReady => hud != null && entryVisibility >= 1f && throttleBuild >= 1f && controllerBuild >= 1f
+            && shownTenths >= 0
+            && shownTargets >= 0 && shownSpeed >= 0 && shownController != null;
+
+        /// <summary>Actual flight feedback takes precedence over optional entry decoration.</summary>
+        public bool HasPriorityNotice => flow != null && (flow.State == RunState.Paused
+            || flow.State == RunState.Completed || flow.State == RunState.Failed)
+            || shownZone != null || proximity.Active
+            || shield != null && shield.State != null && shield.State.IsProtected;
+
+        /// <summary>The tutorial's rings readout under the targets; null hides it. Other courses never show it.</summary>
+        public void SetRingsReadout(string text)
+        {
+            if (ringsLabel == null) return;
+            ringsLabel.style.display = text == null ? DisplayStyle.None : DisplayStyle.Flex;
+            if (text != null) ringsBuild.Text = text;
+        }
+
+        /// <summary>Shows or hides the whole HUD at once (reduced entry, reset).</summary>
+        public void SetEntryVisibility(float amount) => SetEntryAssembly(amount, amount, amount);
+
+        /// <summary>Draws the original HUD in without restarting its bindings, menus or LCD writer. Each value runs
+        /// 0–1: <paramref name="readouts"/> builds the time, then the targets (and fades the rest);
+        /// <paramref name="throttleAssembly"/> the throttle gauge; <paramref name="controller"/> the input tag.</summary>
+        public void SetEntryAssembly(float readouts, float throttleAssembly, float controller)
+        {
+            entryVisibility = Mathf.Clamp01(readouts);
+            throttleBuild = Mathf.Clamp01(throttleAssembly);
+            controllerBuild = Mathf.Clamp01(controller);
+            ApplyEntryPresentation();
+        }
+
+        private void ApplyEntryPresentation()
+        {
+            if (hud == null) return;
+            // Inline styles only while partial, so class-driven opacity (zone banner) resumes afterward.
+            foreach (VisualElement child in hud.Children())
+                if (child != throttle && child != timeLabel && child != targetsLabel && child != controllerStatus
+                    && child != ringsLabel && !child.ClassListContains(InstrumentBuild.RuleClass))
+                    child.style.opacity = Partial(entryVisibility);
+            timeBuild.SetAmount(Mathf.InverseLerp(0f, 0.8f, entryVisibility));
+            targetsBuild.SetAmount(Mathf.InverseLerp(0.2f, 1f, entryVisibility));
+            ringsBuild.SetAmount(Mathf.InverseLerp(0.4f, 1f, entryVisibility));
+            controllerTag.SetAmount(controllerBuild);
+
+            float b = throttleBuild;
+            throttleCaption.text = b >= 1f ? CaptionFor(shownZone)
+                : Typed(CaptionFor(shownZone), Mathf.InverseLerp(0f, 0.3f, b));
+            throttleTrack.style.scale = b >= 1f ? new StyleScale(StyleKeyword.Null)
+                : new Scale(new Vector3(Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.15f, 0.6f, b)), 1f, 1f));
+            // The marks register after the track is drawn, then live values fill in.
+            float marks = b >= 0.55f ? 1f : 0f;
+            throttleCruise.style.opacity = throttleSetpoint.style.opacity = Partial(b >= 1f ? 1f : marks);
+            throttleFill.style.opacity = Partial(Mathf.InverseLerp(0.6f, 0.85f, b));
+            throttleReadouts.style.opacity = throttleReserve.style.opacity = Partial(Mathf.InverseLerp(0.75f, 1f, b));
+        }
+
+        private static StyleFloat Partial(float amount) =>
+            amount >= 1f ? new StyleFloat(StyleKeyword.Null) : new StyleFloat(amount);
+
+        private static string Typed(string text, float amount)
+        {
+            int count = Mathf.FloorToInt(text.Length * Mathf.Clamp01(amount));
+            return count >= text.Length ? text : text.Substring(0, count) + (count > 0 ? "_" : string.Empty);
+        }
 
         private void OnEnable()
         {
@@ -57,17 +135,29 @@ namespace GeometricFlight.UI
             targetsLabel = root.Q<Label>("hud-targets");
             speedLabel = root.Q<Label>("throttle-speed");
             throttle = root.Q("throttle");
+            throttleTrack = throttle.Q(className: "throttle-track");
+            throttleReadouts = throttle.Q(className: "throttle-readouts");
+            throttleTrack.style.transformOrigin = new TransformOrigin(0f, Length.Percent(50f));
             throttleCaption = root.Q<Label>("throttle-caption");
             throttleHint = root.Q<Label>("throttle-hint");
             throttleBand = root.Q("throttle-band");
             zoneBanner = root.Q<Label>("zone-banner");
             controllerStatus = root.Q<Label>("hud-controller");
+            timeBuild = new InstrumentBuild(timeLabel, false);
+            targetsBuild = new InstrumentBuild(targetsLabel, true);
+            ringsLabel = root.Q<Label>("hud-rings");
+            ringsBuild = new InstrumentBuild(ringsLabel, true);
+            controllerTag = new InstrumentBuild(controllerStatus, true);
             proximityLabel = root.Q<Label>("hud-proximity");
             pauseNotice = root.Q<Label>("pause-notice");
             parRow = root.Q("par-row");
             throttleFill = root.Q("throttle-fill");
             throttleSetpoint = root.Q("throttle-setpoint");
             throttleCruise = root.Q("throttle-cruise");
+            throttleBoostZone = root.Q("throttle-boost-zone");
+            throttleReserve = root.Q("throttle-reserve");
+            throttleReserveFill = root.Q("throttle-reserve-fill");
+            throttleReserveState = root.Q<Label>("throttle-reserve-state");
             resultsTitle = root.Q<Label>("results-title");
             resumeButton = root.Q<Button>("resume-button");
             nextButton = root.Q<Button>("next-button");
@@ -75,20 +165,21 @@ namespace GeometricFlight.UI
             helpBack = root.Q<Button>("help-back");
 
             resumeButton.clicked += flow.Resume;
-            root.Q<Button>("pause-retry-button").clicked += flow.Retry;
+            root.Q<Button>("pause-retry-button").clicked += Retry;
             root.Q<Button>("pause-options-button").clicked += ShowOptions;
             root.Q<Button>("pause-help-button").clicked += () => ShowOverlay(helpPanel, helpBack);
             root.Q<Button>("pause-menu-button").clicked += flow.ExitToMenu;
             helpBack.clicked += ShowPause;
             nextButton.clicked += flow.Continue;
-            retryButton.clicked += flow.Retry;
+            retryButton.clicked += Retry;
             root.Q<Button>("results-menu-button").clicked += flow.ExitToMenu;
 
-            throttleCruise.style.left = Length.Percent(SpeedFraction(flight.CruiseSpeed) * 100f);
+            BuildThrottleTrack();
             zones = FindObjectsByType<ThrottleZone>(FindObjectsSortMode.None);
             cockpit = new CockpitDisplay(flow, flight);
             hull = flight.GetComponent<ShipHull>();
             ShowZone(null);
+            ApplyEntryPresentation();
             flow.StateChanged += OnStateChanged;
             ShowOverlay(null, null);
         }
@@ -102,6 +193,14 @@ namespace GeometricFlight.UI
 
         private void OnShieldHit(int remaining) => damageFeedback.Pulse(remaining == 0);
 
+        private void Retry()
+        {
+            var study = flight.GetComponent<RailHandlingStudy>();
+            if (study != null && study.isActiveAndEnabled)
+                study.Restart(study.Candidate, ((ArenaFlight)flight).FullRotation);
+            else flow.Retry();
+        }
+
         private void Update()
         {
             damageFeedback.Tick(Time.unscaledDeltaTime);
@@ -109,27 +208,33 @@ namespace GeometricFlight.UI
             if (tenths != shownTenths)
             {
                 shownTenths = tenths;
-                timeLabel.text = UiScreens.FormatTime(flow.ElapsedTime);
+                timeBuild.Text = UiScreens.FormatTime(flow.ElapsedTime);
             }
             if (flow.TargetsDestroyed != shownTargets)
             {
                 shownTargets = flow.TargetsDestroyed;
-                targetsLabel.text = $"TARGETS {flow.TargetsDestroyed}/{flow.TargetsTotal}";
+                targetsBuild.Text = $"TARGETS {flow.TargetsDestroyed}/{flow.TargetsTotal}";
             }
 
             throttleFill.style.width = Length.Percent(SpeedFraction(flight.CurrentSpeed) * 100f);
-            throttleSetpoint.style.left = Length.Percent(SpeedFraction(flight.TargetSpeed) * 100f);
-            int speedPercent = Mathf.RoundToInt(flight.CurrentSpeed / flight.CruiseSpeed * 100f);
-            if (speedPercent != shownSpeed)
+            throttleSetpoint.style.left = Length.Percent(ThrottleGauge.LeverFraction(flight.Lever) * 100f);
+            int speed = Mathf.RoundToInt(flight.CurrentSpeed);
+            string word = ThrottleGauge.Word(flight);
+            if (speed != shownSpeed || word != shownSpeedWord)
             {
-                shownSpeed = speedPercent;
-                speedLabel.text = $"SPEED {speedPercent}%";
+                shownSpeed = speed;
+                shownSpeedWord = word;
+                speedLabel.text = word.Length > 0 ? $"SPEED {speed} M/S · {word}" : $"SPEED {speed} M/S";
             }
+            UpdateBoostReserve();
             UpdateThrottleGuidance();
             UpdateControllerStatus();
             UpdateProximity();
-            cockpit.Show(shownZone, shownBand, guidance, proximity, UiScreens.FocusedLabel(screen));
-            calibration.Tick(); // Replaces the cockpit on the LCD while open.
+            if (CockpitEnabled)
+            {
+                cockpit.Show(shownZone, shownBand, guidance, proximity, UiScreens.FocusedLabel(screen));
+                calibration.Tick(); // Replaces the cockpit on the LCD while open.
+            }
         }
 
         private void ShowOptions() => ShowOverlay(options.Root, options.FirstFocus);
@@ -145,12 +250,15 @@ namespace GeometricFlight.UI
         private void UpdateControllerStatus()
         {
             ControllerState controller = ControllerService.Instance.State;
-            bool warning = controller.Connected && !controller.ThrottleValid;
-            string text = !controller.Connected ? "KEYBOARD" : warning ? "THROTTLE SENSOR: NO SIGNAL" : "CONTROLLER";
+            bool keyboardThrottle = GameSettings.KeyboardThrottleWithController;
+            bool warning = controller.Connected && !keyboardThrottle && !controller.ThrottleValid;
+            string text = !controller.Connected ? "KEYBOARD"
+                : keyboardThrottle ? "CONTROLLER + KEYBOARD THROTTLE"
+                : warning ? "THROTTLE SENSOR: NO SIGNAL" : "CONTROLLER";
             if (text != shownController)
             {
                 shownController = text;
-                controllerStatus.text = text;
+                controllerTag.Text = text;
                 controllerStatus.EnableInClassList("hud-controller--warning", warning);
             }
 
@@ -166,7 +274,8 @@ namespace GeometricFlight.UI
         private void UpdateProximity()
         {
             bool flying = flow.State == RunState.Playing && flight.isActiveAndEnabled && !flight.InputLocked;
-            proximity.Update(flight, hull, flying && hull != null, Time.unscaledTime);
+            // Only ships whose motion can be predicted honestly (the slide rail, nose-led rails) warn.
+            proximity.Update(flight, hull, flying && flight.CanPredict && hull != null, Time.unscaledTime);
             proximityLabel.style.display = proximity.Active ? DisplayStyle.Flex : DisplayStyle.None;
             proximityLabel.EnableInClassList("hud-proximity--pulse", proximity.Pulse);
         }
@@ -184,7 +293,7 @@ namespace GeometricFlight.UI
 
             Vector2 band = zone.RecommendedCruiseMultiple * flight.CruiseSpeed;
             guidance = flight.TargetSpeed < band.x - 0.01f ? 1 : flight.TargetSpeed > band.y + 0.01f ? -1 : 0;
-            bool keys = !ControllerService.Instance.State.Connected;
+            bool keys = !ControllerService.Instance.State.Connected || GameSettings.KeyboardThrottleWithController;
             string hint = guidance > 0 ? (keys ? "RAISE  [E]" : "RAISE")
                 : guidance < 0 ? (keys ? "LOWER  [Q]" : "LOWER") : "HOLD";
             if (hint == shownHint) return;
@@ -212,8 +321,7 @@ namespace GeometricFlight.UI
             throttle.EnableInClassList("throttle--guided", guided);
             throttleBand.style.display = guided ? DisplayStyle.Flex : DisplayStyle.None;
             throttleHint.style.display = guided ? DisplayStyle.Flex : DisplayStyle.None;
-            throttleCaption.text = !guided ? "THROTTLE"
-                : zone.Type == ThrottleZone.Kind.Slow ? "THROTTLE · SLOW ZONE" : "THROTTLE · FAST ZONE";
+            if (throttleBuild >= 1f) throttleCaption.text = CaptionFor(zone);
             if (!guided) return;
             AnnounceZone(zone);
             float from = SpeedFraction(zone.RecommendedCruiseMultiple.x * flight.CruiseSpeed);
@@ -223,8 +331,44 @@ namespace GeometricFlight.UI
             throttleBand.style.width = Length.Percent((to - from) * 100f);
         }
 
-        private float SpeedFraction(float speed) =>
-            Mathf.InverseLerp(flight.MinSpeed, flight.MaxSpeed, speed);
+        private static string CaptionFor(ThrottleZone zone) => zone == null ? "THROTTLE"
+            : zone.Type == ThrottleZone.Kind.Slow ? "THROTTLE · SLOW ZONE" : "THROTTLE · FAST ZONE";
+
+        private float SpeedFraction(float speed) => ThrottleGauge.SpeedFraction(flight, speed);
+
+        /// <summary>Eight segments like the cockpit's lights, the cruise notch at the centre, and the boost gate
+        /// (normal full throttle) with the boost stretch beyond it.</summary>
+        private void BuildThrottleTrack()
+        {
+            float gate = ThrottleGauge.LeverFraction(flight.BoostGate);
+            bool boost = flight.Boost != BoostStatus.Off;
+            for (int k = 1; k < ThrottleGauge.Segments; k++)
+            {
+                float at = k / (float)ThrottleGauge.Segments;
+                if (Mathf.Approximately(at, 0.5f)) continue; // The cruise notch.
+                var tick = new VisualElement { pickingMode = PickingMode.Ignore };
+                tick.AddToClassList("throttle-tick");
+                tick.EnableInClassList("throttle-tick--gate", boost && Mathf.Approximately(at, gate));
+                tick.style.left = Length.Percent(at * 100f);
+                throttleTrack.Insert(throttleTrack.IndexOf(throttleFill) + 1, tick); // Over the fill.
+            }
+            throttleCruise.style.left = Length.Percent(50f);
+            throttleBoostZone.style.display = boost ? DisplayStyle.Flex : DisplayStyle.None;
+            throttleBoostZone.style.left = Length.Percent(gate * 100f);
+            throttleReserve.style.display = boost ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        private void UpdateBoostReserve()
+        {
+            BoostStatus status = flight.Boost;
+            if (status == BoostStatus.Off) return;
+            throttleReserveFill.style.width = Length.Percent(flight.BoostCharge * 100f);
+            if (status == shownBoost) return;
+            shownBoost = status;
+            throttleReserveState.text = ThrottleGauge.ReserveText(status);
+            throttle.EnableInClassList("throttle--boosting", status == BoostStatus.Active);
+            throttle.EnableInClassList("throttle--boost-ready", status == BoostStatus.Ready);
+        }
 
         private void OnStateChanged(RunState state)
         {

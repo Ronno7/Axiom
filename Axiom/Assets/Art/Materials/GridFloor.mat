@@ -31,8 +31,8 @@ Material:
     - _MinorStrength: 0.4
     - _MinorWidth: 1.2
     m_Colors:
-    - _BaseColor: {r: 0.0235, g: 0.039, b: 0.061, a: 0.5}
+    - _BaseColor: {r: 0.0470588, g: 0.078431346, b: 0.12156858, a: 0.5}
     - _Fade: {r: 150, g: 1100, b: 0, a: 0}
-    - _LineColor: {r: 0.783, g: 1.377, b: 1.5749999, a: 1.8}
+    - _LineColor: {r: 0.28612953, g: 0.9823042, b: 1.328239, a: 1.8}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

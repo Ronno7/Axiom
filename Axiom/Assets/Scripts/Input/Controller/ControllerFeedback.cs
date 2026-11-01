@@ -11,7 +11,7 @@ namespace GeometricFlight.Input
     public sealed class ControllerFeedback : MonoBehaviour
     {
         [SerializeField] private ShipShield shield;
-        [SerializeField] private PlayerFlight flight;
+        [SerializeField] private ShipFlight flight;
 
         private ThrottleZone[] zones;
         private ThrottleZone currentZone;

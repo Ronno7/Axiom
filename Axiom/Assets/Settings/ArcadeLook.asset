@@ -31,7 +31,7 @@ MonoBehaviour:
   saturation: -20
   colourFilter: {r: 1, g: 1, b: 1, a: 1}
   hueShift: 0
-  temperature: -15
+  temperature: 0
   tint: 0
   interfaceOnScreen: 1
   interfaceBrightness: 1.25

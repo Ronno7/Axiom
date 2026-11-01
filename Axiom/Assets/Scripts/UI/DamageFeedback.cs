@@ -1,3 +1,4 @@
+using GeometricFlight.Presentation;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -48,8 +49,9 @@ namespace GeometricFlight.UI
             float depth = Mathf.Min(w, h) * Mathf.Lerp(0.018f, 0.065f, strength);
             Painter2D p = context.painter2D;
             // Dark outer facets stay legible over bright scenery; the pale inner line reads on black.
-            p.fillColor = new Color(0.22f, 0.035f, 0.025f, strength * (fatal ? 0.72f : 0.52f));
-            p.strokeColor = new Color(1f, 0.88f, 0.8f, strength * 0.85f);
+            p.fillColor = AxiomPalette.WithAlpha(Color.Lerp(AxiomPalette.Void, AxiomPalette.Ember, 0.2f),
+                strength * (fatal ? 0.72f : 0.52f));
+            p.strokeColor = AxiomPalette.WithAlpha(AxiomPalette.Hot, strength * 0.85f);
             p.lineWidth = 2f;
             Edge(p, new Vector2(0, 0), new Vector2(0, h), new Vector2(depth, 0));
             Edge(p, new Vector2(w, h), new Vector2(w, 0), new Vector2(-depth, 0));

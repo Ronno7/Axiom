@@ -8,19 +8,30 @@
         <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
             <ui:Label name="hud-time" text="0:00.0" class="hud-readout hud-time" />
             <ui:Label name="hud-targets" text="TARGETS 0/0" class="hud-readout hud-targets" />
+            <ui:Label name="hud-rings" text="RINGS 0/0" class="hud-readout hud-rings" />
             <ui:Label name="zone-banner" class="hud-readout zone-banner" />
             <ui:Label name="hud-controller" text="KEYBOARD" class="hud-readout hud-controller" />
             <ui:Label name="hud-proximity" text="PROXIMITY" class="hud-readout hud-proximity" />
             <ui:VisualElement name="throttle" class="throttle" picking-mode="Ignore">
                 <ui:Label name="throttle-caption" text="THROTTLE" class="hud-caption" />
                 <ui:VisualElement class="throttle-track" picking-mode="Ignore">
+                    <ui:VisualElement name="throttle-boost-zone" class="throttle-boost-zone" picking-mode="Ignore">
+                        <ui:Label text="BOOST" class="throttle-boost-label" />
+                    </ui:VisualElement>
                     <ui:VisualElement name="throttle-fill" class="throttle-fill" picking-mode="Ignore" />
                     <ui:VisualElement name="throttle-band" class="throttle-band" picking-mode="Ignore" />
                     <ui:VisualElement name="throttle-cruise" class="throttle-cruise" picking-mode="Ignore" />
                     <ui:VisualElement name="throttle-setpoint" class="throttle-setpoint" picking-mode="Ignore" />
                 </ui:VisualElement>
+                <ui:VisualElement name="throttle-reserve" class="throttle-reserve" picking-mode="Ignore">
+                    <ui:Label text="BOOST" class="throttle-reserve-caption" />
+                    <ui:VisualElement class="throttle-reserve-track" picking-mode="Ignore">
+                        <ui:VisualElement name="throttle-reserve-fill" class="throttle-reserve-fill" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label name="throttle-reserve-state" text="READY" class="throttle-reserve-state" />
+                </ui:VisualElement>
                 <ui:VisualElement class="throttle-readouts" picking-mode="Ignore">
-                    <ui:Label name="throttle-speed" text="SPEED 100%" class="hud-readout throttle-speed" />
+                    <ui:Label name="throttle-speed" text="SPEED 30 M/S" class="hud-readout throttle-speed" />
                     <ui:Label name="throttle-hint" text="HOLD" class="hud-readout throttle-hint" />
                 </ui:VisualElement>
             </ui:VisualElement>

@@ -47,11 +47,13 @@ namespace GeometricFlight.Presentation
             colour.postExposure.Override((g ? grade.exposure : 0f) + (arcadeColour ? arcade.exposure : 0f));
             colour.contrast.Override(Mathf.Clamp((g ? grade.contrast : 0f) + (arcadeColour ? arcade.contrast : 0f), -100f, 100f));
             colour.saturation.Override(arcadeColour ? arcade.saturation : 0f);
-            colour.colorFilter.Override(arcadeColour ? arcade.colourFilter : Color.white);
-            colour.hueShift.Override(arcadeColour ? arcade.hueShift : 0f);
-            whiteBalance.active = arcadeColour;
-            whiteBalance.temperature.Override(arcadeColour ? arcade.temperature : 0f);
-            whiteBalance.tint.Override(arcadeColour ? arcade.tint : 0f);
+            // CRT changes value, glow and saturation, not the project's authored hue families.
+            // Legacy profile fields remain serialized for compatibility but no longer recolor the palette.
+            colour.colorFilter.Override(Color.white);
+            colour.hueShift.Override(0f);
+            whiteBalance.active = false;
+            whiteBalance.temperature.Override(0f);
+            whiteBalance.tint.Override(0f);
 
             bool glow = arcade != null && arcade.glow;
             bloom.active = glow || (g && grade.bloom);

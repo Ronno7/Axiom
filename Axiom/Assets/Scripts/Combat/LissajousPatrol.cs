@@ -26,6 +26,7 @@ namespace GeometricFlight.Combat
         private float time;
         private ShootableTarget target;
         private LineRenderer path;
+        public Vector3 InitialOffset => Point(0f, amplitude, ratio, phase);
 
         public static Vector3 Point(float t01, Vector3 amplitude, Vector3Int ratio, float phaseDegrees)
         {

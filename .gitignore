@@ -90,3 +90,7 @@ desktop.ini
 DevNotes/
 AGENTS.md
 .claude/
+
+# Python bytecode from ArtSource and DevNotes tools
+__pycache__/
+*.pyc

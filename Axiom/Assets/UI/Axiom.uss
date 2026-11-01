@@ -1,4 +1,6 @@
-/* Axiom UI theme. Monochrome; the focused item is always inverted (white fill, black text). */
+@import url("Palette.uss");
+
+/* Axiom UI theme. Shared palette; focused items invert Light/Void for a clear shape change. */
 
 .damage-feedback {
     position: absolute;
@@ -16,16 +18,16 @@
     bottom: 0;
     align-items: center;
     justify-content: center;
-    color: rgb(235, 235, 235);
+    color: var(--axiom-light);
 }
 
 .screen .unity-label,
 .screen .unity-base-field__label {
-    color: rgb(235, 235, 235);
+    color: var(--axiom-light);
 }
 
 .screen--dimmed {
-    background-color: rgba(0, 0, 0, 0.72);
+    background-color: var(--axiom-void-72);
 }
 
 .screen--menu {
@@ -38,9 +40,9 @@
 .panel {
     width: 780px;
     padding: 44px 52px;
-    background-color: rgba(6, 6, 6, 0.97);
+    background-color: var(--axiom-void-97);
     border-width: 2px;
-    border-color: rgb(235, 235, 235);
+    border-color: var(--axiom-light);
 }
 
 .panel--wide {
@@ -48,7 +50,7 @@
 }
 
 .panel--bare {
-    background-color: rgba(0, 0, 0, 0);
+    background-color: var(--axiom-transparent);
     border-width: 0;
     padding: 0;
     width: auto;
@@ -75,14 +77,14 @@
 .screen .section-title {
     font-size: 24px;
     letter-spacing: 8px;
-    color: rgb(150, 150, 150);
+    color: var(--axiom-muted);
     margin: 8px 0 16px 0;
     padding: 0;
 }
 
 .screen .hint {
     font-size: 20px;
-    color: rgb(150, 150, 150);
+    color: var(--axiom-muted);
     margin: 16px 0 8px 0;
     white-space: normal;
 }
@@ -106,12 +108,12 @@
     letter-spacing: 8px;
     -unity-font-style: bold;
     -unity-text-align: middle-left;
-    color: rgb(235, 235, 235);
-    background-color: rgba(0, 0, 0, 0);
+    color: var(--axiom-light);
+    background-color: var(--axiom-transparent);
     background-image: none;
     border-width: 0;
-    --slant-fill: rgba(0, 0, 0, 0.55);
-    --slant-stroke: rgb(90, 90, 90);
+    --slant-fill: var(--axiom-void-55);
+    --slant-stroke: var(--axiom-edge);
     --slant-stroke-width: 2;
     --slant-lean: 18;
     --slant-point: 22;
@@ -120,19 +122,19 @@
 }
 
 .screen .menu-button:hover {
-    background-color: rgba(0, 0, 0, 0);
-    --slant-stroke: rgb(235, 235, 235);
+    background-color: var(--axiom-transparent);
+    --slant-stroke: var(--axiom-light);
 }
 
 .screen .menu-button:focus {
-    background-color: rgba(0, 0, 0, 0);
-    color: rgb(0, 0, 0);
-    --slant-fill: rgb(235, 235, 235);
-    --slant-stroke: rgb(235, 235, 235);
+    background-color: var(--axiom-transparent);
+    color: var(--axiom-void);
+    --slant-fill: var(--axiom-light);
+    --slant-stroke: var(--axiom-light);
     translate: 14px 0;
 }
 
-/* Red tick beside the focused item; red is reserved for focus and danger. MenuLook can switch it off. */
+/* SlantButton aligns the warm tick with its drawn left edge; MenuLook can switch it off. */
 .menu-button .focus-marker {
     display: none;
     position: absolute;
@@ -140,7 +142,7 @@
     top: 12px;
     bottom: 12px;
     width: 6px;
-    background-color: rgb(214, 31, 41);
+    background-color: var(--axiom-orange);
 }
 
 .menu-button:focus .focus-marker {
@@ -152,9 +154,9 @@
 }
 
 .screen .menu-button:active {
-    background-color: rgba(0, 0, 0, 0);
-    --slant-fill: rgb(170, 170, 170);
-    --slant-stroke: rgb(170, 170, 170);
+    background-color: var(--axiom-transparent);
+    --slant-fill: var(--axiom-text);
+    --slant-stroke: var(--axiom-text);
 }
 
 /* The main call to action (PLAY) is a step larger than its neighbours. */
@@ -170,11 +172,11 @@
     margin: 10px 0;
     padding: 12px 16px;
     border-width: 2px;
-    border-color: rgba(0, 0, 0, 0);
+    border-color: var(--axiom-transparent);
 }
 
 .screen .option--focused {
-    border-color: rgb(235, 235, 235);
+    border-color: var(--axiom-light);
 }
 
 .screen .option .unity-base-field__label {
@@ -183,14 +185,14 @@
 }
 
 .screen .unity-base-slider__tracker {
-    background-color: rgb(40, 40, 40);
-    border-color: rgb(150, 150, 150);
+    background-color: var(--axiom-panel);
+    border-color: var(--axiom-muted);
     border-radius: 0;
 }
 
 .screen .unity-base-slider__dragger {
-    background-color: rgb(235, 235, 235);
-    border-color: rgb(235, 235, 235);
+    background-color: var(--axiom-light);
+    border-color: var(--axiom-light);
     border-radius: 0;
     width: 18px;
     height: 28px;
@@ -202,13 +204,13 @@
     height: 30px;
     border-width: 2px;
     border-radius: 0;
-    border-color: rgb(235, 235, 235);
-    background-color: rgba(0, 0, 0, 0);
-    -unity-background-image-tint-color: rgb(0, 0, 0);
+    border-color: var(--axiom-light);
+    background-color: var(--axiom-transparent);
+    -unity-background-image-tint-color: var(--axiom-void);
 }
 
 .screen .unity-toggle__input:checked > .unity-toggle__checkmark {
-    background-color: rgb(235, 235, 235);
+    background-color: var(--axiom-light);
 }
 
 /* ---------- Help ---------- */
@@ -242,7 +244,7 @@
     padding: 6px 10px;
     margin-right: 18px;
     border-width: 2px;
-    border-color: rgb(235, 235, 235);
+    border-color: var(--axiom-light);
     -unity-text-align: middle-center;
 }
 
@@ -259,14 +261,14 @@
     flex-direction: row;
     justify-content: space-between;
     border-bottom-width: 1px;
-    border-color: rgb(70, 70, 70);
+    border-color: var(--axiom-edge);
     padding: 10px 0;
 }
 
 .screen .stat-name {
     font-size: 26px;
     letter-spacing: 4px;
-    color: rgb(150, 150, 150);
+    color: var(--axiom-muted);
     padding: 0;
 }
 
@@ -292,7 +294,7 @@
 
 /* HUD text sits over bright scenery; a dark halo keeps it readable. */
 .hud .unity-label {
-    text-shadow: 0 0 8px rgba(0, 0, 0, 0.95);
+    text-shadow: 0 0 8px var(--axiom-void-95);
 }
 
 .screen .hud-readout {
@@ -314,6 +316,20 @@
     top: 40px;
 }
 
+/* Tutorial only: rings flown through, under the targets. */
+.hud-rings {
+    display: none;
+    position: absolute;
+    right: 56px;
+    top: 92px;
+}
+
+.screen .hud-rings {
+    font-size: 22px;
+    letter-spacing: 6px;
+    color: var(--axiom-text);
+}
+
 .throttle {
     position: absolute;
     left: 56px;
@@ -324,7 +340,7 @@
 .screen .hud-caption {
     font-size: 20px;
     letter-spacing: 6px;
-    color: rgb(200, 200, 200);
+    color: var(--axiom-text);
     padding: 0;
 }
 
@@ -332,7 +348,7 @@
     height: 18px;
     margin: 10px 0;
     border-width: 2px;
-    border-color: rgb(235, 235, 235);
+    border-color: var(--axiom-light);
 }
 
 .throttle-fill {
@@ -341,7 +357,7 @@
     top: 0;
     bottom: 0;
     width: 50%;
-    background-color: rgb(150, 150, 150);
+    background-color: var(--axiom-muted);
 }
 
 .throttle-cruise {
@@ -350,16 +366,111 @@
     bottom: -6px;
     width: 2px;
     margin-left: -1px;
-    background-color: rgb(90, 90, 90);
+    background-color: var(--axiom-edge);
 }
 
 .throttle-setpoint {
     position: absolute;
     top: -10px;
     bottom: -10px;
-    width: 6px;
-    margin-left: -3px;
-    background-color: rgb(235, 235, 235);
+    width: 8px;
+    margin-left: -4px;
+    background-color: var(--axiom-light);
+    border-width: 2px;
+    border-color: var(--axiom-void);
+}
+
+/* Entry: a readout's rule traces out before its text types in (InstrumentBuild). */
+.instrument-build-rule {
+    position: absolute;
+    height: 2px;
+    background-color: var(--axiom-cyan);
+}
+
+/* The track is the lever's travel in eight segments, like the cockpit's eight lights. */
+.throttle-tick {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--axiom-edge);
+}
+
+.throttle-tick--gate {
+    top: -6px;
+    bottom: -6px;
+    width: 2px;
+    margin-left: -1px;
+    background-color: var(--axiom-text);
+}
+
+.throttle-boost-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background-color: var(--axiom-panel);
+}
+
+.throttle--boosting .throttle-boost-zone {
+    background-color: var(--axiom-light-50);
+}
+
+.screen .throttle-boost-label {
+    position: absolute;
+    bottom: 22px;
+    right: 0;
+    font-size: 14px;
+    letter-spacing: 3px;
+    padding: 0;
+    margin: 0;
+    color: var(--axiom-muted);
+}
+
+.throttle-reserve {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.screen .throttle-reserve-caption,
+.screen .throttle-reserve-state {
+    font-size: 14px;
+    letter-spacing: 3px;
+    padding: 0;
+    margin: 0;
+    color: var(--axiom-muted);
+}
+
+.screen .throttle-reserve-state {
+    width: 130px;
+    -unity-text-align: middle-right;
+}
+
+.throttle-reserve-track {
+    flex-grow: 1;
+    height: 4px;
+    margin: 0 12px;
+    background-color: var(--axiom-structure);
+}
+
+.throttle-reserve-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--axiom-muted);
+}
+
+.screen .throttle--boost-ready .throttle-reserve-state,
+.screen .throttle--boosting .throttle-reserve-state {
+    color: var(--axiom-light);
+}
+
+.throttle--boost-ready .throttle-reserve-fill,
+.throttle--boosting .throttle-reserve-fill {
+    background-color: var(--axiom-light);
 }
 
 .screen .throttle-speed {
@@ -372,9 +483,9 @@
     position: absolute;
     top: -4px;
     bottom: -4px;
-    background-color: rgba(44, 160, 255, 0.45);
+    background-color: var(--axiom-cyan-45);
     border-width: 0 2px;
-    border-color: rgb(44, 160, 255);
+    border-color: var(--axiom-cyan);
 }
 
 .throttle-readouts {
@@ -385,15 +496,15 @@
 .screen .throttle-hint {
     font-size: 26px;
     margin-left: 24px;
-    color: rgb(44, 160, 255);
+    color: var(--axiom-cyan);
 }
 
 .screen .throttle--guided .hud-caption {
-    color: rgb(44, 160, 255);
+    color: var(--axiom-cyan);
 }
 
 .screen .throttle--in-band .throttle-hint {
-    color: rgb(235, 235, 235);
+    color: var(--axiom-light);
 }
 
 .zone-banner {
@@ -411,7 +522,7 @@
 .screen .zone-banner {
     font-size: 40px;
     letter-spacing: 10px;
-    color: rgb(44, 160, 255);
+    color: var(--axiom-cyan);
 }
 
 .zone-banner--visible {
@@ -430,13 +541,13 @@
 .screen .hud-controller {
     font-size: 22px;
     letter-spacing: 6px;
-    color: rgb(200, 200, 200);
+    color: var(--axiom-text);
 }
 
 .screen .hud-controller--warning {
-    color: rgb(0, 0, 0);
-    background-color: rgb(235, 235, 235);
-    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    color: var(--axiom-void);
+    background-color: var(--axiom-light);
+    text-shadow: 0 0 0 var(--axiom-transparent);
 }
 
 /* Collision warning (bottom centre, clear of the flight path). Pulses in time with the beeps. */
@@ -452,18 +563,18 @@
 .screen .hud-proximity {
     font-size: 26px;
     letter-spacing: 8px;
-    color: rgb(235, 235, 235);
+    color: var(--axiom-light);
 }
 
 .screen .hud-proximity--pulse {
-    color: rgb(0, 0, 0);
-    background-color: rgb(235, 235, 235);
-    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    color: var(--axiom-void);
+    background-color: var(--axiom-light);
+    text-shadow: 0 0 0 var(--axiom-transparent);
 }
 
 .screen .pause-notice {
     border-left-width: 4px;
-    border-color: rgb(44, 160, 255);
+    border-color: var(--axiom-cyan);
     padding-left: 14px;
     margin-bottom: 20px;
 }
@@ -485,12 +596,12 @@
     height: 200px;
     margin-right: 48px;
     border-width: 2px;
-    border-color: rgb(235, 235, 235);
+    border-color: var(--axiom-light);
 }
 
 .calibration-cross {
     position: absolute;
-    background-color: rgb(70, 70, 70);
+    background-color: var(--axiom-edge);
 }
 
 .calibration-cross--h {
@@ -516,7 +627,7 @@
     margin-left: -9px;
     margin-top: -9px;
     border-radius: 9px;
-    background-color: rgb(44, 160, 255);
+    background-color: var(--axiom-cyan);
 }
 
 .calibration-throttle {
@@ -568,7 +679,7 @@
     top: 40px;
     width: 36px;
     height: 36px;
-    border-color: rgb(235, 235, 235);
+    border-color: var(--axiom-light);
     border-left-width: 2px;
     border-top-width: 2px;
 }
@@ -604,33 +715,37 @@
     align-items: center;
 }
 
+/* The authored opening keeps the same frame/status while menu navigation gives way to flight. */
+.opening-in-flight #key-hints { visibility: hidden; }
+.opening-in-flight #menu-footer { left: 56px; right: 56px; }
+
 .status-led {
     width: 7px;
     height: 7px;
     margin-right: 12px;
-    background-color: rgb(235, 235, 235);
+    background-color: var(--axiom-light);
 }
 
 .status-led--offline {
-    background-color: rgb(214, 31, 41);
+    background-color: var(--axiom-ember);
 }
 
 .micro {
     font-size: 14px;
     letter-spacing: 4px;
     -unity-font-style: bold;
-    color: rgb(140, 140, 146);
+    color: var(--axiom-muted);
     margin: 0 14px 0 0;
     padding: 0;
 }
 
 .micro--ink {
-    color: rgb(235, 235, 235);
+    color: var(--axiom-light);
 }
 
 .keycap {
     border-width: 1px;
-    border-color: rgba(235, 235, 235, 0.5);
+    border-color: var(--axiom-light-50);
     border-radius: 3px;
     padding: 3px 4px 3px 8px;
     margin-right: 10px;

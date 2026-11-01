@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GeometricFlight.Presentation;
 using UnityEngine;
 
 namespace GeometricFlight.Combat
@@ -12,7 +13,7 @@ namespace GeometricFlight.Combat
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
         [SerializeField, Min(1)] private int hitPoints = 3;
-        [SerializeField] private Color hitFlashColor = new Color(0.25f, 0.9f, 1f);
+        [SerializeField] private Color hitFlashColor = AxiomPalette.Hot;
         [SerializeField, Min(0f)] private float hitFlashDuration = 0.08f;
         [SerializeField] private ShatterEffect destructionEffect;
 

@@ -13,15 +13,27 @@ namespace GeometricFlight.Presentation
         public bool enabled = true;
         [Tooltip("Fog and sky colour while on: a dark haze instead of black, so distance softens objects instead of "
                + "erasing them, and the floor fades into the sky with no edge.")]
-        public Color haze = new Color(0.035f, 0.036f, 0.04f);
+        public Color haze = AxiomPalette.Void;
         [Tooltip("Linear fog: where the haze starts and where it covers everything, in metres.")]
         public Vector2 fogRange = new Vector2(35f, 135f);
         [Header("Horizon band")]
         public bool horizon = true;
-        public Color horizonColor = new Color(0.30f, 0.31f, 0.34f);
+        public Color horizonColor = AxiomPalette.Panel;
         [Min(10f)] public float horizonDistance = 140f;
         public Vector2 horizonSize = new Vector2(420f, 34f);
         [Range(0.5f, 6f)] public float horizonFalloff = 2.2f;
+        [Header("Cloud deck")]
+        [Tooltip("A dark cloud deck overhead instead of an empty or starry sky. Its undersides catch faint light "
+               + "near the horizon. Needs the cloud shader on the look component.")]
+        public bool clouds = false;
+        [Tooltip("Light on the cloud undersides; the upper sky uses the haze colour.")]
+        public Color cloudLight = AxiomPalette.Panel;
+        [Range(0f, 1f)] public float cloudCover = 0.5f;
+        [Range(0f, 4f)] public float cloudBrightness = 1f;
+        [Min(0.05f)] public float cloudScale = 1f;
+        [Min(0f)] public float cloudDrift = 0.004f;
+        [Tooltip("Dome radius, in metres. Keep it inside the camera's far clip plane.")]
+        [Min(10f)] public float cloudRadius = 600f;
         [Header("Stars")]
         public bool stars = true;
         [Range(0, 3000)] public int starCount = 700;
@@ -47,5 +59,8 @@ namespace GeometricFlight.Presentation
         [Tooltip("Metres per second toward the camera, for a still camera (the menu: 4 matches the floor markers). "
                + "Leave at 0 where the camera flies.")]
         [Min(0f)] public float dustDrift = 4f;
+        [Tooltip("Metres per second each mote floats on its own slow course, so a still screen keeps a little "
+               + "motion. Keeps going while the camera flies. 0 = still.")]
+        [Min(0f)] public float dustFloat;
     }
 }

@@ -83,6 +83,22 @@ namespace GeometricFlight.Combat
 
         /// <summary>Swept sphere test over one frame's movement, so fast shots cannot pass
         /// through thin colliders between frames.</summary>
+        /// <summary>Seconds until a shot at <paramref name="speed"/> meets a target <paramref name="offset"/> away
+        /// (target minus shooter) moving at a constant <paramref name="velocity"/>; -1 if it can't.</summary>
+        public static float InterceptTime(Vector3 offset, Vector3 velocity, float speed)
+        {
+            float a = Vector3.Dot(velocity, velocity) - speed * speed;
+            float b = 2f * Vector3.Dot(offset, velocity);
+            float c = Vector3.Dot(offset, offset);
+            if (Mathf.Abs(a) < 1e-4f) return b < 0f ? -c / b : -1f;
+            float discriminant = b * b - 4f * a * c;
+            if (discriminant < 0f) return -1f;
+            float root = Mathf.Sqrt(discriminant);
+            float t1 = (-b - root) / (2f * a), t2 = (-b + root) / (2f * a);
+            float t = Mathf.Min(t1, t2) > 0f ? Mathf.Min(t1, t2) : Mathf.Max(t1, t2);
+            return t > 0f ? t : -1f;
+        }
+
         public static bool TrySweep(Vector3 from, Vector3 to, float radius, LayerMask mask, out RaycastHit hit)
         {
             Vector3 travel = to - from;

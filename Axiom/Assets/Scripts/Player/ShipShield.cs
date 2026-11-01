@@ -33,6 +33,15 @@ namespace GeometricFlight.Player
             Changed?.Invoke(State.Current);
         }
 
+        /// <summary>Destroys the ship regardless of remaining segments or protection.</summary>
+        public bool Destroy()
+        {
+            if (!TakesHits || !State.Deplete()) return false;
+            Changed?.Invoke(State.Current);
+            Depleted?.Invoke();
+            return true;
+        }
+
         public bool ApplyHit(int damage = 1)
         {
             if (!TakesHits || !State.TryHit()) return false;

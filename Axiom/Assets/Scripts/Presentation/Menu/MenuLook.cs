@@ -33,7 +33,7 @@ namespace GeometricFlight.Presentation
             public bool statusLine = true;
             [Tooltip("Key hints, bottom right.")]
             public bool keyHints = true;
-            [Tooltip("Red tick beside the selected menu item.")]
+            [Tooltip("Palette accent beside the selected menu item.")]
             public bool focusMarker = true;
         }
 
@@ -54,10 +54,10 @@ namespace GeometricFlight.Presentation
             [Header("Parts")]
             public bool tears = true;
             public bool blocks = true;
-            [Tooltip("Offset copy in the accent red.")]
+            [Tooltip("Offset copy in the palette accent.")]
             public bool echo = true;
             public bool scanlines = true;
-            [Tooltip("Radial red fringing that pulses with the event.")]
+            [Tooltip("Radial accent fringing that pulses with the event.")]
             public bool fringe = true;
             [Tooltip("A faint bar that rolls down the whole screen, UI included.")]
             public bool rollBar = true;
@@ -76,9 +76,11 @@ namespace GeometricFlight.Presentation
         [Tooltip("The 3D title's render texture (MenuTitle camera).")]
         [SerializeField] private RenderTexture titleTexture;
         [SerializeField] private Shader glowShader;
+        [Tooltip("Sky shader for the atmosphere's optional cloud deck.")]
+        [SerializeField] private Shader cloudShader;
         [SerializeField] private Shader titleGlitchShader;
-        [Tooltip("The game's single accent colour: focus, danger, glitch echo and fringing.")]
-        [SerializeField] private Color accent = new Color(0.84f, 0.12f, 0.16f);
+        [Tooltip("Palette accent for menu focus, glitch echo and fringing.")]
+        [SerializeField] private Color accent = AxiomPalette.Orange;
 
         [Header("Main look")]
         [SerializeField] private GradeSettings grade = new GradeSettings();
@@ -116,6 +118,29 @@ namespace GeometricFlight.Presentation
         private RenderTexture titleGlitchTexture;
 
         private const string SystemText = "SYS ONLINE";
+        // Opt-in study controls. Normal scenes keep their serialized look and idle behavior.
+        public bool StudyControlled { get; set; }
+        public float DepartureAmount { get; set; }
+        public bool CameraSuppliesMotion { get; set; }
+        /// <summary>0–1: lets a sequence fade the dust out (the shared entry clears it before the passage).</summary>
+        public float DustVisibility { get; set; } = 1f;
+        public bool PresentationPaused { get; set; }
+        /// <summary>Opt-in: a departing camera can see farther than the menu's close haze.</summary>
+        public float FogDistanceScale { get; set; } = 1f;
+        public void RebuildAtmosphere() => atmosphereDirty = true;
+
+        /// <summary>Opt-in shared-scene composition. Keep every supplied document inside the same
+        /// CRT surface as the original menu. Call when the document set changes, not every frame.</summary>
+        public void SetInterfaceDocuments(params UIDocument[] documents)
+        {
+            screenInterface.Release();
+            var registered = new System.Collections.Generic.List<UIDocument>();
+            if (menuDocument != null) registered.Add(menuDocument);
+            if (documents != null)
+                foreach (UIDocument document in documents)
+                    if (document != null && !registered.Contains(document)) registered.Add(document);
+            interfaceDocuments = registered.ToArray();
+        }
 
         // ---------------- Lifecycle ----------------
 
@@ -157,7 +182,7 @@ namespace GeometricFlight.Presentation
             if (atmosphereDirty)
             {
                 atmosphereDirty = false;
-                air.Build(atmosphere, menuCamera, glowShader, "Menu");
+                air.Build(atmosphere, menuCamera, glowShader, "Menu", cloudShader);
             }
             if (!Application.isPlaying)
             {
@@ -167,8 +192,18 @@ namespace GeometricFlight.Presentation
 
             float now = Time.unscaledTime;
             TrackInput(now);
-            air.Follow(menuCamera, Time.deltaTime);
+            air.Follow(menuCamera, PresentationPaused || CameraSuppliesMotion ? 0f : Time.deltaTime,
+                PresentationPaused ? 0f : Time.deltaTime);
+            air.SetDustVisibility(DustVisibility);
             UpdateStatus(now);
+
+            if (StudyControlled)
+            {
+                if (eventPlaying) EndEvent();
+                forceEvent = false;
+                Apply(GlitchFrame.Calm);
+                return;
+            }
 
             GlitchFrame frameNow = GlitchFrame.Calm;
             if (HoldPeak)
@@ -208,7 +243,7 @@ namespace GeometricFlight.Presentation
         {
             ArcadeProfile a = ArcadeOn ? arcade : null;
             if (look != null) look.Apply(grade, a, menuCamera);
-            LookAtmosphere.ApplyHaze(atmosphere, menuCamera);
+            LookAtmosphere.ApplyHaze(atmosphere, menuCamera, FogDistanceScale);
             interfaceDocuments ??= new[] { menuDocument };
             screenInterface.Apply(a, menuCamera, interfaceDocuments);
             ApplyScreen(f);
@@ -246,6 +281,7 @@ namespace GeometricFlight.Presentation
             keyHints = root.Q("key-hints");
             title = root.Q("game-title");
             statusSystem = root.Q<Label>("status-system");
+            if (statusSystem != null) statusSystem.tooltip = "Grid systems active. Cockpit connection is shown separately.";
             statusLink = root.Q<Label>("status-link");
             statusBuild = root.Q<Label>("status-build");
             return scrim != null;
@@ -255,7 +291,7 @@ namespace GeometricFlight.Presentation
         {
             if (!BindInterface()) return;
             scrim.style.display = ui.scrim ? DisplayStyle.Flex : DisplayStyle.None;
-            scrim.style.opacity = ui.scrimOpacity;
+            scrim.style.opacity = ui.scrimOpacity * (1f - Mathf.Clamp01(DepartureAmount));
             scrim.style.width = Length.Percent(ui.scrimWidth);
             if (frame != null)
             {
@@ -270,7 +306,7 @@ namespace GeometricFlight.Presentation
                 }
             }
             if (statusLine != null) statusLine.style.display = ui.statusLine ? DisplayStyle.Flex : DisplayStyle.None;
-            if (keyHints != null) keyHints.style.display = ui.keyHints ? DisplayStyle.Flex : DisplayStyle.None;
+            if (keyHints != null) keyHints.style.display = ui.keyHints && DepartureAmount <= 0f ? DisplayStyle.Flex : DisplayStyle.None;
             root.EnableInClassList("no-focus-marker", !ui.focusMarker);
 
             if (rollBar != null)
@@ -293,7 +329,7 @@ namespace GeometricFlight.Presentation
             LinkState state = service != null ? service.Link.State : LinkState.Stopped;
             if (statusLink != null)
                 statusLink.text = state == LinkState.Connected ? $"COCKPIT LINKED  {service.Link.PortName}"
-                    : state == LinkState.Searching ? "COCKPIT SEARCHING" : "COCKPIT OFFLINE";
+                    : state == LinkState.Searching ? "COCKPIT OFFLINE / SEARCHING" : "COCKPIT OFFLINE";
             // Red is reserved for problems: the LED turns red while the cockpit isn't linked.
             statusLed?.EnableInClassList("status-led--offline", state != LinkState.Connected);
             if (statusBuild != null) statusBuild.text = $"BUILD {Application.version}";
@@ -361,7 +397,7 @@ namespace GeometricFlight.Presentation
             titleMaterial.SetFloat("_Seed", eventSeed + f.Seed + 20);
             titleMaterial.SetFloat("_Echo", glitch.echo ? f.TitleEchoPixels * k : 0f);
             titleMaterial.SetFloat("_Scan", glitch.scanlines ? f.Scanlines * 0.6f : 0f);
-            titleMaterial.SetColor("_Accent", accent);
+            titleMaterial.SetVector("_Accent", AxiomPalette.MaterialColor(titleMaterial, "_Accent", accent));
             Graphics.Blit(titleTexture, titleGlitchTexture, titleMaterial);
             title.style.backgroundImage = Background.FromRenderTexture(titleGlitchTexture);
             titleGlitched = true;

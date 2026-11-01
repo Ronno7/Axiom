@@ -10,6 +10,9 @@ namespace GeometricFlight.UI
     [RequireComponent(typeof(UIDocument))]
     public sealed class MainMenu : MonoBehaviour
     {
+        /// <summary>An optional same-scene opening can handle Play instead of loading the legacy course.</summary>
+        public event System.Action PlayRequested;
+        public bool Suspended { get; set; }
         [SerializeField] private string firstLevelScene = "Prototype";
         [Tooltip("The 3D title, rendered by the MenuTitle camera on the Title layer.")]
         [SerializeField] private RenderTexture titleTexture;
@@ -38,10 +41,15 @@ namespace GeometricFlight.UI
             if (titleTexture != null)
                 root.Q("game-title").style.backgroundImage = Background.FromRenderTexture(titleTexture);
 
-            playButton.clicked += () => SceneManager.LoadScene(firstLevelScene);
-            root.Q<Button>("options-button").clicked += ShowOptions;
-            root.Q<Button>("help-button").clicked += () => UiScreens.ShowOnly(helpPanel, helpBack, Panels);
-            root.Q<Button>("quit-button").clicked += UiScreens.QuitGame;
+            playButton.clicked += () =>
+            {
+                if (Suspended) return;
+                if (PlayRequested != null) PlayRequested.Invoke();
+                else SceneManager.LoadScene(firstLevelScene);
+            };
+            root.Q<Button>("options-button").clicked += () => { if (!Suspended) ShowOptions(); };
+            root.Q<Button>("help-button").clicked += () => { if (!Suspended) UiScreens.ShowOnly(helpPanel, helpBack, Panels); };
+            root.Q<Button>("quit-button").clicked += () => { if (!Suspended) UiScreens.QuitGame(); };
             helpBack.clicked += ShowTitle;
             root.RegisterCallback<NavigationCancelEvent>(_ => Back());
             ShowTitle();
@@ -52,6 +60,7 @@ namespace GeometricFlight.UI
         // The LCD mirrors the selected item; calibration replaces it while open.
         private void Update()
         {
+            if (Suspended) return;
             string focused = UiScreens.FocusedLabel(root);
             ControllerService.Instance.Display.Show(LcdTitle, focused == null ? "" : $"{LcdGlyph.Right} {focused}");
             calibration.Tick();
@@ -67,8 +76,17 @@ namespace GeometricFlight.UI
 
         private void ShowTitle() => UiScreens.ShowOnly(titlePanel, playButton, Panels);
 
+        /// <summary>Leave submenus cleanly when an isolated same-scene presentation is restarted.</summary>
+        public void ReturnToTitle()
+        {
+            if (calibration.IsOpen) calibration.Cancel();
+            else if (options.Root.resolvedStyle.display == DisplayStyle.Flex) options.Close();
+            ShowTitle();
+        }
+
         private void Back()
         {
+            if (Suspended) return;
             if (calibration.IsOpen) calibration.Cancel();
             else if (options.Root.resolvedStyle.display == DisplayStyle.Flex) options.Close();
             else if (helpPanel.resolvedStyle.display == DisplayStyle.Flex) ShowTitle();

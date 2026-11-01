@@ -5,14 +5,16 @@ Shader "GeometricFlight/Grid Floor"
 {
     Properties
     {
-        _BaseColor ("Floor", Color) = (0.02, 0.035, 0.05, 1)
-        [HDR] _LineColor ("Lines", Color) = (0.6, 1.6, 2.0, 1)
+        _BaseColor ("Floor", Color) = (0.0470588235, 0.0784313725, 0.121568627, 1)
+        [HDR] _LineColor ("Lines", Color) = (0.286129503, 0.98230403, 1.32823874, 1)
         _MinorSpacing ("Minor spacing (m)", Float) = 10
         _MajorSpacing ("Major spacing (m)", Float) = 50
         _MinorWidth ("Minor width (px)", Float) = 1.2
         _MajorWidth ("Major width (px)", Float) = 2.2
         _MinorStrength ("Minor strength", Range(0, 1)) = 0.35
         _Fade ("Fade start, end (m)", Vector) = (60, 320, 0, 0)
+        [Toggle] _UseFog ("Scene fog (an infinite ground fades into the haze)", Float) = 0
+        _GridOffset ("Grid offset (m, xz; set by script for a gliding ground)", Vector) = (0, 0, 0, 0)
     }
     SubShader
     {
@@ -26,9 +28,10 @@ Shader "GeometricFlight/Grid Floor"
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
+            #pragma multi_compile_fog
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             struct Attributes { float4 positionOS : POSITION; };
-            struct Varyings { float4 positionCS : SV_POSITION; float3 positionWS : TEXCOORD0; };
+            struct Varyings { float4 positionCS : SV_POSITION; float3 positionWS : TEXCOORD0; float fog : TEXCOORD1; };
             CBUFFER_START(UnityPerMaterial)
                 half4 _BaseColor;
                 half4 _LineColor;
@@ -38,6 +41,8 @@ Shader "GeometricFlight/Grid Floor"
                 float _MajorWidth;
                 half _MinorStrength;
                 float4 _Fade;
+                half _UseFog;
+                float4 _GridOffset;
             CBUFFER_END
 
             Varyings Vert(Attributes i)
@@ -45,6 +50,7 @@ Shader "GeometricFlight/Grid Floor"
                 Varyings o;
                 o.positionWS = TransformObjectToWorld(i.positionOS.xyz);
                 o.positionCS = TransformWorldToHClip(o.positionWS);
+                o.fog = ComputeFogFactor(o.positionCS.z);
                 return o;
             }
 
@@ -58,7 +64,7 @@ Shader "GeometricFlight/Grid Floor"
 
             half4 Frag(Varyings i) : SV_Target
             {
-                float2 p = i.positionWS.xz;
+                float2 p = i.positionWS.xz + _GridOffset.xy;
                 float major = Grid(p, _MajorSpacing, _MajorWidth);
                 float minor = Grid(p, _MinorSpacing, _MinorWidth) * _MinorStrength;
                 float distance = length(i.positionWS - _WorldSpaceCameraPos);
@@ -66,7 +72,9 @@ Shader "GeometricFlight/Grid Floor"
                 // Minor lines go first: they alias soonest.
                 float minorFade = 1.0 - smoothstep(_Fade.x * 0.5, _Fade.y * 0.6, distance);
                 float lines = max(major * fade, minor * minorFade);
-                return half4(_BaseColor.rgb + _LineColor.rgb * lines, 1.0h);
+                half3 color = _BaseColor.rgb + _LineColor.rgb * lines;
+                if (_UseFog > 0.5) color = MixFog(color, i.fog);
+                return half4(color, 1.0h);
             }
             ENDHLSL
         }

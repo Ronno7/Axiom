@@ -5,7 +5,7 @@ Shader "GeometricFlight/Title Facets"
 {
     Properties
     {
-        _BaseColor ("Base Color", Color) = (1, 1, 1, 1)
+        _BaseColor ("Base Color", Color) = (0.901960784, 1, 1, 1)
         _KeyDirection ("Key light direction (toward the light)", Vector) = (0.45, 0.65, -0.6, 0)
         _Key ("Key light", Range(0, 1.5)) = 0.9
         _Fill ("Front fill (toward the camera)", Range(0, 1)) = 0.35

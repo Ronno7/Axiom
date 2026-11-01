@@ -17,7 +17,8 @@ namespace GeometricFlight.Combat
         [SerializeField] private Vector2 engagementRange = new Vector2(12f, 45f);
         [Tooltip("Arena turrets: measure straight distance to the player instead of distance along the course.")]
         [SerializeField] private bool measureDistance;
-        [Tooltip("0 aims at the player; 1 aims where the player will be when the shot arrives.")]
+        [Tooltip("0 aims at the player; 1 aims where the player will be when the shot arrives (a true intercept, "
+               + "so head-on approaches are led correctly).")]
         [SerializeField, Range(0f, 1f)] private float lead;
         [SerializeField, Min(0.2f)] private float fireInterval = 1.6f;
         [SerializeField, Min(1f)] private float projectileSpeed = 16f;
@@ -56,6 +57,7 @@ namespace GeometricFlight.Combat
         }
 
         private void OnTargetDestroyed(ShootableTarget _) => enabled = false;
+        public void ClearProjectiles() => pool?.Clear();
 
         private void Update()
         {
@@ -76,10 +78,13 @@ namespace GeometricFlight.Combat
             if (projectile == null) return;
             Vector3 aim = player.position;
             if (lead > 0f)
-                aim += playerVelocity * (lead * Vector3.Distance(transform.position, aim) / projectileSpeed);
+            {
+                float meet = WeaponRules.InterceptTime(aim - transform.position, playerVelocity, projectileSpeed);
+                if (meet > 0f) aim += playerVelocity * (lead * meet);
+            }
             Vector3 direction = (aim - transform.position).normalized;
             projectile.Launch(transform.position + direction * spawnOffset, direction * projectileSpeed,
-                projectileLifetime, hitLayers);
+                projectileLifetime, hitLayers, hostile: true);
         }
     }
 }

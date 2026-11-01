@@ -1,3 +1,4 @@
+using GeometricFlight.Presentation;
 using UnityEngine;
 
 namespace GeometricFlight.Core
@@ -22,7 +23,7 @@ namespace GeometricFlight.Core
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = kind == Kind.Slow ? Color.cyan : Color.yellow;
+            Gizmos.color = kind == Kind.Slow ? AxiomPalette.Cyan : AxiomPalette.Orange;
             Vector3 start = transform.position;
             Gizmos.DrawWireCube(start + Vector3.forward * (length * 0.5f), new Vector3(12f, 6f, length));
         }

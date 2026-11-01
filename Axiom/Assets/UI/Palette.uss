@@ -1,0 +1,28 @@
+/* Generated from ArtSource/Palette/palette.json. Run generate_palette.py; do not edit here. */
+:root {
+    --axiom-void: #060A0C;
+    --axiom-structure: #0C141F;
+    --axiom-panel: #102931;
+    --axiom-edge: #3A5362;
+    --axiom-muted: #8198A6;
+    --axiom-text: #B7C9D1;
+    --axiom-light: #E6FFFF;
+    --axiom-cyan: #6FC3DF;
+    --axiom-orange: #DF740C;
+    --axiom-ember: #FF410D;
+    --axiom-gold: #FFE64D;
+    --axiom-hot: #FFF2D9;
+    --axiom-black: #000000;
+    --axiom-white: #FFFFFF;
+    --axiom-void-55: rgba(6, 10, 12, 0.55);
+    --axiom-void-72: rgba(6, 10, 12, 0.72);
+    --axiom-void-78: rgba(6, 10, 12, 0.78);
+    --axiom-void-85: rgba(6, 10, 12, 0.85);
+    --axiom-void-88: rgba(6, 10, 12, 0.88);
+    --axiom-void-95: rgba(6, 10, 12, 0.95);
+    --axiom-void-97: rgba(6, 10, 12, 0.97);
+    --axiom-light-50: rgba(230, 255, 255, 0.5);
+    --axiom-cyan-45: rgba(111, 195, 223, 0.45);
+    --axiom-cyan-50: rgba(111, 195, 223, 0.5);
+    --axiom-transparent: rgba(0, 0, 0, 0);
+}

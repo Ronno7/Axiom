@@ -28,7 +28,7 @@ namespace GeometricFlight.UI
         public static float BeepInterval(float timeToImpact) => timeToImpact <= SolidBelow
             ? 0f : Mathf.Lerp(0.1f, 0.5f, Mathf.InverseLerp(SolidBelow, Horizon, timeToImpact));
 
-        public void Update(PlayerFlight flight, ShipHull hull, bool enabled, float now)
+        public void Update(ShipFlight flight, ShipHull hull, bool enabled, float now)
         {
             float impact = enabled ? TimeToImpact(flight, hull) : float.PositiveInfinity;
             Active = impact <= Horizon;
@@ -60,7 +60,7 @@ namespace GeometricFlight.UI
             Pulse = now - beepStart < interval * 0.5f;
         }
 
-        private static float TimeToImpact(PlayerFlight flight, ShipHull hull)
+        private static float TimeToImpact(ShipFlight flight, ShipHull hull)
         {
             // Already inside something: the hit has happened; warning now would only be noise.
             if (hull.Overlaps(flight.transform.position, false)) return float.PositiveInfinity;

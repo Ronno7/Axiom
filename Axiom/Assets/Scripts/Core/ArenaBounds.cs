@@ -1,4 +1,5 @@
 using GeometricFlight.Player;
+using GeometricFlight.Presentation;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -128,7 +129,7 @@ namespace GeometricFlight.Core
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = new Color(0.4f, 0.9f, 1f, 0.5f);
+            Gizmos.color = AxiomPalette.WithAlpha(AxiomPalette.Cyan, 0.5f);
             Vector3 c = transform.position;
             const int n = 72;
             for (int i = 0; i < n; i++)

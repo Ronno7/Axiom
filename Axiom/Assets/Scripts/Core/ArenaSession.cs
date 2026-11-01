@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GeometricFlight.Combat;
 using GeometricFlight.Input;
 using GeometricFlight.Player;
+using GeometricFlight.Presentation;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,7 +13,7 @@ namespace GeometricFlight.Core
     /// arena never empties, and losing the shield shatters the ship, which then restarts at the spawn point
     /// with a full shield. Also draws
     /// temporary markers at the screen edge for targets that are off screen, and a small speed readout.
-    /// No score, waves or results: this scene exists to judge whether flying and shooting are fun on their own.
+    /// An optional ArenaEncounter replaces individual target respawns with a finite, repeating wave.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class ArenaSession : MonoBehaviour
@@ -24,9 +25,10 @@ namespace GeometricFlight.Core
         [SerializeField] private GameObject[] hideWhenDestroyed;
         [SerializeField, Min(0f)] private float respawnDelay = 6f;
         [SerializeField, Min(0f)] private float restartDelay = 1.5f;
+        [SerializeField] private ArenaEncounter encounter;
 
         [Header("Off-screen markers")]
-        [SerializeField] private Color markerColor = new Color(1f, 0.55f, 0.1f);
+        [SerializeField] private Color markerColor = AxiomPalette.Orange;
         [SerializeField, Min(4f)] private float markerSize = 14f;
 
         private readonly List<(GameObject template, ShootableTarget live)> spawns =
@@ -37,12 +39,19 @@ namespace GeometricFlight.Core
         private bool paused, destroyed;
         private float nextStallTone;
         private float restartAt;
+        private LockOnWeapon missiles;
 
         private void Start()
         {
             view = Camera.main;
+            missiles = flight != null ? flight.GetComponent<LockOnWeapon>() : null;
             Time.timeScale = 1f;
             if (shield != null) shield.Depleted += OnShieldDepleted;
+            if (encounter != null && encounter.isActiveAndEnabled)
+            {
+                encounter.WaveCleared += OnWaveCleared;
+                return;
+            }
 
             // Inactive copies of every target, made before anything moves, so a fresh one can replace each
             // target that breaks.
@@ -61,6 +70,8 @@ namespace GeometricFlight.Core
         private void OnDestroy()
         {
             if (shield != null) shield.Depleted -= OnShieldDepleted;
+            if (encounter != null) encounter.WaveCleared -= OnWaveCleared;
+            if (templates != null) Destroy(templates.gameObject);
             Time.timeScale = 1f;
         }
 
@@ -88,6 +99,7 @@ namespace GeometricFlight.Core
             {
                 paused = !paused;
                 Time.timeScale = paused ? 0f : 1f;
+                missiles?.CancelPainting();
             }
 
             for (int i = pending.Count - 1; i >= 0; i--)
@@ -110,8 +122,12 @@ namespace GeometricFlight.Core
             destroyed = false;
             flight.enabled = true;
             flight.Respawn();
+            flight.GetComponent<EmpWeapon>()?.ResetCharge();
             flight.InputLocked = false;
             shield.Restore();
+            missiles?.ResetBank();
+            flight.GetComponent<PlayerWeapon>()?.ClearProjectiles();
+            if (encounter != null && encounter.isActiveAndEnabled) encounter.Restart();
             foreach (GameObject go in hideWhenDestroyed) if (go != null) go.SetActive(true);
         }
 
@@ -121,8 +137,19 @@ namespace GeometricFlight.Core
             restartAt = Time.unscaledTime + restartDelay;
             flight.InputLocked = true;
             flight.enabled = false;
+            missiles?.ResetBank();
+            flight.GetComponent<PlayerWeapon>()?.ClearProjectiles();
+            if (encounter != null && encounter.isActiveAndEnabled) encounter.Defeat();
             foreach (GameObject go in hideWhenDestroyed) if (go != null) go.SetActive(false);
             if (shipDestruction != null) shipDestruction.Play();
+        }
+
+        private void OnWaveCleared()
+        {
+            if (destroyed) return;
+            shield?.Restore();
+            missiles?.ResetBank();
+            flight.GetComponent<PlayerWeapon>()?.ClearProjectiles();
         }
 
         private void OnGUI()
@@ -151,17 +178,18 @@ namespace GeometricFlight.Core
                 GUI.matrix = saved;
             }
 
-            GUI.color = Color.white;
+            GUI.color = AxiomPalette.Light;
             if (flight != null)
             {
                 string throttle = Mathf.Abs(flight.Throttle) < 0.001f ? "CRUISE"
                     : (flight.Throttle > 0f ? "+" : "") + Mathf.RoundToInt(flight.Throttle * 100f) + "%";
                 GUI.Label(new Rect(16f, size.y - 52f, 520f, 24f),
-                    (flight.FullRotation ? "FULL ROTATION" : "ARCADE") + " flight  (M to switch)");
+                    (flight.FullRotation ? "ROLL & PITCH" : "BANK & TURN") + " handling  (M to switch)");
                 GUI.Label(new Rect(16f, size.y - 32f, 520f, 24f), Mathf.RoundToInt(flight.CurrentSpeed) + " m/s   "
                     + throttle + (flight.State.Stalled ? "   STALL" : "") + (flight.State.Returning ? "   ARENA EDGE" : ""));
             }
             if (paused) GUI.Label(new Rect(middle.x - 40f, middle.y - 12f, 120f, 24f), "PAUSED");
+            GUI.color = Color.white; // Restore IMGUI's identity tint for other callers.
         }
     }
 }

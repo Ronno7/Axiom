@@ -17,8 +17,8 @@ namespace GeometricFlight.Presentation
         [Header("References")]
         [SerializeField, FormerlySerializedAs("targetCamera")] private Camera levelCamera;
         [SerializeField] private Shader glowShader;
-        [Tooltip("The game's single accent colour, used by Arcade Mode's fringing.")]
-        [SerializeField] private Color accent = new Color(0.84f, 0.12f, 0.16f);
+        [Tooltip("The palette's selection accent, used by Arcade Mode's fringing.")]
+        [SerializeField] private Color accent = AxiomPalette.Orange;
 
         [Header("Main look")]
         [SerializeField] private GradeSettings grade = new GradeSettings();

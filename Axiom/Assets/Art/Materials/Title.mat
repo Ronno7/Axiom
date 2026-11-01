@@ -31,7 +31,7 @@ Material:
     - _ShadeStrength: 0.8
     - _Shadow: 0.015
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.9019608, g: 1, b: 1, a: 1}
     - _KeyDirection: {r: 0.45, g: 0.65, b: -0.6, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

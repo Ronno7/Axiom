@@ -15,18 +15,18 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.024, g: 0.039, b: 0.047, a: 1}
+  m_FogColor: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.01
   m_LinearFogStart: 350
   m_LinearFogEnd: 1700
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
-  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
-  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientSkyColor: {r: 0.226163, g: 0.226163, b: 0.226163, a: 1}
+  m_AmbientEquatorColor: {r: 0.122623004, g: 0.122623004, b: 0.122623004, a: 1}
+  m_AmbientGroundColor: {r: 0.043284, g: 0.043284, b: 0.043284, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_AmbientMode: 3
+  m_SubtractiveShadowColor: {r: 0.477644, g: 0.477644, b: 0.477644, a: 1}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -166,7 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.ArcadeScreen
   levelCamera: {fileID: 1483213716}
   glowShader: {fileID: 4800000, guid: 996ff6a1f898e3346b4600ffb8d42c33, type: 3}
-  accent: {r: 0.84, g: 0.12, b: 0.16, a: 1}
+  accent: {r: 0.8745098, g: 0.45490196, b: 0.047058824, a: 1}
   grade:
     enabled: 1
     exposure: 0.15
@@ -184,10 +184,10 @@ MonoBehaviour:
     grainResponse: 0.8
   atmosphere:
     enabled: 1
-    haze: {r: 0.024, g: 0.039, b: 0.047, a: 1}
+    haze: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
     fogRange: {x: 350, y: 1700}
     horizon: 1
-    horizonColor: {r: 0.063, g: 0.161, b: 0.192, a: 1}
+    horizonColor: {r: 0.0627451, g: 0.16078432, b: 0.19215687, a: 1}
     horizonDistance: 1500
     horizonSize: {x: 4500, y: 260}
     horizonFalloff: 2.2
@@ -207,7 +207,9 @@ MonoBehaviour:
     dustSize: {x: 0.02, y: 0.06}
     dustBrightness: 0.55
     dustDrift: 0
-  interfaceDocuments: []
+  interfaceDocuments:
+  - {fileID: 1395340046}
+  - {fileID: 1772569445}
   arcade: {fileID: 11400000, guid: 22c6e87e0f3a90d40ab6a07610b11d05, type: 2}
   previewArcade: 0
 --- !u!114 &9634413
@@ -381,7 +383,7 @@ Transform:
   m_GameObject: {fileID: 39728535}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 198.99539, y: 200, z: 480.41733}
+  m_LocalPosition: {x: 290.83942, y: 200, z: 702.1484}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -472,7 +474,7 @@ Transform:
   m_GameObject: {fileID: 54349131}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1234.8353, y: 41.44356, z: 232.5985}
+  m_LocalPosition: {x: 1852.2529, y: 41.44356, z: 348.89774}
   m_LocalScale: {x: 73.72977, y: 82.88712, z: 46.449715}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -635,7 +637,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 72139426}
 --- !u!114 &72139426
@@ -707,7 +709,7 @@ Transform:
   m_GameObject: {fileID: 120242742}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 689.0897, y: 297.90042, z: 468.32867}
+  m_LocalPosition: {x: 1033.6345, y: 297.90042, z: 702.49304}
   m_LocalScale: {x: 47.779335, y: 595.80084, z: 42.068367}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1010,7 +1012,7 @@ Transform:
   m_GameObject: {fileID: 129801523}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 825.3473, y: 74.78381, z: 373.64822}
+  m_LocalPosition: {x: 1238.021, y: 74.78381, z: 560.47235}
   m_LocalScale: {x: 78.05664, y: 149.56763, z: 62.416393}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1115,7 +1117,7 @@ Transform:
   m_GameObject: {fileID: 162752755}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -728.4564, y: 42.736683, z: -1043.9207}
+  m_LocalPosition: {x: -1092.6846, y: 42.736683, z: -1565.881}
   m_LocalScale: {x: 43.70858, y: 85.473366, z: 56.127335}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1220,7 +1222,7 @@ Transform:
   m_GameObject: {fileID: 165431153}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -284.1965, y: 92.65062, z: 933.01654}
+  m_LocalPosition: {x: -426.29474, y: 92.65062, z: 1399.5248}
   m_LocalScale: {x: 56.72631, y: 185.30124, z: 59.936657}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1868,7 +1870,7 @@ Transform:
   m_GameObject: {fileID: 214770162}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -794.9649, y: 270.4532, z: 38.488083}
+  m_LocalPosition: {x: -1192.4474, y: 270.4532, z: 57.732124}
   m_LocalScale: {x: 91.71054, y: 540.9064, z: 80.06133}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2080,7 +2082,7 @@ Transform:
   m_GameObject: {fileID: 230106178}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -520, y: 200, z: 0.000006200938}
+  m_LocalPosition: {x: -760, y: 200, z: 0.000009062909}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2170,7 +2172,7 @@ Transform:
   m_GameObject: {fileID: 239903038}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -432.3643, y: 200, z: -288.8964}
+  m_LocalPosition: {x: -631.91705, y: 200, z: -422.2332}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2516,7 +2518,7 @@ Transform:
   m_GameObject: {fileID: 283560323}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 919.29895, y: 152.22983, z: -186.16628}
+  m_LocalPosition: {x: 1378.9485, y: 152.22983, z: -279.24942}
   m_LocalScale: {x: 55.265812, y: 304.45966, z: 45.180115}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2679,7 +2681,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 292231240}
 --- !u!114 &292231240
@@ -2816,7 +2818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 330995493}
 --- !u!114 &330995493
@@ -2995,7 +2997,7 @@ Transform:
   m_GameObject: {fileID: 336554128}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -510.00833, y: 200, z: -101.447}
+  m_LocalPosition: {x: -745.3968, y: 200, z: -148.26869}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3085,7 +3087,7 @@ Transform:
   m_GameObject: {fileID: 337100031}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 200, z: 520}
+  m_LocalPosition: {x: 0, y: 200, z: 760}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3375,7 +3377,7 @@ Transform:
   m_GameObject: {fileID: 349502269}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 60, y: 60, z: -260}
+  m_LocalPosition: {x: 230, y: 60, z: -260}
   m_LocalScale: {x: 40, y: 120, z: 40}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3863,7 +3865,7 @@ Transform:
   m_GameObject: {fileID: 374328633}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -696.2109, y: 188.35745, z: -536.47675}
+  m_LocalPosition: {x: -1044.3163, y: 188.35745, z: -804.7151}
   m_LocalScale: {x: 61.965626, y: 376.7149, z: 80.42883}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4016,7 +4018,7 @@ Transform:
   m_GameObject: {fileID: 374822235}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -101.44705, y: 200, z: -510.00833}
+  m_LocalPosition: {x: -148.26877, y: 200, z: -745.3968}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4215,7 +4217,7 @@ Transform:
   m_GameObject: {fileID: 384453612}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1382.4496, y: 41.209427, z: 220.6733}
+  m_LocalPosition: {x: -2073.6743, y: 41.209427, z: 331.00995}
   m_LocalScale: {x: 71.89726, y: 82.41885, z: 57.3228}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4320,7 +4322,7 @@ Transform:
   m_GameObject: {fileID: 385659961}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 68.11433, y: 47.227055, z: -1322.9237}
+  m_LocalPosition: {x: 102.17149, y: 47.227055, z: -1984.3855}
   m_LocalScale: {x: 73.08189, y: 94.45411, z: 62.93164}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4425,7 +4427,7 @@ Transform:
   m_GameObject: {fileID: 387769151}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1241.61, y: 54.361675, z: 692.8926}
+  m_LocalPosition: {x: 1862.415, y: 54.361675, z: 1039.3389}
   m_LocalScale: {x: 84.549515, y: 108.72335, z: 76.1874}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4530,7 +4532,7 @@ Transform:
   m_GameObject: {fileID: 409753240}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 358.382, y: 161.05807, z: -803.4026}
+  m_LocalPosition: {x: 537.573, y: 161.05807, z: -1205.1039}
   m_LocalScale: {x: 99.81304, y: 322.11615, z: 81.62475}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4635,7 +4637,7 @@ Transform:
   m_GameObject: {fileID: 418096266}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -584.43713, y: 50.115376, z: 812.6966}
+  m_LocalPosition: {x: -876.6557, y: 50.115376, z: 1219.0449}
   m_LocalScale: {x: 80.17681, y: 100.23075, z: 78.7332}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4739,7 +4741,7 @@ Transform:
   m_GameObject: {fileID: 420274853}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -101.44692, y: 200, z: 510.00836}
+  m_LocalPosition: {x: -148.26857, y: 200, z: 745.39685}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4920,7 +4922,7 @@ Transform:
   m_GameObject: {fileID: 474702384}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 691.61926, y: 40.898724, z: -1096.1906}
+  m_LocalPosition: {x: 1037.429, y: 40.898724, z: -1644.2859}
   m_LocalScale: {x: 74.88961, y: 81.79745, z: 70.652405}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5198,7 +5200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 484558729}
 --- !u!114 &484558729
@@ -5829,7 +5831,7 @@ Transform:
   m_GameObject: {fileID: 530991609}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 510.00833, y: 200, z: -101.44697}
+  m_LocalPosition: {x: 745.3968, y: 200, z: -148.26865}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5919,7 +5921,7 @@ Transform:
   m_GameObject: {fileID: 535646142}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 510.00836, y: 200, z: 101.44692}
+  m_LocalPosition: {x: 745.39685, y: 200, z: 148.26857}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6010,7 +6012,7 @@ Transform:
   m_GameObject: {fileID: 536277519}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1101.8317, y: 317.37878, z: 8.632093}
+  m_LocalPosition: {x: 1652.7476, y: 317.37878, z: 12.94814}
   m_LocalScale: {x: 94.84011, y: 634.75757, z: 111.0388}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6115,7 +6117,7 @@ Transform:
   m_GameObject: {fileID: 552772183}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1109.6815, y: 56.002422, z: -542.8942}
+  m_LocalPosition: {x: -1664.5222, y: 56.002422, z: -814.3413}
   m_LocalScale: {x: 70.636955, y: 112.004845, z: 76.20702}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6282,6 +6284,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 560504860}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &563276434
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 563276435}
+  m_Layer: 0
+  m_Name: Portal_3_Turret
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &563276435
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563276434}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -100, y: 100, z: 300}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1599110068}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &570073688
 GameObject:
   m_ObjectHideFlags: 0
@@ -6310,7 +6343,7 @@ Transform:
   m_GameObject: {fileID: 570073688}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -585.26276, y: 43.198692, z: -979.6771}
+  m_LocalPosition: {x: -877.89417, y: 43.198692, z: -1469.5156}
   m_LocalScale: {x: 69.11867, y: 86.397385, z: 96.02995}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6631,7 +6664,7 @@ Transform:
   m_GameObject: {fileID: 601025830}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 367.6225, y: 102.35829, z: 603.36536}
+  m_LocalPosition: {x: 551.4337, y: 102.35829, z: 905.04803}
   m_LocalScale: {x: 77.81592, y: 204.71658, z: 58.760227}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6909,7 +6942,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 614688516}
 --- !u!114 &614688516
@@ -6981,7 +7014,7 @@ Transform:
   m_GameObject: {fileID: 623775847}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1367.815, y: 117.54043, z: 191.52306}
+  m_LocalPosition: {x: 2051.7224, y: 117.54043, z: 287.28458}
   m_LocalScale: {x: 96.645195, y: 235.08086, z: 100.665634}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7086,7 +7119,7 @@ Transform:
   m_GameObject: {fileID: 624483308}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 764.21814, y: 301.06064, z: 584.8386}
+  m_LocalPosition: {x: 1146.3271, y: 301.06064, z: 877.25793}
   m_LocalScale: {x: 53.305996, y: 602.1213, z: 39.041985}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7406,7 +7439,7 @@ Transform:
   m_GameObject: {fileID: 638507016}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 367.69553, y: 200, z: -367.69553}
+  m_LocalPosition: {x: 537.4011, y: 200, z: -537.4011}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7469,6 +7502,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 638507016}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &646134227
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 646134228}
+  m_Layer: 0
+  m_Name: Portal_5_Drone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &646134228
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646134227}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -130, y: 140, z: 150}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1599110068}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &655851060
 GameObject:
   m_ObjectHideFlags: 0
@@ -7498,7 +7562,7 @@ Transform:
   m_GameObject: {fileID: 655851060}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -130, y: 115, z: -200}
+  m_LocalPosition: {x: -240, y: 115, z: -200}
   m_LocalScale: {x: 18, y: 230, z: 18}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7623,7 +7687,7 @@ Transform:
   m_GameObject: {fileID: 675352505}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -480.4173, y: 200, z: 198.99547}
+  m_LocalPosition: {x: -702.1483, y: 200, z: 290.83954}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7844,7 +7908,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 707397594}
 --- !u!114 &707397594
@@ -7916,7 +7980,7 @@ Transform:
   m_GameObject: {fileID: 715328444}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1214.6855, y: 172.3093, z: -547.6504}
+  m_LocalPosition: {x: 1822.0283, y: 172.3093, z: -821.4756}
   m_LocalScale: {x: 41.01847, y: 344.6186, z: 28.251678}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8021,7 +8085,7 @@ Transform:
   m_GameObject: {fileID: 718953392}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1097.0236, y: 43.491135, z: -706.75287}
+  m_LocalPosition: {x: -1645.5354, y: 43.491135, z: -1060.1293}
   m_LocalScale: {x: 83.50978, y: 86.98227, z: 73.03144}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8126,7 +8190,7 @@ Transform:
   m_GameObject: {fileID: 720068607}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1157.9613, y: 111.977234, z: 197.45705}
+  m_LocalPosition: {x: 1736.9419, y: 111.977234, z: 296.18558}
   m_LocalScale: {x: 84.30297, y: 223.95447, z: 62.789406}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8231,7 +8295,7 @@ Transform:
   m_GameObject: {fileID: 728166487}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 857.4732, y: 165.45773, z: 1014.6529}
+  m_LocalPosition: {x: 1286.2098, y: 165.45773, z: 1521.9794}
   m_LocalScale: {x: 64.48379, y: 330.91547, z: 51.28153}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8401,7 +8465,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 780054701}
 --- !u!114 &780054701
@@ -8581,7 +8645,7 @@ Transform:
   m_GameObject: {fileID: 792662679}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 47.510155, y: 42.21025, z: 1384.5979}
+  m_LocalPosition: {x: 71.26523, y: 42.21025, z: 2076.897}
   m_LocalScale: {x: 80.99737, y: 84.4205, z: 58.691658}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8685,7 +8749,7 @@ Transform:
   m_GameObject: {fileID: 809843864}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -432.36414, y: 200, z: 288.8966}
+  m_LocalPosition: {x: -631.9168, y: 200, z: 422.2335}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9005,7 +9069,7 @@ Transform:
   m_GameObject: {fileID: 818483000}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 795.0912, y: 116.7554, z: -163.44289}
+  m_LocalPosition: {x: 1192.6367, y: 116.7554, z: -245.16434}
   m_LocalScale: {x: 89.78389, y: 233.5108, z: 107.27299}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9109,7 +9173,7 @@ Transform:
   m_GameObject: {fileID: 847894824}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -288.89655, y: 200, z: 432.3642}
+  m_LocalPosition: {x: -422.2334, y: 200, z: 631.9169}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9200,7 +9264,7 @@ Transform:
   m_GameObject: {fileID: 848536593}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -643.25305, y: 66.36795, z: 855.708}
+  m_LocalPosition: {x: -964.8796, y: 66.36795, z: 1283.562}
   m_LocalScale: {x: 77.49637, y: 132.7359, z: 90.80897}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9521,7 +9585,7 @@ Transform:
   m_GameObject: {fileID: 867433918}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1199.3999, y: 212.62576, z: -656.2891}
+  m_LocalPosition: {x: 1799.0999, y: 212.62576, z: -984.4337}
   m_LocalScale: {x: 85.79315, y: 425.25153, z: 53.27696}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9625,7 +9689,7 @@ Transform:
   m_GameObject: {fileID: 873693551}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -480.41745, y: 200, z: -198.99522}
+  m_LocalPosition: {x: -702.14856, y: 200, z: -290.83917}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9814,6 +9878,9 @@ GameObject:
   - component: {fileID: 882323229}
   - component: {fileID: 882323227}
   - component: {fileID: 882323226}
+  - component: {fileID: 882323233}
+  - component: {fileID: 882323235}
+  - component: {fileID: 882323234}
   m_Layer: 8
   m_Name: 10_Player
   m_TagString: Untagged
@@ -9830,7 +9897,7 @@ Transform:
   m_GameObject: {fileID: 882323222}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 30, z: -380}
+  m_LocalPosition: {x: 0, y: 70, z: -560}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9949,6 +10016,7 @@ MonoBehaviour:
   lowerThrottleBinding: <Keyboard>/q
   raiseThrottleBinding: <Keyboard>/e
   fireBinding: <Keyboard>/space
+  lockBinding: <Keyboard>/leftShift
   pauseBinding: <Keyboard>/escape
   twistLeftBinding: <Keyboard>/z
   twistRightBinding: <Keyboard>/c
@@ -10042,8 +10110,61 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 55
   poolSize: 40
-  aimAssistCone: 4
-  aimAssistRange: 280
+  aimAssistCone: 6
+  aimAssistRange: 170
+--- !u!114 &882323233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882323222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 498562f5ad75baf40b84e6791e030378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.LockOnWeapon
+  missilePrefab: {fileID: 3390338338515905058, guid: da7f48dcf57d39242b909f96e7e3a6a0, type: 3}
+  bankSize: 4
+  firstLockTime: 0.45
+  additionalLockTime: 0.3
+  retentionTime: 1.5
+  refillTime: 5
+  acquisitionCone: 12
+  minimumRange: 90
+  range: 650
+  missileSpeed: 190
+  turnRate: 45
+  lifetime: 5
+  damage: 3
+--- !u!114 &882323234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882323222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34521ab1281c3cf42bc590edb2dd8fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.EmpDisplay
+  pulseMaterial: {fileID: 2100000, guid: 6c8c2087bdac42e449afb2c0e912deaf, type: 2}
+--- !u!114 &882323235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882323222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56dbd1f9170fbd540a6332ae20b46a0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.EmpWeapon
+  radius: 180
+  compressionTime: 0.22
+  expansionTime: 2.8
 --- !u!1 &886467361
 GameObject:
   m_ObjectHideFlags: 0
@@ -10306,7 +10427,7 @@ Transform:
   m_GameObject: {fileID: 890814913}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 288.8965, y: 200, z: 432.3642}
+  m_LocalPosition: {x: 422.23337, y: 200, z: 631.9169}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10397,7 +10518,7 @@ Transform:
   m_GameObject: {fileID: 896255794}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -791.0318, y: 55.26403, z: 787.93787}
+  m_LocalPosition: {x: -1186.5477, y: 55.26403, z: 1181.9067}
   m_LocalScale: {x: 52.64706, y: 110.52806, z: 70.44773}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10884,7 +11005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 928534860}
 --- !u!114 &928534860
@@ -11063,7 +11184,7 @@ Transform:
   m_GameObject: {fileID: 943527707}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 432.36417, y: 200, z: -288.89658}
+  m_LocalPosition: {x: 631.9169, y: 200, z: -422.23346}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11154,7 +11275,7 @@ Transform:
   m_GameObject: {fileID: 948409445}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1362.5679, y: 83.76042, z: 476.0586}
+  m_LocalPosition: {x: -2043.8518, y: 83.76042, z: 714.0879}
   m_LocalScale: {x: 68.314674, y: 167.52084, z: 80.56469}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11258,7 +11379,7 @@ Transform:
   m_GameObject: {fileID: 961816832}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -198.99538, y: 200, z: 480.41736}
+  m_LocalPosition: {x: -290.8394, y: 200, z: 702.14844}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11349,7 +11470,7 @@ Transform:
   m_GameObject: {fileID: 962608168}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -577.87195, y: 234.7619, z: 321.40222}
+  m_LocalPosition: {x: -866.8079, y: 234.7619, z: 482.10333}
   m_LocalScale: {x: 53.148083, y: 469.5238, z: 63.976208}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11561,7 +11682,7 @@ Transform:
   m_GameObject: {fileID: 988610945}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -367.6956, y: 200, z: -367.69547}
+  m_LocalPosition: {x: -537.40125, y: 200, z: -537.40106}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11652,7 +11773,7 @@ Transform:
   m_GameObject: {fileID: 1002485963}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -653.3185, y: 40.289696, z: 793.5925}
+  m_LocalPosition: {x: -979.9777, y: 40.289696, z: 1190.3888}
   m_LocalScale: {x: 73.98898, y: 80.57939, z: 82.68415}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11756,7 +11877,7 @@ Transform:
   m_GameObject: {fileID: 1005809360}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 101.44697, y: 200, z: 510.00833}
+  m_LocalPosition: {x: 148.26865, y: 200, z: 745.3968}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11955,7 +12076,7 @@ Transform:
   m_GameObject: {fileID: 1028254213}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 41.24278, y: 244.07658, z: -1052.6372}
+  m_LocalPosition: {x: 61.864166, y: 244.07658, z: -1578.9558}
   m_LocalScale: {x: 47.76785, y: 488.15317, z: 44.77784}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12060,7 +12181,7 @@ Transform:
   m_GameObject: {fileID: 1040389228}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 260.19934, y: 139.16847, z: -597.20856}
+  m_LocalPosition: {x: 390.299, y: 139.16847, z: -895.81287}
   m_LocalScale: {x: 95.46975, y: 278.33694, z: 96.552956}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12165,7 +12286,7 @@ Transform:
   m_GameObject: {fileID: 1048246402}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -910.8549, y: 308.63367, z: -699.9324}
+  m_LocalPosition: {x: -1366.2823, y: 308.63367, z: -1049.8986}
   m_LocalScale: {x: 98.10577, y: 617.26733, z: 92.52348}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12270,7 +12391,7 @@ Transform:
   m_GameObject: {fileID: 1048654709}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 213.83734, y: 43.790882, z: -974.0718}
+  m_LocalPosition: {x: 320.756, y: 43.790882, z: -1461.1077}
   m_LocalScale: {x: 60.121803, y: 87.581764, z: 79.94265}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12501,7 +12622,7 @@ Transform:
   m_GameObject: {fileID: 1081992911}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 367.69553, y: 200, z: 367.69553}
+  m_LocalPosition: {x: 537.4011, y: 200, z: 537.4011}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12699,7 +12820,7 @@ Transform:
   m_GameObject: {fileID: 1096254880}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 480.41733, y: 200, z: -198.99542}
+  m_LocalPosition: {x: 702.1484, y: 200, z: -290.83945}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12790,7 +12911,7 @@ Transform:
   m_GameObject: {fileID: 1100998768}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 635.11676, y: 297.95807, z: 368.56012}
+  m_LocalPosition: {x: 952.6752, y: 297.95807, z: 552.8402}
   m_LocalScale: {x: 60.531063, y: 595.91614, z: 82.18986}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12895,7 +13016,7 @@ Transform:
   m_GameObject: {fileID: 1105316291}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -321.12317, y: 87.249695, z: 754.33185}
+  m_LocalPosition: {x: -481.68475, y: 87.249695, z: 1131.4978}
   m_LocalScale: {x: 53.83073, y: 174.49939, z: 48.0822}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13216,7 +13337,7 @@ Transform:
   m_GameObject: {fileID: 1123483931}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1322.0245, y: 197.7506, z: -572.1984}
+  m_LocalPosition: {x: 1983.0369, y: 197.7506, z: -858.2976}
   m_LocalScale: {x: 30.068146, y: 395.5012, z: 25.3491}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13320,7 +13441,7 @@ Transform:
   m_GameObject: {fileID: 1155837721}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.000045459845, y: 200, z: -520}
+  m_LocalPosition: {x: -0.00006644131, y: 200, z: -760}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13383,6 +13504,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1155837721}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1160292953
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1160292954}
+  m_Layer: 0
+  m_Name: Portal_1_Turret
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1160292954
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160292953}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -90, y: 85, z: -80}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1599110068}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1197951069
 GameObject:
   m_ObjectHideFlags: 0
@@ -13518,7 +13670,7 @@ Transform:
   m_GameObject: {fileID: 1198730136}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 288.89648, y: 200, z: -432.36423}
+  m_LocalPosition: {x: 422.2333, y: 200, z: -631.91693}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13782,7 +13934,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1222672760}
 --- !u!114 &1222672760
@@ -14070,7 +14222,7 @@ Transform:
   m_GameObject: {fileID: 1258538429}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 920.8378, y: 49.075634, z: 540.8719}
+  m_LocalPosition: {x: 1381.2567, y: 49.075634, z: 811.30786}
   m_LocalScale: {x: 58.10392, y: 98.15127, z: 59.096943}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14240,7 +14392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1284185271}
 --- !u!114 &1284185271
@@ -14431,7 +14583,8 @@ MonoBehaviour:
   - {fileID: 195926248}
   respawnDelay: 6
   restartDelay: 1.5
-  markerColor: {r: 1, g: 0.55, b: 0.1, a: 1}
+  encounter: {fileID: 1599110067}
+  markerColor: {r: 0.8745098, g: 0.45490196, b: 0.047058824, a: 1}
   markerSize: 14
 --- !u!4 &1305431936
 Transform:
@@ -14477,7 +14630,7 @@ Transform:
   m_GameObject: {fileID: 1312921208}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 882.07324, y: 133.07492, z: -187.39171}
+  m_LocalPosition: {x: 1323.1099, y: 133.07492, z: -281.08755}
   m_LocalScale: {x: 70.27044, y: 266.14984, z: 61.375965}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14582,7 +14735,7 @@ Transform:
   m_GameObject: {fileID: 1317995622}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 103.89438, y: 41.355892, z: 1367.9688}
+  m_LocalPosition: {x: 155.84157, y: 41.355892, z: 2051.9531}
   m_LocalScale: {x: 99.1271, y: 82.711784, z: 113.09811}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14686,7 +14839,7 @@ Transform:
   m_GameObject: {fileID: 1319302691}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -367.6954, y: 200, z: 367.69565}
+  m_LocalPosition: {x: -537.40094, y: 200, z: 537.4013}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14842,7 +14995,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1320898384}
 --- !u!114 &1320898384
@@ -14913,7 +15066,7 @@ Transform:
   m_GameObject: {fileID: 1328465747}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 432.36423, y: 200, z: 288.89648}
+  m_LocalPosition: {x: 631.91693, y: 200, z: 422.2333}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15003,7 +15156,7 @@ Transform:
   m_GameObject: {fileID: 1337461917}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 520, y: 200, z: -0.000022729922}
+  m_LocalPosition: {x: 760, y: 200, z: -0.000033220655}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15202,7 +15355,7 @@ Transform:
   m_GameObject: {fileID: 1358586415}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 445.15106, y: 43.62067, z: 828.20276}
+  m_LocalPosition: {x: 667.72656, y: 43.62067, z: 1242.3042}
   m_LocalScale: {x: 69.51507, y: 87.24134, z: 91.137344}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15372,7 +15525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1361987587}
 --- !u!114 &1361987587
@@ -15665,7 +15818,7 @@ Transform:
   m_GameObject: {fileID: 1377511859}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 840.1694, y: 47.368275, z: 440.01886}
+  m_LocalPosition: {x: 1260.254, y: 47.368275, z: 660.0283}
   m_LocalScale: {x: 72.14347, y: 94.73655, z: 46.21623}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15742,6 +15895,75 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1377511859}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1395340044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1395340047}
+  - component: {fileID: 1395340046}
+  - component: {fileID: 1395340045}
+  m_Layer: 0
+  m_Name: MissileHUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1395340045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395340044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d0783df7b2fb724aaa4b534c849a8fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.MissileDisplay
+  weapon: {fileID: 882323233}
+--- !u!114 &1395340046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395340044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 5a72b3085d869bf4382a5d04d9fd244e, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 0}
+  m_SortingOrder: 10
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!4 &1395340047
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395340044}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1398088169
 GameObject:
   m_ObjectHideFlags: 0
@@ -15770,7 +15992,7 @@ Transform:
   m_GameObject: {fileID: 1398088169}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 405.3624, y: 187.6064, z: 892.8426}
+  m_LocalPosition: {x: 608.0436, y: 187.6064, z: 1339.2639}
   m_LocalScale: {x: 75.83485, y: 375.2128, z: 90.13782}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15875,7 +16097,7 @@ Transform:
   m_GameObject: {fileID: 1405000567}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -870.90295, y: 306.08746, z: -559.1167}
+  m_LocalPosition: {x: -1306.3545, y: 306.08746, z: -838.67505}
   m_LocalScale: {x: 87.39757, y: 612.1749, z: 96.224075}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15979,7 +16201,7 @@ Transform:
   m_GameObject: {fileID: 1417532160}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -510.00833, y: 200, z: 101.447014}
+  m_LocalPosition: {x: -745.3968, y: 200, z: 148.2687}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16412,7 +16634,7 @@ Transform:
   m_GameObject: {fileID: 1430889892}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -288.89655, y: 200, z: -432.36417}
+  m_LocalPosition: {x: -422.2334, y: 200, z: -631.9169}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16568,7 +16790,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1445708333}
 --- !u!114 &1445708333
@@ -16640,7 +16862,7 @@ Transform:
   m_GameObject: {fileID: 1447099113}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -726.6077, y: 279.23117, z: -924.8407}
+  m_LocalPosition: {x: -1089.9116, y: 279.23117, z: -1387.261}
   m_LocalScale: {x: 39.911922, y: 558.46234, z: 55.09124}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16745,7 +16967,7 @@ Transform:
   m_GameObject: {fileID: 1455806563}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -488.122, y: 40.46887, z: 880.1078}
+  m_LocalPosition: {x: -732.183, y: 40.46887, z: 1320.1616}
   m_LocalScale: {x: 49.637363, y: 80.93774, z: 61.609394}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17100,7 +17322,7 @@ Transform:
   m_GameObject: {fileID: 1467327454}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -613.7786, y: 210.21695, z: -533.2136}
+  m_LocalPosition: {x: -920.66797, y: 210.21695, z: -799.82043}
   m_LocalScale: {x: 91.61619, y: 420.4339, z: 72.631226}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17205,7 +17427,7 @@ Transform:
   m_GameObject: {fileID: 1467708237}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 398.2408, y: 153.46854, z: 1075.8472}
+  m_LocalPosition: {x: 597.3612, y: 153.46854, z: 1613.7708}
   m_LocalScale: {x: 54.889412, y: 306.93707, z: 44.033295}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17310,7 +17532,7 @@ Transform:
   m_GameObject: {fileID: 1468808071}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1080.6328, y: 116.36928, z: 76.11155}
+  m_LocalPosition: {x: 1620.9492, y: 116.36928, z: 114.16733}
   m_LocalScale: {x: 37.212425, y: 232.73856, z: 50.75321}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17480,7 +17702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1477482538}
 --- !u!114 &1477482538
@@ -17554,7 +17776,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.024, g: 0.039, b: 0.047, a: 1}
+  m_BackGroundColor: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -18069,7 +18291,7 @@ Transform:
   m_GameObject: {fileID: 1545098916}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 101.44696, y: 200, z: -510.00836}
+  m_LocalPosition: {x: 148.26863, y: 200, z: -745.39685}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18240,6 +18462,108 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1596364059}
   m_Mesh: {fileID: 0}
+--- !u!1 &1599110066
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1599110068}
+  - component: {fileID: 1599110067}
+  - component: {fileID: 1599110069}
+  m_Layer: 0
+  m_Name: ArenaEncounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1599110067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599110066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb3d97b23253fcc40806a229ff85378c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Core.ArenaEncounter
+  practiceTargets:
+  - {fileID: 330995492}
+  - {fileID: 780054700}
+  - {fileID: 614688515}
+  - {fileID: 1601782078}
+  - {fileID: 2066094222}
+  - {fileID: 1677966632}
+  - {fileID: 707397593}
+  - {fileID: 1361987586}
+  - {fileID: 1320898383}
+  - {fileID: 1808894550}
+  - {fileID: 72139425}
+  - {fileID: 1222672759}
+  - {fileID: 484558728}
+  - {fileID: 292231239}
+  - {fileID: 1958508617}
+  - {fileID: 1725089963}
+  - {fileID: 1445708332}
+  - {fileID: 1477482537}
+  - {fileID: 1284185270}
+  - {fileID: 928534859}
+  spawns:
+  - template: {fileID: 1477482537}
+    point: {fileID: 1160292954}
+  - template: {fileID: 1222672759}
+    point: {fileID: 2052737377}
+  - template: {fileID: 1725089963}
+    point: {fileID: 563276435}
+  - template: {fileID: 484558728}
+    point: {fileID: 1929188342}
+  - template: {fileID: 1808894550}
+    point: {fileID: 646134228}
+  - template: {fileID: 72139425}
+    point: {fileID: 2134152437}
+  warningTime: 5
+  recoveryTime: 12
+--- !u!4 &1599110068
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599110066}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1160292954}
+  - {fileID: 2052737377}
+  - {fileID: 563276435}
+  - {fileID: 1929188342}
+  - {fileID: 646134228}
+  - {fileID: 2134152437}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1599110069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599110066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e75efb1675fcc745bc7642c629902ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.ArenaPortalDisplay
+  encounter: {fileID: 1599110067}
+  material: {fileID: 2100000, guid: 801ee7aac627fbf419b5a7540e66fb59, type: 2}
+  radius: 9
 --- !u!1 &1601782074
 GameObject:
   m_ObjectHideFlags: 0
@@ -18333,7 +18657,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1601782079}
 --- !u!114 &1601782079
@@ -18710,7 +19034,7 @@ Transform:
   m_GameObject: {fileID: 1651155814}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 480.41733, y: 200, z: 198.99538}
+  m_LocalPosition: {x: 702.1484, y: 200, z: 290.8394}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18929,14 +19253,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0ae0a734eb9e1f43ba550ab16b8d393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Core.ArenaBounds
-  radius: 480
+  radius: 720
   minAltitude: 2
-  ceiling: 240
+  ceiling: 420
   lineMaterial: {fileID: 2100000, guid: 6c8c2087bdac42e449afb2c0e912deaf, type: 2}
   wallMaterial: {fileID: 2100000, guid: 744671c81035d6b46a7aa9ac2cc440b2, type: 2}
   focus: {fileID: 882323223}
   posts: 36
-  ringHeightStep: 240
+  ringHeightStep: 420
 --- !u!4 &1661152502
 Transform:
   m_ObjectHideFlags: 0
@@ -18986,7 +19310,7 @@ Transform:
   m_GameObject: {fileID: 1677820662}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -727.2816, y: 142.92323, z: -305.82373}
+  m_LocalPosition: {x: -1090.9224, y: 142.92323, z: -458.7356}
   m_LocalScale: {x: 37.579613, y: 285.84647, z: 27.626844}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19156,7 +19480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1677966633}
 --- !u!114 &1677966633
@@ -19228,7 +19552,7 @@ Transform:
   m_GameObject: {fileID: 1691344922}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1280.4932, y: 125.93596, z: -582.7139}
+  m_LocalPosition: {x: 1920.7397, y: 125.93596, z: -874.0709}
   m_LocalScale: {x: 92.519615, y: 251.87192, z: 99.26496}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19333,7 +19657,7 @@ Transform:
   m_GameObject: {fileID: 1708106705}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -588.90753, y: 40.794018, z: -288.14508}
+  m_LocalPosition: {x: -883.3613, y: 40.794018, z: -432.21762}
   m_LocalScale: {x: 49.229538, y: 81.588036, z: 31.511063}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19492,7 +19816,7 @@ Transform:
   m_GameObject: {fileID: 1710785942}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 502.38116, y: 140.8009, z: 507.0901}
+  m_LocalPosition: {x: 753.5718, y: 140.8009, z: 760.63513}
   m_LocalScale: {x: 83.81821, y: 281.6018, z: 60.14852}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19662,7 +19986,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1725089964}
 --- !u!114 &1725089964
@@ -19797,7 +20121,7 @@ Transform:
   m_GameObject: {fileID: 1755228093}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -944.4675, y: 215.911, z: -744.8361}
+  m_LocalPosition: {x: -1416.7013, y: 215.911, z: -1117.2542}
   m_LocalScale: {x: 95.97284, y: 431.822, z: 116.81833}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20052,6 +20376,75 @@ Transform:
   - {fileID: 292231236}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1772569443
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1772569446}
+  - component: {fileID: 1772569445}
+  - component: {fileID: 1772569444}
+  m_Layer: 0
+  m_Name: EncounterHUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1772569444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1772569443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97a29ae3bad0bdf4a9b1646520a15774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.ArenaEncounterDisplay
+  encounter: {fileID: 1599110067}
+--- !u!114 &1772569445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1772569443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 5a72b3085d869bf4382a5d04d9fd244e, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 0}
+  m_SortingOrder: 11
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!4 &1772569446
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1772569443}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1780670116
 GameObject:
   m_ObjectHideFlags: 0
@@ -20181,7 +20574,7 @@ Transform:
   m_GameObject: {fileID: 1793721980}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 123.16267, y: 250.2591, z: -1344.2723}
+  m_LocalPosition: {x: 184.744, y: 250.2591, z: -2016.4084}
   m_LocalScale: {x: 75.5715, y: 500.5182, z: 96.7949}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20501,7 +20894,7 @@ Transform:
   m_GameObject: {fileID: 1805801018}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 198.9953, y: 200, z: -480.41742}
+  m_LocalPosition: {x: 290.8393, y: 200, z: -702.1485}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20650,7 +21043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1808894551}
 --- !u!114 &1808894551
@@ -20722,7 +21115,7 @@ Transform:
   m_GameObject: {fileID: 1819901988}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -995.34204, y: 210.64227, z: -1003.66174}
+  m_LocalPosition: {x: -1493.0131, y: 210.64227, z: -1505.4927}
   m_LocalScale: {x: 42.8835, y: 421.28455, z: 30.477474}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20827,7 +21220,7 @@ Transform:
   m_GameObject: {fileID: 1828142509}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -589.78796, y: 197.42134, z: 863.8278}
+  m_LocalPosition: {x: -884.68195, y: 197.42134, z: 1295.7417}
   m_LocalScale: {x: 83.94447, y: 394.84268, z: 56.57656}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20932,7 +21325,7 @@ Transform:
   m_GameObject: {fileID: 1832820886}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 673.07104, y: 65.30655, z: 803.48315}
+  m_LocalPosition: {x: 1009.60657, y: 65.30655, z: 1205.2247}
   m_LocalScale: {x: 87.89258, y: 130.6131, z: 95.59383}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21253,7 +21646,7 @@ Transform:
   m_GameObject: {fileID: 1846837389}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 305.8784, y: 48.942368, z: 589.67615}
+  m_LocalPosition: {x: 458.81757, y: 48.942368, z: 884.5142}
   m_LocalScale: {x: 95.14457, y: 97.884735, z: 62.91665}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21611,7 +22004,7 @@ Transform:
   m_GameObject: {fileID: 1874714121}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 929.26263, y: 50.211956, z: -242.81114}
+  m_LocalPosition: {x: 1393.8939, y: 50.211956, z: -364.2167}
   m_LocalScale: {x: 84.87644, y: 100.42391, z: 113.63132}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21716,7 +22109,7 @@ Transform:
   m_GameObject: {fileID: 1883013948}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -747.5134, y: 63.467197, z: 745.52625}
+  m_LocalPosition: {x: -1121.2701, y: 63.467197, z: 1118.2893}
   m_LocalScale: {x: 98.451645, y: 126.934395, z: 64.26168}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21929,7 +22322,7 @@ Transform:
   m_GameObject: {fileID: 1891101596}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -227.7057, y: 105.08801, z: 1054.881}
+  m_LocalPosition: {x: -341.55856, y: 105.08801, z: 1582.3215}
   m_LocalScale: {x: 93.05083, y: 210.17603, z: 105.5179}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22006,6 +22399,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1891101596}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1929188341
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1929188342}
+  m_Layer: 0
+  m_Name: Portal_4_Turret
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1929188342
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1929188341}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 110, y: 110, z: 400}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1599110068}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1929296462
 GameObject:
   m_ObjectHideFlags: 0
@@ -22377,7 +22801,7 @@ Transform:
   m_GameObject: {fileID: 1954893724}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -324.3217, y: 75.9183, z: -1287.5376}
+  m_LocalPosition: {x: -486.48254, y: 75.9183, z: -1931.3064}
   m_LocalScale: {x: 32.658577, y: 151.8366, z: 30.716255}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22655,7 +23079,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 1958508618}
 --- !u!114 &1958508618
@@ -22727,7 +23151,7 @@ Transform:
   m_GameObject: {fileID: 1966991793}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 578.3526, y: 175.23584, z: 786.1626}
+  m_LocalPosition: {x: 867.52893, y: 175.23584, z: 1179.2439}
   m_LocalScale: {x: 46.38482, y: 350.47168, z: 60.343864}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22832,7 +23256,7 @@ Transform:
   m_GameObject: {fileID: 1990847180}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 923.1455, y: 66.68348, z: -176.80847}
+  m_LocalPosition: {x: 1384.7183, y: 66.68348, z: -265.2127}
   m_LocalScale: {x: 58.205956, y: 133.36696, z: 53.439938}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22937,7 +23361,7 @@ Transform:
   m_GameObject: {fileID: 2017883756}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 776.07416, y: 111.15438, z: -473.08353}
+  m_LocalPosition: {x: 1164.1112, y: 111.15438, z: -709.6253}
   m_LocalScale: {x: 50.61436, y: 222.30876, z: 34.75163}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23122,6 +23546,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2036650166}
   m_Mesh: {fileID: 0}
+--- !u!1 &2052737376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2052737377}
+  m_Layer: 0
+  m_Name: Portal_2_Turret
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2052737377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2052737376}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 100, y: 95, z: 40}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1599110068}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2066094218
 GameObject:
   m_ObjectHideFlags: 0
@@ -23215,7 +23670,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.902, g: 1, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 2066094223}
 --- !u!114 &2066094223
@@ -23287,7 +23742,7 @@ Transform:
   m_GameObject: {fileID: 2070414754}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -593.61694, y: 117.53567, z: 326.11646}
+  m_LocalPosition: {x: -890.4254, y: 117.53567, z: 489.17468}
   m_LocalScale: {x: 46.00108, y: 235.07133, z: 46.83054}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23391,7 +23846,7 @@ Transform:
   m_GameObject: {fileID: 2105106075}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -198.99538, y: 200, z: -480.41733}
+  m_LocalPosition: {x: -290.8394, y: 200, z: -702.1484}
   m_LocalScale: {x: 3, y: 400, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23670,6 +24125,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2131270786}
   m_Mesh: {fileID: 0}
+--- !u!1 &2134152436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2134152437}
+  m_Layer: 0
+  m_Name: Portal_6_Drone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2134152437
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2134152436}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 130, y: 155, z: 260}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1599110068}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2137634923
 GameObject:
   m_ObjectHideFlags: 0
@@ -23825,7 +24311,7 @@ Transform:
   m_GameObject: {fileID: 2142321146}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 723.864, y: 98.44654, z: 19.471638}
+  m_LocalPosition: {x: 1085.796, y: 98.44654, z: 29.207457}
   m_LocalScale: {x: 32.006683, y: 196.89308, z: 37.306892}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23911,3 +24397,6 @@ SceneRoots:
   - {fileID: 1661152502}
   - {fileID: 1771155105}
   - {fileID: 1305431936}
+  - {fileID: 1395340047}
+  - {fileID: 1599110068}
+  - {fileID: 1772569446}

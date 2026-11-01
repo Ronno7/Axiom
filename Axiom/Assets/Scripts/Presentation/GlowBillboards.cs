@@ -27,7 +27,8 @@ namespace GeometricFlight.Presentation
                     Range(random, depth.x, depth.y));
                 sizes[i] = Range(random, size.x, size.y);
                 float b = Mathf.Lerp(brightness.x, brightness.y, Mathf.Pow((float)random.NextDouble(), brightnessCurve));
-                for (int j = 0; j < 4; j++) colors[i * 4 + j] = new Color(1f, 1f, 1f, b);
+                // White is an identity mask; the shared material supplies the palette hue.
+                for (int j = 0; j < 4; j++) colors[i * 4 + j] = AxiomPalette.WithAlpha(AxiomPalette.White, b);
                 uv[i * 4] = new Vector2(0, 0); uv[i * 4 + 1] = new Vector2(1, 0);
                 uv[i * 4 + 2] = new Vector2(1, 1); uv[i * 4 + 3] = new Vector2(0, 1);
                 int v = i * 4, t = i * 6;

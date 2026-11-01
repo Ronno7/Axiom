@@ -20,12 +20,14 @@ namespace GeometricFlight.Combat
         private LayerMask hitLayers;
         private Action onDamageDealt;
         private float travelled;
+        public bool Hostile { get; private set; }
 
         /// <param name="damageDealt">Optional; invoked when this shot damages something.</param>
         public void Launch(Vector3 position, Vector3 worldVelocity, float lifetime, LayerMask layers,
-            Action damageDealt = null)
+            Action damageDealt = null, bool hostile = false)
         {
             velocity = worldVelocity;
+            Hostile = hostile;
             remainingLifetime = lifetime;
             hitLayers = layers;
             onDamageDealt = damageDealt;

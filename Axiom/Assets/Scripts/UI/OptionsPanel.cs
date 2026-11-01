@@ -16,6 +16,7 @@ namespace GeometricFlight.UI
         private readonly Toggle invertVertical;
         private readonly Toggle buzzer;
         private readonly Toggle arcade;
+        private readonly Toggle keyboardThrottle;
         private readonly Action back;
 
         public OptionsPanel(VisualElement root, Action back, Action calibrate)
@@ -25,6 +26,7 @@ namespace GeometricFlight.UI
             invertVertical = root.Q<Toggle>("invert-vertical");
             buzzer = root.Q<Toggle>("controller-buzzer");
             arcade = root.Q<Toggle>("arcade-mode");
+            keyboardThrottle = root.Q<Toggle>("keyboard-throttle");
 
             sensitivity.lowValue = GameSettings.MinSteeringSensitivity;
             sensitivity.highValue = GameSettings.MaxSteeringSensitivity;
@@ -45,11 +47,14 @@ namespace GeometricFlight.UI
             buzzer.RegisterValueChangedCallback(e => GameSettings.BuzzerEnabled = e.newValue);
             arcade.SetValueWithoutNotify(GameSettings.ArcadeMode);
             arcade.RegisterValueChangedCallback(e => GameSettings.ArcadeMode = e.newValue);
+            keyboardThrottle.SetValueWithoutNotify(GameSettings.KeyboardThrottleWithController);
+            keyboardThrottle.RegisterValueChangedCallback(e => GameSettings.KeyboardThrottleWithController = e.newValue);
 
             UiScreens.MarkFocusWithin(sensitivity);
             UiScreens.MarkFocusWithin(invertVertical);
             UiScreens.MarkFocusWithin(buzzer);
             UiScreens.MarkFocusWithin(arcade);
+            UiScreens.MarkFocusWithin(keyboardThrottle);
             this.back = back;
             root.Q<Button>("options-calibrate").clicked += calibrate;
             root.Q<Button>("options-back").clicked += Close;

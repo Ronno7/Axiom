@@ -29,13 +29,16 @@ namespace GeometricFlight.Tests
         }
 
         [Test]
-        public void ArcadeColourAddsToTheGrade()
+        public void ArcadeAddsValueAndSaturationWithoutRecoloringThePalette()
         {
             var grade = new GradeSettings { exposure = 0.2f, contrast = 12f };
             arcade.exposure = 0.3f;
             arcade.contrast = 95f;
             arcade.saturation = 40f;
             arcade.temperature = -20f;
+            arcade.tint = 80f;
+            arcade.hueShift = 120f;
+            arcade.colourFilter = Color.magenta;
             look.Apply(grade, arcade, null);
 
             look.Profile.TryGet(out ColorAdjustments colour);
@@ -43,8 +46,11 @@ namespace GeometricFlight.Tests
             Assert.That(colour.postExposure.value, Is.EqualTo(0.5f).Within(1e-5f));
             Assert.That(colour.contrast.value, Is.EqualTo(100f), "clamped");
             Assert.That(colour.saturation.value, Is.EqualTo(40f));
-            Assert.That(white.active, Is.True);
-            Assert.That(white.temperature.value, Is.EqualTo(-20f));
+            Assert.That(colour.colorFilter.value, Is.EqualTo(Color.white));
+            Assert.That(colour.hueShift.value, Is.Zero);
+            Assert.That(white.active, Is.False);
+            Assert.That(white.temperature.value, Is.Zero);
+            Assert.That(white.tint.value, Is.Zero);
         }
 
         [Test]

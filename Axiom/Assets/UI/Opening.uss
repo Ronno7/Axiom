@@ -1,0 +1,25 @@
+@import url("Palette.uss");
+
+#opening-overlay, #opening-hud { position: absolute; left: 0; right: 0; top: 0; bottom: 0; color: var(--axiom-light); }
+.opening-card { background-color: var(--axiom-void-88); border-left-width: 2px; border-left-color: var(--axiom-cyan); padding: 16px; }
+#opening-choices { position: absolute; right: 44px; bottom: 90px; width: 310px; }
+#opening-overlay Button { height: 40px; margin-top: 8px; background-color: var(--axiom-panel); color: var(--axiom-light); border-width: 1px; border-color: var(--axiom-edge); }
+#opening-overlay Button:hover, #opening-overlay Button:focus { background-color: var(--axiom-edge); border-color: var(--axiom-light); }
+#opening-overlay Toggle { margin-top: 12px; color: var(--axiom-light); }
+#opening-overlay .unity-toggle__checkmark { background-color: var(--axiom-void); border-width: 1px; border-color: var(--axiom-muted); -unity-background-image-tint-color: var(--axiom-void); }
+#opening-overlay .unity-toggle__input:checked > .unity-toggle__checkmark { background-color: var(--axiom-light); border-color: var(--axiom-light); }
+#opening-overlay Toggle:focus .unity-toggle__checkmark, #opening-overlay Toggle:hover .unity-toggle__checkmark { border-color: var(--axiom-orange); }
+.opening-micro { font-size: 12px; color: var(--axiom-cyan); white-space: normal; }
+.opening-heading { font-size: 26px; -unity-font-style: bold; letter-spacing: 2px; white-space: normal; }
+.opening-help { font-size: 17px; margin-top: 8px; white-space: normal; }
+#opening-address { position: absolute; top: 8%; left: 28%; right: 8%; background-color: var(--axiom-void-78); border-top-width: 1px; border-top-color: var(--axiom-cyan); padding: 14px; }
+#opening-instruments { position: absolute; left: 36px; bottom: 76px; width: 290px; }
+#speed-track { height: 3px; background-color: var(--axiom-panel); margin-top: 8px; margin-bottom: 12px; }
+#speed-fill { height: 3px; width: 40%; background-color: var(--axiom-light); }
+#opening-arm { font-size: 18px; margin-top: 8px; }
+#opening-score, #opening-weapons { margin-top: 8px; }
+#opening-console { position: absolute; right: 44px; bottom: 112px; font-size: 11px; color: var(--axiom-cyan-50); }
+#opening-hints { position: absolute; left: 36px; bottom: 32px; font-size: 13px; color: var(--axiom-cyan); }
+.opening-in-flight #opening-hints { left: 56px; bottom: 86px; }
+.opening-in-flight #opening-instruments { left: 56px; bottom: 120px; }
+.opening-modal { position: absolute; left: 27%; right: 27%; top: 22%; padding: 28px; background-color: var(--axiom-void-97); border-top-width: 2px; border-top-color: var(--axiom-light); }

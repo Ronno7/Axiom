@@ -5,7 +5,7 @@ Shader "GeometricFlight/Arena Wall"
 {
     Properties
     {
-        [HDR] _Color ("Color", Color) = (0.44, 0.77, 0.88, 1)
+        [HDR] _Color ("Color", Color) = (0.158960835, 0.545724461, 0.737910409, 1)
         _BaseOpacity ("Base glow", Range(0, 0.2)) = 0.025
         _NearOpacity ("Glow near the ship", Range(0, 1)) = 0.3
         _NearRange ("Near range (m)", Float) = 160

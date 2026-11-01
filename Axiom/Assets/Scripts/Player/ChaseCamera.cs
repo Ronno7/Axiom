@@ -30,6 +30,7 @@ namespace GeometricFlight.Player
         private Camera view;
         private Vector3 springVelocity;
         private bool placed;
+        private int resetFrame = -1;
 
         private void Awake()
         {
@@ -41,12 +42,57 @@ namespace GeometricFlight.Player
             }
         }
 
+        /// <summary>The settled chase pose for the current actor state, without moving the camera.
+        /// Includes the spring's steady trailing distance at the ship's current velocity, so a camera
+        /// placed here and handed over with ResetToTarget keeps still instead of dropping back.</summary>
+        public void GetTargetPose(out Vector3 position, out Quaternion rotation, out float fieldOfView)
+        {
+            ArenaFlightState s = target.State;
+            position = s.Position + s.Heading * new Vector3(0f, height, -distance)
+                + SteadyTrail(target.Velocity, positionLag, maxLag);
+            rotation = RotationAt(s, position);
+            fieldOfView = FieldOfViewAt(s.Speed);
+        }
+
+        /// <summary>Where SmoothDamp settles behind a target moving at constant velocity: about
+        /// velocity × smoothing time behind it, never more than the maximum lag.</summary>
+        public static Vector3 SteadyTrail(Vector3 velocity, float smoothTime, float maxTrail) =>
+            Vector3.ClampMagnitude(-velocity * smoothTime, maxTrail);
+
+        /// <summary>Hands the camera back from entry already moving with the ship, so the spring
+        /// continues from its steady state.</summary>
+        public void ResetToTarget()
+        {
+            if (view == null) view = GetComponent<Camera>();
+            GetTargetPose(out Vector3 position, out Quaternion rotation, out float fieldOfView);
+            transform.SetPositionAndRotation(position, rotation);
+            view.fieldOfView = fieldOfView;
+            springVelocity = target.Velocity;
+            placed = true;
+            // The ship hasn't moved yet this frame; integrating now would nudge the camera ahead of it.
+            resetFrame = Time.frameCount;
+        }
+
+        private Quaternion RotationAt(ArenaFlightState s, Vector3 position)
+        {
+            Quaternion heading = s.Heading;
+            Vector3 look = s.Position + heading * (Vector3.forward * lookAhead) - position;
+            Quaternion rotation = Quaternion.LookRotation(look, heading * Vector3.up);
+            return s.FullRotation ? rotation : rotation * Quaternion.Euler(0f, 0f, -s.Bank * rollFollow);
+        }
+
+        private float FieldOfViewAt(float speed)
+        {
+            float boost = Mathf.InverseLerp(target.CruiseSpeed, target.MaxSpeed, speed);
+            return baseFieldOfView + speedFieldOfView * boost;
+        }
+
         private void LateUpdate()
         {
             ArenaFlightState s = target.State;
             Quaternion heading = s.Heading;
             Vector3 ideal = s.Position + heading * new Vector3(0f, height, -distance);
-            if (!placed || Time.deltaTime <= 0f)
+            if (!placed || Time.deltaTime <= 0f || Time.frameCount == resetFrame)
             {
                 if (!placed) transform.position = ideal;
                 placed = true;
@@ -58,22 +104,19 @@ namespace GeometricFlight.Player
                 transform.position = trail.magnitude > maxLag ? ideal + trail.normalized * maxLag : p;
             }
 
-            Vector3 look = s.Position + heading * (Vector3.forward * lookAhead) - transform.position;
+            Quaternion goal = RotationAt(s, transform.position);
             if (!s.FullRotation)
             {
-                transform.rotation = Quaternion.LookRotation(look, heading * Vector3.up)
-                    * Quaternion.Euler(0f, 0f, -s.Bank * rollFollow);
+                transform.rotation = goal;
             }
             else
             {
-                Quaternion goal = Quaternion.LookRotation(look, heading * Vector3.up);
                 float share = Time.deltaTime > 0f && rotationLag > 0f
                     ? 1f - Mathf.Exp(-Time.deltaTime / rotationLag) : 1f;
                 transform.rotation = Quaternion.Slerp(transform.rotation, goal, share);
             }
 
-            float boost = Mathf.InverseLerp(target.CruiseSpeed, target.MaxSpeed, s.Speed);
-            view.fieldOfView = baseFieldOfView + speedFieldOfView * boost;
+            view.fieldOfView = FieldOfViewAt(s.Speed);
         }
     }
 }

@@ -2,7 +2,7 @@ Shader "GeometricFlight/Foundation Flat"
 {
     Properties
     {
-        _BaseColor("Base Color", Color) = (1, 1, 1, 1)
+        _BaseColor("Base Color", Color) = (0.901960784, 1, 1, 1)
         _ShadeStrength("Facet Shading", Range(0, 1)) = 0.65
     }
     SubShader

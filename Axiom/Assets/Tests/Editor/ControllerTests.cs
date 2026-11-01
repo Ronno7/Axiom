@@ -42,6 +42,20 @@ namespace GeometricFlight.Tests
             Assert.That(p.Twist, Is.EqualTo(1023));
             Assert.That(p.Emp, Is.True);
             Assert.That(p.Armed, Is.False);
+            Assert.That(p.HasLock || p.LockHeld, Is.False, "older cockpit firmware has no LOCK");
+        }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        public void ParsesExtendedCockpitLockWithoutMovingExistingFields(int held)
+        {
+            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame($"AX,700,300,180,1,1,1023,1,0,{held}"),
+                out ControllerPacket p), Is.True);
+            Assert.That(p.IsCockpit && p.HasLock, Is.True);
+            Assert.That(p.LockHeld, Is.EqualTo(held == 1));
+            Assert.That(p.Fire && p.StickButton && p.Emp, Is.True);
+            Assert.That(p.Armed, Is.False);
+            Assert.That(p.Twist, Is.EqualTo(1023));
         }
 
         [Test]
@@ -50,6 +64,7 @@ namespace GeometricFlight.Tests
             Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,512,512,200,0,0"), out ControllerPacket p), Is.True);
             Assert.That(p.IsCockpit, Is.False);
             Assert.That(p.Emp || p.Armed, Is.False);
+            Assert.That(p.HasLock || p.LockHeld, Is.False);
         }
 
         [TestCase("")]
@@ -68,6 +83,10 @@ namespace GeometricFlight.Tests
         [TestCase("AX,512,512,200,0,0,512,0")]      // cockpit packet missing a field
         [TestCase("AX,512,512,200,0,0,1024,0,0")]   // twist out of range
         [TestCase("AX,512,512,200,0,0,512,0,2")]    // arm not 0/1
+        [TestCase("AX,512,512,200,0,0,512,0,0,2")]  // LOCK not 0/1
+        [TestCase("AX,512,512,200,0,0,512,0,0,-1")]
+        [TestCase("AX,512,512,200,0,0,512,0,0,")]   // truncated LOCK
+        [TestCase("AX,512,512,200,0,0,512,0,0,1,0")] // unexpected extra field
         [TestCase("BZ,440,100")]                    // wrong message type
         public void RejectsValidlyFramedButInvalidContent(string body)
         {
@@ -171,7 +190,90 @@ namespace GeometricFlight.Tests
             Assert.That(heldKeys.Steering, Is.EqualTo(Vector2.left));
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void KeyboardThrottleWorksWithControllerStickAndButtonsRegardlessOfSensor(bool throttleValid)
+        {
+            var keys = new FlightInput(Vector2.zero, 0.6f, false, false);
+            var controller = new ControllerState(true, Vector2.up, -0.8f, throttleValid, true, true,
+                twist: 0.4f, lockHeld: true, hasLock: true, empHeld: true);
+            FlightInput result = FlightInputMerge.Merge(keys, controller, true);
+            Assert.That(result.Throttle, Is.EqualTo(0.6f));
+            Assert.That(result.Steering, Is.EqualTo(Vector2.up));
+            Assert.That(result.Twist, Is.EqualTo(0.4f));
+            Assert.That(result.FireHeld && result.LockHeld && result.EmpHeld && result.PausePressed, Is.True);
+        }
+
+        [Test]
+        public void SelectedKeyboardThrottleCanHoldCruiseWithoutFallingBackToHardware()
+        {
+            var controller = new ControllerState(true, Vector2.up, 1f, true, false, false);
+            FlightInput result = FlightInputMerge.Merge(default, controller, true);
+            Assert.That(result.Throttle, Is.Zero, "Cruise is a valid selected setpoint, not an idle keyboard.");
+            Assert.That(result.Steering, Is.EqualTo(Vector2.up));
+        }
+
+        [Test]
+        public void HardwareThrottleLossKeepsFilteredSetpointInsteadOfSwitchingToStaleKeys()
+        {
+            var keys = new FlightInput(Vector2.zero, 1f, false, false);
+            var controller = new ControllerState(true, Vector2.up, 0.3f, false, false, false);
+            FlightInput result = FlightInputMerge.Merge(keys, controller, false);
+            Assert.That(result.Throttle, Is.EqualTo(0.3f), "ThrottleFilter owns the existing ease back to cruise.");
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void DisconnectedOrExplicitKeyboardOnlyInputDoesNotDependOnThrottlePreference(bool keyboardThrottle)
+        {
+            var keys = new FlightInput(Vector2.left, -0.4f, true, true, twist: -0.2f,
+                lockHeld: true, empHeld: true);
+            // CombinedFlightInput supplies a default controller during explicit keyboard takeover.
+            FlightInput result = FlightInputMerge.Merge(keys, default, keyboardThrottle);
+            Assert.That(result.Throttle, Is.EqualTo(-0.4f));
+            Assert.That(result.Steering, Is.EqualTo(Vector2.left));
+            Assert.That(result.Twist, Is.EqualTo(-0.2f));
+            Assert.That(result.FireHeld && result.LockHeld && result.EmpHeld && result.PausePressed, Is.True);
+        }
+
         // ---------- Link (background thread, simulated device) ----------
+
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(true, true)]
+        [TestCase(false, false)]
+        public void LockRemainsHeldUntilBothInputsRelease(bool keyboardHeld, bool controllerHeld)
+        {
+            var keys = new FlightInput(Vector2.zero, 0f, false, false, lockHeld: keyboardHeld);
+            var controller = new ControllerState(true, Vector2.zero, 0f, true, false, false,
+                lockHeld: controllerHeld, hasLock: true);
+            Assert.That(FlightInputMerge.Merge(keys, controller).LockHeld, Is.EqualTo(keyboardHeld || controllerHeld));
+        }
+
+        [Test]
+        public void LostHardwareLockCancelsEvenWhenKeyboardRemainsHeld()
+        {
+            var keys = new FlightInput(Vector2.right, 0.5f, true, false, lockHeld: true);
+            var lost = new ControllerState(false, Vector2.zero, 0f, false, false, false, lockCancelled: true);
+            FlightInput result = FlightInputMerge.Merge(keys, lost);
+            Assert.That(result.LockCancelled, Is.True);
+            Assert.That(result.LockHeld && result.FireHeld, Is.True);
+            Assert.That(result.Steering, Is.EqualTo(Vector2.right));
+            Assert.That(result.Throttle, Is.EqualTo(0.5f));
+        }
+
+        [Test]
+        public void SimulatorEmitsCockpitLockPressAndRelease()
+        {
+            var simulator = new SimulatedLineTransport();
+            simulator.SetLock(true);
+            Assert.That(ControllerProtocol.TryParse(simulator.ReadLine(), out ControllerPacket held), Is.True);
+            Assert.That(held.HasLock && held.LockHeld, Is.True);
+            simulator.SetLock(false);
+            Assert.That(ControllerProtocol.TryParse(simulator.ReadLine(), out ControllerPacket released), Is.True);
+            Assert.That(released.HasLock, Is.True);
+            Assert.That(released.LockHeld, Is.False);
+        }
 
         [Test]
         public void LinkConnectsReadsRejectsGarbageAndReconnectsAfterUnplug()

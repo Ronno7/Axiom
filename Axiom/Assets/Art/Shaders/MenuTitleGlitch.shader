@@ -10,7 +10,7 @@ Shader "Hidden/GeometricFlight/Menu Title Glitch"
         _Echo ("Echo offset (px)", Float) = 0
         _EchoAmount ("Echo strength", Range(0, 1)) = 0.9
         _Scan ("Scanlines", Range(0, 1)) = 0
-        _Accent ("Accent", Color) = (0.84, 0.12, 0.16, 1)
+        _Accent ("Accent", Color) = (0.874509804, 0.454901961, 0.0470588235, 1)
     }
     SubShader
     {

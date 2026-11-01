@@ -38,5 +38,11 @@ namespace GeometricFlight.Combat
         {
             if (root != null) Object.Destroy(root);
         }
+
+        public void Clear()
+        {
+            foreach (Projectile projectile in projectiles)
+                if (projectile != null) projectile.gameObject.SetActive(false);
+        }
     }
 }

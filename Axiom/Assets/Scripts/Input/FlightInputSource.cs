@@ -12,9 +12,17 @@ namespace GeometricFlight.Input
         public readonly bool FireHeld;
         public readonly bool PausePressed;
         public readonly float Twist;
+        public readonly bool LockHeld;
+        public readonly bool EmpHeld;
+        /// <summary>Cancel a painted volley when its input device is lost; this is not a release.</summary>
+        public readonly bool LockCancelled;
 
-        public FlightInput(Vector2 steering, float throttle, bool fireHeld, bool pausePressed, float twist = 0f)
+        public FlightInput(Vector2 steering, float throttle, bool fireHeld, bool pausePressed, float twist = 0f,
+            bool lockHeld = false, bool lockCancelled = false, bool empHeld = false)
         {
+            LockHeld = lockHeld;
+            EmpHeld = empHeld;
+            LockCancelled = lockCancelled;
             Twist = Mathf.Clamp(twist, -1f, 1f);
             Steering = Vector2.ClampMagnitude(steering, 1f);
             Throttle = Mathf.Clamp(throttle, -1f, 1f);
@@ -28,5 +36,9 @@ namespace GeometricFlight.Input
     public abstract class FlightInputSource : MonoBehaviour
     {
         public abstract FlightInput ReadInput(float deltaTime);
+
+        /// <summary>Moves a latched throttle back to at most <paramref name="setpoint"/>. Returns false when the
+        /// throttle is a physical lever the game can't move.</summary>
+        public virtual bool LimitThrottle(float setpoint) => false;
     }
 }

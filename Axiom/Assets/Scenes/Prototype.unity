@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.035, g: 0.036, b: 0.04, a: 1}
+  m_FogColor: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.01
   m_LinearFogStart: 45
@@ -198,7 +198,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.035, g: 0.036, b: 0.04, a: 1}
+  m_BackGroundColor: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -5574,7 +5574,10 @@ MonoBehaviour:
   lowerThrottleBinding: <Keyboard>/q
   raiseThrottleBinding: <Keyboard>/e
   fireBinding: <Keyboard>/space
+  lockBinding: <Keyboard>/leftShift
   pauseBinding: <Keyboard>/escape
+  twistLeftBinding: <Keyboard>/z
+  twistRightBinding: <Keyboard>/c
 --- !u!114 &3001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5631,6 +5634,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 55
   poolSize: 24
+  aimAssistCone: 0
+  aimAssistRange: 120
 --- !u!114 &3004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7105,7 +7110,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.25, g: 0.9, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 216091963}
 --- !u!114 &216091963
@@ -7164,6 +7169,8 @@ MonoBehaviour:
   projectilePrefab: {fileID: 263261147442279135, guid: 9d9b9ff48f214104d8f3e3c80f275e86, type: 3}
   player: {fileID: 1011}
   engagementRange: {x: 12, y: 45}
+  measureDistance: 0
+  lead: 0
   fireInterval: 1.6
   projectileSpeed: 16
   projectileLifetime: 4
@@ -9908,7 +9915,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.25, g: 0.9, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 649409421}
 --- !u!114 &649409421
@@ -9967,6 +9974,8 @@ MonoBehaviour:
   projectilePrefab: {fileID: 263261147442279135, guid: 9d9b9ff48f214104d8f3e3c80f275e86, type: 3}
   player: {fileID: 1011}
   engagementRange: {x: 12, y: 45}
+  measureDistance: 0
+  lead: 0
   fireInterval: 1.6
   projectileSpeed: 16
   projectileLifetime: 4
@@ -10679,7 +10688,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Combat.ShootableTarget
   hitPoints: 3
-  hitFlashColor: {r: 0.25, g: 0.9, b: 1, a: 1}
+  hitFlashColor: {r: 1, g: 0.9490196, b: 0.8509804, a: 1}
   hitFlashDuration: 0.08
   destructionEffect: {fileID: 810693797}
 --- !u!114 &810693797
@@ -14315,7 +14324,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.ArcadeScreen
   levelCamera: {fileID: 1005}
   glowShader: {fileID: 4800000, guid: 996ff6a1f898e3346b4600ffb8d42c33, type: 3}
-  accent: {r: 0.84, g: 0.12, b: 0.16, a: 1}
+  accent: {r: 0.8745098, g: 0.45490196, b: 0.047058824, a: 1}
   grade:
     enabled: 1
     exposure: 0.15
@@ -14333,10 +14342,10 @@ MonoBehaviour:
     grainResponse: 0.8
   atmosphere:
     enabled: 1
-    haze: {r: 0.035, g: 0.036, b: 0.04, a: 1}
+    haze: {r: 0.023529412, g: 0.039215688, b: 0.047058824, a: 1}
     fogRange: {x: 45, y: 185}
     horizon: 1
-    horizonColor: {r: 0.3, g: 0.31, b: 0.34, a: 1}
+    horizonColor: {r: 0.0627451, g: 0.16078432, b: 0.19215687, a: 1}
     horizonDistance: 200
     horizonSize: {x: 640, y: 48}
     horizonFalloff: 2.2

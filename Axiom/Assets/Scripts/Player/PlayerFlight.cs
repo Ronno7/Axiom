@@ -56,7 +56,9 @@ namespace GeometricFlight.Player
 
         /// <summary>Where the ship will be after <paramref name="seconds"/> if the current speed and
         /// steering hold, clamped to the flight bounds like real movement.</summary>
-        public Vector3 PredictPosition(float seconds)
+        public override bool CanPredict => true;
+
+        public override Vector3 PredictPosition(float seconds)
         {
             Vector2 steering = CurrentInput.Steering;
             if (GameSettings.InvertVertical) steering.y = -steering.y;

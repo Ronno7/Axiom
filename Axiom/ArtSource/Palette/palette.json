@@ -1,0 +1,231 @@
+{
+  "name": "Axiom",
+  "version": 1,
+  "color_space": "sRGB",
+  "description": "Axiom's authored art and UI palette; these are project choices, not certified film production values.",
+  "colors": [
+    {
+      "name": "Void",
+      "hex": "#060A0C",
+      "role": "Sky, recesses and scrims",
+      "family": "neutral"
+    },
+    {
+      "name": "Structure",
+      "hex": "#0C141F",
+      "role": "Dark architecture and craft bodies",
+      "family": "neutral"
+    },
+    {
+      "name": "Panel",
+      "hex": "#102931",
+      "role": "Raised panels and secondary planes",
+      "family": "neutral"
+    },
+    {
+      "name": "Edge",
+      "hex": "#3A5362",
+      "role": "Quiet outlines and inactive tracks",
+      "family": "neutral"
+    },
+    {
+      "name": "Muted",
+      "hex": "#8198A6",
+      "role": "Secondary readable text and labels",
+      "family": "neutral"
+    },
+    {
+      "name": "Text",
+      "hex": "#B7C9D1",
+      "role": "Body text and neutral outlines",
+      "family": "neutral"
+    },
+    {
+      "name": "Light",
+      "hex": "#E6FFFF",
+      "role": "Title, focus fill and player core",
+      "family": "neutral"
+    },
+    {
+      "name": "Cyan",
+      "hex": "#6FC3DF",
+      "role": "Player systems, shield and cool energy",
+      "family": "cool"
+    },
+    {
+      "name": "Orange",
+      "hex": "#DF740C",
+      "role": "Program energy and selection accent",
+      "family": "warm"
+    },
+    {
+      "name": "Ember",
+      "hex": "#FF410D",
+      "role": "Fault, damage and attack escalation",
+      "family": "warm"
+    },
+    {
+      "name": "Gold",
+      "hex": "#FFE64D",
+      "role": "Reserved boss and authority signature",
+      "family": "warm"
+    },
+    {
+      "name": "Hot",
+      "hex": "#FFF2D9",
+      "role": "Warm impact core and warning text",
+      "family": "warm"
+    }
+  ],
+  "technical_colors": [
+    {
+      "name": "Black",
+      "hex": "#000000",
+      "role": "Mask, shade and empty-data endpoint"
+    },
+    {
+      "name": "White",
+      "hex": "#FFFFFF",
+      "role": "Neutral multiplier and light endpoint"
+    }
+  ],
+  "alpha_variants": [
+    {
+      "name": "void-55",
+      "source": "Void",
+      "alpha": 0.55
+    },
+    {
+      "name": "void-72",
+      "source": "Void",
+      "alpha": 0.72
+    },
+    {
+      "name": "void-78",
+      "source": "Void",
+      "alpha": 0.78
+    },
+    {
+      "name": "void-85",
+      "source": "Void",
+      "alpha": 0.85
+    },
+    {
+      "name": "void-88",
+      "source": "Void",
+      "alpha": 0.88
+    },
+    {
+      "name": "void-95",
+      "source": "Void",
+      "alpha": 0.95
+    },
+    {
+      "name": "void-97",
+      "source": "Void",
+      "alpha": 0.97
+    },
+    {
+      "name": "light-50",
+      "source": "Light",
+      "alpha": 0.5
+    },
+    {
+      "name": "cyan-45",
+      "source": "Cyan",
+      "alpha": 0.45
+    },
+    {
+      "name": "cyan-50",
+      "source": "Cyan",
+      "alpha": 0.5
+    }
+  ],
+  "rules": [
+    "Use the authored swatches by role; do not infer hostility from orange alone.",
+    "Permitted derivatives are alpha, neutral shading, scalar emission and the explicit ramps in derivation_rules; semantic families alone do not authorize mixing.",
+    "Convert sRGB to linear once at the shader boundary; intensity scales RGB, not alpha.",
+    "Preserve value hierarchy: dark mass, selective seams, readable instruments, brief bright threats.",
+    "Gold is reserved; routine ready, success and warnings use the other families.",
+    "Final lit pixels are continuous; palette constraint does not mean image quantization."
+  ],
+  "shader_defaults": {
+    "FoundationFlat.shader": {
+      "_BaseColor": {
+        "source": "Light",
+        "intensity": 1
+      }
+    },
+    "TitleFacets.shader": {
+      "_BaseColor": {
+        "source": "Light",
+        "intensity": 1
+      }
+    },
+    "AdditiveGlow.shader": {
+      "_Color": {
+        "source": "White",
+        "intensity": 1
+      }
+    },
+    "ArenaWall.shader": {
+      "_Color": {
+        "source": "Cyan",
+        "intensity": 1
+      }
+    },
+    "GridFloor.shader": {
+      "_BaseColor": {
+        "source": "Structure",
+        "intensity": 1
+      },
+      "_LineColor": {
+        "source": "Cyan",
+        "intensity": 1.8
+      }
+    },
+    "GridConstruction.shader": {
+      "_BaseColor": {
+        "source": "Edge",
+        "intensity": 1
+      },
+      "_EdgeColor": {
+        "source": "Cyan",
+        "intensity": 2.5
+      }
+    },
+    "MenuTitleGlitch.shader": {
+      "_Accent": {
+        "source": "Orange",
+        "intensity": 1
+      }
+    },
+    "PassageConstruction.shader": {
+      "_BaseColor": {
+        "source": "Structure",
+        "intensity": 1
+      },
+      "_EdgeColor": {
+        "source": "Cyan",
+        "intensity": 2.5
+      }
+    },
+    "CloudDeck.shader": {
+      "_ZenithColor": {
+        "source": "Void",
+        "intensity": 1
+      },
+      "_CloudColor": {
+        "source": "Panel",
+        "intensity": 1
+      }
+    }
+  },
+  "derivation_rules": [
+    "Any swatch may darken toward Void or Structure; the neutral ramp may interpolate between its own entries.",
+    "Cyan may brighten toward Light. Orange and Ember may interpolate with each other or brighten toward Hot.",
+    "Gold is reserved for exceptional authority/boss identity; never blend routine colors toward Gold. Its own emission may brighten toward Hot.",
+    "Alpha crossfades between approved semantic states are allowed; do not store their intermediate colors as new swatches.",
+    "Neutral lighting and spatial fog may naturally mix approved colors; no arbitrary hue rotation or colored white balance."
+  ]
+}
