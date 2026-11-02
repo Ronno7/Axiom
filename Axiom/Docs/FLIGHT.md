@@ -108,7 +108,10 @@ and is full strength at that room.
 - `ShipFlight`: what weapons and presentation read from the flying ship (input snapshot, speed, velocity).
   `ArenaFlight` derives from it, and steps the flight models.
 - `ArenaFlightModel`: the stateless flight maths (EditMode tests: loop, barrel roll, edge turn, containment, mode
-  switching, energy, stall). `RailFlightModel` adds the rail's heading limit to it.
+  switching, energy, stall). `RailFlightModel` adds the rail's heading limit to it, and flies the frame that crosses
+  the rail's end: the rail's law up to the plane and the arena's for the rest, with nothing reset or blended.
+- `RailRings`: scores the rail's rings from the path the flight reports each frame. `RingScore` holds the once-only
+  rule and the checkpoint save.
 - `FlightMovement`: stateless target-speed and acceleration calculations. Acceleration integrates the ramp and any
   time at the target speed within a frame.
 

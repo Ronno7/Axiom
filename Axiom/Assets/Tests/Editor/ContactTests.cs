@@ -68,16 +68,16 @@ namespace GeometricFlight.Tests
         [Test]
         public void ACheckpointRetryRestoresTheScoreAsItWasThere()
         {
-            var score = new GeometricFlight.Core.OpeningCourseScore();
-            score.CrossGate(0, Vector2.zero, 10f);
+            var score = new GeometricFlight.Core.RingScore();
+            score.Cross(0, Vector2.zero, 10f);
             var atCheckpoint = score.Save();
-            score.CrossGate(1, Vector2.zero, 10f);
-            score.CrossGate(2, new Vector2(20f, 0f), 10f);
+            score.Cross(1, Vector2.zero, 10f);
+            score.Cross(2, new Vector2(20f, 0f), 10f);
             score.Restore(atCheckpoint);
-            Assert.That(score.Score, Is.EqualTo(100));
-            Assert.That(score.CrossGate(0, Vector2.zero, 10f), Is.False, "a gate passed before the checkpoint stays spent");
-            Assert.That(score.CrossGate(1, Vector2.zero, 10f), Is.True, "gates after it can be scored again");
-            Assert.That(score.CrossGate(2, Vector2.zero, 10f), Is.True, "including ones missed before the retry");
+            Assert.That(score.Hit, Is.EqualTo(1));
+            Assert.That(score.Cross(0, Vector2.zero, 10f), Is.False, "a ring passed before the checkpoint stays spent");
+            Assert.That(score.Cross(1, Vector2.zero, 10f), Is.True, "rings after it can be scored again");
+            Assert.That(score.Cross(2, Vector2.zero, 10f), Is.True, "including ones missed before the retry");
         }
 
         [Test]

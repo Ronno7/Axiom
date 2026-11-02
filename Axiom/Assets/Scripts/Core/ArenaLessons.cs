@@ -34,7 +34,6 @@ namespace GeometricFlight.Core
     {
         public enum Step { Waiting, FreeFlight, LockSingle, LockPair, EmpGroup, Breather, Encounter, Ending, Done }
 
-        [SerializeField] private RailHandlingStudy rail;
         [SerializeField] private LockOnWeapon missiles;
         [SerializeField] private SharedEntryStudy entry;
         [SerializeField] private LevelFlow flow;
@@ -85,7 +84,7 @@ namespace GeometricFlight.Core
 
         private readonly HashSet<ShootableTarget> lockedLastFrame = new HashSet<ShootableTarget>();
         private MasterArmInput authority;
-        private ShipFlight ship;
+        private ArenaFlight ship;
         private EmpWeapon emp;
         private LevelUi levelUi;
         private int arenaDestroyed, arenaTotal;
@@ -105,7 +104,7 @@ namespace GeometricFlight.Core
         private void Awake()
         {
             authority = missiles != null ? missiles.GetComponent<MasterArmInput>() : null;
-            ship = missiles != null ? missiles.GetComponent<ShipFlight>() : null;
+            ship = missiles != null ? missiles.GetComponent<ArenaFlight>() : null;
             emp = missiles != null ? missiles.GetComponent<EmpWeapon>() : null;
             levelUi = guidance != null ? guidance.GetComponent<LevelUi>() : null;
             foreach (ArenaEncounter wave in new[] { lockSingleWave, lockPairWave, empGroup, encounter })
@@ -114,10 +113,10 @@ namespace GeometricFlight.Core
 
         private void Update()
         {
-            if (rail == null || missiles == null || entry == null) return;
+            if (ship == null || entry == null) return;
             if (Current == Step.Waiting)
             {
-                if (rail.Released) Begin(Step.FreeFlight);
+                if (ship.RailReleased) Begin(Step.FreeFlight);
                 return;
             }
             if (awaitingStation) TryPlaceWave();

@@ -111,12 +111,12 @@ namespace GeometricFlight.Tests
             var tuning = new ArenaFlightTuning();
             tuning.boost.enabled = true;
             var state = new ArenaFlightState { Speed = tuning.cruiseSpeed, Boost = BoostState.Full };
-            RailFlightModel.Step(ref state, Vector2.zero, 0f, 0f, tuning, RailTravelMode.NoseLed, 30f, Dt);
+            RailFlightModel.Step(ref state, Vector2.zero, 0f, 0f, tuning, 30f, Dt);
             for (int i = 0; i < 60; i++)
-                RailFlightModel.Step(ref state, Vector2.zero, 0f, 1f, tuning, RailTravelMode.NoseLed, 30f, Dt);
+                RailFlightModel.Step(ref state, Vector2.zero, 0f, 1f, tuning, 30f, Dt);
             Assert.That(state.Speed, Is.EqualTo(tuning.boost.speed).Within(0.01f), "at boost speed within a second");
             for (int i = 0; i < 120; i++)
-                RailFlightModel.Step(ref state, Vector2.zero, 0f, 1f, tuning, RailTravelMode.NoseLed, 30f, Dt);
+                RailFlightModel.Step(ref state, Vector2.zero, 0f, 1f, tuning, 30f, Dt);
             float full = FlightMovement.TargetSpeed(1f, tuning.cruiseSpeed, tuning.throttleMultipliers);
             Assert.That(state.Speed, Is.LessThan(tuning.boost.speed));
             Assert.That(state.Speed, Is.GreaterThanOrEqualTo(full), "eases back at normal acceleration");

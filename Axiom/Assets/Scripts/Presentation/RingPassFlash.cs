@@ -15,7 +15,7 @@ namespace GeometricFlight.Presentation
     [DisallowMultipleComponent]
     public sealed class RingPassFlash : MonoBehaviour
     {
-        [SerializeField] private RailHandlingStudy rail;
+        [SerializeField] private RailRings rail;
         [Tooltip("GeometricFlight/Additive Glow, for the expanding outline.")]
         [SerializeField] private Shader glowShader;
         [SerializeField, Min(0.1f)] private float seconds = 0.6f;
@@ -70,13 +70,13 @@ namespace GeometricFlight.Presentation
             }
             block ??= new MaterialPropertyBlock();
             ghostMaterial = LookAtmosphere.GlowMaterial(glowShader, AxiomPalette.Light, 3f, 0f, 2.5f);
-            rail.HoopScored += OnScored;
+            rail.Scored += OnScored;
             RingGate.Passed += OnGate;
         }
 
         private void OnDisable()
         {
-            if (rail != null) rail.HoopScored -= OnScored;
+            if (rail != null) rail.Scored -= OnScored;
             RingGate.Passed -= OnGate;
             foreach (Flash flash in active) End(flash);
             active.Clear();
@@ -86,7 +86,7 @@ namespace GeometricFlight.Presentation
             if (ghostMaterial != null) Destroy(ghostMaterial);
         }
 
-        private void OnScored(int index) => Show(rail.Hoop(index));
+        private void OnScored(int index) => Show(rail.Ring(index));
 
         private void OnGate(RingGate gate) => Show(gate.transform);
 

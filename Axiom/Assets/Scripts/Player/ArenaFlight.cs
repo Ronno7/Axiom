@@ -1,11 +1,13 @@
+using System;
 using GeometricFlight.Core;
 using GeometricFlight.Input;
 using UnityEngine;
 
 namespace GeometricFlight.Player
 {
-    /// <summary>Free flight inside an arena (ArenaFlightModel): the stick banks and turns, the twist is a rudder,
-    /// the throttle sets speed and how hard the ship turns. Reads its input source once per Update.</summary>
+    /// <summary>Flies the ship: the nose-led rail (RailFlightModel) up to the rail's end, then free flight in the arena
+    /// (ArenaFlightModel). The stick rolls and pitches or banks and turns, the twist is a rudder, the throttle sets speed
+    /// and how hard the ship turns. Reads its input source once per Update.</summary>
     [DisallowMultipleComponent]
     public sealed class ArenaFlight : ShipFlight
     {
@@ -16,25 +18,32 @@ namespace GeometricFlight.Player
                + "The Options invert setting flips either.")]
         [SerializeField] private bool pushToDive = true;
         [Tooltip("Full rotation: free loops, rolls and inverted flight; turning is roll-then-pull. Off: arcade "
-               + "bank-and-turn that keeps the ship upright. M switches in Play Mode.")]
+               + "bank-and-turn that keeps the ship upright.")]
         [SerializeField] private bool fullRotation = true;
+        [Tooltip("World Z where the rail ends and the arena's flight takes over.")]
+        [SerializeField] private float railEndZ = 900f;
+        [Tooltip("How far the nose can turn from straight ahead on the rail. Wider cones need a separate time-integration "
+               + "check before use.")]
+        [SerializeField, Range(40f, 55f)] private float railHeadingLimit = 45f;
 
         private ArenaFlightState state;
         private ArenaFlightState spawn;
-        private RailHandlingStudy study;
-        private Vector3 studyVelocity;
 
+        /// <summary>The ship flew between these two points along the rail this frame.</summary>
+        public event Action<Vector3, Vector3> RailFlown;
         public ArenaFlightState State => state;
         public ArenaFlightTuning Tuning => tuning;
         public bool FullRotation => state.FullRotation;
+        public float RailHeadingLimit => railHeadingLimit;
+        /// <summary>The ship has crossed the rail's end. Nothing else changes at that moment: no input or weapon reset.</summary>
+        public bool RailReleased { get; private set; }
         /// <summary>Entry presentation owns the pose; input remains current without advancing flight.</summary>
         public bool EntryHeld { get; private set; }
         public int InputSampleFrame { get; private set; } = -1;
         /// <summary>This frame's throttle after the cruise notch, -1 to +1.</summary>
         public float Throttle { get; private set; }
         public override float CurrentSpeed => state.Speed;
-        public override Vector3 Velocity => study != null && study.isActiveAndEnabled
-            ? studyVelocity : state.Forward * state.Speed;
+        public override Vector3 Velocity => state.Forward * state.Speed;
         public override float CruiseSpeed => SpeedAt(0f);
         public override float MinSpeed => SpeedAt(-1f);
         public override float MaxSpeed => SpeedAt(1f);
@@ -65,19 +74,7 @@ namespace GeometricFlight.Player
             state.SetFullRotation(fullRotation);
             transform.rotation = state.Rotation;
             spawn = state;
-            study = GetComponent<RailHandlingStudy>();
-            studyVelocity = state.Forward * state.Speed;
         }
-
-        /// <summary>Switches between full rotation and arcade flight mid-flight.</summary>
-        public void SetFullRotation(bool full)
-        {
-            fullRotation = full;
-            state.SetFullRotation(full);
-        }
-
-        /// <summary>Back to the starting position, heading and cruise speed.</summary>
-        public void Respawn() => Respawn(spawn.Position);
 
         /// <summary>The starting heading and cruise speed at <paramref name="position"/> (a checkpoint). The boost
         /// keeps its charge; the lever must come back before it fires.</summary>
@@ -91,7 +88,6 @@ namespace GeometricFlight.Player
             state.Boost = boost;
             state.Boost.Remaining = 0f;
             state.Boost.Armed = false;
-            studyVelocity = state.Forward * state.Speed;
             transform.SetPositionAndRotation(state.Position, state.Rotation);
         }
 
@@ -106,15 +102,13 @@ namespace GeometricFlight.Player
             state = entryState;
             state.Boost = boost;
             fullRotation = state.FullRotation;
-            studyVelocity = study != null && study.isActiveAndEnabled && !study.Released
-                ? RailHandlingStudy.InstantRailVelocity(state, study.Candidate) : state.Forward * state.Speed;
             transform.SetPositionAndRotation(state.Position, state.Rotation);
         }
 
         internal void ReleaseEntry() => EntryHeld = false;
 
         /// <summary>Rails only: the arena's own edge and floor behavior is not a scenery prediction.</summary>
-        public override bool CanPredict => !EntryHeld && study != null && study.isActiveAndEnabled && !study.Released;
+        public override bool CanPredict => !EntryHeld && !RailReleased;
 
         /// <summary>Steps the pure rail model on a copy of the state with this frame's input held.</summary>
         public override Vector3 PredictPosition(float seconds)
@@ -124,8 +118,8 @@ namespace GeometricFlight.Player
             Vector2 stick = ApplyOptions(CurrentInput.Steering);
             const float step = 0.05f;
             for (float t = 0f; t < seconds - 1e-4f; t += step)
-                RailFlightModel.Step(ref predicted, stick, CurrentInput.Twist, Throttle, tuning, study.Candidate,
-                    study.HeadingLimit, Mathf.Min(step, seconds - t));
+                RailFlightModel.Step(ref predicted, stick, CurrentInput.Twist, Throttle, tuning, railHeadingLimit,
+                    Mathf.Min(step, seconds - t));
             return predicted.Position;
         }
 
@@ -152,20 +146,25 @@ namespace GeometricFlight.Player
 
             Vector2 stick = ApplyOptions(CurrentInput.Steering);
             bool wasBoosting = state.Boost.Active;
-            if (study != null && study.isActiveAndEnabled)
-                studyVelocity = study.Step(ref state, stick, CurrentInput.Twist, Throttle, tuning,
-                    arena.Limits, CurrentInput, deltaTime);
-            else if (state.FullRotation)
-                ArenaFlightModel.StepFull(ref state, stick, CurrentInput.Twist, Throttle, tuning, arena.Limits,
-                    deltaTime);
-            else
-                ArenaFlightModel.Step(ref state, stick, CurrentInput.Twist, Throttle, tuning, arena.Limits,
-                    deltaTime);
+            Fly(stick, deltaTime);
             // A spent burst returns a latched (keyboard) throttle to normal full, out of the boost gate.
             if (wasBoosting && !state.Boost.Active && Throttle > tuning.boost.gate
                 && inputSource.LimitThrottle(ThrottleBoost.RetractSetpoint(tuning.boost, tuning.cruiseSnap)))
                 ThrottleBoost.Retracted(ref state.Boost);
             transform.SetPositionAndRotation(state.Position, state.Rotation);
+        }
+
+        private void Fly(Vector2 stick, float deltaTime)
+        {
+            if (RailReleased)
+            {
+                ArenaFlightModel.Fly(ref state, stick, CurrentInput.Twist, Throttle, tuning, arena.Limits, deltaTime);
+                return;
+            }
+            Vector3 from = state.Position;
+            RailReleased = RailFlightModel.FlyToRelease(ref state, stick, CurrentInput.Twist, Throttle, tuning,
+                railHeadingLimit, railEndZ, arena.Limits, deltaTime, out Vector3 railEnd);
+            RailFlown?.Invoke(from, railEnd);
         }
 
         private float SpeedAt(float throttle) =>

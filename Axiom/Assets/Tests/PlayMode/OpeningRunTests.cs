@@ -19,8 +19,8 @@ namespace GeometricFlight.Tests
     {
         public enum Display { Normal, Crt }
 
-        /// <summary>Past the rail's end, where the ship is released into the arena.</summary>
-        private const float BeyondTheRail = 5900f;
+        /// <summary>Just short of the rail's end, where the ship is released into the arena.</summary>
+        private const float NearTheRailEnd = 5900f;
         private const string WaveArrivalTone = "BZ,440,180", WaveClearedTone = "BZ,1320,220";
 
         private readonly Display display;
@@ -142,6 +142,31 @@ namespace GeometricFlight.Tests
             game.Shield.Destroy();
             Assert.That(game.Course.Rebuilding, "a lethal hit starts a rebuild");
             yield return game.Rebuilt();
+        }
+
+        [UnityTest]
+        public IEnumerator FlyingThroughARingScoresItOnceAndARetryForgetsIt()
+        {
+            yield return game.ReachControl();
+            Assert.That(game.HudText("hud-rings"), Is.EqualTo("RINGS 0/17"));
+            Transform ring = GameObject.Find("Tutorial hoop 01").transform;
+            yield return FlyThrough(ring);
+            Assert.That(game.HudText("hud-rings"), Is.EqualTo("RINGS 1/17"));
+            yield return game.Capture("ring-scored");
+            yield return FlyThrough(ring);
+            Assert.That(game.HudText("hud-rings"), Is.EqualTo("RINGS 1/17"), "a ring scores once");
+
+            game.Shield.Destroy();
+            yield return game.Rebuilt();
+            yield return game.Wait(0.2f);
+            Assert.That(game.HudText("hud-rings"), Is.EqualTo("RINGS 0/17"), "a retry forgets rings since the checkpoint");
+        }
+
+        private IEnumerator FlyThrough(Transform ring)
+        {
+            game.Flight.Respawn(ring.position + Vector3.back * 6f);
+            yield return game.Until("the ship to pass the ring", () => game.Flight.transform.position.z > ring.position.z + 1f, 3f);
+            yield return game.Wait(0.2f);
         }
 
         [UnityTest]
@@ -316,8 +341,10 @@ namespace GeometricFlight.Tests
 
         private IEnumerator FreeFlight()
         {
-            game.Jump(BeyondTheRail);
+            game.Jump(NearTheRailEnd);
             yield return game.Until("the rail to release the ship", () => game.Lessons.Current == ArenaLessons.Step.FreeFlight, 10f);
+            RailSeal seal = Object.FindAnyObjectByType<RailSeal>();
+            yield return game.Until("the seal to close behind the ship", () => seal.Sealed, 5f);
             yield return game.Wait(0.3f);
             Assert.That(game.HudShows("hud-rings"), Is.False, "the rings readout goes");
             Assert.That(game.HudText("hud-targets"), Does.Contain("/13"), "the target count starts over");

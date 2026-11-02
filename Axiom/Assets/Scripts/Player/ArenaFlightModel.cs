@@ -195,6 +195,14 @@ namespace GeometricFlight.Player
             return speed / Mathf.Max(0.01f, turnRateDegrees * Mathf.Deg2Rad);
         }
 
+        /// <summary>One step of whichever handling the state is in.</summary>
+        public static void Fly(ref ArenaFlightState s, Vector2 stick, float twist, float throttle, ArenaFlightTuning t,
+            ArenaLimits limits, float deltaTime)
+        {
+            if (s.FullRotation) StepFull(ref s, stick, twist, throttle, t, limits, deltaTime);
+            else Step(ref s, stick, twist, throttle, t, limits, deltaTime);
+        }
+
         public static void Step(ref ArenaFlightState s, Vector2 stick, float twist, float throttle,
             ArenaFlightTuning t, ArenaLimits limits, float deltaTime)
         {

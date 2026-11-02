@@ -2,45 +2,66 @@ using UnityEngine;
 
 namespace GeometricFlight.Player
 {
-    public enum RailTravelMode
-    {
-        NoseLed,
-        CourseDriven,
-    }
-
     /// <summary>
-    /// The two straight +Z rail studies share the existing arena rotational controls and speed law.
-    /// No wall contact or arena edge assistance is applied here. NoseLed requires an initially valid
+    /// The nose-led straight +Z rail: the arena's rotational controls and speed law, with the nose setting travel inside
+    /// a heading limit. No wall contact or arena edge assistance is applied here. It requires an initially valid
     /// forward heading; it never snaps an invalid imported attitude into the permitted cone.
     /// </summary>
     public static class RailFlightModel
     {
-        // These limits keep the arena model's existing edge/floor behavior out of this small study.
+        // These limits keep the arena model's edge/floor behavior off the rail.
         // They are not a playable corridor or an invisible containment boundary.
         private static readonly ArenaLimits DistantLimits =
             new ArenaLimits(Vector3.zero, 1e9f, -1e9f, 1e9f);
 
-        /// <summary>Advances the selected rail law and returns actual displacement / deltaTime.
-        /// CourseDriven's Speed remains the throttle-controlled longitudinal speed, so its total
-        /// velocity can reach sqrt(2) times Speed when the nose points sideways.</summary>
+        /// <summary>A frame that may cross the rail's end: the rail's law up to the release plane, then the arena's for
+        /// the rest of the frame, with nothing reset or blended between them. <paramref name="railEnd"/> is where the rail
+        /// part of the frame ended. Returns whether the ship was released. A paused frame does nothing, even on the plane.</summary>
+        public static bool FlyToRelease(ref ArenaFlightState state, Vector2 stick, float twist, float throttle,
+            ArenaFlightTuning tuning, float headingLimitDegrees, float releaseZ, ArenaLimits arenaLimits, float deltaTime,
+            out Vector3 railEnd)
+        {
+            railEnd = state.Position;
+            if (deltaTime <= 0f) return false;
+            float railTime = TimeToPlane(state, stick, twist, throttle, tuning, headingLimitDegrees, releaseZ, deltaTime);
+            Step(ref state, stick, twist, throttle, tuning, headingLimitDegrees, railTime);
+            railEnd = state.Position;
+            if (state.Position.z < releaseZ) return false;
+            ArenaFlightModel.Fly(ref state, stick, twist, throttle, tuning, arenaLimits, deltaTime - railTime);
+            return true;
+        }
+
+        /// <summary>How much of this frame the rail's law flies before the ship reaches the plane; all of it if it doesn't.</summary>
+        private static float TimeToPlane(ArenaFlightState state, Vector2 stick, float twist, float throttle,
+            ArenaFlightTuning tuning, float headingLimitDegrees, float planeZ, float deltaTime)
+        {
+            if (state.Position.z >= planeZ) return 0f;
+            ArenaFlightState end = state;
+            Step(ref end, stick, twist, throttle, tuning, headingLimitDegrees, deltaTime);
+            if (end.Position.z < planeZ) return deltaTime;
+            // Monotonic forward travel makes a bounded bisection valid.
+            float low = 0f, high = deltaTime;
+            for (int i = 0; i < 16; i++)
+            {
+                float mid = (low + high) * 0.5f;
+                ArenaFlightState trial = state;
+                Step(ref trial, stick, twist, throttle, tuning, headingLimitDegrees, mid);
+                if (trial.Position.z < planeZ) low = mid; else high = mid;
+            }
+            return high;
+        }
+
+        /// <summary>Advances the rail's law and returns actual displacement / deltaTime.</summary>
         public static Vector3 Step(ref ArenaFlightState state, Vector2 stick, float twist, float throttle,
-            ArenaFlightTuning tuning, RailTravelMode mode, float headingLimitDegrees, float deltaTime)
+            ArenaFlightTuning tuning, float headingLimitDegrees, float deltaTime)
         {
             if (deltaTime <= 0f) return Vector3.zero;
 
             ArenaFlightState before = state;
-            if (state.FullRotation)
-                ArenaFlightModel.StepFull(ref state, stick, twist, throttle, tuning, DistantLimits, deltaTime);
-            else
-                ArenaFlightModel.Step(ref state, stick, twist, throttle, tuning, DistantLimits, deltaTime);
+            ArenaFlightModel.Fly(ref state, stick, twist, throttle, tuning, DistantLimits, deltaTime);
 
             Vector3 requestedTravel = state.Position - before.Position;
-            if (mode == RailTravelMode.CourseDriven)
-            {
-                Vector3 direction = Vector3.forward + Vector3.ProjectOnPlane(state.Forward, Vector3.forward);
-                state.Position = before.Position + direction * requestedTravel.magnitude;
-            }
-            else if (ConstrainRequestedHeading(ref state, before, headingLimitDegrees))
+            if (ConstrainRequestedHeading(ref state, before, headingLimitDegrees))
             {
                 // Use the existing model's integrated distance, including the part of a long frame
                 // spent at the target throttle speed; the mean of end speeds would be incorrect.

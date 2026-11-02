@@ -87,7 +87,7 @@ namespace GeometricFlight.Core
                 Gate gate = sorted[next];
                 Vector2 stick = Pilot(state, gate.Center, tuning);
                 Vector3 before = state.Position;
-                RailFlightModel.Step(ref state, stick, 0f, throttle, tuning, RailTravelMode.NoseLed, headingLimit, step);
+                RailFlightModel.Step(ref state, stick, 0f, throttle, tuning, headingLimit, step);
                 Vector3 after = state.Position;
                 time += step;
                 if (Mathf.Abs(after.x) > bounds.x - 1f || after.y < 1f || after.y > bounds.y - 1f)

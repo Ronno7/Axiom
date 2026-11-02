@@ -47,7 +47,7 @@ namespace GeometricFlight.Core
         [SerializeField] private LevelFlow flow;
         [SerializeField] private ArenaFlight flight;
         [SerializeField] private ShipShield shield;
-        [SerializeField] private RailHandlingStudy rail;
+        [SerializeField] private RailRings railRings;
         [SerializeField] private SharedEntryStudy entry;
         [SerializeField] private ChaseCamera chase;
         [SerializeField] private PlayerWeapon weapon;
@@ -80,7 +80,7 @@ namespace GeometricFlight.Core
         private string shownRings;
         private float rebuildAt = -1f, armedAt = float.NegativeInfinity;
         private bool wasArmed, showingLesson, showingFlag, lessonAsksToArm, weaponsIntroduced;
-        private OpeningCourseScore.Snapshot saved;
+        private RingScore.Snapshot saved;
 
         /// <summary>Z where the next retry rebuilds the ship.</summary>
         public float RetryZ => reached < 0 ? startZ : checkpoints[reached].z;
@@ -89,9 +89,9 @@ namespace GeometricFlight.Core
 
         private void OnEnable()
         {
-            if (flow == null || flight == null || shield == null || rail == null || entry == null)
+            if (flow == null || flight == null || shield == null || railRings == null || entry == null)
             {
-                Debug.LogError("Assign the flow, flight, shield, rail and entry to TutorialCourse.", this);
+                Debug.LogError("Assign the flow, flight, shield, rail rings and entry to TutorialCourse.", this);
                 enabled = false;
                 return;
             }
@@ -100,7 +100,7 @@ namespace GeometricFlight.Core
             Array.Sort(checkpoints, (a, b) => a.z.CompareTo(b.z));
             Array.Sort(cues, (a, b) => a.z.CompareTo(b.z));
             flow.CheckpointRecovery = TakeOverDestroyedShip;
-            saved = rail.SaveScore();
+            saved = railRings.SaveScore();
         }
 
         private void Start()
@@ -115,8 +115,8 @@ namespace GeometricFlight.Core
             if (flow != null && flow.CheckpointRecovery == TakeOverDestroyedShip) flow.CheckpointRecovery = null;
         }
 
-        private bool OnRail => !flow.EntryHeld && !rail.Released;
-        private bool InArenaLessons => !flow.EntryHeld && rail.Released && arena != null && arena.Active;
+        private bool OnRail => !flow.EntryHeld && !flight.RailReleased;
+        private bool InArenaLessons => !flow.EntryHeld && flight.RailReleased && arena != null && arena.Active;
 
         private bool TakeOverDestroyedShip()
         {
@@ -156,7 +156,7 @@ namespace GeometricFlight.Core
             {
                 reached++;
                 shield.Restore();
-                saved = rail.SaveScore();
+                saved = railRings.SaveScore();
                 levelUi?.ShowShieldNote("CHECKPOINT");
             }
             while (nextCue < cues.Length && z >= cues[nextCue].z)
@@ -265,12 +265,12 @@ namespace GeometricFlight.Core
         {
             Transform best = null;
             float bestZ = z + ringLookahead;
-            for (int i = 0; i < rail.HoopsTotal; i++)
+            for (int i = 0; i < railRings.Count; i++)
             {
-                Transform hoop = rail.Hoop(i);
-                float at = hoop.position.z;
+                Transform ring = railRings.Ring(i);
+                float at = ring.position.z;
                 if (at <= z || at >= bestZ) continue;
-                best = hoop;
+                best = ring;
                 bestZ = at;
             }
             return best;
@@ -280,7 +280,7 @@ namespace GeometricFlight.Core
         private void ShowRings()
         {
             if (levelUi == null) return;
-            string text = rail.Released || rail.HoopsTotal == 0 ? null : $"RINGS {rail.HoopsHit}/{rail.HoopsTotal}";
+            string text = flight.RailReleased || railRings.Count == 0 ? null : $"RINGS {railRings.Hit}/{railRings.Count}";
             if (text == shownRings) return;
             shownRings = text;
             levelUi.SetRingsReadout(text);
@@ -289,7 +289,7 @@ namespace GeometricFlight.Core
         private void Rebuild()
         {
             rebuildAt = -1f;
-            if (rail.Released)
+            if (flight.RailReleased)
             {
                 RebuildInArena();
                 return;
@@ -298,7 +298,7 @@ namespace GeometricFlight.Core
             flight.Respawn(new Vector3(0f, flightLineY, z));
             flow.SetShipDestroyed(false);
             shield.Restore();
-            rail.RestoreScore(saved);
+            railRings.RestoreScore(saved);
             // Obstacles ahead of the retry point start fresh.
             foreach (ClosingIris iris in irises)
                 if (iris != null && iris.TriggerZ >= z) iris.ResetForStudy();

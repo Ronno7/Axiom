@@ -14,7 +14,7 @@ namespace GeometricFlight.Core
     [DisallowMultipleComponent]
     public sealed class RailSeal : MonoBehaviour
     {
-        [SerializeField] private RailHandlingStudy rail;
+        [SerializeField] private ArenaFlight flight;
         [Tooltip("The ship's hull box.")]
         [SerializeField] private BoxCollider hull;
         [Tooltip("A manual ClosingIris on the passage's end plane, its blades facing the arena.")]
@@ -30,7 +30,7 @@ namespace GeometricFlight.Core
 
         private void Update()
         {
-            if (Sealed || rail == null || hull == null || !rail.Released) return;
+            if (Sealed || flight == null || hull == null || !flight.RailReleased) return;
             if (hull.bounds.min.z <= EndZ) return;
             Seal();
         }

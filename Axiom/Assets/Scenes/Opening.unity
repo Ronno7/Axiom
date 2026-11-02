@@ -4996,7 +4996,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ca4837a21188d46a43287b74b2db13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Presentation.RingPassFlash
-  rail: {fileID: 1293384980}
+  rail: {fileID: 1293384990}
   glowShader: {fileID: 4800000, guid: 996ff6a1f898e3346b4600ffb8d42c33, type: 3}
   seconds: 0.6
   ghostGrowth: 1.6
@@ -5266,7 +5266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffd53e97b76abad4f9a99da5c95417d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Core.RailSeal
-  rail: {fileID: 1293384980}
+  flight: {fileID: 1293384976}
   hull: {fileID: 1293384988}
   iris: {fileID: 1029953547}
   closeSeconds: 0.4
@@ -16057,7 +16057,7 @@ MonoBehaviour:
   flow: {fileID: 451169379}
   flight: {fileID: 1293384976}
   shield: {fileID: 1293384987}
-  rail: {fileID: 1293384980}
+  railRings: {fileID: 1293384990}
   entry: {fileID: 463723346}
   chase: {fileID: 463385707}
   weapon: {fileID: 1293384989}
@@ -22414,7 +22414,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce5d16f459b9ae5408ed486bc11cadf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Core.ArenaLessons
-  rail: {fileID: 1293384980}
   missiles: {fileID: 1293384983}
   entry: {fileID: 463723346}
   flow: {fileID: 451169379}
@@ -36182,7 +36181,7 @@ GameObject:
   - component: {fileID: 1293384982}
   - component: {fileID: 1293384981}
   - component: {fileID: 1293384977}
-  - component: {fileID: 1293384980}
+  - component: {fileID: 1293384990}
   m_Layer: 8
   m_Name: 10_StudyPlayer
   m_TagString: Untagged
@@ -36263,6 +36262,8 @@ MonoBehaviour:
     twistExpo: 2
   pushToDive: 1
   fullRotation: 1
+  railEndZ: 5980
+  railHeadingLimit: 45
 --- !u!114 &1293384977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36309,45 +36310,6 @@ MonoBehaviour:
   pauseBinding: <Keyboard>/escape
   twistLeftBinding: <Keyboard>/z
   twistRightBinding: <Keyboard>/c
---- !u!114 &1293384980
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1293384974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e41fb71b6e7461449d2265a92a3359f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Core.RailHandlingStudy
-  candidate: 0
-  headingLimit: 45
-  releaseZ: 5980
-  envelopeX: {x: -32, y: 32}
-  envelopeY: {x: 1, y: 34}
-  flow: {fileID: 451169379}
-  hoops:
-  - {fileID: 1186034527}
-  - {fileID: 2084813396}
-  - {fileID: 2140924916}
-  - {fileID: 74975118}
-  - {fileID: 1069916557}
-  - {fileID: 1391156037}
-  - {fileID: 1569159446}
-  - {fileID: 114945530}
-  - {fileID: 1037701943}
-  - {fileID: 997622460}
-  - {fileID: 982262055}
-  - {fileID: 812742950}
-  - {fileID: 1994086937}
-  - {fileID: 1268412438}
-  - {fileID: 1926614758}
-  - {fileID: 1306035074}
-  - {fileID: 398808866}
-  hoopRadius: 10
-  iris: {fileID: 1246815517}
-  testKeys: 0
 --- !u!114 &1293384981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36528,6 +36490,37 @@ MonoBehaviour:
   poolSize: 40
   aimAssistCone: 6
   aimAssistRange: 170
+--- !u!114 &1293384990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293384974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5bbab858f2ecc448bea728718438c7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Core.RailRings
+  rings:
+  - {fileID: 1186034527}
+  - {fileID: 2084813396}
+  - {fileID: 2140924916}
+  - {fileID: 74975118}
+  - {fileID: 1069916557}
+  - {fileID: 1391156037}
+  - {fileID: 1569159446}
+  - {fileID: 114945530}
+  - {fileID: 1037701943}
+  - {fileID: 997622460}
+  - {fileID: 982262055}
+  - {fileID: 812742950}
+  - {fileID: 1994086937}
+  - {fileID: 1268412438}
+  - {fileID: 1926614758}
+  - {fileID: 1306035074}
+  - {fileID: 398808866}
+  ringRadius: 10
 --- !u!1 &1293922254
 GameObject:
   m_ObjectHideFlags: 0

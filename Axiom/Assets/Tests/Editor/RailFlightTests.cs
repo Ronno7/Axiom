@@ -31,7 +31,7 @@ namespace GeometricFlight.Tests
             if (full) ArenaFlightModel.StepFull(ref expected, stick, 0.1f, 1f, tuning, DistantLimits, 0.2f);
             else ArenaFlightModel.Step(ref expected, stick, 0.1f, 1f, tuning, DistantLimits, 0.2f);
             Vector3 velocity = RailFlightModel.Step(ref actual, stick, 0.1f, 1f, tuning,
-                RailTravelMode.NoseLed, 45f, 0.2f);
+                45f, 0.2f);
             Assert.That(actual.Position, Is.EqualTo(expected.Position));
             Assert.That(Quaternion.Angle(actual.Rotation, expected.Rotation), Is.LessThan(0.01f));
             Assert.That(actual.Speed, Is.EqualTo(expected.Speed));
@@ -51,7 +51,7 @@ namespace GeometricFlight.Tests
             for (int i = 0; i < Mathf.RoundToInt(8f / dt); i++)
             {
                 Vector3 velocity = RailFlightModel.Step(ref state, new Vector2(0.35f, 1f), 0.4f, 1f,
-                    tuning, RailTravelMode.NoseLed, 45f, dt);
+                    tuning, 45f, dt);
                 Assert.That(Vector3.Angle(state.Forward, Vector3.forward), Is.LessThanOrEqualTo(45.02f));
                 Assert.That(velocity.z, Is.GreaterThan(0f));
                 Assert.That(state.Returning, Is.False, "No arena return assistance belongs in the rail law.");
@@ -66,12 +66,12 @@ namespace GeometricFlight.Tests
             ArenaFlightState state = Start(true, initial);
             Vector3 nose = state.Forward;
             for (int i = 0; i < 120; i++)
-                RailFlightModel.Step(ref state, Vector2.right, 0f, 0f, tuning, RailTravelMode.NoseLed, 45f, Dt);
+                RailFlightModel.Step(ref state, Vector2.right, 0f, 0f, tuning, 45f, Dt);
             Assert.That(Quaternion.Angle(state.Attitude, initial), Is.LessThan(0.1f));
             Assert.That(Vector3.Angle(state.Forward, nose), Is.LessThan(0.03f));
             Quaternion beforeNeutral = state.Attitude;
             for (int i = 0; i < 60; i++)
-                RailFlightModel.Step(ref state, Vector2.zero, 0f, 0f, tuning, RailTravelMode.NoseLed, 45f, Dt);
+                RailFlightModel.Step(ref state, Vector2.zero, 0f, 0f, tuning, 45f, Dt);
             Assert.That(Quaternion.Angle(state.Attitude, beforeNeutral), Is.LessThan(0.03f));
         }
 
@@ -80,7 +80,7 @@ namespace GeometricFlight.Tests
         {
             ArenaFlightState state = Start(true, Quaternion.Euler(0f, 45f, 0f));
             RailFlightModel.Step(ref state, Vector2.up, 0f, 0f, new ArenaFlightTuning(),
-                RailTravelMode.NoseLed, 45f, 0.1f);
+                45f, 0.1f);
             Assert.That(state.Forward.y, Is.GreaterThan(0.1f), "Rejecting a whole rotation would freeze this allowed motion.");
             Assert.That(Vector3.Angle(state.Forward, Vector3.forward), Is.EqualTo(45f).Within(0.02f));
         }
@@ -90,7 +90,7 @@ namespace GeometricFlight.Tests
         {
             ArenaFlightState state = Start(true, Quaternion.Euler(-45f, 0f, 0f));
             RailFlightModel.Step(ref state, Vector2.down, 0f, 0f, new ArenaFlightTuning(),
-                RailTravelMode.NoseLed, 45f, 0.1f);
+                45f, 0.1f);
             Assert.That(Vector3.Angle(state.Forward, Vector3.forward), Is.EqualTo(35f).Within(0.02f));
         }
 
@@ -99,7 +99,7 @@ namespace GeometricFlight.Tests
         {
             ArenaFlightState state = Start(true, Quaternion.Euler(0f, 0f, 180f));
             RailFlightModel.Step(ref state, Vector2.up, 0f, 0f, new ArenaFlightTuning(),
-                RailTravelMode.NoseLed, 45f, 0.1f);
+                45f, 0.1f);
             Assert.That(state.Forward.y, Is.LessThan(-0.1f));
             Assert.That((state.Attitude * Vector3.up).y, Is.LessThan(-0.9f));
         }
@@ -113,7 +113,7 @@ namespace GeometricFlight.Tests
             state.Bank = 25f;
             ArenaFlightState expected = state;
             ArenaFlightModel.Step(ref expected, Vector2.right, 0f, 0f, tuning, DistantLimits, 0.1f);
-            RailFlightModel.Step(ref state, Vector2.right, 0f, 0f, tuning, RailTravelMode.NoseLed, 45f, 0.1f);
+            RailFlightModel.Step(ref state, Vector2.right, 0f, 0f, tuning, 45f, 0.1f);
             Assert.That(state.Bank, Is.EqualTo(expected.Bank));
             Assert.That(state.Yaw, Is.EqualTo(45f).Within(0.02f));
             Assert.That(Quaternion.Angle(state.Attitude, state.Rotation), Is.LessThan(0.01f));
@@ -125,45 +125,8 @@ namespace GeometricFlight.Tests
             Quaternion initial = Quaternion.Euler(-65f, 0f, 20f);
             ArenaFlightState state = Start(true, initial);
             RailFlightModel.Step(ref state, Vector2.zero, 0f, 0f, new ArenaFlightTuning(),
-                RailTravelMode.NoseLed, 45f, Dt);
+                45f, Dt);
             Assert.That(Quaternion.Angle(state.Attitude, initial), Is.LessThan(0.02f));
-        }
-
-        [Test]
-        public void CourseDrivenKeepsProgressEvenWhenNosePointsBackwards()
-        {
-            ArenaFlightState state = Start(true, Quaternion.Euler(0f, 180f, 0f));
-            Vector3 velocity = RailFlightModel.Step(ref state, Vector2.zero, 0f, 0f, new ArenaFlightTuning(),
-                RailTravelMode.CourseDriven, 45f, 0.1f);
-            Assert.That(velocity.z, Is.EqualTo(30f).Within(0.001f));
-            Assert.That(state.Forward.z, Is.LessThan(-0.99f));
-        }
-
-        [Test]
-        public void CourseDrivenPreservesLongitudinalSpeedAndExposesFasterDiagonalTravel()
-        {
-            ArenaFlightState state = Start(true, Quaternion.Euler(0f, 90f, 0f));
-            Vector3 before = state.Position;
-            Vector3 velocity = RailFlightModel.Step(ref state, Vector2.zero, 0f, 0f, new ArenaFlightTuning(),
-                RailTravelMode.CourseDriven, 45f, 0.1f);
-            Assert.That(velocity.x, Is.EqualTo(30f).Within(0.001f));
-            Assert.That(velocity.z, Is.EqualTo(30f).Within(0.001f));
-            Assert.That(velocity.magnitude, Is.EqualTo(30f * Mathf.Sqrt(2f)).Within(0.001f));
-            Assert.That(state.Speed, Is.EqualTo(30f), "Speed is the throttle-controlled travel scalar, not total speed.");
-            Assert.That(velocity, Is.EqualTo((state.Position - before) / 0.1f));
-        }
-
-        [Test]
-        public void CourseDrivenUsesIntegratedAccelerationWhenThrottleTargetIsReachedMidFrame()
-        {
-            ArenaFlightState state = Start(true, Quaternion.Euler(0f, 90f, 0f));
-            state.Speed = 44f;
-            Vector3 velocity = RailFlightModel.Step(ref state, Vector2.zero, 0f, 1f, new ArenaFlightTuning(),
-                RailTravelMode.CourseDriven, 45f, 0.2f);
-            // 0.05 s accelerating 44 -> 45, followed by 0.15 s at 45: 8.975 m total.
-            Assert.That(velocity.z, Is.EqualTo(44.875f).Within(0.001f));
-            Assert.That(velocity.x, Is.EqualTo(44.875f).Within(0.001f));
-            Assert.That(state.Speed, Is.EqualTo(45f));
         }
 
         [Test]
@@ -171,15 +134,14 @@ namespace GeometricFlight.Tests
         {
             ArenaFlightState state = Start();
             Vector3 velocity = RailFlightModel.Step(ref state, Vector2.up, 0f, 0f, new ArenaFlightTuning(),
-                RailTravelMode.NoseLed, 45f, 1.8f);
+                45f, 1.8f);
             Assert.That(Vector3.Angle(state.Forward, Vector3.forward), Is.EqualTo(45f).Within(0.02f));
             Assert.That(velocity.z, Is.GreaterThan(0f));
             Assert.That(float.IsNaN(state.Attitude.w), Is.False);
         }
 
-        [TestCase(RailTravelMode.NoseLed)]
-        [TestCase(RailTravelMode.CourseDriven)]
-        public void NonPositiveTimeDoesNotMutateAnyState(RailTravelMode mode)
+        [Test]
+        public void NonPositiveTimeDoesNotMutateAnyState()
         {
             ArenaFlightState state = Start(true, Quaternion.Euler(10f, 20f, 30f));
             state.Returning = true;
@@ -188,7 +150,7 @@ namespace GeometricFlight.Tests
             foreach (float dt in new[] { 0f, -0.1f })
             {
                 Vector3 velocity = RailFlightModel.Step(ref state, Vector2.one, 1f, 1f,
-                    new ArenaFlightTuning(), mode, 45f, dt);
+                    new ArenaFlightTuning(), 45f, dt);
                 Assert.That(state, Is.EqualTo(before));
                 Assert.That(velocity, Is.EqualTo(Vector3.zero));
             }

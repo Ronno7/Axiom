@@ -351,9 +351,7 @@ namespace GeometricFlight.Core
                 case "mouth": return $"{passage.MouthZ:0}";
                 case "ribs": return $"{passage.RibCount}";
                 case "shieldMax": return shield.State == null ? "-" : $"{shield.State.Max}";
-                case "limit":
-                    RailHandlingStudy rail = flight.GetComponent<RailHandlingStudy>();
-                    return rail != null ? $"{rail.HeadingLimit:0}" : "-";
+                case "limit": return $"{flight.RailHeadingLimit:0}";
                 case "min": return $"{flight.MinSpeed:0}";
                 case "max": return $"{flight.MaxSpeed:0}";
                 case "cruise": return $"{flight.CruiseSpeed:0}";

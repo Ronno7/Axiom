@@ -205,13 +205,13 @@ namespace GeometricFlight.UI
             helpBack = root.Q<Button>("help-back");
 
             resumeButton.clicked += flow.Resume;
-            root.Q<Button>("pause-retry-button").clicked += Retry;
+            root.Q<Button>("pause-retry-button").clicked += flow.Retry;
             root.Q<Button>("pause-options-button").clicked += ShowOptions;
             root.Q<Button>("pause-help-button").clicked += () => ShowOverlay(helpPanel, helpBack);
             root.Q<Button>("pause-menu-button").clicked += flow.ExitToMenu;
             helpBack.clicked += ShowPause;
             nextButton.clicked += flow.Continue;
-            retryButton.clicked += Retry;
+            retryButton.clicked += flow.Retry;
             resultsMenuButton = root.Q<Button>("results-menu-button");
             resultsMenuButton.clicked += flow.ExitToMenu;
 
@@ -250,14 +250,6 @@ namespace GeometricFlight.UI
             shieldGauge.Show(shield.State.Current);
             shieldGauge.Tick(Time.unscaledDeltaTime);
             shieldRow.EnableInClassList("shield--low", shield.State.Current == 1);
-        }
-
-        private void Retry()
-        {
-            var study = flight.GetComponent<RailHandlingStudy>();
-            if (study != null && study.isActiveAndEnabled)
-                study.Restart(study.Candidate, ((ArenaFlight)flight).FullRotation);
-            else flow.Retry();
         }
 
         private void Update()
@@ -341,7 +333,7 @@ namespace GeometricFlight.UI
         private void UpdateProximity()
         {
             bool flying = flow.State == RunState.Playing && flight.isActiveAndEnabled && !flight.InputLocked;
-            // Only ships whose motion can be predicted honestly (the slide rail, nose-led rails) warn.
+            // Only on the rail: the ship's motion can be predicted honestly there.
             proximity.Update(flight, hull, flying && flight.CanPredict && hull != null, Time.unscaledTime);
             proximityLabel.style.display = proximity.Active ? DisplayStyle.Flex : DisplayStyle.None;
             proximityLabel.EnableInClassList("hud-proximity--pulse", proximity.Pulse);

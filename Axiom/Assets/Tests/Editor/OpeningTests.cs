@@ -89,28 +89,14 @@ namespace GeometricFlight.Tests
         }
 
         [Test]
-        public void GateScoresOnceAndAMissedGateCannotBeClaimedLater()
+        public void RingScoresOnceAndAMissedRingCannotBeClaimedLater()
         {
-            var score = new OpeningCourseScore();
-            Assert.That(score.CrossGate(1, new Vector2(2,1), 3.2f), Is.True);
-            Assert.That(score.CrossGate(1, Vector2.zero, 3.2f), Is.False);
-            Assert.That(score.CrossGate(2, new Vector2(4,0), 3.2f), Is.False);
-            Assert.That(score.CrossGate(2, Vector2.zero, 3.2f), Is.False);
-            Assert.That(score.Score, Is.EqualTo(100));
-            Assert.That(score.GatesPassed, Is.EqualTo(2));
-            Assert.That(score.GatesHit, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void DuplicateTargetDestructionCannotFarmScoreAndRetryResetsIt()
-        {
-            var score = new OpeningCourseScore();
-            score.DestroyTarget(7); score.DestroyTarget(7); score.DestroyTarget(8);
-            Assert.That(score.Score, Is.EqualTo(100));
-            score.Reset();
-            Assert.That(score.Score, Is.Zero);
-            score.DestroyTarget(7);
-            Assert.That(score.Score, Is.EqualTo(50));
+            var score = new RingScore();
+            Assert.That(score.Cross(1, new Vector2(2,1), 3.2f), Is.True);
+            Assert.That(score.Cross(1, Vector2.zero, 3.2f), Is.False);
+            Assert.That(score.Cross(2, new Vector2(4,0), 3.2f), Is.False);
+            Assert.That(score.Cross(2, Vector2.zero, 3.2f), Is.False);
+            Assert.That(score.Hit, Is.EqualTo(1));
         }
 
         [TestCase(false)]
