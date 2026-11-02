@@ -14,57 +14,35 @@ namespace GeometricFlight.Tests
         [Test]
         public void ParsesValidPacketIncludingCarriageReturn()
         {
-            string line = ControllerProtocol.Frame("AX,1023,0,245,1,0") + "\r";
+            string line = ControllerProtocol.Frame("AX,1023,0,245,1,0,512,0,0,0") + "\r";
             Assert.That(ControllerProtocol.TryParse(line, out ControllerPacket p), Is.True);
             Assert.That(p.StickX, Is.EqualTo(1023));
             Assert.That(p.StickY, Is.EqualTo(0));
             Assert.That(p.DistanceMm, Is.EqualTo(245));
             Assert.That(p.Fire, Is.True);
-            Assert.That(p.StickButton, Is.False);
+            Assert.That(p.Menu, Is.False);
         }
 
         [Test]
         public void ParsesMissingEcho()
         {
-            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,512,512,-1,0,0"), out ControllerPacket p), Is.True);
+            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,512,512,-1,0,0,512,0,0,0"), out ControllerPacket p), Is.True);
             Assert.That(p.DistanceMm, Is.EqualTo(-1));
-        }
-
-        [Test]
-        public void ParsesCockpitPacketAndKeepsV1FieldsInPlace()
-        {
-            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,700,300,180,1,1,1023,1,0"),
-                out ControllerPacket p), Is.True);
-            Assert.That(p.IsCockpit, Is.True);
-            Assert.That(p.StickX, Is.EqualTo(700));
-            Assert.That(p.DistanceMm, Is.EqualTo(180));
-            Assert.That(p.Fire && p.StickButton, Is.True);
-            Assert.That(p.Twist, Is.EqualTo(1023));
-            Assert.That(p.Emp, Is.True);
-            Assert.That(p.Armed, Is.False);
-            Assert.That(p.HasLock || p.LockHeld, Is.False, "older cockpit firmware has no LOCK");
         }
 
         [TestCase(0)]
         [TestCase(1)]
-        public void ParsesExtendedCockpitLockWithoutMovingExistingFields(int held)
+        public void ParsesEveryFieldOfThePacket(int held)
         {
             Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame($"AX,700,300,180,1,1,1023,1,0,{held}"),
                 out ControllerPacket p), Is.True);
-            Assert.That(p.IsCockpit && p.HasLock, Is.True);
-            Assert.That(p.LockHeld, Is.EqualTo(held == 1));
-            Assert.That(p.Fire && p.StickButton && p.Emp, Is.True);
-            Assert.That(p.Armed, Is.False);
+            Assert.That(p.StickX, Is.EqualTo(700));
+            Assert.That(p.StickY, Is.EqualTo(300));
+            Assert.That(p.DistanceMm, Is.EqualTo(180));
+            Assert.That(p.Fire && p.Menu && p.Emp, Is.True);
             Assert.That(p.Twist, Is.EqualTo(1023));
-        }
-
-        [Test]
-        public void V1PacketIsNotCockpit()
-        {
-            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,512,512,200,0,0"), out ControllerPacket p), Is.True);
-            Assert.That(p.IsCockpit, Is.False);
-            Assert.That(p.Emp || p.Armed, Is.False);
-            Assert.That(p.HasLock || p.LockHeld, Is.False);
+            Assert.That(p.Armed, Is.False);
+            Assert.That(p.LockHeld, Is.EqualTo(held == 1));
         }
 
         [TestCase("")]
@@ -77,12 +55,13 @@ namespace GeometricFlight.Tests
             Assert.That(ControllerProtocol.TryParse(line, out _), Is.False);
         }
 
-        [TestCase("AX,2000,512,200,0,0")]           // axis out of range
-        [TestCase("AX,512,512,200,2,0")]            // button not 0/1
+        [TestCase("AX,2000,512,200,0,0,512,0,0,0")] // axis out of range
+        [TestCase("AX,512,512,200,2,0,512,0,0,0")]  // button not 0/1
         [TestCase("AX,512,512,200,0")]              // missing field
-        [TestCase("AX,512,512,200,0,0,512,0")]      // cockpit packet missing a field
-        [TestCase("AX,512,512,200,0,0,1024,0,0")]   // twist out of range
-        [TestCase("AX,512,512,200,0,0,512,0,2")]    // arm not 0/1
+        [TestCase("AX,512,512,200,0,0")]            // the retired kit packet
+        [TestCase("AX,512,512,200,0,0,512,0,0")]    // the older cockpit packet, without LOCK
+        [TestCase("AX,512,512,200,0,0,1024,0,0,0")] // twist out of range
+        [TestCase("AX,512,512,200,0,0,512,0,2,0")]  // arm not 0/1
         [TestCase("AX,512,512,200,0,0,512,0,0,2")]  // LOCK not 0/1
         [TestCase("AX,512,512,200,0,0,512,0,0,-1")]
         [TestCase("AX,512,512,200,0,0,512,0,0,")]   // truncated LOCK
@@ -196,7 +175,7 @@ namespace GeometricFlight.Tests
         {
             var keys = new FlightInput(Vector2.zero, 0.6f, false, false);
             var controller = new ControllerState(true, Vector2.up, -0.8f, throttleValid, true, true,
-                twist: 0.4f, lockHeld: true, hasLock: true, empHeld: true);
+                twist: 0.4f, lockHeld: true, empHeld: true);
             FlightInput result = FlightInputMerge.Merge(keys, controller, true);
             Assert.That(result.Throttle, Is.EqualTo(0.6f));
             Assert.That(result.Steering, Is.EqualTo(Vector2.up));
@@ -224,11 +203,10 @@ namespace GeometricFlight.Tests
 
         [TestCase(true)]
         [TestCase(false)]
-        public void DisconnectedOrExplicitKeyboardOnlyInputDoesNotDependOnThrottlePreference(bool keyboardThrottle)
+        public void DisconnectedInputDoesNotDependOnThrottlePreference(bool keyboardThrottle)
         {
             var keys = new FlightInput(Vector2.left, -0.4f, true, true, twist: -0.2f,
                 lockHeld: true, empHeld: true);
-            // CombinedFlightInput supplies a default controller during explicit keyboard takeover.
             FlightInput result = FlightInputMerge.Merge(keys, default, keyboardThrottle);
             Assert.That(result.Throttle, Is.EqualTo(-0.4f));
             Assert.That(result.Steering, Is.EqualTo(Vector2.left));
@@ -246,7 +224,7 @@ namespace GeometricFlight.Tests
         {
             var keys = new FlightInput(Vector2.zero, 0f, false, false, lockHeld: keyboardHeld);
             var controller = new ControllerState(true, Vector2.zero, 0f, true, false, false,
-                lockHeld: controllerHeld, hasLock: true);
+                lockHeld: controllerHeld);
             Assert.That(FlightInputMerge.Merge(keys, controller).LockHeld, Is.EqualTo(keyboardHeld || controllerHeld));
         }
 
@@ -268,10 +246,9 @@ namespace GeometricFlight.Tests
             var simulator = new SimulatedLineTransport();
             simulator.SetLock(true);
             Assert.That(ControllerProtocol.TryParse(simulator.ReadLine(), out ControllerPacket held), Is.True);
-            Assert.That(held.HasLock && held.LockHeld, Is.True);
+            Assert.That(held.LockHeld, Is.True);
             simulator.SetLock(false);
             Assert.That(ControllerProtocol.TryParse(simulator.ReadLine(), out ControllerPacket released), Is.True);
-            Assert.That(released.HasLock, Is.True);
             Assert.That(released.LockHeld, Is.False);
         }
 

@@ -7,7 +7,7 @@ namespace GeometricFlight.Core
     /// key chip.</summary>
     public static class TutorialCaptions
     {
-        public static string Resolve(string line, MasterArmInput authority)
+        public static string Resolve(string line)
         {
             if (string.IsNullOrEmpty(line)) return line;
             ControllerState device = ControllerService.Instance.State;
@@ -17,9 +17,9 @@ namespace GeometricFlight.Core
                 .Replace("{lower}", keyThrottle ? "[Q]" : "THROTTLE BACK")
                 .Replace("{raise}", keyThrottle ? "[E]" : "THROTTLE FORWARD")
                 .Replace("{boost}", keyThrottle ? "HOLD [E]" : "TO THE FINAL STOP")
-                .Replace("{arm}", authority != null && authority.HasPhysicalSwitch ? "[MASTER ARM]" : "[T]")
-                .Replace("{lock}", !keyboard && device.HasLock ? "[LOCK]" : "[LEFT SHIFT]")
-                .Replace("{emp}", !keyboard && device.HasMasterArm ? "[EMP]" : "[R]");
+                .Replace("{arm}", keyboard ? "[T]" : "[MASTER ARM]")
+                .Replace("{lock}", keyboard ? "[LEFT SHIFT]" : "[LOCK]")
+                .Replace("{emp}", keyboard ? "[R]" : "[EMP]");
         }
     }
 }

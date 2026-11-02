@@ -34,7 +34,7 @@ namespace GeometricFlight.UI
         public static string Word(ShipFlight flight)
         {
             if (flight.Boost == BoostStatus.Active) return "BOOST";
-            float lever = flight.Lever;
+            float lever = flight.Throttle;
             if (lever < 0f) return "LOW";
             if (lever == 0f) return "CRUISE";
             return lever >= Mathf.Min(flight.BoostGate, 1f) - 0.005f ? "FULL" : string.Empty;

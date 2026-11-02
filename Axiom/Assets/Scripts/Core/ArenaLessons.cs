@@ -84,7 +84,7 @@ namespace GeometricFlight.Core
 
         private readonly HashSet<ShootableTarget> lockedLastFrame = new HashSet<ShootableTarget>();
         private MasterArmInput authority;
-        private ArenaFlight ship;
+        private ShipFlight ship;
         private EmpWeapon emp;
         private LevelUi levelUi;
         private int arenaDestroyed, arenaTotal;
@@ -104,7 +104,7 @@ namespace GeometricFlight.Core
         private void Awake()
         {
             authority = missiles != null ? missiles.GetComponent<MasterArmInput>() : null;
-            ship = missiles != null ? missiles.GetComponent<ArenaFlight>() : null;
+            ship = missiles != null ? missiles.GetComponent<ShipFlight>() : null;
             emp = missiles != null ? missiles.GetComponent<EmpWeapon>() : null;
             levelUi = guidance != null ? guidance.GetComponent<LevelUi>() : null;
             foreach (ArenaEncounter wave in new[] { lockSingleWave, lockPairWave, empGroup, encounter })
@@ -333,7 +333,7 @@ namespace GeometricFlight.Core
                 guidance.ClearCard();
                 return;
             }
-            guidance.SetCard(TutorialCaptions.Resolve(line, authority), emphasis, arrival);
+            guidance.SetCard(TutorialCaptions.Resolve(line), emphasis, arrival);
             guidance.ChipsLit = held;
         }
 
@@ -548,6 +548,6 @@ namespace GeometricFlight.Core
         }
 
         private void Say(string line, float seconds) =>
-            entry.Announce(TutorialCaptions.Resolve(line, authority), seconds);
+            entry.Announce(TutorialCaptions.Resolve(line), seconds);
     }
 }

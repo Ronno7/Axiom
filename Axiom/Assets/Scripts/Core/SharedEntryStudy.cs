@@ -16,7 +16,7 @@ namespace GeometricFlight.Core
     public sealed class SharedEntryStudy : MonoBehaviour
     {
         [SerializeField] private LevelFlow flow;
-        [SerializeField] private ArenaFlight flight;
+        [SerializeField] private ShipFlight flight;
         [SerializeField] private ChaseCamera chase;
         [SerializeField] private MainMenu menu;
         [SerializeField] private LevelUi levelUi;

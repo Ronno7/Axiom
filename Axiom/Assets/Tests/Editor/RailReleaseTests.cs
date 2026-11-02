@@ -18,7 +18,7 @@ namespace GeometricFlight.Tests
         private const float ReleaseZ = 10f, HeadingLimit = 45f;
         private static readonly ArenaLimits Arena = new ArenaLimits(Vector3.zero, 10000f, -10000f, 10000f);
         private GameObject actor;
-        private ArenaFlight flight;
+        private ShipFlight flight;
         private MasterArmInput authority;
         private WeaponAuthority weaponAuthority;
         private ShipShield shield;
@@ -30,9 +30,8 @@ namespace GeometricFlight.Tests
         {
             actor = new GameObject("Rail release test (inactive)");
             actor.SetActive(false);
-            flight = actor.AddComponent<ArenaFlight>();
+            flight = actor.AddComponent<ShipFlight>();
             var source = actor.AddComponent<CombinedFlightInput>();
-            source.KeyboardOnly = true; // Reading Armed must never create the real serial service.
             var bounds = actor.AddComponent<ArenaBounds>();
             Set(bounds, "radius", 10000f);
             Set(flight, "arena", bounds);
@@ -122,7 +121,7 @@ namespace GeometricFlight.Tests
             weaponAuthority.Filter(held, true, true);
             Set(flight, "state", State(Quaternion.identity));
 
-            typeof(ArenaFlight).GetMethod("Step", Private).Invoke(flight, new object[] { 0.1f });
+            typeof(ShipFlight).GetMethod("Step", Private).Invoke(flight, new object[] { 0.1f });
 
             Assert.That(flight.RailReleased, Is.True);
             Assert.That(actor.GetComponents<ShipFlight>(), Has.Length.EqualTo(1));

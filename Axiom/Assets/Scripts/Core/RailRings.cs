@@ -6,14 +6,14 @@ namespace GeometricFlight.Core
 {
     /// <summary>The rail's scoring rings: scores each one the ship flies through, from where the flight says it went. A
     /// retry puts the score back to where a checkpoint saved it (<see cref="RingScore"/>).</summary>
-    [DisallowMultipleComponent, RequireComponent(typeof(ArenaFlight))]
+    [DisallowMultipleComponent, RequireComponent(typeof(ShipFlight))]
     public sealed class RailRings : MonoBehaviour
     {
         [SerializeField] private Transform[] rings = new Transform[0];
         [SerializeField, Min(1f)] private float ringRadius = 12f;
 
         private readonly RingScore score = new RingScore();
-        private ArenaFlight flight;
+        private ShipFlight flight;
 
         /// <summary>A ring was flown through and scored (its index).</summary>
         public event Action<int> Scored;
@@ -25,7 +25,7 @@ namespace GeometricFlight.Core
         public RingScore.Snapshot SaveScore() => score.Save();
         public void RestoreScore(RingScore.Snapshot snapshot) => score.Restore(snapshot);
 
-        private void Awake() => flight = GetComponent<ArenaFlight>();
+        private void Awake() => flight = GetComponent<ShipFlight>();
         private void OnEnable() => flight.RailFlown += Cross;
         private void OnDisable() => flight.RailFlown -= Cross;
 

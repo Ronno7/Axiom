@@ -14,7 +14,7 @@ namespace GeometricFlight.Core
     [DisallowMultipleComponent]
     public sealed class RailSeal : MonoBehaviour
     {
-        [SerializeField] private ArenaFlight flight;
+        [SerializeField] private ShipFlight flight;
         [Tooltip("The ship's hull box.")]
         [SerializeField] private BoxCollider hull;
         [Tooltip("A manual ClosingIris on the passage's end plane, its blades facing the arena.")]

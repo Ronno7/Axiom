@@ -272,7 +272,7 @@ namespace GeometricFlight.UI
             UpdateShield();
 
             throttleFill.style.width = Length.Percent(SpeedFraction(flight.CurrentSpeed) * 100f);
-            throttleSetpoint.style.left = Length.Percent(ThrottleGauge.LeverFraction(flight.Lever) * 100f);
+            throttleSetpoint.style.left = Length.Percent(ThrottleGauge.LeverFraction(flight.Throttle) * 100f);
             int speed = Mathf.RoundToInt(flight.CurrentSpeed);
             string word = ThrottleGauge.Word(flight);
             if (speed != shownSpeed || word != shownSpeedWord)

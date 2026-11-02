@@ -45,7 +45,7 @@ namespace GeometricFlight.Core
         }
 
         [SerializeField] private LevelFlow flow;
-        [SerializeField] private ArenaFlight flight;
+        [SerializeField] private ShipFlight flight;
         [SerializeField] private ShipShield shield;
         [SerializeField] private RailRings railRings;
         [SerializeField] private SharedEntryStudy entry;
@@ -78,14 +78,15 @@ namespace GeometricFlight.Core
         private ClosingIris[] irises;
         private int reached = -1, nextCue;
         private string shownRings;
-        private float rebuildAt = -1f, armedAt = float.NegativeInfinity;
+        private float armedAt = float.NegativeInfinity;
         private bool wasArmed, showingLesson, showingFlag, lessonAsksToArm, weaponsIntroduced;
         private RingScore.Snapshot saved;
+        private ShipRebuild rebuild;
 
         /// <summary>Z where the next retry rebuilds the ship.</summary>
         public float RetryZ => reached < 0 ? startZ : checkpoints[reached].z;
         public int CheckpointsReached => reached + 1;
-        public bool Rebuilding => rebuildAt >= 0f;
+        public bool Rebuilding => rebuild.Pending;
 
         private void OnEnable()
         {
@@ -96,6 +97,7 @@ namespace GeometricFlight.Core
                 return;
             }
             authority = flight.GetComponent<MasterArmInput>();
+            rebuild = new ShipRebuild(flow, flight, shield, weapon, authority, chase);
             irises = FindObjectsByType<ClosingIris>(FindObjectsSortMode.None);
             Array.Sort(checkpoints, (a, b) => a.z.CompareTo(b.z));
             Array.Sort(cues, (a, b) => a.z.CompareTo(b.z));
@@ -122,9 +124,7 @@ namespace GeometricFlight.Core
         {
             if (!OnRail && !InArenaLessons) return false;
             if (!OnRail) arena.ShipDestroyed();
-            flight.InputLocked = true;
-            weapon?.ClearProjectiles();
-            rebuildAt = Time.time + rebuildDelay;
+            rebuild.Begin(rebuildDelay);
             entry.Announce("SIGNAL LOST", rebuildDelay);
             return true;
         }
@@ -142,7 +142,7 @@ namespace GeometricFlight.Core
             if (Rebuilding)
             {
                 ClearLesson();
-                if (Time.time >= rebuildAt) Rebuild();
+                if (rebuild.Due) Rebuild();
                 return;
             }
             if (!OnRail)
@@ -162,7 +162,7 @@ namespace GeometricFlight.Core
             while (nextCue < cues.Length && z >= cues[nextCue].z)
             {
                 Cue cue = cues[nextCue++];
-                if (cue.untilZ <= 0f) entry.Announce(TutorialCaptions.Resolve(cue.line, authority), cue.seconds);
+                if (cue.untilZ <= 0f) entry.Announce(TutorialCaptions.Resolve(cue.line), cue.seconds);
             }
             ShowLesson(z);
         }
@@ -178,7 +178,7 @@ namespace GeometricFlight.Core
                 armedAt = armed ? Time.time : float.NegativeInfinity;
             }
             if (authority.RefusedThisFrame && OnRail && !lessonAsksToArm)
-                entry.Announce(TutorialCaptions.Resolve("WEAPONS SAFE · ARM WITH {arm}", authority), 2.5f);
+                entry.Announce(TutorialCaptions.Resolve("WEAPONS SAFE · ARM WITH {arm}"), 2.5f);
             if (weaponsInstrument != null) weaponsInstrument.CallForArming = lessonAsksToArm || InArenaLessons;
         }
 
@@ -229,7 +229,7 @@ namespace GeometricFlight.Core
                 return;
             }
             showingLesson = true;
-            guidance.SetCard(TutorialCaptions.Resolve(line, authority), confirming);
+            guidance.SetCard(TutorialCaptions.Resolve(line), confirming);
             guidance.ChipsLit = authority != null && line.Contains("{fire}") && authority.RawInput.FireHeld;
         }
 
@@ -288,45 +288,31 @@ namespace GeometricFlight.Core
 
         private void Rebuild()
         {
-            rebuildAt = -1f;
-            if (flight.RailReleased)
-            {
-                RebuildInArena();
-                return;
-            }
+            if (flight.RailReleased) RebuildInArena();
+            else RebuildOnRail();
+            entry.Announce("REBUILT", 1.5f);
+        }
+
+        private void RebuildOnRail()
+        {
             float z = RetryZ;
-            flight.Respawn(new Vector3(0f, flightLineY, z));
-            flow.SetShipDestroyed(false);
-            shield.Restore();
+            rebuild.Finish(new Vector3(0f, flightLineY, z));
             railRings.RestoreScore(saved);
             // Obstacles ahead of the retry point start fresh.
             foreach (ClosingIris iris in irises)
                 if (iris != null && iris.TriggerZ >= z) iris.ResetForStudy();
-            weapon?.ClearProjectiles();
-            authority?.RequireRelease();
-            flight.InputLocked = false;
-            chase?.ResetToTarget();
             // Captions after the retry point play again as the ship flies past them.
             nextCue = 0;
             while (nextCue < cues.Length && cues[nextCue].z < z) nextCue++;
-            entry.Announce("REBUILT", 1.5f);
         }
 
-        /// <summary>An arena retry: rebuilt at the step's arena checkpoint with a full shield and whatever weapons have been
-        /// issued so far restocked (as an arena death always restored), and the current step started again. The rail stays
-        /// sealed.</summary>
+        /// <summary>An arena retry: rebuilt at the step's arena checkpoint with whatever weapons have been issued so far
+        /// restocked, and the current step started again. The rail stays sealed.</summary>
         private void RebuildInArena()
         {
-            flight.Respawn(arena.RetryPosition);
-            flow.SetShipDestroyed(false);
-            shield.Restore();
+            rebuild.Finish(arena.RetryPosition);
             arena.Restock();
-            weapon?.ClearProjectiles();
-            authority?.RequireRelease();
-            flight.InputLocked = false;
-            chase?.ResetToTarget();
             arena.RestartStep();
-            entry.Announce("REBUILT", 1.5f);
         }
     }
 }

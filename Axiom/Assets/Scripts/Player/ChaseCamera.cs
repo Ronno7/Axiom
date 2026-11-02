@@ -11,7 +11,7 @@ namespace GeometricFlight.Player
     [RequireComponent(typeof(Camera))]
     public sealed class ChaseCamera : MonoBehaviour
     {
-        [SerializeField] private ArenaFlight target;
+        [SerializeField] private ShipFlight target;
         [SerializeField, Min(1f)] private float distance = 7.5f;
         [SerializeField] private float height = 2f;
         [Tooltip("Seconds for the position spring to catch up (smooth time).")]
@@ -37,7 +37,7 @@ namespace GeometricFlight.Player
             view = GetComponent<Camera>();
             if (target == null)
             {
-                Debug.LogError("Assign an ArenaFlight target to ChaseCamera before playing.", this);
+                Debug.LogError("Assign a ShipFlight target to ChaseCamera before playing.", this);
                 enabled = false;
             }
         }

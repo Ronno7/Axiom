@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 namespace GeometricFlight.Input
 {
-    /// <summary>Opt-in input adapter for commissioning. Existing scenes keep their original input path.</summary>
+    /// <summary>Weapons authority: the MASTER ARM switch while a cockpit is connected, T on the keyboard otherwise.</summary>
     [DefaultExecutionOrder(-25), DisallowMultipleComponent]
     public sealed class MasterArmInput : FlightInputSource
     {
@@ -14,9 +14,8 @@ namespace GeometricFlight.Input
         private bool previousArmed;
         private bool previousPhysical;
         public bool WeaponsAvailable { get; set; }
-        public bool HasPhysicalSwitch => !source.KeyboardOnly && ControllerService.Instance.State.HasMasterArm;
-        public bool Armed => HasPhysicalSwitch ? ControllerService.Instance.State.Armed : keyboardArmed;
-        public bool KeyboardOnly => source.KeyboardOnly;
+        public bool HasPhysicalSwitch => ControllerService.Current != null && ControllerService.Current.State.Connected;
+        public bool Armed => HasPhysicalSwitch ? ControllerService.Current.State.Armed : keyboardArmed;
         public FlightInput RawInput { get; private set; }
         public bool RefusedThisFrame => authority.RefusedThisFrame;
 
@@ -27,7 +26,7 @@ namespace GeometricFlight.Input
 
         private void Update()
         {
-            // Preserve the last accepted switch position while the recovery screen selects a device.
+            // Unplugging keeps the last switch position until T changes it.
             if (previousPhysical && !HasPhysicalSwitch) keyboardArmed = previousArmed;
             if (!HasPhysicalSwitch && toggle.WasPressedThisFrame()) keyboardArmed = !keyboardArmed;
             if (previousArmed != Armed || previousPhysical != HasPhysicalSwitch) authority.RequireRelease();

@@ -15,7 +15,7 @@ namespace GeometricFlight.Tests
     {
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private GameObject actor, inputObject, cameraObject;
-        private ArenaFlight flight;
+        private ShipFlight flight;
         private ArenaBounds bounds;
         private LevelFlow flow;
         private EntryCountingInput input;
@@ -25,7 +25,7 @@ namespace GeometricFlight.Tests
         {
             actor = new GameObject("Entry actor (inactive)");
             actor.SetActive(false);
-            flight = actor.AddComponent<ArenaFlight>();
+            flight = actor.AddComponent<ShipFlight>();
             bounds = actor.AddComponent<ArenaBounds>();
             Set(bounds, "radius", 10000f);
             Set(bounds, "minAltitude", -1000f);
@@ -179,20 +179,20 @@ namespace GeometricFlight.Tests
         [Test]
         public void HeldMenuOnReconnectCannotResumeButALaterDeliberatePressCan()
         {
-            EntrySnapshotFlight sampled = inputObject.AddComponent<EntrySnapshotFlight>();
+            ShipFlight sampled = inputObject.AddComponent<ShipFlight>();
             Set(flow, "flight", sampled);
             flow.Pause();
-            sampled.SetInput(new FlightInput(Vector2.zero, 0f, false, true));
+            SetInput(sampled, new FlightInput(Vector2.zero, 0f, false, true));
             typeof(LevelFlow).GetMethod("OnControllerConnected", Private).Invoke(flow, null);
             Step(flow, 0f);
             Assert.That(flow.State, Is.EqualTo(RunState.Paused),
                 "The reconnect packet's held MENU edge must not resume flight.");
 
             Set(flow, "controllerConnectedFrame", Time.frameCount - 1);
-            sampled.SetInput(default);
+            SetInput(sampled, default);
             Step(flow, 0f);
             Assert.That(flow.State, Is.EqualTo(RunState.Paused));
-            sampled.SetInput(new FlightInput(Vector2.zero, 0f, false, true));
+            SetInput(sampled, new FlightInput(Vector2.zero, 0f, false, true));
             Step(flow, 0f);
             Assert.That(flow.State, Is.EqualTo(RunState.Playing), "A fresh MENU press still resumes normally.");
             Assert.That(input.Reads, Is.Zero, "Recovery observes the cached snapshot without polling input.");
@@ -232,6 +232,8 @@ namespace GeometricFlight.Tests
             Assert.That((bool)Get(chase, "placed"), Is.True);
         }
 
+        private static void SetInput(ShipFlight flight, FlightInput input) =>
+            Set(flight, "<CurrentInput>k__BackingField", input);
         private static void Step(object component, float deltaTime) =>
             component.GetType().GetMethod("Step", Private).Invoke(component, new object[] { deltaTime });
         private static void Set(object target, string field, object value) =>
@@ -250,16 +252,5 @@ namespace GeometricFlight.Tests
             LastDeltaTime = deltaTime;
             return Value;
         }
-    }
-
-    public sealed class EntrySnapshotFlight : ShipFlight
-    {
-        public override float CurrentSpeed => 30f;
-        public override Vector3 Velocity => Vector3.forward * CurrentSpeed;
-        public override float CruiseSpeed => 30f;
-        public override float MinSpeed => 18f;
-        public override float MaxSpeed => 45f;
-        public override float TargetSpeed => 30f;
-        public void SetInput(FlightInput input) => CurrentInput = input;
     }
 }

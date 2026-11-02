@@ -46,7 +46,7 @@ namespace GeometricFlight.Input
                     }
                     target.stickCenterX = packet.StickX;
                     target.stickCenterY = packet.StickY;
-                    if (packet.IsCockpit && Mathf.Abs(packet.Twist - 512) <= MaxCenterOffset)
+                    if (Mathf.Abs(packet.Twist - 512) <= MaxCenterOffset)
                         target.twistCenter = packet.Twist;
                     Current = Step.ThrottleMin;
                     return true;

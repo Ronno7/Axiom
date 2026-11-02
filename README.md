@@ -1,6 +1,6 @@
 # Axiom
 
-A flight shooter set in a world of light lines and dark glass. Flown on the keyboard, or on a custom Arduino cockpit.
+A flight shooter set in a world of light lines and dark glass. Flown on a custom Arduino cockpit, or on the keyboard.
 
 ![The main menu](Axiom/Docs/images/menu.gif)
 
@@ -31,7 +31,7 @@ build isn't signed, so Windows may show a warning.
 | Version | |
 | --- | --- |
 | 0.1 | Prototype |
-| **0.2** | **Playable opening, here now** |
+| **0.2** | **Playable opening** |
 | 0.3 | One procedural rail and arena pair, with scoring |
 | 0.4 | Vertical slice: final ship, real audio, finished UI |
 | 0.5 | Alpha |

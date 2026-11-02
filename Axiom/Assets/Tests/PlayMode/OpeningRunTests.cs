@@ -5,6 +5,7 @@ using GeometricFlight.Core;
 using GeometricFlight.Input;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 
@@ -196,6 +197,21 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.3f);
             Assert.That(game.HudShows("pause-notice"), Is.False, "the notice clears");
             Assert.That(game.Authority.Armed, "still armed");
+        }
+
+        [UnityTest]
+        public IEnumerator TArmsOnlyWithoutACockpitConnected()
+        {
+            yield return game.ReachControl();
+            yield return game.PressKey(Key.T);
+            Assert.That(game.Authority.Armed, Is.False, "the switch owns MASTER ARM while the cockpit is connected");
+
+            game.Cockpit.SetUnplugged(true);
+            yield return game.Until("the cockpit to drop", () => !ControllerService.Instance.State.Connected, 4f);
+            yield return game.PressKey(Key.T);
+            Assert.That(game.Authority.Armed, "T arms on the keyboard");
+            yield return game.PressKey(Key.T);
+            Assert.That(game.Authority.Armed, Is.False, "T makes safe");
         }
 
         [UnityTest]

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GeometricFlight.Input
 {
-    /// <summary>The controller's calibrated state for the current frame.</summary>
+    /// <summary>The cockpit's calibrated state for the current frame.</summary>
     public readonly struct ControllerState
     {
         public readonly bool Connected;
@@ -13,20 +13,19 @@ namespace GeometricFlight.Input
         public readonly float Throttle;
         public readonly bool ThrottleValid;
         public readonly bool Fire;
-        /// <summary>Joystick switch press edge (used as pause).</summary>
-        public readonly bool StickButtonPressed;
-        /// <summary>Stick twist, -1 to +1 (cockpit only; 0 on the kit controller).</summary>
+        /// <summary>MENU press edge (used as pause).</summary>
+        public readonly bool MenuPressed;
+        /// <summary>Stick twist, -1 to +1.</summary>
         public readonly float Twist;
-        public readonly bool LockHeld, HasLock;
-        public readonly bool EmpHeld;
-        /// <summary>Cockpit switch capability and physical position; kit controllers have neither.</summary>
-        public readonly bool HasMasterArm, Armed;
+        public readonly bool LockHeld, EmpHeld;
+        /// <summary>The MASTER ARM switch's physical position.</summary>
+        public readonly bool Armed;
         /// <summary>One frame when a held hardware LOCK is lost with the link or packet capability.</summary>
         public readonly bool LockCancelled;
 
         public ControllerState(bool connected, Vector2 stick, float throttle, bool throttleValid, bool fire,
-            bool stickButtonPressed, float twist = 0f, bool lockHeld = false, bool hasLock = false,
-            bool lockCancelled = false, bool empHeld = false, bool hasMasterArm = false, bool armed = false)
+            bool menuPressed, float twist = 0f, bool lockHeld = false, bool lockCancelled = false,
+            bool empHeld = false, bool armed = false)
         {
             Twist = twist;
             Connected = connected;
@@ -34,12 +33,10 @@ namespace GeometricFlight.Input
             Throttle = throttle;
             ThrottleValid = throttleValid;
             Fire = fire;
-            StickButtonPressed = stickButtonPressed;
+            MenuPressed = menuPressed;
             LockHeld = lockHeld;
             EmpHeld = empHeld;
-            HasLock = hasLock;
             LockCancelled = lockCancelled;
-            HasMasterArm = hasMasterArm;
             Armed = armed;
         }
     }
@@ -90,7 +87,7 @@ namespace GeometricFlight.Input
         private long lastPacketCount = -1;
         private bool wasConnected;
         private bool wasThrottleLost;
-        private bool previousStickButton;
+        private bool previousMenu;
         private ControllerProtocol.Lamp? empLamp;
         private bool empNeedsRelease = true;
 
@@ -174,17 +171,17 @@ namespace GeometricFlight.Input
             ControllerPacket p = snapshot.Packet;
             if (!connected || !wasConnected) empNeedsRelease = true;
             if (connected && !p.Emp) empNeedsRelease = false;
-            bool stickButton = connected && p.StickButton;
-            bool lockCancelled = State.LockHeld && (!connected || !p.HasLock);
+            bool menu = connected && p.Menu;
+            bool lockCancelled = State.LockHeld && !connected;
             State = new ControllerState(connected,
                 connected ? Calibration.NormalizeStick(p.StickX, p.StickY) : Vector2.zero,
                 Throttle.Setpoint, connected && !Throttle.SignalLost, connected && p.Fire,
-                stickButton && !previousStickButton,
-                connected && p.IsCockpit ? Calibration.NormalizeTwist(p.Twist) : 0f,
-                connected && p.HasLock && p.LockHeld, connected && p.HasLock, lockCancelled,
-                connected && p.IsCockpit && p.Emp && !empNeedsRelease,
-                connected && p.IsCockpit, connected && p.IsCockpit && p.Armed);
-            previousStickButton = stickButton;
+                menu && !previousMenu,
+                connected ? Calibration.NormalizeTwist(p.Twist) : 0f,
+                connected && p.LockHeld, lockCancelled,
+                connected && p.Emp && !empNeedsRelease,
+                connected && p.Armed);
+            previousMenu = menu;
 
             if (connected != wasConnected)
             {

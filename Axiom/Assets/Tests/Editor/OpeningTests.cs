@@ -106,7 +106,6 @@ namespace GeometricFlight.Tests
             var simulator = new SimulatedLineTransport();
             simulator.SetArmed(armed);
             Assert.That(ControllerProtocol.TryParse(simulator.ReadLine(), out ControllerPacket packet), Is.True);
-            Assert.That(packet.IsCockpit, Is.True);
             Assert.That(packet.Armed, Is.EqualTo(armed));
         }
     }

@@ -68,10 +68,10 @@ namespace GeometricFlight.Core
         private void Awake()
         {
             Time.timeScale = 1f;
-            if (waitForEntry && flight is ArenaFlight arenaFlight)
+            if (waitForEntry)
             {
                 EntryHeld = true;
-                arenaFlight.HoldForEntry();
+                flight.HoldForEntry();
             }
             targets = FindObjectsByType<ShootableTarget>(FindObjectsSortMode.None);
             TargetsTotal = targets.Length;
@@ -160,9 +160,8 @@ namespace GeometricFlight.Core
         /// A pause on this frame keeps the entry held. Normal movement and scored time begin next Update.</summary>
         public bool TryBeginEntryRun()
         {
-            if (!EntryHeld || !EntryStarted || State != RunState.Playing || !(flight is ArenaFlight arenaFlight))
-                return false;
-            arenaFlight.ReleaseEntry();
+            if (!EntryHeld || !EntryStarted || State != RunState.Playing) return false;
+            flight.ReleaseEntry();
             EntryHeld = false;
             return true;
         }

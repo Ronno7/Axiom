@@ -12,6 +12,8 @@ using GeometricFlight.Presentation;
 using GeometricFlight.UI;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
@@ -26,12 +28,15 @@ namespace GeometricFlight.Tests
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private const string HitTone = "BZ,196";
 
-        private static readonly FieldInfo FlightState = typeof(ArenaFlight).GetField("state", Private);
+        private static readonly FieldInfo FlightState = typeof(ShipFlight).GetField("state", Private);
         private static readonly FieldInfo StepStarted = typeof(ArenaLessons).GetField("stepStarted", Private);
         private static readonly FieldInfo Checkpoints = typeof(TutorialCourse).GetField("checkpoints", Private);
 
         private readonly string captureFolder;
         private Action restoreSettings;
+        private Keyboard keyboard;
+        private InputSettings.BackgroundBehavior realBackground;
+        private InputSettings.EditorInputBehaviorInPlayMode realEditorInput;
         private ShipHull hull;
         private MainMenu menu;
 
@@ -42,7 +47,7 @@ namespace GeometricFlight.Tests
 
         public LevelFlow Flow { get; private set; }
         public SharedEntryStudy Entry { get; private set; }
-        public ArenaFlight Flight { get; private set; }
+        public ShipFlight Flight { get; private set; }
         public ShipShield Shield { get; private set; }
         public LockOnWeapon Missiles { get; private set; }
         public EmpWeapon Emp { get; private set; }
@@ -115,6 +120,10 @@ namespace GeometricFlight.Tests
         {
             Application.logMessageReceived -= RecordWarning;
             restoreSettings?.Invoke();
+            if (keyboard == null) return;
+            InputSystem.RemoveDevice(keyboard);
+            InputSystem.settings.backgroundBehavior = realBackground;
+            InputSystem.settings.editorInputBehaviorInPlayMode = realEditorInput;
         }
 
         /// <summary>Follows a button that reloads the scene.</summary>
@@ -136,7 +145,7 @@ namespace GeometricFlight.Tests
         {
             Flow = UnityEngine.Object.FindAnyObjectByType<LevelFlow>();
             Entry = UnityEngine.Object.FindAnyObjectByType<SharedEntryStudy>();
-            Flight = UnityEngine.Object.FindAnyObjectByType<ArenaFlight>();
+            Flight = UnityEngine.Object.FindAnyObjectByType<ShipFlight>();
             Lessons = UnityEngine.Object.FindAnyObjectByType<ArenaLessons>();
             Course = UnityEngine.Object.FindAnyObjectByType<TutorialCourse>();
             Ui = UnityEngine.Object.FindAnyObjectByType<LevelUi>();
@@ -239,6 +248,25 @@ namespace GeometricFlight.Tests
 
         /// <summary>Stick centred, throttle mid range, with the given buttons held.</summary>
         public void Hands(bool fire = false, bool menuButton = false) => Cockpit.Set(512, 512, 200, fire, menuButton);
+
+        /// <summary>Presses a key on a virtual keyboard inside the engine, so nothing reaches the rest of the PC. The
+        /// settings let it through while the Editor is out of focus.</summary>
+        public IEnumerator PressKey(Key key)
+        {
+            if (keyboard == null)
+            {
+                InputSettings settings = InputSystem.settings;
+                realBackground = settings.backgroundBehavior;
+                realEditorInput = settings.editorInputBehaviorInPlayMode;
+                settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+                settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+                keyboard = InputSystem.AddDevice<Keyboard>("Test keyboard");
+            }
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(key));
+            yield return Wait(0.1f);
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            yield return Wait(0.1f);
+        }
 
         public IEnumerator PressMenu()
         {

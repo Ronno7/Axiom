@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 namespace GeometricFlight.Core
 {
     /// <summary>A round arena around this transform: the floor disc, the lowest flying height and the
-    /// ceiling that ArenaFlight keeps the ship inside. Draws the edge as thin light lines (floor ring,
+    /// ceiling that ShipFlight keeps the ship inside. Draws the edge as thin light lines (floor ring,
     /// ceiling ring and evenly spaced posts) so the boundary is visible before the ship reaches it.</summary>
     [DisallowMultipleComponent]
     public sealed class ArenaBounds : MonoBehaviour

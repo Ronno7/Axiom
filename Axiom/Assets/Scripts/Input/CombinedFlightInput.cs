@@ -12,14 +12,11 @@ namespace GeometricFlight.Input
 
         /// <summary>True while a controller is connected (HUD prompts adapt to it).</summary>
         public bool UsingController { get; private set; }
-        /// <summary>Explicit keyboard takeover, used by the opening prototype's paused recovery screen.</summary>
-        public bool KeyboardOnly { get; set; }
 
         public override FlightInput ReadInput(float deltaTime)
         {
             FlightInput keys = keyboard != null && keyboard.isActiveAndEnabled ? keyboard.ReadInput(deltaTime) : default;
             ControllerState controller = ControllerService.Instance.State;
-            if (KeyboardOnly) controller = default;
             UsingController = controller.Connected;
             return FlightInputMerge.Merge(keys, controller, GameSettings.KeyboardThrottleWithController);
         }
@@ -47,7 +44,7 @@ namespace GeometricFlight.Input
             float twist = Mathf.Abs(keyboard.Twist) > 0.0001f ? keyboard.Twist : controller.Twist;
             float throttle = keyboardThrottleWithController ? keyboard.Throttle : controller.Throttle;
             return new FlightInput(steering, throttle,
-                keyboard.FireHeld || controller.Fire, keyboard.PausePressed || controller.StickButtonPressed,
+                keyboard.FireHeld || controller.Fire, keyboard.PausePressed || controller.MenuPressed,
                 twist, keyboard.LockHeld || controller.LockHeld,
                 keyboard.LockCancelled || controller.LockCancelled, keyboard.EmpHeld || controller.EmpHeld);
         }

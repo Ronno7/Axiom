@@ -72,21 +72,20 @@ namespace GeometricFlight.Input
         private readonly object gate = new object();
         private readonly List<string> sent = new List<string>();
         private int stickX = 512, stickY = 512, distanceMm = 180;
-        private bool fire, stickButton, unplugged;
-        private bool cockpit, lockHeld, empHeld, armed;
+        private bool fire, menu, unplugged;
+        private bool lockHeld, empHeld, armed;
         private string injected;
 
         public string Name => "Simulator";
 
-        public void Set(int x, int y, int mm, bool fireHeld, bool stickPressed = false)
+        public void Set(int x, int y, int mm, bool fireHeld, bool menuPressed = false)
         {
-            lock (gate) { stickX = x; stickY = y; distanceMm = mm; fire = fireHeld; stickButton = stickPressed; }
+            lock (gate) { stickX = x; stickY = y; distanceMm = mm; fire = fireHeld; menu = menuPressed; }
         }
 
-        /// <summary>Emit the extended cockpit packet for hardware LOCK integration checks.</summary>
-        public void SetLock(bool held) { lock (gate) { cockpit = true; lockHeld = held; } }
-        public void SetEmp(bool held) { lock (gate) { cockpit = true; empHeld = held; } }
-        public void SetArmed(bool value) { lock (gate) { cockpit = true; armed = value; } }
+        public void SetLock(bool held) { lock (gate) lockHeld = held; }
+        public void SetEmp(bool held) { lock (gate) empHeld = held; }
+        public void SetArmed(bool value) { lock (gate) armed = value; }
 
         public void SetUnplugged(bool value) { lock (gate) unplugged = value; }
 
@@ -116,9 +115,8 @@ namespace GeometricFlight.Input
                     injected = null;
                     return line;
                 }
-                string body = $"AX,{stickX},{stickY},{distanceMm},{(fire ? 1 : 0)},{(stickButton ? 1 : 0)}";
-                if (cockpit) body += $",512,{(empHeld ? 1 : 0)},{(armed ? 1 : 0)},{(lockHeld ? 1 : 0)}";
-                return ControllerProtocol.Frame(body);
+                return ControllerProtocol.Frame($"AX,{stickX},{stickY},{distanceMm},{(fire ? 1 : 0)},{(menu ? 1 : 0)},"
+                    + $"512,{(empHeld ? 1 : 0)},{(armed ? 1 : 0)},{(lockHeld ? 1 : 0)}");
             }
         }
 

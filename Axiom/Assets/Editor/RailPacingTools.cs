@@ -28,7 +28,7 @@ namespace GeometricFlight.Editor
                 Debug.LogWarning("Check Rail Pacing needs a scene with rail rings and an enclosed passage.");
                 return;
             }
-            ArenaFlight flight = rings.GetComponent<ArenaFlight>();
+            ShipFlight flight = rings.GetComponent<ShipFlight>();
 
             List<RailCourseCheck.Gate> gates = Gates(rings, passage);
             gates.Sort((a, b) => a.Center.z.CompareTo(b.Center.z));

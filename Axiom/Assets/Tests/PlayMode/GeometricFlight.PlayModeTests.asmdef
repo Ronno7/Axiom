@@ -1,6 +1,6 @@
 {
     "name": "GeometricFlight.PlayModeTests",
     "rootNamespace": "GeometricFlight.Tests",
-    "references": ["GeometricFlight.Runtime"],
+    "references": ["GeometricFlight.Runtime", "Unity.InputSystem"],
     "optionalUnityReferences": ["TestAssemblies"]
 }

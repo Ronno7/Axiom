@@ -4,51 +4,39 @@ using UnityEngine;
 
 namespace GeometricFlight.Input
 {
-    /// <summary>One raw sample from the controller; calibration happens in ControllerCalibration.</summary>
+    /// <summary>One raw sample from the cockpit; calibration happens in ControllerCalibration.</summary>
     public readonly struct ControllerPacket
     {
-        /// <summary>Joystick axes, raw 0–1023.</summary>
-        public readonly int StickX, StickY;
+        /// <summary>Stick and twist axes, raw 0–1023.</summary>
+        public readonly int StickX, StickY, Twist;
         /// <summary>Ultrasonic distance in millimetres, or -1 when the sensor got no echo.</summary>
         public readonly int DistanceMm;
-        /// <summary>StickButton is the pause control: the stick push switch on v1, MENU on the cockpit (v2).</summary>
-        public readonly bool Fire, StickButton;
-        /// <summary>Cockpit (v2) only: twist axis raw 0–1023, EMP button, MASTER ARM switch.</summary>
-        public readonly bool IsCockpit;
-        public readonly int Twist;
-        public readonly bool Emp, Armed;
-        /// <summary>Extended cockpit packet includes the D11 LOCK button; older packets have no LOCK.</summary>
-        public readonly bool HasLock, LockHeld;
+        public readonly bool Fire, Menu, Emp, Armed, LockHeld;
 
-        public ControllerPacket(int stickX, int stickY, int distanceMm, bool fire, bool stickButton)
-            : this(stickX, stickY, distanceMm, fire, stickButton, false, 512, false, false) { }
-
-        public ControllerPacket(int stickX, int stickY, int distanceMm, bool fire, bool stickButton,
-            bool isCockpit, int twist, bool emp, bool armed, bool lockHeld = false, bool hasLock = false)
+        public ControllerPacket(int stickX, int stickY, int distanceMm, bool fire = false, bool menu = false,
+            int twist = 512, bool emp = false, bool armed = false, bool lockHeld = false)
         {
             StickX = stickX;
             StickY = stickY;
             DistanceMm = distanceMm;
             Fire = fire;
-            StickButton = stickButton;
-            IsCockpit = isCockpit;
+            Menu = menu;
             Twist = twist;
             Emp = emp;
             Armed = armed;
             LockHeld = lockHeld;
-            HasLock = hasLock;
         }
     }
 
     /// <summary>
-    /// Serial protocol v1 (Arduino/README.md). ASCII lines ending in newline, 115200 baud, with an
+    /// Serial protocol (Arduino/README.md). ASCII lines ending in newline, 115200 baud, with an
     /// NMEA-style checksum: XOR of every character before '*', written as two hex digits.
-    ///   controller → PC, ~50 Hz:  AX,&lt;x 0-1023&gt;,&lt;y 0-1023&gt;,&lt;mm or -1&gt;,&lt;fire 0/1&gt;,&lt;stick 0/1&gt;*HH
-    ///   cockpit (v2) appends:     ...,&lt;twist 0-1023&gt;,&lt;emp 0/1&gt;,&lt;arm 0/1&gt;[,&lt;lock 0/1&gt;]*HH
-    ///   PC → controller:          BZ,&lt;hz&gt;,&lt;ms&gt;*HH   (buzzer tone)
-    ///   PC → controller:          LT,&lt;row 0/1&gt;,&lt;text&gt;*HH   (one LCD row, see FormatLcdRow)
-    ///   PC → cockpit:             RM,&lt;level 0-255&gt;,&lt;ms&gt;*HH   (rumble, see FormatRumble)
-    ///   PC → cockpit:             LA,&lt;0 off | 1 on | 2 blink&gt;*HH   (EMP dome lamp)
+    ///   cockpit → PC, ~50 Hz:  AX,&lt;x 0-1023&gt;,&lt;y 0-1023&gt;,&lt;mm or -1&gt;,&lt;fire 0/1&gt;,&lt;menu 0/1&gt;,
+    ///                          &lt;twist 0-1023&gt;,&lt;emp 0/1&gt;,&lt;arm 0/1&gt;,&lt;lock 0/1&gt;*HH
+    ///   PC → cockpit:          BZ,&lt;hz&gt;,&lt;ms&gt;*HH   (buzzer tone)
+    ///   PC → cockpit:          LT,&lt;row 0/1&gt;,&lt;text&gt;*HH   (one LCD row, see FormatLcdRow)
+    ///   PC → cockpit:          RM,&lt;level 0-255&gt;,&lt;ms&gt;*HH   (rumble, see FormatRumble)
+    ///   PC → cockpit:          LA,&lt;0 off | 1 on | 2 blink&gt;*HH   (EMP dome lamp)
     /// Anything that fails the checksum, field count, or range checks is rejected.
     /// </summary>
     public static class ControllerProtocol
@@ -70,24 +58,14 @@ namespace GeometricFlight.Input
                 return false;
 
             string[] f = body.Split(',');
-            if ((f.Length != 6 && f.Length != 9 && f.Length != 10) || f[0] != "AX") return false;
+            if (f.Length != 10 || f[0] != "AX") return false;
             if (!TryInt(f[1], 0, 1023, out int x) || !TryInt(f[2], 0, 1023, out int y)
                 || !TryInt(f[3], -1, MaxDistanceMm, out int mm)
-                || !TryInt(f[4], 0, 1, out int fire) || !TryInt(f[5], 0, 1, out int stick))
+                || !TryInt(f[4], 0, 1, out int fire) || !TryInt(f[5], 0, 1, out int menu)
+                || !TryInt(f[6], 0, 1023, out int twist) || !TryInt(f[7], 0, 1, out int emp)
+                || !TryInt(f[8], 0, 1, out int arm) || !TryInt(f[9], 0, 1, out int missileLock))
                 return false;
-
-            if (f.Length == 6)
-            {
-                packet = new ControllerPacket(x, y, mm, fire == 1, stick == 1);
-                return true;
-            }
-            if (!TryInt(f[6], 0, 1023, out int twist) || !TryInt(f[7], 0, 1, out int emp)
-                || !TryInt(f[8], 0, 1, out int arm))
-                return false;
-            int missileLock = 0;
-            if (f.Length == 10 && !TryInt(f[9], 0, 1, out missileLock)) return false;
-            packet = new ControllerPacket(x, y, mm, fire == 1, stick == 1, true, twist, emp == 1, arm == 1,
-                missileLock == 1, f.Length == 10);
+            packet = new ControllerPacket(x, y, mm, fire == 1, menu == 1, twist, emp == 1, arm == 1, missileLock == 1);
             return true;
         }
 
