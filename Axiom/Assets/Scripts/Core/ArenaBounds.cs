@@ -18,15 +18,10 @@ namespace GeometricFlight.Core
 
         [Header("Edge lines")]
         [SerializeField] private Material lineMaterial;
-        [Tooltip("Optional translucent wall (Arena Wall shader) on the edge, brightening near Focus.")]
-        [SerializeField] private Material wallMaterial;
-        [Tooltip("What the wall brightens near (the player ship).")]
-        [SerializeField] private Transform focus;
         [SerializeField, Range(4, 72)] private int posts = 36;
         [SerializeField, Min(0f)] private float ringHeightStep = 25f;
 
-        private Mesh mesh, wallMesh;
-        private static readonly int FocusId = Shader.PropertyToID("_ArenaFocus");
+        private Mesh mesh;
 
         public ArenaLimits Limits => new ArenaLimits(transform.position, radius, minAltitude, ceiling);
         public float Radius => radius;
@@ -34,65 +29,19 @@ namespace GeometricFlight.Core
 
         private void Awake()
         {
-            if (lineMaterial != null)
-            {
-                mesh = BuildEdge();
-                AddChild("ArenaEdge", mesh, lineMaterial);
-            }
-            if (wallMaterial != null)
-            {
-                wallMesh = BuildWall();
-                AddChild("ArenaWall", wallMesh, wallMaterial);
-            }
-        }
-
-        private void LateUpdate()
-        {
-            if (focus != null) Shader.SetGlobalVector(FocusId, focus.position);
+            if (lineMaterial == null) return;
+            mesh = BuildEdge();
+            var go = new GameObject("ArenaEdge");
+            go.transform.SetParent(transform, false);
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var r = go.AddComponent<MeshRenderer>();
+            r.sharedMaterial = lineMaterial;
+            r.shadowCastingMode = ShadowCastingMode.Off;
         }
 
         private void OnDestroy()
         {
             if (mesh != null) Destroy(mesh);
-            if (wallMesh != null) Destroy(wallMesh);
-        }
-
-        private void AddChild(string label, Mesh m, Material material)
-        {
-            var go = new GameObject(label);
-            go.transform.SetParent(transform, false);
-            go.AddComponent<MeshFilter>().sharedMesh = m;
-            var r = go.AddComponent<MeshRenderer>();
-            r.sharedMaterial = material;
-            r.shadowCastingMode = ShadowCastingMode.Off;
-        }
-
-        /// <summary>An open cylinder from the floor to the ceiling; uv.y is 0 at the floor and 1 at the ceiling.</summary>
-        private Mesh BuildWall()
-        {
-            const int segments = 144;
-            var vertices = new Vector3[(segments + 1) * 2];
-            var uv = new Vector2[vertices.Length];
-            var triangles = new int[segments * 6];
-            for (int i = 0; i <= segments; i++)
-            {
-                float a = i * Mathf.PI * 2f / segments;
-                var p = new Vector3(Mathf.Sin(a) * radius, 0f, Mathf.Cos(a) * radius);
-                vertices[i * 2] = p;
-                vertices[i * 2 + 1] = p + Vector3.up * ceiling;
-                uv[i * 2] = new Vector2(i / (float)segments, 0f);
-                uv[i * 2 + 1] = new Vector2(i / (float)segments, 1f);
-                if (i == segments) break;
-                int t = i * 6, v = i * 2;
-                triangles[t] = v; triangles[t + 1] = v + 1; triangles[t + 2] = v + 2;
-                triangles[t + 3] = v + 2; triangles[t + 4] = v + 1; triangles[t + 5] = v + 3;
-            }
-            var m = new Mesh { name = "Arena wall (generated)", hideFlags = HideFlags.HideAndDontSave };
-            m.vertices = vertices;
-            m.uv = uv;
-            m.triangles = triangles;
-            m.RecalculateBounds();
-            return m;
         }
 
         private Mesh BuildEdge()

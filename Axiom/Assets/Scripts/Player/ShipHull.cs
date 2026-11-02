@@ -7,7 +7,7 @@ namespace GeometricFlight.Player
     /// flies on through; ShipShield's protection window stops one obstacle from hitting twice.
     /// Scenery marked with LethalSurface (passage walls) destroys the ship instead.
     /// The BoxCollider (on the Player layer) is also what enemy shots hit.</summary>
-    [DefaultExecutionOrder(10)] // After PlayerFlight has moved the ship this frame.
+    [DefaultExecutionOrder(10)] // After the flight has moved the ship this frame.
     [DisallowMultipleComponent]
     [RequireComponent(typeof(BoxCollider), typeof(ShipShield))]
     public sealed class ShipHull : MonoBehaviour

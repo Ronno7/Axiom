@@ -22,7 +22,7 @@ namespace GeometricFlight.UI
         private VisualElement screen, hud, pausePanel, resultsPanel, helpPanel;
         private VisualElement throttle, throttleTrack, throttleReadouts, throttleFill, throttleSetpoint, throttleCruise,
             throttleBand, throttleBoostZone, throttleReserve, throttleReserveFill, parRow;
-        private Label timeLabel, targetsLabel, speedLabel, throttleCaption, throttleHint, zoneBanner, resultsTitle,
+        private Label timeLabel, targetsLabel, speedLabel, throttleCaption, throttleHint, resultsTitle,
             throttleReserveState;
         private string shownSpeedWord;
         private BoostStatus shownBoost = (BoostStatus)(-1);
@@ -54,8 +54,8 @@ namespace GeometricFlight.UI
         private Label shieldNote;
         private IVisualElementScheduledItem hideShieldNote;
 
-        /// <summary>Where a level has its own announcement panel, its slot's messages go there instead (null clears).
-        /// Its lessons also speak for the throttle zones, so their calls stay on the gauge.</summary>
+        /// <summary>The level's announcement panel (null clears it). Its lessons also speak for the throttle zones, so
+        /// their calls stay on the gauge.</summary>
         public System.Action<string> AddressSink { get; set; }
 
         /// <summary>Opt-in shared-menu handoff. The level remains bound while the menu owns the LCD.</summary>
@@ -88,18 +88,11 @@ namespace GeometricFlight.UI
             courseTotal = total;
         }
 
-        /// <summary>The one announcement slot at top centre; null clears it. Stays until replaced or cleared.</summary>
+        /// <summary>The one announcement slot; null clears it. Stays until replaced or cleared.</summary>
         public void SetBanner(string text)
         {
             hideBanner?.Pause();
-            if (AddressSink != null)
-            {
-                AddressSink(text);
-                return;
-            }
-            if (zoneBanner == null) return;
-            if (text != null) zoneBanner.text = text;
-            zoneBanner.EnableInClassList("zone-banner--visible", text != null);
+            AddressSink?.Invoke(text);
         }
 
         /// <summary>A short note beside the shield gauge, for what changed it ("CHECKPOINT").</summary>
@@ -130,7 +123,7 @@ namespace GeometricFlight.UI
         private void ApplyEntryPresentation()
         {
             if (hud == null) return;
-            // Inline styles only while partial, so class-driven opacity (zone banner) resumes afterward.
+            // Inline styles only while partial, so class-driven opacity resumes afterward.
             foreach (VisualElement child in hud.Children())
                 if (child != throttle && child != timeLabel && child != targetsLabel && child != controllerStatus
                     && child != ringsLabel && !child.ClassListContains(InstrumentBuild.RuleClass))
@@ -189,7 +182,6 @@ namespace GeometricFlight.UI
             throttleCaption = root.Q<Label>("throttle-caption");
             throttleHint = root.Q<Label>("throttle-hint");
             throttleBand = root.Q("throttle-band");
-            zoneBanner = root.Q<Label>("zone-banner");
             controllerStatus = root.Q<Label>("hud-controller");
             timeBuild = new InstrumentBuild(timeLabel, false);
             targetsBuild = new InstrumentBuild(targetsLabel, true);
@@ -377,20 +369,12 @@ namespace GeometricFlight.UI
             throttle.EnableInClassList("throttle--in-band", hint == "HOLD");
         }
 
-        /// <summary>Brief top-of-screen callout when a zone starts, so the floor cues are not missed.</summary>
-        private void AnnounceZone(ThrottleZone zone)
-        {
-            if (AddressSink != null) return;
-            Announce(zone.Type == ThrottleZone.Kind.Slow
-                ? "SLOW ZONE  ·  LOWER THROTTLE" : "FAST ZONE  ·  FULL THROTTLE");
-        }
-
-        /// <summary>A passing announcement in the top centre slot.</summary>
+        /// <summary>A passing announcement in the one slot.</summary>
         public void Announce(string text, float seconds = 3f)
         {
-            if (zoneBanner == null) return;
+            if (screen == null) return;
             SetBanner(text);
-            hideBanner = zoneBanner.schedule.Execute(() => SetBanner(null));
+            hideBanner = screen.schedule.Execute(() => SetBanner(null));
             hideBanner.ExecuteLater((long)(seconds * 1000f));
         }
 
@@ -404,7 +388,6 @@ namespace GeometricFlight.UI
             throttleHint.style.display = guided ? DisplayStyle.Flex : DisplayStyle.None;
             if (throttleBuild >= 1f) throttleCaption.text = CaptionFor(zone);
             if (!guided) return;
-            AnnounceZone(zone);
             float from = SpeedFraction(zone.RecommendedCruiseMultiple.x * flight.CruiseSpeed);
             float to = SpeedFraction(zone.RecommendedCruiseMultiple.y * flight.CruiseSpeed);
             shownBand = new Vector2(from, to);

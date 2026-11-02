@@ -32,7 +32,7 @@ namespace GeometricFlight.Presentation
 
         private static readonly int Front = Shader.PropertyToID("_BuildFront");
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
-        // The existing aircraft's silhouette, shared in form with OpeningPresentation.
+        // The existing aircraft's silhouette.
         private static readonly Vector3[] Edges = {
             new Vector3(-2f, 0.03f, -1.4f), new Vector3(0f, 0.03f, 2.5f),
             new Vector3(2f, 0.03f, -1.4f), new Vector3(0f, 0.53f, -0.5f),

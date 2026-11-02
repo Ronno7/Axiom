@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace GeometricFlight.Player
 {
-    /// <summary>What weapons and presentation need from whichever component flies the ship: the rail
-    /// course (PlayerFlight) or free flight in an arena (ArenaFlight). Each reads its input source once
-    /// per Update and exposes that snapshot here, so nothing else reads the input a second time.</summary>
+    /// <summary>What weapons and presentation need from the component that flies the ship. It reads its input source
+    /// once per Update and exposes that snapshot here, so nothing else reads the input a second time.</summary>
     public abstract class ShipFlight : MonoBehaviour
     {
         /// <summary>Raw input snapshot for this frame (before player options are applied).</summary>

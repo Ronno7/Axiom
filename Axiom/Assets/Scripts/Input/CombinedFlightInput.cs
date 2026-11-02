@@ -4,7 +4,7 @@ using UnityEngine;
 namespace GeometricFlight.Input
 {
     /// <summary>The ship's input: keyboard always works; the Arduino controller joins in when connected.
-    /// PlayerFlight reads this source, and it reads the keyboard exactly once per frame.</summary>
+    /// The flight reads this source, and it reads the keyboard exactly once per frame.</summary>
     [DisallowMultipleComponent]
     public sealed class CombinedFlightInput : FlightInputSource
     {

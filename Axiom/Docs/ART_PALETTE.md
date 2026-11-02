@@ -17,9 +17,8 @@ defaults listed in `shader_defaults`. Shader logic remains hand-authored; only t
 defaults are regenerated. Change the source and regenerate; do not maintain another list of nearly
 matching RGB values in a script, stylesheet or shader default.
 
-The constraint applies to authored color in the current game: Opening, MainMenu, Prototype, Arena
-and the earlier study scenes; shared UI, runtime-generated graphics, shaders, materials, prefabs and
-serialized scene settings. Existing artwork should use these tokens or their defined derivatives. New
+The constraint applies to authored color in the game: the Opening scene, shared UI, runtime-generated graphics,
+shaders, materials, prefabs and serialized scene settings. Existing artwork should use these tokens or their defined derivatives. New
 art uses the same palette from its source-generation step onward.
 
 Reference images and earlier screenshots are

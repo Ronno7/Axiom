@@ -29,7 +29,7 @@ namespace GeometricFlight.Core
         [Tooltip("Hidden when the ship is destroyed (aircraft visuals, reticles).")]
         [SerializeField] private GameObject[] hideWhenDestroyed;
         [SerializeField] private ShatterEffect shipDestruction;
-        [SerializeField] private string menuScene = "MainMenu";
+        [SerializeField] private string menuScene = "Opening";
         [Tooltip("Loaded by Continue. Empty returns to the menu.")]
         [SerializeField] private string nextScene = "";
         [Tooltip("Target completion time in seconds, shown on results. 0 hides it.")]
@@ -228,17 +228,6 @@ namespace GeometricFlight.Core
         private static void Load(string scene)
         {
             Time.timeScale = 1f;
-#if UNITY_EDITOR
-            // Isolated studies are intentionally absent from release build settings. Retry only the
-            // currently open scene by its known path; menu/continue keep their normal build lookup.
-            Scene current = SceneManager.GetActiveScene();
-            if (!Application.CanStreamedLevelBeLoaded(scene) && scene == current.name)
-            {
-                UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(current.path,
-                    new LoadSceneParameters(LoadSceneMode.Single));
-                return;
-            }
-#endif
             SceneManager.LoadScene(scene);
         }
     }

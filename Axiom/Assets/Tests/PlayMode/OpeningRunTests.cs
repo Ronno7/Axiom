@@ -21,6 +21,7 @@ namespace GeometricFlight.Tests
 
         /// <summary>Past the rail's end, where the ship is released into the arena.</summary>
         private const float BeyondTheRail = 5900f;
+        private const string WaveArrivalTone = "BZ,440,180", WaveClearedTone = "BZ,1320,220";
 
         private readonly Display display;
         private OpeningDriver game;
@@ -51,7 +52,7 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.4f);
             Assert.That(game.HudShows("pause-panel"), "the pause panel shows");
             Assert.That(Time.timeScale, Is.Zero, "time stops");
-            game.Capture("entry-paused");
+            yield return game.Capture("entry-paused");
             float frozen = game.Entry.Elapsed;
             yield return game.Wait(1f);
             Assert.That(game.Entry.Elapsed, Is.EqualTo(frozen), "the entry clock stops");
@@ -64,7 +65,7 @@ namespace GeometricFlight.Tests
             Assert.That(game.MenuShows("title-panel"), Is.False, "the title is gone");
             Assert.That(game.Flow.State, Is.EqualTo(RunState.Playing));
             Assert.That(game.Flow.ElapsedTime, Is.GreaterThan(0f), "run time counts");
-            game.Capture("control");
+            yield return game.Capture("control");
         }
 
         [UnityTest]
@@ -74,7 +75,7 @@ namespace GeometricFlight.Tests
             Assert.That(game.Ui.EntryReady, "the HUD is ready at control");
             Assert.That(game.WeaponsPanel.enabled, "the weapons panel is on");
             Assert.That(game.MenuShows("title-panel"), Is.False, "the title is gone");
-            game.Capture("reduced-control");
+            yield return game.Capture("reduced-control");
         }
 
         [UnityTest]
@@ -86,7 +87,7 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.3f);
             Assert.That(game.Header, Does.Contain("SAFE").Or.Contain("ARM"));
             Assert.That(game.Gun.ShotsFired, Is.Zero);
-            game.Capture("safe-refused");
+            yield return game.Capture("safe-refused");
         }
 
         [UnityTest]
@@ -98,13 +99,13 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.6f);
             Assert.That(game.Course.CheckpointsReached, Is.GreaterThanOrEqualTo(1), "the checkpoint registers");
             Assert.That(game.HitTones, Is.EqualTo(tones), "a checkpoint isn't a hit");
-            game.Capture("checkpoint");
+            yield return game.Capture("checkpoint");
 
             game.Shield.ApplyHit();
             Assert.That(game.Shield.State.Current, Is.EqualTo(2), "one hit costs one segment");
             yield return game.Wait(0.1f);
             Assert.That(game.HitTones, Is.GreaterThan(tones), "the hit tone sounds");
-            game.Capture("hit");
+            yield return game.Capture("hit");
         }
 
         [UnityTest]
@@ -124,7 +125,7 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.3f);
             Assert.That(game.Flight.enabled, Is.False, "the ship is gone while destroyed");
             Assert.That(game.Header, Does.Contain("SIGNAL"));
-            game.Capture("signal-lost");
+            yield return game.Capture("signal-lost");
 
             game.Flow.Pause();
             yield return game.Wait(2.5f);
@@ -136,7 +137,7 @@ namespace GeometricFlight.Tests
             Assert.That(game.Flight.transform.position.z, Is.EqualTo(retryZ).Within(30f), "rebuilt at the checkpoint");
             Assert.That(game.Flight.InputLocked, Is.False, "input is back");
             Assert.That(game.Header, Does.Contain("REBUILT"));
-            game.Capture("rebuilt");
+            yield return game.Capture("rebuilt");
 
             game.Shield.Destroy();
             Assert.That(game.Course.Rebuilding, "a lethal hit starts a rebuild");
@@ -157,14 +158,14 @@ namespace GeometricFlight.Tests
             Assert.That(game.Flow.PauseReason, Is.EqualTo(PauseReason.ControllerLost));
             Assert.That(game.HudText("pause-notice"), Does.Contain("disconnected"));
             Assert.That(game.Authority.Armed, "arming survives on the keyboard");
-            game.Capture("disconnected");
+            yield return game.Capture("disconnected");
 
             game.Cockpit.SetUnplugged(false);
             yield return game.Until("replugging to reconnect", () => ControllerService.Instance.State.Connected, 8f);
             yield return game.Wait(0.3f);
             Assert.That(game.Flow.State, Is.EqualTo(RunState.Paused), "it waits for the player");
             Assert.That(game.HudText("pause-notice"), Does.Contain("reconnected"));
-            game.Capture("reconnected");
+            yield return game.Capture("reconnected");
 
             game.Flow.Resume();
             yield return game.Wait(0.3f);
@@ -191,7 +192,7 @@ namespace GeometricFlight.Tests
             game.ClickHud("pause-help-button");
             yield return game.Wait(0.3f);
             Assert.That(game.HudShows("help-panel"), "help opens");
-            game.Capture("pause-help");
+            yield return game.Capture("pause-help");
             yield return game.PressMenu();
             AssertPausedOn("pause-panel", "help-panel");
 
@@ -212,14 +213,14 @@ namespace GeometricFlight.Tests
             game.ClickHud("options-calibrate");
             yield return game.Wait(0.3f);
             Assert.That(game.HudShows("calibration-panel"), "calibration opens");
-            game.Capture("calibration");
+            yield return game.Capture("calibration");
             yield return game.PressMenu();
             AssertPausedOn("options-panel", "calibration-panel");
 
             game.ClickHud("options-back");
             yield return game.Wait(0.3f);
             AssertPausedOn("pause-panel", "options-panel");
-            game.Capture("pause");
+            yield return game.Capture("pause");
 
             yield return game.PressMenu();
             Assert.That(game.Flow.State, Is.EqualTo(RunState.Playing), "MENU resumes from the pause panel");
@@ -266,7 +267,7 @@ namespace GeometricFlight.Tests
             crt.value = !before;
             yield return game.Wait(0.5f);
             Assert.That(GameSettings.ArcadeMode, Is.Not.EqualTo(before));
-            game.Capture("options-crt-flipped");
+            yield return game.Capture("options-crt-flipped");
         }
 
         [UnityTest]
@@ -320,7 +321,7 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.3f);
             Assert.That(game.HudShows("hud-rings"), Is.False, "the rings readout goes");
             Assert.That(game.HudText("hud-targets"), Does.Contain("/13"), "the target count starts over");
-            game.Capture("arena-start");
+            yield return game.Capture("arena-start");
 
             yield return game.Wait(1f);
             game.Shield.Destroy();
@@ -337,14 +338,14 @@ namespace GeometricFlight.Tests
             yield return game.Until("the LOCK step", () => game.Lessons.Current == ArenaLessons.Step.LockSingle, 3f);
             yield return game.WaveArrives("the LOCK target");
             Assert.That(game.Missiles.State.Ammo, Is.EqualTo(4), "missiles are issued");
-            game.Capture("lock-arrived");
+            yield return game.Capture("lock-arrived");
 
             yield return game.Wait(3f); // MISSILES ONLINE has the panel first.
             game.NearestLive().ApplyHit(999);
             yield return game.Wait(0.4f);
             Assert.That(game.Header, Does.Contain("USE MISSILES"), "a gun kill asks for missiles");
             Assert.That(game.HudText("hud-targets"), Does.StartWith("TARGETS 0/"), "a gun kill doesn't count");
-            game.Capture("use-missiles");
+            yield return game.Capture("use-missiles");
             yield return game.WaveArrives("the target to come back");
             yield return game.PaintAndLaunch();
 
@@ -372,7 +373,7 @@ namespace GeometricFlight.Tests
             yield return game.Until("the pulse to end", () => !game.Emp.Pulsing, 6f);
             yield return game.Wait(0.4f);
             Assert.That(game.Header, Does.Contain("RETRY"), "a retry is offered");
-            game.Capture("emp-retry-offer");
+            yield return game.Capture("emp-retry-offer");
             yield return game.PressEmp();
             yield return game.Wait(0.3f);
             Assert.That(game.Emp.State.Ready, "the retry recharges");
@@ -381,10 +382,10 @@ namespace GeometricFlight.Tests
             yield return game.WaveArrives("the drones to return");
             game.ChaseWave = true;
             yield return game.Until("the line to ask for the pulse", () => game.Header.StartsWith("PRESS"), 25f);
-            game.Capture("press-emp");
+            yield return game.Capture("press-emp");
             yield return game.PressEmp();
             yield return game.Wait(0.9f);
-            game.Capture("emp-pulse");
+            yield return game.Capture("emp-pulse");
             yield return game.Until("the breather", () => game.Lessons.Current == ArenaLessons.Step.Breather, 15f);
             game.ChaseWave = false;
         }
@@ -398,19 +399,23 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.1f);
             Assert.That(game.Emp.State.Ready, "a rebuild restocks the EMP");
             Assert.That(game.Lessons.Current, Is.EqualTo(ArenaLessons.Step.Breather), "still the breather");
+            int arrivals = game.Tones(WaveArrivalTone);
             game.SkipStepWait();
 
             yield return game.Until("the final wave", () => game.Lessons.Current == ArenaLessons.Step.Encounter, 3f);
             yield return game.WaveArrives("the final wave to arrive");
+            Assert.That(game.Tones(WaveArrivalTone), Is.GreaterThan(arrivals), "the arrival sounds on the cockpit");
             game.Shield.Destroy();
             yield return game.Rebuilt();
             yield return game.WaveArrives("the final wave to return");
+            int clears = game.Tones(WaveClearedTone);
             foreach (ShootableTarget target in new List<ShootableTarget>(game.Lessons.CurrentWave.Live))
                 if (target != null) target.ApplyHit(999);
             yield return game.Until("the ending", () => game.Lessons.Current == ArenaLessons.Step.Ending, 4f);
             yield return game.Wait(0.3f);
+            Assert.That(game.Tones(WaveClearedTone), Is.GreaterThan(clears), "the clear sounds on the cockpit");
             Assert.That(game.Header, Does.Contain("TRAINING"));
-            game.Capture("ending");
+            yield return game.Capture("ending");
         }
 
         private IEnumerator Results()
@@ -424,12 +429,12 @@ namespace GeometricFlight.Tests
             Assert.That(game.HudShows("hud"), Is.False, "the HUD is hidden");
             Assert.That(game.HudText("results-title"), Does.Contain("TRAINING"));
             Assert.That(game.Flow.Results.TargetsTotal, Is.EqualTo(23), "the rail's targets and the arena's");
-            game.Capture("results");
+            yield return game.Capture("results");
 
             game.ClickHud("results-menu-button");
             yield return game.Reloaded();
             AssertCleanTitleScreen();
-            game.Capture("title-after-results");
+            yield return game.Capture("title-after-results");
         }
     }
 }

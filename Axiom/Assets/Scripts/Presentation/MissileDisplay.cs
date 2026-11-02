@@ -12,7 +12,7 @@ namespace GeometricFlight.Presentation
     /// while it can. SAFE also shows where the eye already is: the aim diamonds dim under a quiet X, which turns bright when
     /// a lesson calls for arming or a press is refused, and only an armed gun brackets its target. Gun, acquiring and locked
     /// brackets are one family of corners. Reads the weapons; never changes them.</summary>
-    [DefaultExecutionOrder(110)] // After the chase camera and LevelLook's panel routing.
+    [DefaultExecutionOrder(110)] // After the chase camera and MenuLook's panel routing.
     [DisallowMultipleComponent, RequireComponent(typeof(UIDocument))]
     public sealed class MissileDisplay : MonoBehaviour
     {
@@ -20,13 +20,7 @@ namespace GeometricFlight.Presentation
         private const int GunMarker = 9, CandidateMarker = 8;
 
         [SerializeField] private LockOnWeapon weapon;
-        [Tooltip("Disable when an existing level HUD owns the cockpit LCD. Missile tones still play.")]
-        [SerializeField] private bool writeCockpit = true;
         [SerializeField, Min(0f)] private float bottomMargin = 24f;
-        [Tooltip("Off where a guidance panel names the controls: the instrument then reports state only.")]
-        [SerializeField] private bool controlHints = true;
-        [Tooltip("Draws the gun's aim brackets here, with the missile brackets. Off where an AimAssistMarker draws them.")]
-        [SerializeField] private bool gunBrackets;
         [Tooltip("The aim diamonds, which dim while SAFE.")]
         [SerializeField] private Renderer[] reticles = new Renderer[0];
 
@@ -41,7 +35,7 @@ namespace GeometricFlight.Presentation
         private VisualElement overlay, panel, edge;
         private ArmBar armBar;
         private StoreRow gunRow, missileRow, empRow;
-        private Label armLabel, count, empState, status, hint, safeWord;
+        private Label armLabel, count, empState, status, safeWord;
         private Cross safeMark;
         private EmpWeapon emp;
         private PlayerWeapon gun;
@@ -157,14 +151,6 @@ namespace GeometricFlight.Presentation
             status.style.marginTop = 4;
             status.style.minHeight = 20; // Holds its line when empty, so the panel never changes height.
             panel.Add(status);
-            hint = new Label { pickingMode = PickingMode.Ignore };
-            hint.style.fontSize = 12;
-            hint.style.color = Cyan;
-            hint.style.paddingLeft = hint.style.paddingRight = 0;
-            hint.style.marginTop = 4;
-            hint.style.display = controlHints ? DisplayStyle.Flex : DisplayStyle.None;
-            panel.Add(hint);
-
             safeMark = new Cross(2.5f) { pickingMode = PickingMode.Ignore };
             safeMark.style.position = Position.Absolute;
             safeMark.style.width = safeMark.style.height = SafeMarkSize;
@@ -233,7 +219,7 @@ namespace GeometricFlight.Presentation
             if (Assembly < 1f) return;
             if (weapon.Available && Time.timeScale > 0f)
             {
-                if (gunBrackets && armed && gun != null) ShowMarker(GunMarker, gun.AssistTarget, Cyan, string.Empty, root, 44f);
+                if (armed && gun != null) ShowMarker(GunMarker, gun.AssistTarget, Cyan, string.Empty, root, 44f);
                 for (int i = 0; i < state.Locks.Count; i++)
                     ShowMarker(i, weapon.Target(state.Locks[i]), Ready, "LOCK " + (i + 1), root, 48f);
                 // Acquiring closes in on the target as it completes.
@@ -302,9 +288,6 @@ namespace GeometricFlight.Presentation
             }
             else empRow.Root.style.display = DisplayStyle.None;
             status.text = !weapon.Available ? string.Empty : Status(state);
-            if (controlHints)
-                hint.text = (ControllerService.Current != null && ControllerService.Current.State.HasLock
-                    ? "HOLD LOCK BUTTON / LEFT SHIFT" : "HOLD LEFT SHIFT TO LOCK") + "   EMP: DOME or R";
         }
 
         private string Status(MissileLockState state)
@@ -313,7 +296,7 @@ namespace GeometricFlight.Presentation
             if (state.IsPainting)
                 return state.Locks.Count > 0 ? state.Locks.Count + " LOCKED  /  RELEASE TO FIRE"
                     : state.Ammo == 0 ? "RELOADING" : weapon.CloseTargetInCone ? "TOO CLOSE TO LOCK" : "PAINTING";
-            if (weapon.CloseTargetInCone) return controlHints ? "CLOSE TARGET — USE GUNS" : "TOO CLOSE TO LOCK";
+            if (weapon.CloseTargetInCone) return "TOO CLOSE TO LOCK";
             return $"LOCK RANGE {weapon.MinimumRange:0}–{weapon.MaximumRange:0} m";
         }
 
@@ -414,10 +397,6 @@ namespace GeometricFlight.Presentation
         {
             ControllerService service = ControllerService.Current;
             if (service == null) return;
-            if (writeCockpit) service.Display.Show(LcdGlyph.Spread("MISSILES", state.Ammo + "/" + state.Capacity),
-                !weapon.Available ? "RESTARTING" : Time.timeScale <= 0f ? "PAUSED"
-                : state.IsPainting ? "LOCK " + state.Locks.Count + " RELEASE"
-                : service.State.HasLock ? "HOLD LOCK BUTTON" : "HOLD SHIFT: LOCK");
             int step = state.IsPainting ? state.Locks.Count * 4 + Mathf.FloorToInt(state.Progress * 3f) : -1;
             if (weapon.MissilesFired > lastFired) service.PlayTone(660, 120);
             else if (state.Locks.Count > lastLocks || step > toneStep)

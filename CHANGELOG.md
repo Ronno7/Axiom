@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Removed
+- Prototype, arena and study scenes that predate the opening.
+
 ### Fixed
 - Checkpoints sounded the cockpit's shield hit tone.
 - Pause menu options missed changes made on the title screen.

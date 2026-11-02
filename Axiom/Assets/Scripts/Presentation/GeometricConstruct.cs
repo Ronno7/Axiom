@@ -69,24 +69,6 @@ namespace GeometricFlight.Presentation
         private Quaternion knotTilt;
         private float timeOffset;
         private bool rebuildRequested;
-        private bool presentationClock;
-        private float presentationTime, presentationDelta;
-
-        /// <summary>Repeatable presentation-only playback; rebuilding restores seeded tumble state.</summary>
-        public void ResetPresentationClock()
-        {
-            presentationClock = true;
-            presentationTime = presentationDelta = 0f;
-            Build();
-        }
-
-        public void SetPresentationTime(float elapsed, float deltaTime)
-        {
-            presentationTime = elapsed;
-            presentationDelta = Mathf.Max(0f, deltaTime);
-        }
-
-        public void ReleasePresentationClock() => presentationClock = false;
 
         private void OnEnable() => Build();
         private void OnDisable() => Release();
@@ -97,7 +79,7 @@ namespace GeometricFlight.Presentation
             if (rebuildRequested) Build();
             if (pivot == null) return;
 
-            float t = (presentationClock ? presentationTime : Application.isPlaying ? Time.time : Time.realtimeSinceStartup) + timeOffset;
+            float t = (Application.isPlaying ? Time.time : Time.realtimeSinceStartup) + timeOffset;
             pivot.localPosition = new Vector3(0f, bob * Mathf.Sin(t * 1.19f), bob * 0.5f * Mathf.Sin(t * 0.83f));
 
             Vector3 coreAxis = Vector3.one.normalized;
@@ -106,7 +88,7 @@ namespace GeometricFlight.Presentation
 
             if (cageTransform != null)
             {
-                if (Application.isPlaying) tumble.Step(presentationClock ? presentationDelta : Time.deltaTime);
+                if (Application.isPlaying) tumble.Step(Time.deltaTime);
                 cageTransform.localRotation = tumble.Orientation;
                 cageTransform.localScale = Vector3.one * (1f + 0.03f * Mathf.Sin(t * 1.7f));
             }

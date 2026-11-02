@@ -1,6 +1,5 @@
 using GeometricFlight.Input;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace GeometricFlight.UI
@@ -10,10 +9,9 @@ namespace GeometricFlight.UI
     [RequireComponent(typeof(UIDocument))]
     public sealed class MainMenu : MonoBehaviour
     {
-        /// <summary>An optional same-scene opening can handle Play instead of loading the legacy course.</summary>
+        /// <summary>PLAY was pressed; the entry takes it from here.</summary>
         public event System.Action PlayRequested;
         public bool Suspended { get; set; }
-        [SerializeField] private string firstLevelScene = "Prototype";
         [Tooltip("The 3D title, rendered by the MenuTitle camera on the Title layer.")]
         [SerializeField] private RenderTexture titleTexture;
 
@@ -41,12 +39,7 @@ namespace GeometricFlight.UI
             if (titleTexture != null)
                 root.Q("game-title").style.backgroundImage = Background.FromRenderTexture(titleTexture);
 
-            playButton.clicked += () =>
-            {
-                if (Suspended) return;
-                if (PlayRequested != null) PlayRequested.Invoke();
-                else SceneManager.LoadScene(firstLevelScene);
-            };
+            playButton.clicked += () => { if (!Suspended) PlayRequested?.Invoke(); };
             root.Q<Button>("options-button").clicked += () => { if (!Suspended) ShowOptions(); };
             root.Q<Button>("help-button").clicked += () => { if (!Suspended) UiScreens.ShowOnly(helpPanel, helpBack, Panels); };
             root.Q<Button>("quit-button").clicked += () => { if (!Suspended) UiScreens.QuitGame(); };
@@ -79,14 +72,6 @@ namespace GeometricFlight.UI
         }
 
         private void ShowTitle() => UiScreens.ShowOnly(titlePanel, playButton, Panels);
-
-        /// <summary>Leave submenus cleanly when an isolated same-scene presentation is restarted.</summary>
-        public void ReturnToTitle()
-        {
-            if (calibration.IsOpen) calibration.Cancel();
-            else if (options.Root.resolvedStyle.display == DisplayStyle.Flex) options.Close();
-            ShowTitle();
-        }
 
         private void Back()
         {

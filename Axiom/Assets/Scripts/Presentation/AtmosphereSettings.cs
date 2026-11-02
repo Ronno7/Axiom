@@ -4,7 +4,7 @@ using UnityEngine;
 namespace GeometricFlight.Presentation
 {
     /// <summary>A scene's atmosphere (haze, horizon band, stars, dust), built by <see cref="LookAtmosphere"/>.
-    /// Used by <see cref="MenuLook"/> and <see cref="LevelLook"/>. Distances are from the camera; keep them inside
+    /// Used by <see cref="MenuLook"/>. Distances are from the camera; keep them inside
     /// its far clip plane.</summary>
     [Serializable]
     public sealed class AtmosphereSettings

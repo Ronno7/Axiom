@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace GeometricFlight.Presentation
 {
-    /// <summary>Link between the components that drive screen effects (<see cref="MenuLook"/> on the menu,
-    /// <see cref="LevelLook"/> in levels) and <see cref="ScreenEffectsFeature"/>: which camera gets the pass and
+    /// <summary>Link between <see cref="MenuLook"/>, which drives screen effects, and
+    /// <see cref="ScreenEffectsFeature"/>: which camera gets the pass and
     /// the shader globals it reads. Globals rather than a material, so nothing is saved to an asset;
     /// <see cref="Clear"/> runs when the driving component goes away, so other scenes never see the pass.</summary>
     public static class ScreenEffects

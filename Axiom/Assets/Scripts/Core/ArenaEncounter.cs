@@ -30,7 +30,6 @@ namespace GeometricFlight.Core
         private int generation;
 
         public ArenaWaveState State { get; private set; }
-        public event Action WaveCleared;
         public int SpawnCount => spawns == null ? 0 : spawns.Length;
         public Vector3 SpawnPosition(int index) => spawns[index].point.position;
         public Transform SpawnPoint(int index) => spawns[index].point;
@@ -98,7 +97,6 @@ namespace GeometricFlight.Core
         {
             if (generation != waveGeneration || !State.ReportDestroyed(slot) || State.Phase != ArenaWavePhase.Cleared) return;
             ClearEnemyShots();
-            WaveCleared?.Invoke();
         }
 
         public void Defeat()

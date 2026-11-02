@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace GeometricFlight.Player
 {
-    /// <summary>Stateless movement rules for the current straight, world +Z course.</summary>
+    /// <summary>Stateless speed rules shared by the flight models.</summary>
     public static class FlightMovement
     {
         public static float TargetSpeed(float throttle, float cruiseSpeed, Vector2 multipliers)
@@ -24,20 +24,6 @@ namespace GeometricFlight.Player
             float rampTime = Mathf.Min(deltaTime, Mathf.Abs(target - previous) / rate);
             speed = Mathf.MoveTowards(previous, target, rate * deltaTime);
             return ((previous + speed) * 0.5f * rampTime + speed * (deltaTime - rampTime)) / deltaTime;
-        }
-
-        public static Vector3 Step(Vector3 position, Vector2 steering, float deltaTime,
-            float forwardSpeed, float steeringSpeed, Rect bounds)
-        {
-            if (deltaTime <= 0f) return position;
-
-            // Preserve analog magnitude while preventing faster diagonal movement.
-            Vector2 displacement = Vector2.ClampMagnitude(steering, 1f)
-                * (Mathf.Max(0f, steeringSpeed) * deltaTime);
-            return new Vector3(
-                Mathf.Clamp(position.x + displacement.x, bounds.xMin, bounds.xMax),
-                Mathf.Clamp(position.y + displacement.y, bounds.yMin, bounds.yMax),
-                position.z + Mathf.Max(0f, forwardSpeed) * deltaTime);
         }
     }
 }

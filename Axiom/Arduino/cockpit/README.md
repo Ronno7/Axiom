@@ -19,8 +19,7 @@ has 28 solder joints including the added LOCK button.
 
 Only the parts marked ✓ are in the game so far; the rest is planned. MASTER ARM is introduced at the tutorial's
 first weapons lesson, and SAFE inhibits all weapons while flight continues. An already armed switch needs no
-extra cycle. It works in the [opening](../../Docs/OPENING.md) and the earlier opening
-prototype, with T as the keyboard equivalent; the original Prototype and Arena scenes don't use it.
+extra cycle. It works in the [opening](../../Docs/OPENING.md), with T as the keyboard equivalent.
 EMP's separate menu-confirm role remains under review.
 
 Turn on **Options > Cockpit controller (USB)** to connect. Until the throttle lever is installed, select **Options > Keyboard throttle with controller (Q / E)**.

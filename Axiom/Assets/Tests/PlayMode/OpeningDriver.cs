@@ -61,7 +61,9 @@ namespace GeometricFlight.Tests
         private VisualElement MenuRoot => menu.GetComponent<UIDocument>().rootVisualElement;
 
         public float FirstCheckpointZ => ((TutorialCourse.Checkpoint[])Checkpoints.GetValue(Course))[0].z;
-        public int HitTones => Cockpit.SentLines().Count(line => line.StartsWith(HitTone));
+        public int HitTones => Tones(HitTone);
+        /// <summary>How many times the cockpit has been sent this buzzer line.</summary>
+        public int Tones(string tone) => Cockpit.SentLines().Count(line => line.StartsWith(tone));
 
         /// <summary>The guidance panel's line as the player reads it.</summary>
         public string Header
@@ -226,11 +228,13 @@ namespace GeometricFlight.Tests
             }
         }
 
-        /// <summary>Saves a picture of this frame for a visual check.</summary>
-        public void Capture(string name)
+        /// <summary>Saves a picture of this frame for a visual check. The picture is taken as the frame ends, so this
+        /// waits it out, and whatever the test does next isn't in it.</summary>
+        public IEnumerator Capture(string name)
         {
             Directory.CreateDirectory(captureFolder);
             ScreenCapture.CaptureScreenshot(Path.Combine(captureFolder, name + ".png"));
+            yield return null;
         }
 
         /// <summary>Stick centred, throttle mid range, with the given buttons held.</summary>

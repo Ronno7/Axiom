@@ -5,7 +5,7 @@ using UnityEngine.Rendering.Universal;
 namespace GeometricFlight.Presentation
 {
     /// <summary>A scene's colour grade (tonemapping, exposure, contrast, bloom, vignette, grain), applied by
-    /// <see cref="LookVolume"/>. Used by <see cref="MenuLook"/> and <see cref="LevelLook"/>.</summary>
+    /// <see cref="LookVolume"/>. Used by <see cref="MenuLook"/>.</summary>
     [Serializable]
     public sealed class GradeSettings
     {

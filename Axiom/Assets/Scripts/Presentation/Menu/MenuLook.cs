@@ -89,7 +89,7 @@ namespace GeometricFlight.Presentation
         [SerializeField] private GlitchSettings glitch = new GlitchSettings();
 
         [Header("Arcade mode (player toggle in Options)")]
-        [Tooltip("Shared with the levels' LevelLook, so the look is tuned in one place.")]
+        [Tooltip("The CRT look, in one asset so it is tuned in one place.")]
         [SerializeField] private ArcadeProfile arcade;
         [Tooltip("Show Arcade Mode in the editor whatever the player's Options setting is (ignored in builds).")]
         [SerializeField] private bool previewArcade;

@@ -44,7 +44,7 @@ controller (USB)**.
 ## How it's built
 
 - **Systems:** [the opening](Axiom/Docs/OPENING.md), [flight](Axiom/Docs/FLIGHT.md), [combat](Axiom/Docs/COMBAT.md),
-  [UI](Axiom/Docs/UI.md), [art palette](Axiom/Docs/ART_PALETTE.md) and [earlier experiments](Axiom/Docs/STUDIES.md).
+  [UI](Axiom/Docs/UI.md) and [art palette](Axiom/Docs/ART_PALETTE.md).
 - **Hardware:** [cockpit controller](Axiom/Arduino/cockpit/README.md), with parts, wiring and firmware.
 - **Next ship:** the [Swept Dart](Axiom/ArtSource/Ships/SweptDart/README.md), with renders and its import package. It isn't in the game yet.
 - **Development:** [project table](https://github.com/users/Ronno7/projects/2) and [issues](https://github.com/Ronno7/Axiom/issues).

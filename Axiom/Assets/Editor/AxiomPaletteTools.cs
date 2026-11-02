@@ -55,9 +55,7 @@ namespace GeometricFlight.Editor
             { "ProgramOrangeDim", Base(AxiomPalette.Orange, 0.8f) },
             { "LaserCyan", Base(AxiomPalette.Cyan, 3.2f) },
             { "MissileTrail", new[] { new Tint("_BaseColor", AxiomPalette.Light, 2.4f), new Tint("_EmissionColor", AxiomPalette.Black) } },
-            { "ArenaWall", new[] { new Tint("_Color", AxiomPalette.Cyan) } },
             { "GridFloor", new[] { new Tint("_BaseColor", AxiomPalette.Structure), new Tint("_LineColor", AxiomPalette.Cyan, 1.8f) } },
-            { "OpeningFloor", new[] { new Tint("_BaseColor", AxiomPalette.Structure), new Tint("_LineColor", AxiomPalette.Cyan, 0.8f) } },
             { "OpeningHull", new[] { new Tint("_BaseColor", AxiomPalette.Edge), new Tint("_EdgeColor", AxiomPalette.Cyan, 2.5f) } },
             // Enclosed passage: dark walls, neutral ribs, cyan edge lines and runway-matching markings.
             { "PassageSurface", new[] { new Tint("_BaseColor", AxiomPalette.Structure), new Tint("_EdgeColor", AxiomPalette.Cyan, 2.5f) } },
@@ -136,7 +134,7 @@ namespace GeometricFlight.Editor
             var issues = new List<string>(ValidateAssets());
             Scene scene = SceneManager.GetActiveScene();
             if (scene.IsValid() && scene.isLoaded) issues.AddRange(ValidateScene(scene));
-            if (issues.Count == 0) Debug.Log("Palette audit passed: 25 material roles, profiles, prefabs and active scene.");
+            if (issues.Count == 0) Debug.Log($"Palette audit passed: {Materials.Count} material roles, profiles, prefabs and active scene.");
             else Debug.LogWarning("Palette audit:\n" + string.Join("\n", issues));
         }
 
@@ -241,7 +239,7 @@ namespace GeometricFlight.Editor
             {
                 if (component == null || IsGenerated(component)) continue;
                 var serialized = new SerializedObject(component);
-                if (component is MenuLook || component is LevelLook)
+                if (component is MenuLook)
                 {
                     pass.Color(serialized, "accent", AxiomPalette.Orange);
                     pass.Color(serialized, "atmosphere.haze", AxiomPalette.Void);
@@ -249,7 +247,6 @@ namespace GeometricFlight.Editor
                     pass.Color(serialized, "atmosphere.cloudLight", AxiomPalette.Panel);
                 }
                 else if (component is ShootableTarget) pass.Color(serialized, "hitFlashColor", AxiomPalette.Hot);
-                else if (component is ArenaSession) pass.Color(serialized, "markerColor", AxiomPalette.Orange);
                 else if (component is GeometricConstruct && component.name == "HeroConstruct")
                 {
                     Material band = AssetDatabase.LoadAssetAtPath<Material>(MaterialFolder + "LightLineOrangeBright.mat");
@@ -267,11 +264,10 @@ namespace GeometricFlight.Editor
                     {
                         if (property.propertyType != SerializedPropertyType.Color) continue;
                         string path = property.propertyPath;
-                        bool assigned = ((component is MenuLook || component is LevelLook) &&
+                        bool assigned = (component is MenuLook &&
                             (path == "accent" || path == "atmosphere.haze" || path == "atmosphere.horizonColor"
                             || path == "atmosphere.cloudLight")) ||
-                            (component is ShootableTarget && path == "hitFlashColor") ||
-                            (component is ArenaSession && path == "markerColor");
+                            (component is ShootableTarget && path == "hitFlashColor");
                         if (!assigned) pass.Issues.Add(component.name + "/" + path + ": unassigned serialized color");
                     }
                 }

@@ -70,9 +70,7 @@ namespace GeometricFlight.Core
         public float Elapsed => clock;
         public float Duration => reduced ? 1f : EntrySequence.Duration(tempo);
         public bool Started => started;
-        public bool Transferred => transferred;
         public bool Admitted => admitted;
-        public bool Reduced => reduced;
         public bool Returning => returning;
         public DepartureSample Current { get; private set; }
 

@@ -1,7 +1,6 @@
 # UI
 
-The current HUD is in the [opening](OPENING.md); earlier experiments are
-summarized in [studies](STUDIES.md).
+The HUD and menus of the [opening](OPENING.md).
 
 ## Entry and flight HUD
 
@@ -29,9 +28,8 @@ For a visual tour, see the [UI showcase](https://ronno7.github.io/Axiom/) (sourc
 Images can be enlarged; Standard / Arcade comparisons and layer views are interactive. See
 [`docs/README.md`](../../docs/README.md) for editing and capture guidance.
 
-**Approach:** UI Toolkit (UXML + USS) for menus, the HUD, missile brackets and guidance. The gun's aim
-brackets are world-space lines (`AimAssistMarker`). Original menu/level scenes each have one `UIDocument`;
-The Opening scene keeps separate menu and level documents under one look/CRT component. They use
+**Approach:** UI Toolkit (UXML + USS) for menus, the HUD, target brackets and guidance. The scene keeps separate
+menu and level documents under one look/CRT component. They use
 `Assets/UI/AxiomPanelSettings` (1920×1080 reference, match 0.5) and an `EventSystem` with
 `InputSystemUIInputModule`, so menus work with mouse and keyboard (arrows, Enter, Esc). The cockpit drives
 them too (`CockpitMenuNavigation`, created at start-up): the stick moves focus like the arrow keys (one step
@@ -49,7 +47,7 @@ has focus, so flight is unaffected, and a FIRE held into a menu must be released
 Scripts (`Scripts/UI`): `MainMenu` and `LevelUi` bind buttons and observe game state;
 `OptionsPanel` binds the shared options template to `GameSettings`; `UiScreens` holds
 panel switching, quit, and time formatting. UI never owns gameplay rules: `LevelUi` reads
-`LevelFlow`/`PlayerFlight` and calls `Resume`, `Retry`, `Continue`, `ExitToMenu`.
+`LevelFlow`/`ShipFlight` and calls `Resume`, `Retry`, `Continue`, `ExitToMenu`.
 
 **Options** (`Core/GameSettings`, saved in PlayerPrefs): steering sensitivity (50–150%) and
 invert vertical, controller buzzer, **CRT display** (see below), reduced entry animation, **Cockpit controller** (off by default, because opening serial ports can reset other devices; a PC whose cockpit has connected before starts on), and **Calibrate controller** (`CalibrationPanel`, a step wizard in `CalibrationWizard`). The game has an EMP sound effect and temporary entry voice clips. General volume controls are not implemented. Expanded sound and presentation settings remain planned.
@@ -67,9 +65,8 @@ its weapons. A loss flashes Hot and empties, a restore sweeps left to right, and
 says what changed them, such as CHECKPOINT (`LevelUi.ShowShieldNote`). The hull shows the same state in the world. Only a loss plays the
 screen-edge damage pulse.
 
-**Announcements** (top centre): `LevelUi.SetBanner` and `Announce` are the one slot. Where a level has a guidance panel
-([below](#guidance)) they speak through it, and throttle zones are left to the gauge's band and hint. Elsewhere they use a compact line
-on a Void backing, such as the Prototype's zone calls.
+**Announcements** (top centre): `LevelUi.SetBanner` and `Announce` are the one slot, and they speak through the guidance panel
+([below](#guidance)). Throttle zones are left to the gauge's band and hint.
 
 **Instructions and pointers** have one place each: the guidance panel and flag. Captions are only the subtitles of the entry's
 spoken reports. The input tag is a quiet line, except for its warning.
@@ -88,12 +85,12 @@ height, lean and stroke inset, so PLAY and the shorter secondary buttons each re
 
 **Title** is a 3D mesh: "aXiom" in Earth Orbiter Bold, extruded, leaned 15° to match the buttons, with
 flat chamfers (`Art/Models/AxiomTitle_EarthOrbiter.fbx`). The earlier Furore "AXIOM"
-(`AxiomTitle_Furore.fbx`) is kept as an alternative: in MainMenu, `MenuTitle` holds `Title_EarthOrbiter`
+(`AxiomTitle_Furore.fbx`) is kept as an alternative: `MenuTitle` holds `Title_EarthOrbiter`
 (active) and `Title_Furore` (inactive); swap which is active. Both are built by
 `ArtSource/Title/make_title.py` in Blender (commands in its header); its options build other fonts, texts
 and shapes, always at the same 3.7 m width so the framing holds. Earth Orbiter is free for non-commercial
-use only (`ArtSource/earth-orbiter/earthorbiter.txt`). Furore's font file carries no license, so it isn't in this repository. In
-MainMenu, `MenuTitle/TitleCamera` renders only the `Title` layer into `UI/MenuTitle.renderTexture`
+use only (`ArtSource/earth-orbiter/earthorbiter.txt`). Furore's font file carries no license, so it isn't in this repository.
+`MenuTitle/TitleCamera` renders only the `Title` layer into `UI/MenuTitle.renderTexture`
 (2048×512, transparent); `MainMenu` sets it as the background of the `game-title` element, so it
 follows the UI layout at any resolution. The main camera excludes the `Title` layer. Shading comes
 from `Title.mat` (`Title Facets` shader: key light from the upper right, a front fill focused on the face, and a
@@ -102,18 +99,17 @@ displays as about 12% grey). The titles are extruded 0.28 m; framing comes from 
 field of view.
 
 **Menu backdrop** (`MenuBackdrop`, `GeometricConstruct`): a hero construct and three simpler
-ones at fixed depths (fog fades the far ones) over a scrolling floor. The floor is 420 m wide and the sky is
-the fog colour, so the floor fades into the background with no visible edge; the horizon glow also lights the
+ones at fixed depths (fog fades the far ones) over one endless grid (`InfiniteGround`). The sky is
+the fog colour, so the grid fades into the background with no visible edge; the horizon glow also lights the
 far floor (depth-faded, beyond about 85 m) to hide the horizon line. A construct can combine a
 counter-rotating star tetrahedron, a golden-ratio cage tumbling under Euler's rigid-body equations,
 a trefoil-knot band, and satellites on Kepler orbits; keep each background one to a single idea.
-MainMenu's floor and dust drift at 5 m/s. The opening replaces the scrolling floor with one
-endless grid (`InfiniteGround`) whose lines glide toward the camera at the same 5 m/s (**Glide Speed**, a
+The grid's lines glide toward the camera at 5 m/s (**Glide Speed**, a
 shader offset), with dust drifting alongside and floating slightly (**Dust Float**). At PLAY both stop as the
 camera starts moving at that speed; the dust clears at the passage threshold. Its hero trefoil uses the existing bright Orange light material with a
 0.025 m tube radius; the narrower line keeps the glow from dominating the title.
 
-**Menu look** (`Presentation/Menu/MenuLook` on the MainMenu `MenuLook` object).
+**Menu look** (`Presentation/Menu/MenuLook` on the `MenuLook` object).
 One Inspector, live in the editor:
 
 The footer distinguishes **SYS ONLINE** (the Grid's fictional operating status) from the actual
@@ -128,16 +124,6 @@ stay through flight; only the menu key hints hide.
 | Glitch | Signal glitch every 8–12 s while idle: tears, Orange echo, blocks, scanlines, fringe pulse, roll bar, title tear, construct snap/drop, status scramble. **Hold Peak** freezes it for tuning (editor only); the component menu has **Play glitch now** |
 | Arcade mode | The shared `ArcadeLook` asset, applied while the player has Arcade Mode on (**Preview Arcade** shows it in the editor; builds ignore it) |
 
-**Level look** (`Presentation/LevelLook`; Prototype: `00_CameraAndLighting/LevelLook`) gives a level the menu's
-grade and atmosphere, plus Arcade Mode, with none of the menu-only parts (no glitch or interface details). Its
-Grade and Atmosphere sections match the menu's, tuned per level: in the Prototype the haze runs 45–185 m and the
-horizon sits at 200 m, inside the camera's 240 m far clip. The horizon band and stars travel with the camera; dust
-stays put in the world and wraps around the camera, so it streams past in flight (leave **Dust Drift** at 0). The
-floor is 420 m wide and runs past the far clip, so it fades into the sky like the menu's. Four of the menu's
-constructs (pale neutral ones) float high beside the course as scenery
-(`20_EnvironmentBlockout/Backdrop`) and emerge from the haze as you approach. Both look components share
-`GradeSettings`/`AtmosphereSettings` and the runtime pieces `LookVolume` and `LookAtmosphere`.
-
 `Foundation Flat` works out fog per pixel: the floor is two huge triangles, and per-vertex fog left its far end
 brighter than the sky. The horizon glow's depth fade reads the camera depth texture, which only holds
 `Foundation Flat` geometry when URP copies depth after the opaque pass. Anything that adds a depth prepass
@@ -145,9 +131,9 @@ brighter than the sky. The horizon glow's depth fade reads the camera depth text
 over foreground objects. SSAO is therefore off on `PC_Renderer`; it had no visible effect on these unlit
 shaders anyway. To use a prepass later, give `Foundation Flat` DepthOnly and DepthNormals passes first.
 
-**CRT display** (Options toggle, `GameSettings.ArcadeMode`) gives the menu and the levels a vintage vector-monitor
-look. Its settings live in one asset, `Settings/ArcadeLook` (`ArcadeProfile`), used by `MenuLook` on the menu and
-`LevelLook` in each level. Each part can be switched off: phosphor glow (replaces the normal bloom), colour
+**CRT display** (Options toggle, `GameSettings.ArcadeMode`) gives the menu and the level a vintage vector-monitor
+look. Its settings live in one asset, `Settings/ArcadeLook` (`ArcadeProfile`), used by `MenuLook`. Each part can be
+switched off: phosphor glow (replaces the normal bloom), colour
 fringing in palette Orange, CRT (curvature, scanlines, monochrome grille, tube edge), neutral grading
 (exposure, contrast and saturation), a lighter vignette, vintage extras (rounded corners, flicker, static,
 a rolling band and coarser grain), and the interface on the tube (below). Legacy hue shift, color filter
@@ -183,7 +169,7 @@ at the existing rear engine ports. A white core, translucent outer facets, and t
 diamonds per engine keep the effect geometric. Length, width, and diamond motion increase
 with the selected throttle. The response eases over about 0.1 seconds, so it communicates
 engine demand promptly while the ship's actual speed catches up. Minimum throttle still has
-a small jet because flight never stops. This uses the shared `PlayerFlight.TargetSpeed`, so
+a small jet because flight never stops. This uses the shared `ShipFlight.TargetSpeed`, so
 keyboard and controller inputs drive the same presentation without an extra input read.
 
 Tune `lengthRange`, `response`, and the two port positions in the Inspector. Geometry uses
@@ -201,7 +187,7 @@ persistent low-shield flashing. Event subscriptions are removed when the level U
 
 ## Weapons instrument
 
-`MissileDisplay` uses UI Toolkit and is included in `LevelLook`'s interface documents, so the panel and brackets follow
+`MissileDisplay` uses UI Toolkit and is included in `MenuLook`'s interface documents, so the panel and brackets follow
 Arcade Mode's screen curvature and glow. The bottom-right panel is laid out like a stores page:
 - **MASTER ARM bar:** hatched SAFE or solid ARMED, so the shape carries it as well as the colour ([COMBAT](COMBAT.md#master-arm)).
 - **GUN, MSL and EMP rows:** marked x while the weapon can't fire and framed in `< >` while it can, muted when empty.
@@ -210,16 +196,14 @@ Arcade Mode's screen curvature and glow. The bottom-right panel is laid out like
 - **EMP:** READY, DISCHARGED, SPENT, or OFFLINE before it is issued.
 - **A status line:** the lock range, PAINTING, how many are LOCKED, or TOO CLOSE TO LOCK.
 
-With **Control Hints** on it also names the controls; off, the guidance panel does. Where a level flow runs, the panel hides during
-pause, rebuilding and the results.
+The guidance panel names the controls. The weapons panel hides during pause, rebuilding and the results.
 
-Target markers are one family of corners. The gun's assist target gets thin Cyan brackets (**Gun Brackets**), hidden while SAFE
+Target markers are one family of corners. The gun's assist target gets thin Cyan brackets, hidden while SAFE
 or while LOCK is held. Acquiring targets get dim Cyan brackets that close in with a percentage, then brighten to white-cyan with a
 lock number. Markers project after the chase camera moves, keeping them aligned during rolls. Enemy attacks use Orange/Ember with threat geometry; decorative Orange alone does not imply hostility.
 
-The cockpit LCD shows the missile bank and painted count; HUD/LCD prompts name the LOCK button when the
-connected firmware supports D11, otherwise Left Shift. Standby firmware shows K while the button is held.
-Acquisition sends short rising buzzer tones and
+Prompts name the LOCK button when the connected firmware supports D11, otherwise Left Shift. Standby firmware shows
+K while the button is held. Acquisition sends short rising buzzer tones and
 launch sends a confirmation tone, respecting the existing buzzer option.
 
 ## Guidance
@@ -241,21 +225,12 @@ Lessons take their lines from the systems' real state, so a held key never reads
 aside while weapon feedback shows the same object. Guidance is Cyan with Light emphasis; targets keep Orange. Every
 tutorial lesson uses it, on the rail and in the arena ([lessons](OPENING.md)). Pause hides it.
 
-## Arena encounter display
+## Arena portals and the EMP
 
-`EncounterHUD` uses UI Toolkit and shares Arcade Mode's interface routing with the missile HUD. In the Arena scene it
-shows the arrival countdown, round number, remaining target count, and the SECTOR CLEAR/recovery beat. Where a
-level HUD exists, the lessons speak through the guidance panel and flag instead, and only the cockpit's tones remain.
-Otherwise a portal marker guides the player during the warning, including when the spawn points are behind the
-camera. World-space orange octagonal portals face the viewer, grow during the warning and collapse just after enemies
-arrive; they have no collision or gameplay logic. Arrival and clear cues use the controller buzzer's existing setting.
+World-space orange octagonal portals (`ArenaPortalDisplay`) face the viewer, grow during a wave's warning and collapse
+just after enemies arrive; they have no collision or gameplay logic. Pause freezes them. The lessons speak through the
+guidance panel and flag, and `ControllerFeedback` sounds the final waves' arrival and clearing on the buzzer.
 
-Pause freezes portal motion and replaces the objective with PAUSED. Ship destruction shows RECONSTRUCTING,
-then a fresh warning for the retry. Disable `ArenaEncounter` before Play Mode to hide this interface and return
-to free practice.
-
-With Control Hints on, the weapons instrument also shows **CLOSE TARGET — USE GUNS** when a nearby target is in the
-acquisition cone, and its EMP row shows **EMP READY / DOME or R**, then **EMP SPENT / ONE PER LIFE**.
 `EmpDisplay` renders one dominant planar ring with faint spherical arcs and radial fragments. Its 0.22 s
 compression beat precedes the 2.8 s expansion; a metallic bass impact and 900 ms rumble pulse begin when
 the front starts moving. It also sends the D12 charge-lamp state and discharge LCD message. The EMP row shares the missile

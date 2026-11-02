@@ -3,8 +3,8 @@ using UnityEngine.Rendering.Universal;
 
 namespace GeometricFlight.Presentation
 {
-    /// <summary>The look of Arcade Mode (Options): a vintage vector monitor. One asset shared by the menu
-    /// (<see cref="MenuLook"/>) and the levels (<see cref="LevelLook"/>), so it's tuned in one place.
+    /// <summary>The look of Arcade Mode (Options): a vintage vector monitor, read by <see cref="MenuLook"/>. One asset,
+    /// so it's tuned in one place.
     /// Each part can be switched off on its own.</summary>
     [CreateAssetMenu(menuName = "Axiom/Arcade Look", fileName = "ArcadeLook")]
     public sealed class ArcadeProfile : ScriptableObject

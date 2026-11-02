@@ -42,19 +42,6 @@ namespace GeometricFlight.Input
             authority.RequireRelease();
         }
 
-        public void SelectKeyboard()
-        {
-            keyboardArmed = previousArmed;
-            source.KeyboardOnly = true;
-            authority.RequireRelease();
-        }
-
-        public void SelectController()
-        {
-            source.KeyboardOnly = false;
-            authority.RequireRelease();
-        }
-
         public void RequireRelease() => authority.RequireRelease();
 
         public override bool LimitThrottle(float setpoint) => source != null && source.LimitThrottle(setpoint);

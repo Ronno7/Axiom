@@ -50,7 +50,7 @@ namespace GeometricFlight.Input
     /// Created on first use. Converts raw packets to a calibrated ControllerState each frame on
     /// the main thread and raises Connected/Disconnected there.
     /// </summary>
-    [DefaultExecutionOrder(-50)] // Before PlayerFlight reads input.
+    [DefaultExecutionOrder(-50)] // Before the flight reads input.
     [DisallowMultipleComponent]
     public sealed class ControllerService : MonoBehaviour
     {
