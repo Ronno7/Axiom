@@ -36,7 +36,7 @@ namespace GeometricFlight.Core
         [SerializeField, Min(0f)] private float parTime;
         [Tooltip("Results title for a completed run.")]
         [SerializeField] private string completedTitle = "LEVEL COMPLETE";
-        [Tooltip("Opt-in entry study: keep input and pause live, but hold flight and run time until admission.")]
+        [Tooltip("The entry: keep input and pause live, but hold flight and run time until admission.")]
         [SerializeField] private bool waitForEntry;
 
         public event Action<RunState> StateChanged;
@@ -148,7 +148,7 @@ namespace GeometricFlight.Core
             SetState(RunState.Playing);
         }
 
-        /// <summary>Accepts PLAY for an opt-in held entry. Native pause and recovery now own the run.</summary>
+        /// <summary>Accepts PLAY for a held entry. Native pause and recovery now own the run.</summary>
         public bool BeginEntry()
         {
             if (!EntryHeld || EntryStarted || State != RunState.Playing) return false;

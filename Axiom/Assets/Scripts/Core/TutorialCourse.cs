@@ -48,7 +48,7 @@ namespace GeometricFlight.Core
         [SerializeField] private ShipFlight flight;
         [SerializeField] private ShipShield shield;
         [SerializeField] private RailRings railRings;
-        [SerializeField] private SharedEntryStudy entry;
+        [SerializeField] private OpeningEntry entry;
         [SerializeField] private ChaseCamera chase;
         [SerializeField] private PlayerWeapon weapon;
         [Tooltip("Shows the tutorial-only rings readout.")]
@@ -60,7 +60,7 @@ namespace GeometricFlight.Core
         [Tooltip("Lights the next ring.")]
         [SerializeField] private RingPassFlash rings;
         [Tooltip("Pulses its SAFE state when a lesson calls for MASTER ARM.")]
-        [SerializeField] private MissileDisplay weaponsInstrument;
+        [SerializeField] private WeaponsDisplay weaponsInstrument;
         [Tooltip("Metres ahead the next ring is lit and flagged: over 6 s at cruise, over 4 s at full throttle.")]
         [SerializeField, Min(1f)] private float ringLookahead = 200f;
         [Tooltip("Seconds the panel confirms weapons authority.")]
@@ -300,7 +300,7 @@ namespace GeometricFlight.Core
             railRings.RestoreScore(saved);
             // Obstacles ahead of the retry point start fresh.
             foreach (ClosingIris iris in irises)
-                if (iris != null && iris.TriggerZ >= z) iris.ResetForStudy();
+                if (iris != null && iris.TriggerZ >= z) iris.Reopen();
             // Captions after the retry point play again as the ship flies past them.
             nextCue = 0;
             while (nextCue < cues.Length && cues[nextCue].z < z) nextCue++;

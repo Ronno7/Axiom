@@ -57,6 +57,10 @@ namespace GeometricFlight.UI
             Apply();
         }
 
+        /// <summary>An inline opacity only while partial, so class-driven looks resume afterward.</summary>
+        public static StyleFloat Partial(float amount) =>
+            amount >= 1f ? new StyleFloat(StyleKeyword.Null) : new StyleFloat(amount);
+
         /// <summary>The first part of <paramref name="text"/> typed behind a cursor; <paramref name="typed"/>
         /// runs 0–1.</summary>
         public static string Reveal(string text, float typed)

@@ -46,7 +46,7 @@ namespace GeometricFlight.Tests
         }
 
         public LevelFlow Flow { get; private set; }
-        public SharedEntryStudy Entry { get; private set; }
+        public OpeningEntry Entry { get; private set; }
         public ShipFlight Flight { get; private set; }
         public ShipShield Shield { get; private set; }
         public LockOnWeapon Missiles { get; private set; }
@@ -56,7 +56,7 @@ namespace GeometricFlight.Tests
         public ArenaLessons Lessons { get; private set; }
         public TutorialCourse Course { get; private set; }
         public LevelUi Ui { get; private set; }
-        public MissileDisplay WeaponsPanel { get; private set; }
+        public WeaponsDisplay Weapons { get; private set; }
         public SimulatedLineTransport Cockpit { get; private set; }
         public List<string> Warnings { get; } = new List<string>();
         /// <summary>Keeps the nose on the current wave's nearest live target.</summary>
@@ -144,13 +144,13 @@ namespace GeometricFlight.Tests
         private void FindParts()
         {
             Flow = UnityEngine.Object.FindAnyObjectByType<LevelFlow>();
-            Entry = UnityEngine.Object.FindAnyObjectByType<SharedEntryStudy>();
+            Entry = UnityEngine.Object.FindAnyObjectByType<OpeningEntry>();
             Flight = UnityEngine.Object.FindAnyObjectByType<ShipFlight>();
             Lessons = UnityEngine.Object.FindAnyObjectByType<ArenaLessons>();
             Course = UnityEngine.Object.FindAnyObjectByType<TutorialCourse>();
             Ui = UnityEngine.Object.FindAnyObjectByType<LevelUi>();
             menu = UnityEngine.Object.FindAnyObjectByType<MainMenu>();
-            WeaponsPanel = UnityEngine.Object.FindAnyObjectByType<MissileDisplay>();
+            Weapons = UnityEngine.Object.FindAnyObjectByType<WeaponsDisplay>();
             Shield = Flight.GetComponent<ShipShield>();
             hull = Flight.GetComponent<ShipHull>();
             Missiles = Flight.GetComponent<LockOnWeapon>();

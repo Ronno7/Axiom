@@ -35,7 +35,7 @@ namespace GeometricFlight.Core
         public enum Step { Waiting, FreeFlight, LockSingle, LockPair, EmpGroup, Breather, Encounter, Ending, Done }
 
         [SerializeField] private LockOnWeapon missiles;
-        [SerializeField] private SharedEntryStudy entry;
+        [SerializeField] private OpeningEntry entry;
         [SerializeField] private LevelFlow flow;
         [SerializeField] private ShipShield shield;
         [Tooltip("Where an arena retry rebuilds the ship (just inside the sealed mouth, facing +Z).")]

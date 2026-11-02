@@ -8,7 +8,7 @@ using UnityEngine;
 namespace GeometricFlight.Tests
 {
     /// <summary>Material ownership at the reveal seam. The inactive rig avoids scene/input services.</summary>
-    public sealed class SharedEntryPresentationTests
+    public sealed class EntryPresentationTests
     {
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private static readonly int Marker = Shader.PropertyToID("_EntryTestMarker");
@@ -16,7 +16,7 @@ namespace GeometricFlight.Tests
         private GameObject aircraft;
         private MeshRenderer renderer;
         private ShieldDisplay display;
-        private SharedEntryPresentation presentation;
+        private EntryPresentation presentation;
         private Material original, second, construction;
 
         [SetUp]
@@ -30,7 +30,7 @@ namespace GeometricFlight.Tests
             var shield = rig.AddComponent<ShipShield>();
             display = rig.AddComponent<ShieldDisplay>();
             var ui = rig.AddComponent<LevelUi>();
-            presentation = rig.AddComponent<SharedEntryPresentation>();
+            presentation = rig.AddComponent<EntryPresentation>();
             Shader shader = Shader.Find("GeometricFlight/Grid Construction");
             Assert.That(shader, Is.Not.Null);
             original = new Material(shader);

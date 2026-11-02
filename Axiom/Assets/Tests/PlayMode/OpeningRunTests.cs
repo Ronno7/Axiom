@@ -23,6 +23,7 @@ namespace GeometricFlight.Tests
         /// <summary>Just short of the rail's end, where the ship is released into the arena.</summary>
         private const float NearTheRailEnd = 5900f;
         private const string WaveArrivalTone = "BZ,440,180", WaveClearedTone = "BZ,1320,220";
+        private const string ArmedTone = "BZ,880,160", RefusedTone = "BZ,180,140";
 
         private readonly Display display;
         private OpeningDriver game;
@@ -53,6 +54,7 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.4f);
             Assert.That(game.HudShows("pause-panel"), "the pause panel shows");
             Assert.That(Time.timeScale, Is.Zero, "time stops");
+            Assert.That(game.HudShows("weapons-panel"), Is.False, "the weapons panel stands down under the menu");
             yield return game.Capture("entry-paused");
             float frozen = game.Entry.Elapsed;
             yield return game.Wait(1f);
@@ -62,7 +64,7 @@ namespace GeometricFlight.Tests
             yield return game.Until("control to arrive", () => !game.Flow.EntryHeld, 15f);
             yield return game.Wait(0.3f);
             Assert.That(game.Ui.EntryReady, "the HUD is ready at control");
-            Assert.That(game.WeaponsPanel.enabled, "the weapons panel is on");
+            Assert.That(game.HudShows("weapons-panel"), "the weapons panel is on");
             Assert.That(game.MenuShows("title-panel"), Is.False, "the title is gone");
             Assert.That(game.Flow.State, Is.EqualTo(RunState.Playing));
             Assert.That(game.Flow.ElapsedTime, Is.GreaterThan(0f), "run time counts");
@@ -74,7 +76,7 @@ namespace GeometricFlight.Tests
         {
             yield return game.ReachControl();
             Assert.That(game.Ui.EntryReady, "the HUD is ready at control");
-            Assert.That(game.WeaponsPanel.enabled, "the weapons panel is on");
+            Assert.That(game.HudShows("weapons-panel"), "the weapons panel is on");
             Assert.That(game.MenuShows("title-panel"), Is.False, "the title is gone");
             yield return game.Capture("reduced-control");
         }
@@ -84,10 +86,12 @@ namespace GeometricFlight.Tests
         {
             yield return game.ReachControl();
             Assert.That(game.Authority.Armed, Is.False, "the run starts SAFE");
+            int refusals = game.Tones(RefusedTone);
             game.Hands(fire: true);
             yield return game.Wait(0.3f);
             Assert.That(game.Header, Does.Contain("SAFE").Or.Contain("ARM"));
             Assert.That(game.Gun.ShotsFired, Is.Zero);
+            Assert.That(game.Tones(RefusedTone), Is.GreaterThan(refusals), "a refused press sounds on the cockpit");
             yield return game.Capture("safe-refused");
         }
 
@@ -174,9 +178,11 @@ namespace GeometricFlight.Tests
         public IEnumerator UnpluggingPausesAndTheArmingSurvivesTheReconnect()
         {
             yield return game.ReachControl();
+            int arming = game.Tones(ArmedTone);
             game.Cockpit.SetArmed(true);
             yield return game.Wait(0.3f);
             Assert.That(game.Authority.Armed, "the switch arms");
+            Assert.That(game.Tones(ArmedTone), Is.GreaterThan(arming), "arming answers on the cockpit");
 
             game.Cockpit.SetUnplugged(true);
             yield return game.Until("unplugging to pause", () => game.Flow.State == RunState.Paused, 4f);

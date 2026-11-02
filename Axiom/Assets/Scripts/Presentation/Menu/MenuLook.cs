@@ -118,19 +118,19 @@ namespace GeometricFlight.Presentation
         private RenderTexture titleGlitchTexture;
 
         private const string SystemText = "SYS ONLINE";
-        // Opt-in study controls. Normal scenes keep their serialized look and idle behavior.
-        public bool StudyControlled { get; set; }
+        // Set by the entry. Until then the menu keeps its serialized look and idle behavior.
+        public bool EntryControlled { get; set; }
         public float DepartureAmount { get; set; }
         public bool CameraSuppliesMotion { get; set; }
-        /// <summary>0–1: lets a sequence fade the dust out (the shared entry clears it before the passage).</summary>
+        /// <summary>0–1: lets a sequence fade the dust out (the entry clears it before the passage).</summary>
         public float DustVisibility { get; set; } = 1f;
         public bool PresentationPaused { get; set; }
-        /// <summary>Opt-in: a departing camera can see farther than the menu's close haze.</summary>
+        /// <summary>A departing camera can see farther than the menu's close haze.</summary>
         public float FogDistanceScale { get; set; } = 1f;
         public void RebuildAtmosphere() => atmosphereDirty = true;
 
-        /// <summary>Opt-in shared-scene composition. Keep every supplied document inside the same
-        /// CRT surface as the original menu. Call when the document set changes, not every frame.</summary>
+        /// <summary>Keeps every supplied document inside the same CRT surface as the menu.
+        /// Call when the document set changes, not every frame.</summary>
         public void SetInterfaceDocuments(params UIDocument[] documents)
         {
             screenInterface.Release();
@@ -197,7 +197,7 @@ namespace GeometricFlight.Presentation
             air.SetDustVisibility(DustVisibility);
             UpdateStatus(now);
 
-            if (StudyControlled)
+            if (EntryControlled)
             {
                 if (eventPlaying) EndEvent();
                 forceEvent = false;

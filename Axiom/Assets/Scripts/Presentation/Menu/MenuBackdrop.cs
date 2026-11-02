@@ -13,7 +13,7 @@ namespace GeometricFlight.Presentation
         [SerializeField, Min(1f)] private float markerSpacing = 12f;
         private bool presentationMotion;
 
-        /// <summary>A moving-camera study uses stationary, repeatable floor markings, so camera
+        /// <summary>A moving camera uses stationary, repeatable floor markings, so camera
         /// travel does not add a second independent floor speed. Also tolerates large view transfers.</summary>
         public void SetPresentationMotion(bool active, float cameraZ = 0f)
         {

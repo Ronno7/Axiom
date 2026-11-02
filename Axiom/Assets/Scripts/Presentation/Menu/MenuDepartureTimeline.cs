@@ -64,7 +64,7 @@ namespace GeometricFlight.Presentation
             DepartureTreatment treatment, float coverCenter = 0.52f)
         {
             // A nonfinite clock is treated as a fresh sample. The upper bound only prevents overflow
-            // in adversarial float inputs; it is far beyond any representable real study session.
+            // in adversarial float inputs; it is far beyond any representable real session.
             float time = Finite(elapsed) ? Mathf.Clamp(elapsed, 0f, float.MaxValue / (ArrivalSpeed * 2f)) : 0f;
             duration = EffectiveDuration(duration, returning, reduced);
             float distance = TotalDistance(returning);

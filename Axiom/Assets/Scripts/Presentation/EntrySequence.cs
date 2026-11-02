@@ -24,7 +24,7 @@ namespace GeometricFlight.Presentation
     }
 
     /// <summary>
-    /// The shared entry as a four-bar build: sixteen beats from PLAY to flight control. Every visual
+    /// The entry as a four-bar build: sixteen beats from PLAY to flight control. Every visual
     /// accent sits on this grid so the temporary score and the picture agree, but construction flows
     /// between accents. Times are seconds from PLAY at the given tempo; nothing here owns a clock.
     /// </summary>

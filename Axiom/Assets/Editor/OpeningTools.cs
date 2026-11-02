@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 namespace GeometricFlight.Editor
 {
     /// <summary>Opens the game's one scene. It is authored in place and never regenerated.</summary>
-    public static class SharedEntryStudyTools
+    public static class OpeningTools
     {
         private const string ScenePath = "Assets/Scenes/Opening.unity";
 

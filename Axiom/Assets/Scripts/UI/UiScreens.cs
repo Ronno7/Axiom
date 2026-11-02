@@ -46,6 +46,11 @@ namespace GeometricFlight.UI
         }
 
         /// <summary>m:ss.t, truncated to tenths.</summary>
+        /// <summary>A point from Camera.WorldToScreenPoint, in this panel's coordinates.</summary>
+        public static Vector2 ScreenToPanel(Vector3 screenPoint, VisualElement root) => new Vector2(
+            screenPoint.x / Screen.width * root.resolvedStyle.width,
+            (1f - screenPoint.y / Screen.height) * root.resolvedStyle.height);
+
         public static string FormatTime(float seconds)
         {
             int tenths = Mathf.FloorToInt(Mathf.Max(0f, seconds) * 10f);

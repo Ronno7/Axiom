@@ -8,12 +8,12 @@ using UnityEngine.UIElements;
 
 namespace GeometricFlight.Core
 {
-    /// <summary>An opt-in entry study over the existing rail run. LevelFlow remains the only run,
+    /// <summary>The opening's entry over the rail run, from PLAY to flight control. LevelFlow remains the only run,
     /// pause and retry owner. This component relinquishes the actor and camera at admission.
     /// The menu sits at the passage's approach: one camera rises off the runway into the chase view
     /// while a terminal prints the passage into existence ahead of it (see EntrySequence).</summary>
     [DefaultExecutionOrder(40), DisallowMultipleComponent]
-    public sealed class SharedEntryStudy : MonoBehaviour
+    public sealed class OpeningEntry : MonoBehaviour
     {
         [SerializeField] private LevelFlow flow;
         [SerializeField] private ShipFlight flight;
@@ -22,8 +22,8 @@ namespace GeometricFlight.Core
         [SerializeField] private LevelUi levelUi;
         [SerializeField] private MenuLook look;
         [SerializeField] private MenuBackdrop backdrop;
-        [SerializeField] private SharedEntryPresentation presentation;
-        [SerializeField] private MissileDisplay missileDisplay;
+        [SerializeField] private EntryPresentation presentation;
+        [SerializeField] private WeaponsDisplay weaponsDisplay;
         [SerializeField] private GameObject[] flightDetails;
         [SerializeField] private AudioSource voice;
         [SerializeField] private AudioClip shieldReport, controlReport;
@@ -85,9 +85,9 @@ namespace GeometricFlight.Core
         {
             if (flow == null || flight == null || chase == null || menu == null || levelUi == null ||
                 look == null || backdrop == null || presentation == null || !presentation.IsConfigured ||
-                missileDisplay == null || passage == null || !flow.EntryHeld)
+                weaponsDisplay == null || passage == null || !flow.EntryHeld)
             {
-                Debug.LogError("The shared entry study is missing its held run or presentation references.", this);
+                Debug.LogError("The entry is missing its held run or presentation references.", this);
                 enabled = false;
                 return;
             }
@@ -110,7 +110,7 @@ namespace GeometricFlight.Core
             titlePanel = root.Q("title-panel");
             look.SetInterfaceDocuments(menuDocument, levelDocument);
             levelUi.CockpitEnabled = false;
-            missileDisplay.enabled = false;
+            weaponsDisplay.enabled = false;
             reduced = GameSettings.ReducedEntryAnimation;
             presentation.Begin(reduced);
             BuildCover();
@@ -161,7 +161,7 @@ namespace GeometricFlight.Core
             // The menu glides over the ground at the departure's starting speed; the camera takes the motion over.
             if (ground != null) ground.GlideSpeed = 0f;
             levelUi.CockpitEnabled = true;
-            look.StudyControlled = true;
+            look.EntryControlled = true;
             look.CameraSuppliesMotion = true;
             backdrop.SetPresentationMotion(true, cameraStart.z);
             // Menu input has ended. The existing run document now owns all navigation and pause UI.
@@ -239,7 +239,7 @@ namespace GeometricFlight.Core
                 SampleThreshold(coverAt);
                 ApplyCameraAndShip();
                 if (transferred) presentation.Sample(clock, Duration);
-                SampleMissilePanel();
+                SampleWeaponsPanel();
                 ApplyDeparture();
                 SampleBuild();
                 if (!reduced && !shieldReported && clock >= Duration * 0.72f)
@@ -397,13 +397,13 @@ namespace GeometricFlight.Core
 
         /// <summary>The weapons instrument draws itself in after the throttle (beats 13.4–15.2); weapons are
         /// still only released at control.</summary>
-        private void SampleMissilePanel()
+        private void SampleWeaponsPanel()
         {
             if (reduced) return;
             float amount = Mathf.InverseLerp(0.84f, 0.95f, clock / Duration);
             if (amount <= 0f) return;
-            missileDisplay.Assembly = amount;
-            if (!missileDisplay.enabled) missileDisplay.enabled = true;
+            weaponsDisplay.Assembly = amount;
+            if (!weaponsDisplay.enabled) weaponsDisplay.enabled = true;
         }
 
         private void RetireBackdrop()
@@ -420,7 +420,7 @@ namespace GeometricFlight.Core
             shield.TakesHits = true;
             if (!presentation.HullReady || !presentation.HudReady || flight.InputSampleFrame != Time.frameCount)
             {
-                Debug.LogError("Entry admission stopped: hull, HUD or current input is not ready. Retry the study.", this);
+                Debug.LogError("Entry admission stopped: hull, HUD or current input is not ready. Retry the run.", this);
                 flow.Pause();
                 return;
             }
@@ -434,8 +434,8 @@ namespace GeometricFlight.Core
             authority.RequireRelease();
             authority.WeaponsAvailable = true;
             chase.enabled = true;
-            missileDisplay.Assembly = 1f;
-            missileDisplay.enabled = true;
+            weaponsDisplay.Assembly = 1f;
+            weaponsDisplay.enabled = true;
             RetireBackdrop(); // Behind the camera by now; the passage floor continues it exactly.
             foreach (GameObject detail in flightDetails) detail.SetActive(true);
             cover.style.opacity = 0f;

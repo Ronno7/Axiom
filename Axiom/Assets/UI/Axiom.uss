@@ -774,3 +774,168 @@
     background-image: url("Textures/RollBar.png");
     opacity: 0.08;
 }
+
+/* The weapons panel (WeaponsPanel.uxml), laid out like a stores page. */
+.weapons-layer,
+.target-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.weapons-panel {
+    position: absolute;
+    right: 56px;
+    bottom: 92px;
+    width: 340px;
+    padding: 10px 14px;
+    background-color: var(--axiom-void-85);
+    border-left-width: 2px;
+    border-left-color: var(--axiom-cyan);
+}
+
+.weapons-panel-edge {
+    position: absolute;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    display: none;
+    background-color: var(--axiom-cyan);
+    transform-origin: 0 100%;
+}
+
+.arm-bar {
+    height: 34px;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.arm-label {
+    font-size: 22px;
+    letter-spacing: 6px;
+    -unity-font-style: bold;
+    padding: 0 8px;
+}
+
+.store-row {
+    flex-direction: row;
+    align-items: center;
+    height: 28px;
+}
+
+.store-bracket {
+    width: 18px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--axiom-light);
+    padding: 0;
+}
+
+.store-name-box {
+    width: 52px;
+}
+
+.store-name {
+    font-size: 22px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    padding: 0;
+}
+
+.store-value-box {
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.store-bank {
+    flex-direction: row;
+    align-items: center;
+}
+
+.store-pip {
+    width: 26px;
+    height: 12px;
+    margin-right: 4px;
+    border-width: 1px;
+}
+
+.store-value {
+    font-size: 18px;
+    letter-spacing: 1px;
+    padding: 0;
+}
+
+.store-count {
+    margin-left: 6px;
+}
+
+/* Holds its line when empty, so the panel never changes height. */
+.weapons-status {
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--axiom-cyan);
+    padding: 2px 0 0 0;
+    margin-top: 4px;
+    min-height: 20px;
+}
+
+/* The SAFE mark and target brackets, placed each frame by TargetMarkers. */
+.safe-mark {
+    position: absolute;
+    width: 58px;
+    height: 58px;
+}
+
+.safe-word {
+    position: absolute;
+    font-size: 20px;
+    letter-spacing: 5px;
+    -unity-font-style: bold;
+    padding: 0 6px;
+    background-color: var(--axiom-void-78);
+}
+
+.target-marker {
+    position: absolute;
+}
+
+.target-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+}
+
+.target-corner--left {
+    left: 0;
+    border-left-width: 2px;
+}
+
+.target-corner--right {
+    right: 0;
+    border-right-width: 2px;
+}
+
+.target-corner--top {
+    top: 0;
+    border-top-width: 2px;
+}
+
+.target-corner--bottom {
+    bottom: 0;
+    border-bottom-width: 2px;
+}
+
+.target-number {
+    position: absolute;
+    width: 120px;
+    font-size: 13px;
+    -unity-font-style: bold;
+}

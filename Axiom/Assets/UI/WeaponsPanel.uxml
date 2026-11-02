@@ -1,0 +1,49 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Axiom.uss" />
+    <ui:VisualElement name="weapons-panel" class="weapons-panel" picking-mode="Ignore">
+        <ui:VisualElement name="weapons-panel-edge" class="weapons-panel-edge" picking-mode="Ignore" />
+        <GeometricFlight.UI.ArmBar name="arm-bar" class="arm-bar" picking-mode="Ignore">
+            <ui:Label name="arm-label" text="SAFE" class="arm-label" picking-mode="Ignore" />
+        </GeometricFlight.UI.ArmBar>
+        <ui:VisualElement name="store-gun" class="store-row" picking-mode="Ignore">
+            <ui:Label text="&lt;" class="store-bracket store-open" picking-mode="Ignore" />
+            <ui:VisualElement class="store-name-box" picking-mode="Ignore">
+                <ui:Label text="GUN" class="store-name" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="&gt;" class="store-bracket store-close" picking-mode="Ignore" />
+            <ui:VisualElement class="store-value-box" picking-mode="Ignore">
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="store-msl" class="store-row" picking-mode="Ignore">
+            <ui:Label text="&lt;" class="store-bracket store-open" picking-mode="Ignore" />
+            <ui:VisualElement class="store-name-box" picking-mode="Ignore">
+                <ui:Label text="MSL" class="store-name" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="&gt;" class="store-bracket store-close" picking-mode="Ignore" />
+            <ui:VisualElement class="store-value-box" picking-mode="Ignore">
+                <ui:VisualElement class="store-bank" picking-mode="Ignore">
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:VisualElement class="store-pip" picking-mode="Ignore" />
+                    <ui:Label name="store-count" text="4/4" class="store-value store-count" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="store-emp" class="store-row" picking-mode="Ignore">
+            <ui:Label text="&lt;" class="store-bracket store-open" picking-mode="Ignore" />
+            <ui:VisualElement class="store-name-box" picking-mode="Ignore">
+                <ui:Label text="EMP" class="store-name" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="&gt;" class="store-bracket store-close" picking-mode="Ignore" />
+            <ui:VisualElement class="store-value-box" picking-mode="Ignore">
+                <ui:Label name="store-emp-state" text="READY" class="store-value" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="weapons-status" class="weapons-status" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

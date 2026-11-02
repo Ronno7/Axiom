@@ -53,7 +53,7 @@ namespace GeometricFlight.Combat
         {
             bladeMesh = CreateChild("Blades", new[] { bladeMaterialA, bladeMaterialB }, 0f);
             rimMesh = CreateChild("Rim", new[] { rimMaterial }, -0.03f);
-            ResetForStudy();
+            Reopen();
         }
 
         private void OnDestroy()
@@ -146,8 +146,8 @@ namespace GeometricFlight.Combat
             return closeDuration * (1f - fits / openApothem);
         }
 
-        /// <summary>Restores the existing iris for an explicit study restart. It never moves the ship.</summary>
-        public void ResetForStudy()
+        /// <summary>Opens the iris again for a retry. It never moves the ship.</summary>
+        public void Reopen()
         {
             elapsed = 0f;
             Closing = false;

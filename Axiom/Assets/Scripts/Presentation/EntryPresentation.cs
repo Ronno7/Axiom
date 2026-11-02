@@ -9,7 +9,7 @@ namespace GeometricFlight.Presentation
     /// <summary>Manually sampled ship and instrument reveal. Owns no clock, input, camera or run state.
     /// The solid hull relinquishes to ShieldDisplay before flight; only a local trace remains afterward.</summary>
     [DisallowMultipleComponent]
-    public sealed class SharedEntryPresentation : MonoBehaviour
+    public sealed class EntryPresentation : MonoBehaviour
     {
         [SerializeField] private Transform aircraft;
         [SerializeField] private Renderer[] hullRenderers;
@@ -71,7 +71,7 @@ namespace GeometricFlight.Presentation
             ResetPresentation();
             if (!IsConfigured)
             {
-                Debug.LogError("Shared entry presentation references are incomplete.", this);
+                Debug.LogError("Entry presentation references are incomplete.", this);
                 return;
             }
 
