@@ -192,7 +192,7 @@ lights, textures, or particle allocations per frame. Pause freezes the jets; des
 aircraft hides them, and disabling the component releases its generated mesh.
 
 `UI/DamageFeedback` is a non-interactive UI Toolkit element beneath the HUD and menus.
-`LevelUi` observes `ShipShield.Changed`: each accepted hit produces a single 0.55-second
+`LevelUi` observes `ShipShield.Hit`: each accepted hit produces a single 0.55-second
 angular edge pulse. Void-to-Ember facets and Hot inner lines provide contrast on both light and
 dark scenery; geometry and timing carry the warning as well as color. The centre stays clear.
 Invulnerability-blocked hits produce no pulse. The pulse decays using unscaled time, clears

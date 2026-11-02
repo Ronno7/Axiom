@@ -1,10 +1,38 @@
 using GeometricFlight.Player;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace GeometricFlight.Tests
 {
     public sealed class ShieldTests
     {
+        [Test]
+        public void ARestoreChangesTheCountWithoutCountingAsAHit()
+        {
+            var go = new GameObject("TestShip") { hideFlags = HideFlags.DontSave };
+            try
+            {
+                var shield = go.AddComponent<ShipShield>();
+                // Awake does not run for EditMode AddComponent without ExecuteAlways; invoke it.
+                typeof(ShipShield).GetMethod("Awake",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    .Invoke(shield, null);
+                int changes = 0, hits = 0;
+                shield.Changed += _ => changes++;
+                shield.Hit += _ => hits++;
+                Assert.That(shield.ApplyHit(), Is.True);
+                Assert.That(changes, Is.EqualTo(1));
+                Assert.That(hits, Is.EqualTo(1));
+                shield.Restore();
+                Assert.That(changes, Is.EqualTo(2), "the gauge still hears about a restore");
+                Assert.That(hits, Is.EqualTo(1), "damage feedback doesn't");
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+            }
+        }
+
         [Test]
         public void HitRemovesOneSegmentThenProtects()
         {

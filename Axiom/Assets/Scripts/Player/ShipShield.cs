@@ -15,8 +15,10 @@ namespace GeometricFlight.Player
         [Tooltip("Seconds of protection after a hit, so one crash cannot drain every segment.")]
         [SerializeField, Min(0f)] private float protectionAfterHit = 1.2f;
 
-        /// <summary>Raised after a segment is lost, with the remaining count.</summary>
+        /// <summary>The segment count changed, including a restore. For what shows the count.</summary>
         public event Action<int> Changed;
+        /// <summary>A segment was lost, with the remaining count. For what reacts to damage.</summary>
+        public event Action<int> Hit;
         public event Action Depleted;
 
         public Shield State { get; private set; }
@@ -37,7 +39,7 @@ namespace GeometricFlight.Player
         public bool Destroy()
         {
             if (!TakesHits || !State.Deplete()) return false;
-            Changed?.Invoke(State.Current);
+            RaiseHit();
             Depleted?.Invoke();
             return true;
         }
@@ -45,9 +47,15 @@ namespace GeometricFlight.Player
         public bool ApplyHit(int damage = 1)
         {
             if (!TakesHits || !State.TryHit()) return false;
-            Changed?.Invoke(State.Current);
+            RaiseHit();
             if (State.IsDepleted) Depleted?.Invoke();
             return true;
+        }
+
+        private void RaiseHit()
+        {
+            Changed?.Invoke(State.Current);
+            Hit?.Invoke(State.Current);
         }
     }
 }

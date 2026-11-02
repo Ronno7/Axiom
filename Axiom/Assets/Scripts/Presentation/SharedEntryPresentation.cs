@@ -114,7 +114,7 @@ namespace GeometricFlight.Presentation
             outline = MakeLine("Entry hull outline", 0.025f);
             registration = MakeLine("Entry local trace", 0.018f);
             begun = true;
-            shield.Changed += OnShieldChanged;
+            shield.Hit += OnShieldHit;
             aircraft.gameObject.SetActive(false);
             levelUi.SetEntryVisibility(0f);
             SetCaption(string.Empty);
@@ -191,7 +191,7 @@ namespace GeometricFlight.Presentation
 
         public void ResetPresentation()
         {
-            if (begun && shield != null) shield.Changed -= OnShieldChanged;
+            if (begun && shield != null) shield.Hit -= OnShieldHit;
             RestoreHull();
             if (begun && aircraft != null) aircraft.gameObject.SetActive(aircraftWasActive);
             if (levelUi != null) levelUi.SetEntryVisibility(1f);
@@ -289,6 +289,6 @@ namespace GeometricFlight.Presentation
         }
 
         private void OnDisable() => ResetPresentation();
-        private void OnShieldChanged(int remaining) => SuppressDecoration();
+        private void OnShieldHit(int remaining) => SuppressDecoration();
     }
 }

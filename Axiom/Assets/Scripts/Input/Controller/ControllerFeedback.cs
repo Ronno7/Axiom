@@ -20,12 +20,12 @@ namespace GeometricFlight.Input
 
         private void OnEnable()
         {
-            if (shield != null) shield.Changed += OnShieldHit;
+            if (shield != null) shield.Hit += OnShieldHit;
         }
 
         private void OnDisable()
         {
-            if (shield != null) shield.Changed -= OnShieldHit;
+            if (shield != null) shield.Hit -= OnShieldHit;
         }
 
         private void OnShieldHit(int remaining) =>

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+- Checkpoints sounded the cockpit's shield hit tone.
+- Pause menu options missed changes made on the title screen.
+- Esc in a pause submenu resumed flight instead of stepping back.
+
 ## [0.2.0] - 2026-11-01
 
 ### Added

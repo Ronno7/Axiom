@@ -131,7 +131,7 @@ namespace GeometricFlight.Core
                             if (part.enabled) { part.enabled = false; awaitingWalls.Add(part); }
             menu.PlayRequested += Begin;
             flow.StateChanged += OnRunState;
-            shield.Changed += OnShieldChanged;
+            shield.Hit += OnShieldHit;
         }
 
         public void Begin()
@@ -466,7 +466,7 @@ namespace GeometricFlight.Core
             captionUntil = clock + (clip != null ? clip.length : 1.8f);
         }
 
-        private void OnShieldChanged(int remaining)
+        private void OnShieldHit(int remaining)
         {
             if (voice != null) voice.Stop();
             presentation.SuppressDecoration();
@@ -541,7 +541,7 @@ namespace GeometricFlight.Core
         {
             if (menu != null) menu.PlayRequested -= Begin;
             if (flow != null) flow.StateChanged -= OnRunState;
-            if (shield != null) shield.Changed -= OnShieldChanged;
+            if (shield != null) shield.Hit -= OnShieldHit;
             if (voice != null) voice.Stop();
             if (music != null) music.Stop();
             terminal?.Remove();

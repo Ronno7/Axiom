@@ -58,6 +58,8 @@ namespace GeometricFlight.Core
         /// <summary>Set by a course with checkpoints. Returning true takes over a destroyed ship (shattered and
         /// hidden here; the course rebuilds it with <see cref="SetShipDestroyed"/>) instead of ending the run.</summary>
         public Func<bool> CheckpointRecovery { get; set; }
+        /// <summary>Set by the pause menu. The pause input leaves a submenu first (returning true) before it resumes.</summary>
+        public Func<bool> LeaveSubmenu { get; set; }
 
         private ShootableTarget[] targets;
         private readonly RunRecord record = new RunRecord();
@@ -100,7 +102,7 @@ namespace GeometricFlight.Core
                 && Time.frameCount != controllerConnectedFrame;
             if (State == RunState.Paused)
             {
-                if (pausePressed) Resume();
+                if (pausePressed && (LeaveSubmenu == null || !LeaveSubmenu())) Resume();
                 return;
             }
             if (State != RunState.Playing) return;

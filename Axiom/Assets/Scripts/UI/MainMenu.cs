@@ -66,7 +66,11 @@ namespace GeometricFlight.UI
             calibration.Tick();
         }
 
-        private void ShowOptions() => UiScreens.ShowOnly(options.Root, options.FirstFocus, Panels);
+        private void ShowOptions()
+        {
+            options.Refresh();
+            UiScreens.ShowOnly(options.Root, options.FirstFocus, Panels);
+        }
 
         private void ShowCalibration()
         {

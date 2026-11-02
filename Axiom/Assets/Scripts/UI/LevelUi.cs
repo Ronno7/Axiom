@@ -49,7 +49,7 @@ namespace GeometricFlight.UI
         private int courseDestroyed = -1, courseTotal, shownTargetTotal = -1;
         private VisualElement shieldRow;
         private ShieldGauge shieldGauge;
-        private int lastShield;
+        private VisualElement shownPanel;
 
         private Label shieldNote;
         private IVisualElementScheduledItem hideShieldNote;
@@ -170,7 +170,7 @@ namespace GeometricFlight.UI
             damageFeedback = root.Q<DamageFeedback>("damage-feedback");
             damageFeedback.ResetPulse();
             shield = flight.GetComponent<ShipShield>();
-            if (shield != null) shield.Changed += OnShieldHit;
+            if (shield != null) shield.Hit += OnShieldHit;
             pausePanel = root.Q("pause-panel");
             resultsPanel = root.Q("results-panel");
             helpPanel = root.Q("help-panel");
@@ -230,24 +230,22 @@ namespace GeometricFlight.UI
             ShowZone(null);
             ApplyEntryPresentation();
             flow.StateChanged += OnStateChanged;
+            flow.LeaveSubmenu = LeaveSubmenu;
             ShowOverlay(null, null);
         }
 
         private void OnDisable()
         {
-            if (flow != null) flow.StateChanged -= OnStateChanged;
-            if (shield != null) shield.Changed -= OnShieldHit;
+            if (flow != null)
+            {
+                flow.StateChanged -= OnStateChanged;
+                flow.LeaveSubmenu = null;
+            }
+            if (shield != null) shield.Hit -= OnShieldHit;
             damageFeedback?.ResetPulse();
         }
 
-        private void Start() => lastShield = shield != null && shield.State != null ? shield.State.Current : 0;
-
-        /// <summary>Only a loss is damage: a restored shield (a checkpoint, a rebuild) shows in the gauge instead.</summary>
-        private void OnShieldHit(int remaining)
-        {
-            if (remaining < lastShield) damageFeedback.Pulse(remaining == 0);
-            lastShield = remaining;
-        }
+        private void OnShieldHit(int remaining) => damageFeedback.Pulse(remaining == 0);
 
         private void UpdateShield()
         {
@@ -310,7 +308,11 @@ namespace GeometricFlight.UI
             }
         }
 
-        private void ShowOptions() => ShowOverlay(options.Root, options.FirstFocus);
+        private void ShowOptions()
+        {
+            options.Refresh();
+            ShowOverlay(options.Root, options.FirstFocus);
+        }
 
         private void ShowCalibration()
         {
@@ -454,7 +456,7 @@ namespace GeometricFlight.UI
             switch (state)
             {
                 case RunState.Playing:
-                    // Resuming (e.g. Esc) mid-calibration abandons it and restores the old values.
+                    // Resuming mid-calibration abandons it and restores the old values.
                     if (calibration.IsOpen) calibration.Cancel();
                     ShowOverlay(null, null);
                     break;
@@ -471,6 +473,16 @@ namespace GeometricFlight.UI
         }
 
         private void ShowPause() => ShowOverlay(pausePanel, resumeButton);
+
+        /// <summary>The pause input steps back out of a submenu, as Esc does on the title screen.</summary>
+        private bool LeaveSubmenu()
+        {
+            if (calibration.IsOpen) calibration.Cancel();
+            else if (shownPanel == options.Root) options.Close();
+            else if (shownPanel == helpPanel) ShowPause();
+            else return false;
+            return true;
+        }
 
         private void ShowResults()
         {
@@ -499,6 +511,7 @@ namespace GeometricFlight.UI
         private void ShowOverlay(VisualElement panel, VisualElement focus)
         {
             if (panel != null) damageFeedback.ResetPulse();
+            shownPanel = panel;
             screen.EnableInClassList("screen--dimmed", panel != null);
             UiScreens.ShowOnly(panel, focus, pausePanel, resultsPanel, options.Root, helpPanel, calibration.Root);
         }
