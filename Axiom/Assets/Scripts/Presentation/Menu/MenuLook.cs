@@ -148,8 +148,8 @@ namespace GeometricFlight.Presentation
         {
             look = new LookVolume(GetComponent<Volume>(), "Menu look (generated)");
             atmosphereDirty = true;
-            nextEvent = Time.unscaledTime + MenuGlitchTimeline.NextInterval(random, glitch.interval.x, glitch.interval.y);
-            lastInput = Time.unscaledTime;
+            nextEvent = UiClock.Now + MenuGlitchTimeline.NextInterval(random, glitch.interval.x, glitch.interval.y);
+            lastInput = UiClock.Now;
             Apply(CurrentPreview());
         }
 
@@ -190,7 +190,7 @@ namespace GeometricFlight.Presentation
                 return;
             }
 
-            float now = Time.unscaledTime;
+            float now = UiClock.Now;
             TrackInput(now);
             air.Follow(menuCamera, PresentationPaused || CameraSuppliesMotion ? 0f : Time.deltaTime,
                 PresentationPaused ? 0f : Time.deltaTime);
@@ -370,7 +370,7 @@ namespace GeometricFlight.Presentation
                     if (r != null) r.enabled = true;
             dropRenderers = null;
             RestoreTitle();
-            nextEvent = Time.unscaledTime + MenuGlitchTimeline.NextInterval(random, glitch.interval.x, glitch.interval.y);
+            nextEvent = UiClock.Now + MenuGlitchTimeline.NextInterval(random, glitch.interval.x, glitch.interval.y);
         }
 
         private void ApplyEventToWorld(in GlitchFrame f)

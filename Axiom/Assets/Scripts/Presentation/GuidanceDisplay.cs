@@ -1,3 +1,4 @@
+using GeometricFlight.Core;
 using GeometricFlight.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -167,18 +168,18 @@ namespace GeometricFlight.Presentation
             bool paused = Time.timeScale <= 0f;
             Line line = paused ? null : announcement ?? card;
             if (!paused && announcement == null && shown != null && !shown.Same(line)
-                && Time.unscaledTime - lineAt < lineHoldSeconds) line = shown;
+                && UiClock.Now - lineAt < lineHoldSeconds) line = shown;
             addressLine.style.display = line != null ? DisplayStyle.Flex : DisplayStyle.None;
             if (line == null)
             {
                 shown = null;
                 return;
             }
-            if (shown == null) shownAt = Time.unscaledTime;
-            rule.style.width = Length.Percent(Mathf.Clamp01((Time.unscaledTime - shownAt) / ruleDrawSeconds) * 100f);
+            if (shown == null) shownAt = UiClock.Now;
+            rule.style.width = Length.Percent(Mathf.Clamp01((UiClock.Now - shownAt) / ruleDrawSeconds) * 100f);
             if (line.Same(shown)) return;
             shown = line;
-            lineAt = Time.unscaledTime;
+            lineAt = UiClock.Now;
             rule.style.backgroundColor = line.Arrival ? AxiomPalette.Orange : line.Emphasis ? AxiomPalette.Light : AxiomPalette.Cyan;
             FillLine(line);
         }

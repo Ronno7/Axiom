@@ -1,4 +1,5 @@
 using GeometricFlight.Combat;
+using GeometricFlight.Core;
 using GeometricFlight.Presentation;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -65,7 +66,7 @@ namespace GeometricFlight.UI
             bool safe = !armed;
             gunRow.Show(safe, armed);
             missileRow.Show(safe, armed && state.Ammo > 0);
-            shownAmmo = state.Ammo < shownAmmo ? state.Ammo : Mathf.MoveTowards(shownAmmo, state.Ammo, Time.unscaledDeltaTime * 6f);
+            shownAmmo = state.Ammo < shownAmmo ? state.Ammo : Mathf.MoveTowards(shownAmmo, state.Ammo, UiClock.Delta * 6f);
             count.text = state.Ammo + "/" + state.Capacity;
             count.style.color = state.Ammo > 0 && armed ? Ready : AxiomPalette.Muted;
             for (int i = 0; i < pips.Length; i++)

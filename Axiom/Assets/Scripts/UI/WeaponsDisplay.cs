@@ -92,18 +92,18 @@ namespace GeometricFlight.UI
         /// <summary>The moment of arming flares the diamonds; a press while SAFE turns the mark Ember.</summary>
         private void WatchMasterArm(bool armed)
         {
-            if (armKnown && armed && !wasArmed && Assembly >= 1f) flareUntil = Time.unscaledTime + FlareSeconds;
+            if (armKnown && armed && !wasArmed && Assembly >= 1f) flareUntil = UiClock.Now + FlareSeconds;
             armKnown = true;
             wasArmed = armed;
-            if (authority.RefusedThisFrame) refusedUntil = Time.unscaledTime + RefusedSeconds;
+            if (authority.RefusedThisFrame) refusedUntil = UiClock.Now + RefusedSeconds;
         }
 
-        private Color SafeColour(Color quiet) => Time.unscaledTime < refusedUntil ? AxiomPalette.Ember
-            : CallForArming ? Color.Lerp(AxiomPalette.Text, AxiomPalette.Light, 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 7f)) : quiet;
+        private Color SafeColour(Color quiet) => UiClock.Now < refusedUntil ? AxiomPalette.Ember
+            : CallForArming ? Color.Lerp(AxiomPalette.Text, AxiomPalette.Light, 0.5f + 0.5f * Mathf.Sin(UiClock.Now * 7f)) : quiet;
 
         private void TintReticles(bool armed)
         {
-            float flare = Mathf.Clamp01((flareUntil - Time.unscaledTime) / FlareSeconds);
+            float flare = Mathf.Clamp01((flareUntil - UiClock.Now) / FlareSeconds);
             bool tinting = !armed || flare > 0f;
             if (!tinting && !tinted) return;
             tinted = tinting;

@@ -183,13 +183,13 @@ namespace GeometricFlight.UI
             }
             shieldGauge ??= new ShieldGauge(shieldRow.Q("shield-segments"), shield.State.Max);
             shieldGauge.Show(shield.State.Current);
-            shieldGauge.Tick(Time.unscaledDeltaTime);
+            shieldGauge.Tick(UiClock.Delta);
             shieldRow.EnableInClassList("shield--low", shield.State.Current == 1);
         }
 
         private void Update()
         {
-            damageFeedback.Tick(Time.unscaledDeltaTime);
+            damageFeedback.Tick(UiClock.Delta);
             int tenths = Mathf.FloorToInt(flow.ElapsedTime * 10f);
             if (tenths != shownTenths)
             {
@@ -245,7 +245,7 @@ namespace GeometricFlight.UI
         {
             bool flying = flow.State == RunState.Playing && flight.isActiveAndEnabled && !flight.InputLocked;
             // Only on the rail: the ship's motion can be predicted honestly there.
-            proximity.Update(flight, hull, flying && flight.CanPredict && hull != null, Time.unscaledTime);
+            proximity.Update(flight, hull, flying && flight.CanPredict && hull != null, UiClock.Now);
             proximityLabel.style.display = proximity.Active ? DisplayStyle.Flex : DisplayStyle.None;
             proximityLabel.EnableInClassList("hud-proximity--pulse", proximity.Pulse);
         }

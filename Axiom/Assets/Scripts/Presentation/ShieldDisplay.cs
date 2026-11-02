@@ -1,3 +1,4 @@
+using GeometricFlight.Core;
 using GeometricFlight.Player;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ namespace GeometricFlight.Presentation
             blinking = protectedNow;
             // Unscaled time keeps the blink phase steady; while paused, the ship stays visible.
             SetVisible(!protectedNow || Time.timeScale == 0f
-                || Mathf.Repeat(Time.unscaledTime * blinkRate, 1f) < 0.5f);
+                || Mathf.Repeat(UiClock.Now * blinkRate, 1f) < 0.5f);
         }
 
         private void SetVisible(bool visible)
