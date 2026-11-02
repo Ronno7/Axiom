@@ -37,7 +37,8 @@ namespace GeometricFlight.Combat
         public bool CloseTargetInCone { get; private set; }
         public float MinimumRange => minimumRange;
         public float MaximumRange => range;
-        public bool SuppressGun => flight != null && flight.CurrentInput.LockHeld;
+        /// <summary>Holding LOCK stops the gun, unless there are no missiles to paint for yet.</summary>
+        public bool SuppressGun => flight != null && flight.CurrentInput.LockHeld && !State.Unloaded;
         public bool Available => flight != null && flight.isActiveAndEnabled && !flight.InputLocked;
 
         private void Awake()
@@ -127,6 +128,9 @@ namespace GeometricFlight.Combat
         }
 
         public void CancelPainting() => State?.Cancel();
+
+        /// <summary>Holds the bank at zero until <see cref="ResetBank"/> (a tutorial, before its missile lesson).</summary>
+        public void Unload() => State?.Unload();
 
         public void ResetBank()
         {

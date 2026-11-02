@@ -42,7 +42,7 @@ namespace GeometricFlight.Presentation
         private MaterialPropertyBlock buildBlock;
         private LineRenderer outline, registration;
         private Label caption;
-        private VisualElement captionRoot;
+        private VisualElement captionRoot, captionLine;
         private string captionText = string.Empty;
         private bool begun, reduced, hullRestored, decorationSuppressed;
         private bool aircraftWasActive, shieldWasEnabled;
@@ -126,7 +126,8 @@ namespace GeometricFlight.Presentation
             if (!begun || !float.IsFinite(elapsed) || !float.IsFinite(controlTime) || controlTime <= 0f) return;
             float progress = Mathf.Clamp01(elapsed / controlTime);
             bool reveal = reduced || progress >= 0.54f;
-            if (reveal && !aircraft.gameObject.activeSelf) aircraft.gameObject.SetActive(true);
+            // Only the build shows the aircraft; once restored, a destroyed ship stays hidden until it is rebuilt.
+            if (reveal && !hullRestored && !aircraft.gameObject.activeSelf) aircraft.gameObject.SetActive(true);
             if (!hullRestored && reveal)
             {
                 float surface = reduced ? 1f : Mathf.InverseLerp(0.55f, 0.71f, progress);
@@ -143,7 +144,7 @@ namespace GeometricFlight.Presentation
             }
 
             // The instruments draw themselves in turn over the last beats (progress 0.75 = beat 12 of 16):
-            // time and targets, the throttle, then the input tag; the missile panel is the run owner's.
+            // time and targets, the throttle, then the input tag; the weapons instrument is the run owner's.
             if (reduced) levelUi.SetEntryVisibility(1f);
             else levelUi.SetEntryAssembly(Mathf.InverseLerp(0.75f, 0.83f, progress),
                 Mathf.InverseLerp(0.78f, 0.93f, progress), Mathf.InverseLerp(0.9f, 0.97f, progress));
@@ -174,6 +175,7 @@ namespace GeometricFlight.Presentation
             if (outline != null) outline.enabled = false;
         }
 
+        /// <summary>The subtitle of a spoken entry report. It gives way to flight feedback and shield changes.</summary>
         public void SetCaption(string text)
         {
             captionText = text ?? string.Empty;
@@ -184,7 +186,7 @@ namespace GeometricFlight.Presentation
         {
             decorationSuppressed = true;
             if (registration != null) registration.enabled = false;
-            if (caption != null) caption.style.display = DisplayStyle.None;
+            UpdateCaption();
         }
 
         public void ResetPresentation()
@@ -204,7 +206,8 @@ namespace GeometricFlight.Presentation
                 Generated.Release(registration.gameObject);
             }
             outline = registration = null;
-            caption?.RemoveFromHierarchy();
+            captionLine?.RemoveFromHierarchy();
+            captionLine = null;
             caption = null;
             captionRoot = null;
             captionText = string.Empty;
@@ -260,27 +263,29 @@ namespace GeometricFlight.Presentation
             if (root == null) return;
             if (caption == null || captionRoot != root)
             {
-                caption?.RemoveFromHierarchy();
+                captionLine?.RemoveFromHierarchy();
                 captionRoot = root;
+                // A full-width line centres the caption at any length; a translate on the label itself goes stale.
+                captionLine = new VisualElement { pickingMode = PickingMode.Ignore };
+                captionLine.style.position = Position.Absolute;
+                captionLine.style.left = captionLine.style.right = 0f;
+                captionLine.style.bottom = 88f;
+                captionLine.style.alignItems = Align.Center;
+                root.Add(captionLine);
                 caption = new Label { name = "entry-caption", pickingMode = PickingMode.Ignore };
-                caption.style.position = Position.Absolute;
-                caption.style.left = Length.Percent(50f);
-                caption.style.translate = new Translate(Length.Percent(-50f), 0f);
-                caption.style.bottom = 88f;
-                caption.style.maxWidth = Length.Percent(42f);
                 caption.style.fontSize = 18f;
                 caption.style.letterSpacing = 1f;
                 caption.style.color = AxiomPalette.Text;
                 caption.style.backgroundColor = AxiomPalette.WithAlpha(AxiomPalette.Void, 0.72f);
                 caption.style.paddingLeft = caption.style.paddingRight = 8f;
                 caption.style.paddingTop = caption.style.paddingBottom = 3f;
-                caption.style.whiteSpace = WhiteSpace.Normal;
+                caption.style.whiteSpace = WhiteSpace.NoWrap;
                 caption.style.unityTextAlign = TextAnchor.MiddleCenter;
-                root.Add(caption);
+                captionLine.Add(caption);
             }
             caption.text = captionText;
-            caption.style.display = !decorationSuppressed && !levelUi.HasPriorityNotice && captionText.Length > 0
-                ? DisplayStyle.Flex : DisplayStyle.None;
+            bool show = !decorationSuppressed && !levelUi.HasPriorityNotice && captionText.Length > 0;
+            caption.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void OnDisable() => ResetPresentation();

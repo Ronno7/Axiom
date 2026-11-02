@@ -8,10 +8,9 @@ summarized in [studies](STUDIES.md).
 During the shared entry, `EntryTerminal` (top centre) prints real state and the geometry being built, and
 `EntryCodeTerminals` streams pseudo-code windows at the screen edges (Share Tech Mono, OFL, in
 `Assets/UI/Fonts`). Both wait until the menu has flown past. Over the last beats before control the HUD
-draws itself in turn (`LevelUi.SetEntryAssembly`): the time and targets, the throttle gauge, the missile/EMP
-panel, then the input tag. Each readout's thin cyan rule traces out, then its real text types in
-(`InstrumentBuild`); the missile panel's edge draws up, its sockets appear one by one before their contents
-show, and it stays silent until control. Nothing counts up, and everything is readable at hand-over.
+draws itself in turn (`LevelUi.SetEntryAssembly`): the time and targets, the shield and throttle, the weapons panel,
+then the input tag. Each readout's thin cyan rule traces out, then its real text types in (`InstrumentBuild`); the weapons
+panel's edge draws up and its bar and stores appear in turn. Nothing counts up, and everything is readable at hand-over.
 On the tutorial rail a RINGS readout sits under the targets (`LevelUi.SetRingsReadout`, set only by
 `TutorialCourse`); other courses never show it. The original HUD, corner brackets and
 menu footer stay through flight, and both UI documents share the CRT composition.
@@ -60,9 +59,23 @@ latched throttle. The rail HUD identifies this combination and keeps Q/E zone hi
 HUD/LCD warnings and the sonar-loss chirp are suppressed when the sensor is not the selected throttle.
 Calibration continues to show the actual sensor readings.
 
-**Planned UI work:** an overhaul of the flight HUD. It gives each kind of information one place (targets,
-instructions, pointers), replaces the temporary missile panel and brings back the original scenes' working
-UI. Settings and control guidance follow, along with a broader keyboard/mouse scheme and an Xbox mapping.
+**Target count** (top right): TARGETS counts the run's targets. A course can start the count over with
+`LevelUi.SetTargetCount`: the tutorial's arena counts its own 13 once the rail is behind it, and the results carry the whole run.
+
+**Shield** (above the throttle): three forward-leaning segments (`ShieldGauge`), so the left of the screen is the ship and the right
+its weapons. A loss flashes Hot and empties, a restore sweeps left to right, and the last segment burns Ember. A short note beside them
+says what changed them, such as CHECKPOINT (`LevelUi.ShowShieldNote`). The hull shows the same state in the world. Only a loss plays the
+screen-edge damage pulse.
+
+**Announcements** (top centre): `LevelUi.SetBanner` and `Announce` are the one slot. Where a level has a guidance panel
+([below](#guidance)) they speak through it, and throttle zones are left to the gauge's band and hint. Elsewhere they use a compact line
+on a Void backing, such as the Prototype's zone calls.
+
+**Instructions and pointers** have one place each: the guidance panel and flag. Captions are only the subtitles of the entry's
+spoken reports. The input tag is a quiet line, except for its warning.
+
+**Planned UI work:** the footer and the menu's hints. Settings and control guidance follow, along with a
+broader keyboard/mouse scheme and an Xbox mapping.
 Startup reports and arena announcements need sound controls and captions.
 
 **Quit** exits a desktop build; in the editor it stops Play Mode.
@@ -157,10 +170,10 @@ wireframes, the second splits light into off-palette rainbow colours.
 
 **UI classification so far:**
 - **Diegetic:** shield segments on the hull and throttle-responsive engine exhaust.
-- **Non-diegetic:** the HUD (time, targets, throttle gauge with zone band and hint, missile panel), the guidance
-  card and chips, menus and results.
-- **Spatial:** aim reticles, target and aim brackets, the guidance flag, Cyan floor throttle cues, rings and
-  portals.
+- **Non-diegetic:** the HUD (time, targets, shield gauge, throttle gauge with zone band and hint, weapons panel), the guidance
+  panel and chips, menus and results.
+- **Spatial:** aim reticles and their SAFE mark, target and aim brackets, the guidance flag, the lit next ring, Cyan floor throttle
+  cues, rings and portals.
 - **Meta:** angular screen-edge damage feedback, and the entry's terminals and HUD assembly.
 
 ## Engine thrust and damage feedback
@@ -186,17 +199,23 @@ Invulnerability-blocked hits produce no pulse. The pulse decays using unscaled t
 when a menu opens, and is slightly stronger on the final hit. It adds no camera shake or
 persistent low-shield flashing. Event subscriptions are removed when the level UI disables.
 
-## Arena missile display
+## Weapons instrument
 
-`MissileHUD` uses UI Toolkit (`MissileDisplay`) and is included in `LevelLook`'s interface documents, so the
-bank and brackets follow Arcade Mode's screen curvature and glow. The bottom-right panel, a temporary piece due
-for replacement, shows four bank
-pips, highlights ammunition reserved by current locks, and gives the hold/release prompt. Empty pips fill
-gradually as ammunition regenerates. Pause and destruction replace the prompt with their current state.
+`MissileDisplay` uses UI Toolkit and is included in `LevelLook`'s interface documents, so the panel and brackets follow
+Arcade Mode's screen curvature and glow. The bottom-right panel is laid out like a stores page:
+- **MASTER ARM bar:** hatched SAFE or solid ARMED, so the shape carries it as well as the colour ([COMBAT](COMBAT.md#master-arm)).
+- **GUN, MSL and EMP rows:** marked x while the weapon can't fire and framed in `< >` while it can, muted when empty.
+- **MSL:** bank pips that highlight ammunition reserved by current locks and fill gradually as ammunition regenerates, with 0/4 style
+  count that stays readable while SAFE.
+- **EMP:** READY, DISCHARGED, SPENT, or OFFLINE before it is issued.
+- **A status line:** the lock range, PAINTING, how many are LOCKED, or TOO CLOSE TO LOCK.
 
-Acquiring targets have dim cyan corner brackets and a percentage; they brighten to white-cyan with a lock
-number when ready. The ordinary gun-assist marker hides while LOCK is held. Markers project after the chase
-camera moves, keeping them aligned during rolls. Enemy attacks use Orange/Ember with threat geometry; decorative Orange alone does not imply hostility.
+With **Control Hints** on it also names the controls; off, the guidance panel does. Where a level flow runs, the panel hides during
+pause, rebuilding and the results.
+
+Target markers are one family of corners. The gun's assist target gets thin Cyan brackets (**Gun Brackets**), hidden while SAFE
+or while LOCK is held. Acquiring targets get dim Cyan brackets that close in with a percentage, then brighten to white-cyan with a
+lock number. Markers project after the chase camera moves, keeping them aligned during rolls. Enemy attacks use Orange/Ember with threat geometry; decorative Orange alone does not imply hostility.
 
 The cockpit LCD shows the missile bank and painted count; HUD/LCD prompts name the LOCK button when the
 connected firmware supports D11, otherwise Left Shift. Standby firmware shows K while the button is held.
@@ -207,32 +226,36 @@ launch sends a confirmation tone, respecting the existing buzzer option.
 
 `GuidanceDisplay` draws lesson guidance into the HUD's screen, so Arcade Mode carries it. It renders what a lesson
 gives it and knows nothing about lessons:
-- **Flag:** marks one object. A short Cyan leader ends beside the object (never on it), under a tab with an action
-  and the distance ("LOCK TARGET 368 m") on a Void backing. Off screen, a Cyan pointer at an inset edge, clear of
-  the curve and the HUD corners, points the way.
-- **Card:** sits under the timer. A Muted lesson line and one Text instruction show at once, while its Cyan rule
-  draws down.
+- **Panel (top centre):** the system's one voice, a single short centred line on a Void backing, under a rule that draws out when it
+  appears. Orange marks a hostile arrival, and the words say so too. It stays empty unless there is something new to do. A standing line
+  holds at least 1.2 s before another replaces it, so quick state changes can't flicker; an announcement cuts in at once and covers it
+  until it ends. The lines are written for the calm voice that will later read them aloud.
 - **Key chips:** controls in brackets ("[LEFT SHIFT]") draw as forward-leaning key boxes in the menu buttons' lean.
   A chip fills Light while its control is held, which only means the input arrived.
+- **Flag:** marks one object with a verb and its distance ("SHOOT 120 m"). A short Cyan leader ends beside the object (never on it),
+  under a tab on a Void backing. Off screen, a Cyan pointer at an inset edge, clear of the curve and the HUD corners, points the way.
+- **Next ring:** the ring a course says is next burns brighter with a slow breath (`RingPassFlash.MarkNext`), and its flag shows the
+  distance alone, because a ring explains itself. It shows about 200 m ahead.
 
 Lessons take their lines from the systems' real state, so a held key never reads as success, and the flag steps
-aside while weapon feedback shows the same object. Guidance is Cyan with Light emphasis; targets keep Orange. The
-first lesson to use it is the arena's single LOCK target.
+aside while weapon feedback shows the same object. Guidance is Cyan with Light emphasis; targets keep Orange. Every
+tutorial lesson uses it, on the rail and in the arena ([lessons](SHARED_ENTRY_STUDY.md)). Pause hides it.
 
 ## Arena encounter display
 
-`EncounterHUD` uses UI Toolkit and shares Arcade Mode's interface routing with the missile HUD. It shows the
-arrival countdown, round number, remaining target count, and the SECTOR CLEAR/recovery beat. A portal marker
-guides the player during the warning, including when the spawn points are behind the camera. World-space
-orange octagonal portals grow during the five-second warning and collapse just after enemies arrive; they
-have no collision or gameplay logic. Arrival and clear cues use the controller buzzer's existing setting.
+`EncounterHUD` uses UI Toolkit and shares Arcade Mode's interface routing with the missile HUD. In the Arena scene it
+shows the arrival countdown, round number, remaining target count, and the SECTOR CLEAR/recovery beat. Where a
+level HUD exists, the lessons speak through the guidance panel and flag instead, and only the cockpit's tones remain.
+Otherwise a portal marker guides the player during the warning, including when the spawn points are behind the
+camera. World-space orange octagonal portals face the viewer, grow during the warning and collapse just after enemies
+arrive; they have no collision or gameplay logic. Arrival and clear cues use the controller buzzer's existing setting.
 
 Pause freezes portal motion and replaces the objective with PAUSED. Ship destruction shows RECONSTRUCTING,
 then a fresh warning for the retry. Disable `ArenaEncounter` before Play Mode to hide this interface and return
 to free practice.
 
-The missile panel also shows the 90–650 m lock range and **CLOSE TARGET — USE GUNS** when a nearby target
-is in the acquisition cone. Its EMP row shows **EMP READY / DOME or R**, then **EMP SPENT / ONE PER LIFE**.
+With Control Hints on, the weapons instrument also shows **CLOSE TARGET — USE GUNS** when a nearby target is in the
+acquisition cone, and its EMP row shows **EMP READY / DOME or R**, then **EMP SPENT / ONE PER LIFE**.
 `EmpDisplay` renders one dominant planar ring with faint spherical arcs and radial fragments. Its 0.22 s
 compression beat precedes the 2.8 s expansion; a metallic bass impact and 900 ms rumble pulse begin when
 the front starts moving. It also sends the D12 charge-lamp state and discharge LCD message. The EMP row shares the missile

@@ -1,15 +1,19 @@
 using GeometricFlight.Core;
 using GeometricFlight.Input;
+using GeometricFlight.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GeometricFlight.Presentation
 {
-    /// <summary>Objective, arrival countdown and recovery beat on the same tube as the missile HUD.</summary>
+    /// <summary>Objective, arrival countdown and recovery beat on the same tube as the missile HUD. This panel and its
+    /// portal marker are the Arena scene's own: where a level HUD exists, the lessons speak through its guidance panel
+    /// and flag. The cockpit's phase tones play either way.</summary>
     [DefaultExecutionOrder(110), RequireComponent(typeof(UIDocument))]
     public sealed class ArenaEncounterDisplay : MonoBehaviour
     {
         [SerializeField] private ArenaEncounter encounter;
+        private LevelUi levelUi;
         private UIDocument document;
         private VisualElement overlay, panel, bar;
         private Label title, detail, guide;
@@ -22,6 +26,7 @@ namespace GeometricFlight.Presentation
         {
             document = GetComponent<UIDocument>();
             view = Camera.main;
+            levelUi = FindAnyObjectByType<LevelUi>();
         }
 
         private void Build(VisualElement root)
@@ -103,7 +108,8 @@ namespace GeometricFlight.Presentation
                 title.text = "RECONSTRUCTING";
                 detail.text = "RETRY ROUND " + wave.Round.ToString("00");
             }
-            GuideToPortals(incoming && Time.timeScale > 0f, root);
+            panel.style.display = levelUi != null ? DisplayStyle.None : DisplayStyle.Flex;
+            GuideToPortals(levelUi == null && incoming && Time.timeScale > 0f, root);
             if (wave.Phase != lastPhase)
             {
                 if (incoming) ControllerService.Current?.PlayTone(440, 180);

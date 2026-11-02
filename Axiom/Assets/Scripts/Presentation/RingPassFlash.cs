@@ -8,7 +8,8 @@ namespace GeometricFlight.Presentation
     /// <summary>
     /// Flying through a scoring ring lights it: the ring flares white and settles back, and a ghost of its outline
     /// shoots ahead down the rail, growing and fading, so the confirmation is seen in front of the ship rather than
-    /// behind the camera. Any rail with scoring rings (tutorial or procedural) can use it. Visual only; reads the
+    /// behind the camera. Any rail with scoring rings (tutorial or procedural) can use it. It also lights the ring a
+    /// course says is next (<see cref="MarkNext"/>), brighter than the rest with a slow breath. Visual only; reads the
     /// rail's scoring event and never changes the score.
     /// </summary>
     [DisallowMultipleComponent]
@@ -23,6 +24,8 @@ namespace GeometricFlight.Presentation
         [Tooltip("How far ahead the ghost outline travels, metres.")]
         [SerializeField, Min(0f)] private float ghostTravel = 60f;
         [SerializeField, Min(0f)] private float flareIntensity = 4f;
+        [Tooltip("How bright the next ring burns.")]
+        [SerializeField, Min(0f)] private float nextIntensity = 2.5f;
 
         private sealed class Flash
         {
@@ -40,6 +43,22 @@ namespace GeometricFlight.Presentation
         private readonly Vector3[] outline = new Vector3[6];
         private MaterialPropertyBlock block;
         private Material ghostMaterial;
+        private Renderer next;
+
+        /// <summary>Lights this ring as the next one; null lights none.</summary>
+        public void MarkNext(Transform ring)
+        {
+            Renderer renderer = ring != null ? ring.GetComponent<Renderer>() : null;
+            if (renderer == next) return;
+            if (next != null && !IsFlashing(next)) next.SetPropertyBlock(null);
+            next = renderer;
+        }
+
+        private bool IsFlashing(Renderer ring)
+        {
+            foreach (Flash flash in active) if (flash.Ring == ring) return true;
+            return false;
+        }
 
         private void OnEnable()
         {
@@ -61,6 +80,8 @@ namespace GeometricFlight.Presentation
             RingGate.Passed -= OnGate;
             foreach (Flash flash in active) End(flash);
             active.Clear();
+            if (next != null) next.SetPropertyBlock(null);
+            next = null;
             while (spare.Count > 0) { LineRenderer line = spare.Pop(); if (line != null) Destroy(line.gameObject); }
             if (ghostMaterial != null) Destroy(ghostMaterial);
         }
@@ -114,6 +135,13 @@ namespace GeometricFlight.Presentation
                 flash.Ghost.startWidth = flash.Ghost.endWidth = width;
                 flash.Ghost.startColor = flash.Ghost.endColor = AxiomPalette.WithAlpha(AxiomPalette.White, 1f - t);
             }
+            if (next == null || IsFlashing(next)) return;
+            Material lit = next.sharedMaterial;
+            float breath = 0.75f + 0.25f * Mathf.Sin(Time.time * 4f);
+            block.Clear();
+            block.SetColor(BaseColor, Color.Lerp(lit.GetColor(BaseColor),
+                AxiomPalette.MaterialColor(lit, "_BaseColor", AxiomPalette.Light, nextIntensity), breath));
+            next.SetPropertyBlock(block);
         }
 
         private void End(Flash flash)

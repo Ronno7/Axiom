@@ -134,5 +134,31 @@ namespace GeometricFlight.Tests
             // Legacy controller packets have no LOCK; the keyboard remains available.
             Assert.That(new FlightInput(Vector2.zero, 0f, false, false).LockHeld, Is.False);
         }
+
+        [Test]
+        public void UnloadedBank_StaysEmptyUntilReset()
+        {
+            var state = new MissileLockState(4, 0.1f, 0.1f, 1f, 0.5f);
+            state.Unload();
+            var none = new System.Collections.Generic.HashSet<int>();
+            for (int i = 0; i < 20; i++) state.Step(0.5f, false, true, 0, none, none);
+            Assert.AreEqual(0, state.Ammo);
+            Assert.IsTrue(state.Unloaded);
+            state.Reset();
+            Assert.AreEqual(4, state.Ammo);
+            Assert.IsFalse(state.Unloaded);
+        }
+
+        [Test]
+        public void UnloadedBank_CannotLockATarget()
+        {
+            var state = new MissileLockState(4, 0.1f, 0.1f, 1f, 0.5f);
+            state.Unload();
+            var seen = new System.Collections.Generic.HashSet<int> { 7 };
+            state.Step(0.1f, false, true, 0, seen, seen); // Release after the unload's cancel.
+            for (int i = 0; i < 5; i++) state.Step(0.1f, true, true, 7, seen, seen);
+            Assert.AreEqual(0, state.Locks.Count);
+            Assert.AreEqual(0, state.Step(0.1f, false, true, 7, seen, seen).Length);
+        }
     }
 }

@@ -24,6 +24,8 @@ namespace GeometricFlight.Core
         [SerializeField] private Transform[] hoops;
         [SerializeField, Min(1f)] private float hoopRadius = 12f;
         [SerializeField] private ClosingIris iris;
+        [Tooltip("The comparison's restart and report keys (F1, F2, M, Backspace, F8). Off in authored runs.")]
+        [SerializeField] private bool testKeys = true;
         private static bool hasSelection, selectedFullRotation = true;
         private static RailTravelMode selectedCandidate;
         private ArenaFlight flight;
@@ -236,7 +238,7 @@ namespace GeometricFlight.Core
                 lastShield = shield.State.Current;
                 return;
             }
-            Keyboard keys = Keyboard.current;
+            Keyboard keys = testKeys ? Keyboard.current : null;
             if (keys != null)
             {
                 if (keys.f1Key.wasPressedThisFrame) { Restart(RailTravelMode.NoseLed, flight.FullRotation); return; }

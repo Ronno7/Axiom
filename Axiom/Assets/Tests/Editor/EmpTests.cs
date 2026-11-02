@@ -93,5 +93,20 @@ namespace GeometricFlight.Tests
                 Assert.That(LissajousPatrol.Point(i / 1000f, amplitude, new Vector3Int(rx, ry, rz), phase).magnitude,
                     Is.LessThanOrEqualTo(amplitude.magnitude + 1e-3f));
         }
+
+        [Test]
+        public void OfflineCharge_CannotFireUntilReset()
+        {
+            var charge = new EmpChargeState();
+            charge.TakeOffline();
+            Assert.IsTrue(charge.Offline);
+            Assert.IsFalse(charge.Ready);
+            charge.Step(false, true);
+            Assert.IsFalse(charge.Step(true, true));
+            charge.Reset();
+            Assert.IsFalse(charge.Offline);
+            charge.Step(false, true);
+            Assert.IsTrue(charge.Step(true, true));
+        }
     }
 }

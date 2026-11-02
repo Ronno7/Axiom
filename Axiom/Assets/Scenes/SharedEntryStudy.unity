@@ -4647,7 +4647,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6979879}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -5003,6 +5003,7 @@ MonoBehaviour:
   ghostGrowth: 1.6
   ghostTravel: 60
   flareIntensity: 4
+  nextIntensity: 2.5
 --- !u!1 &32045065
 GameObject:
   m_ObjectHideFlags: 0
@@ -8127,6 +8128,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 148879169}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &149788688
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 149788689}
+  m_Layer: 0
+  m_Name: Station SE
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &149788689
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 149788688}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 368, y: 140, z: 6212}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &155633974
 GameObject:
   m_ObjectHideFlags: 0
@@ -10056,7 +10088,7 @@ Transform:
   m_GameObject: {fileID: 239548103}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -130, y: 140, z: 6730}
+  m_LocalPosition: {x: 250, y: 170, z: 6190}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11739,6 +11771,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 337016526}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &339801782
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 339801783}
+  m_Layer: 0
+  m_Name: Station NE
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &339801783
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339801782}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 368, y: 140, z: 6948}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &341319283
 GameObject:
   m_ObjectHideFlags: 0
@@ -12404,9 +12467,9 @@ MonoBehaviour:
   practiceTargets: []
   spawns:
   - template: {fileID: 1121792919}
-    point: {fileID: 1121792916}
+    point: {fileID: 718727196}
   - template: {fileID: 1085831704}
-    point: {fileID: 1085831707}
+    point: {fileID: 1007238742}
   warningTime: 2
   recoveryTime: 12
   startOnPlay: 0
@@ -12437,7 +12500,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 718727196}
+  - {fileID: 1007238742}
   m_Father: {fileID: 742470722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &374138404
@@ -12865,7 +12930,7 @@ MonoBehaviour:
   practiceTargets: []
   spawns:
   - template: {fileID: 307376057}
-    point: {fileID: 307376054}
+    point: {fileID: 959467186}
   warningTime: 2
   recoveryTime: 12
   startOnPlay: 0
@@ -12896,7 +12961,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 959467186}
   m_Father: {fileID: 742470722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &396031536
@@ -15031,7 +15097,7 @@ Transform:
   m_GameObject: {fileID: 455950642}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 22, z: 2230}
+  m_LocalPosition: {x: 0, y: 22, z: 2330}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15996,79 +16062,82 @@ MonoBehaviour:
   weapon: {fileID: 1293384989}
   levelUi: {fileID: 553250158}
   arena: {fileID: 742470721}
+  guidance: {fileID: 553250161}
+  rings: {fileID: 32020435}
+  weaponsInstrument: {fileID: 553250160}
+  ringLookahead: 200
+  armedConfirmSeconds: 1.5
   flightLineY: 16
   startZ: 0
   rebuildDelay: 2
   checkpoints:
   - z: 1050
-    caption: "CHECKPOINT \xB7 SHIELD RESTORED"
-  - z: 1850
-    caption: "CHECKPOINT \xB7 SHIELD RESTORED"
+  - z: 1775
   - z: 2740
-    caption: "CHECKPOINT \xB7 SHIELD RESTORED"
   - z: 3800
-    caption: "CHECKPOINT \xB7 SHIELD RESTORED"
   - z: 4580
-    caption: "CHECKPOINT \xB7 SHIELD RESTORED"
   - z: 5140
-    caption: "CHECKPOINT \xB7 SHIELD RESTORED"
   cues:
   - z: 130
-    caption: STEER THROUGH THE RINGS
-    whenSafe: 
-    seconds: 3.5
-  - z: 590
-    caption: "AGAIN \xB7 MORE ROOM THIS TIME"
-    whenSafe: 
-    seconds: 3
-  - z: 1135
-    caption: "LATTICE COSTS SHIELD \xB7 WALLS DESTROY"
-    whenSafe: 
+    untilZ: 0
+    line: FLY THROUGH THE RINGS
+    weapons: 0
+    shoot: 0
     seconds: 4
-  - z: 1460
-    caption: "AGAIN \xB7 OTHER SIDE FIRST"
-    whenSafe: 
-    seconds: 3
-  - z: 5900
-    caption: OPEN SPACE AHEAD
-    whenSafe: 
-    seconds: 3
-  - z: 1880
-    caption: "WEAPONS ARMED \xB7 SHOOT THE TARGETS \xB7 {fire}"
-    whenSafe: "ARM WEAPONS \xB7 {arm}"
+  - z: 1065
+    untilZ: 0
+    line: "LATTICE COSTS SHIELD \xB7 WALLS DESTROY"
+    weapons: 0
+    shoot: 0
+    seconds: 4.5
+  - z: 1790
+    untilZ: 2340
+    line: HOLD {fire} TO SHOOT
+    weapons: 1
+    shoot: 1
     seconds: 4
-  - z: 2245
-    caption: "AGAIN \xB7 TAKE YOUR TIME"
-    whenSafe: "ARM WEAPONS \xB7 {arm}"
-    seconds: 3
+  - z: 2345
+    untilZ: 2660
+    line: 
+    weapons: 1
+    shoot: 1
+    seconds: 4
   - z: 2775
-    caption: "TIGHT TURNS AHEAD \xB7 SLOWER GIVES MORE TIME \xB7 {lower}"
-    whenSafe: 
-    seconds: 4
-  - z: 3265
-    caption: "AGAIN \xB7 SAME TURNS, OTHER SIDE FIRST"
-    whenSafe: 
-    seconds: 3
+    untilZ: 0
+    line: "TIGHT TURNS \xB7 SLOW DOWN {lower}"
+    weapons: 0
+    shoot: 0
+    seconds: 5
   - z: 3835
-    caption: "THE IRIS SHUTS ON SLOW SHIPS \xB7 FULL THROTTLE \xB7 {raise}"
-    whenSafe: 
-    seconds: 4
-  - z: 4175
-    caption: "AGAIN \xB7 REACH FULL SPEED EARLY"
-    whenSafe: 
-    seconds: 3
+    untilZ: 0
+    line: "IRIS SHUTS ON SLOW SHIPS \xB7 FULL THROTTLE {raise}"
+    weapons: 0
+    shoot: 0
+    seconds: 5
   - z: 4605
-    caption: "BOOST \xB7 THROTTLE ALL THE WAY FORWARD \xB7 {boost}"
-    whenSafe: 
+    untilZ: 0
+    line: "BOOST \xB7 {boost}"
+    weapons: 0
+    shoot: 0
     seconds: 4
   - z: 5165
-    caption: "TURRETS SHOOT BACK \xB7 HIT THEM FIRST"
-    whenSafe: "ARM WEAPONS \xB7 {arm}"
+    untilZ: 0
+    line: TURRETS SHOOT BACK
+    weapons: 0
+    shoot: 0
+    seconds: 3.5
+  - z: 5165
+    untilZ: 5435
+    line: 
+    weapons: 1
+    shoot: 1
     seconds: 4
   - z: 5520
-    caption: "AGAIN \xB7 TAKE THEM EARLY"
-    whenSafe: "ARM WEAPONS \xB7 {arm}"
-    seconds: 3
+    untilZ: 5805
+    line: 
+    weapons: 1
+    shoot: 1
+    seconds: 4
 --- !u!1 &470527829
 GameObject:
   m_ObjectHideFlags: 0
@@ -17485,6 +17554,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 499626901}
   m_Mesh: {fileID: 0}
+--- !u!1 &499790035
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 499790036}
+  m_Layer: 0
+  m_Name: Station S
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &499790036
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499790035}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 110, z: 6060}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &501582728
 GameObject:
   m_ObjectHideFlags: 0
@@ -17755,6 +17855,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 518531194}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &518563607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 518563608}
+  m_Layer: 0
+  m_Name: Station SW
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &518563608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518563607}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -368, y: 140, z: 6212}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &518723706
 GameObject:
   m_ObjectHideFlags: 0
@@ -18345,6 +18476,11 @@ MonoBehaviour:
   weapon: {fileID: 1293384983}
   writeCockpit: 0
   bottomMargin: 92
+  controlHints: 0
+  gunBrackets: 1
+  reticles:
+  - {fileID: 942172535}
+  - {fileID: 211781359}
 --- !u!114 &553250161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18360,7 +18496,8 @@ MonoBehaviour:
   document: {fileID: 553250159}
   distanceFrom: {fileID: 1293384975}
   edgeInset: {x: 120, y: 150, z: 120, w: 210}
-  cardDrawSeconds: 0.3
+  ruleDrawSeconds: 0.3
+  lineHoldSeconds: 1.2
 --- !u!65 &555237239
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -22108,6 +22245,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 717043418}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &718727195
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 718727196}
+  m_Layer: 0
+  m_Name: Lock pair point A
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &718727196
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 718727195}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -35, y: 140, z: 7100}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 369400789}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &720860289
 GameObject:
   m_ObjectHideFlags: 0
@@ -22355,6 +22523,22 @@ MonoBehaviour:
   encounter: {fileID: 1424053463}
   endingSeconds: 4
   guidance: {fileID: 553250161}
+  rings: {fileID: 32020435}
+  stations:
+  - {fileID: 1488982086}
+  - {fileID: 339801783}
+  - {fileID: 1330323544}
+  - {fileID: 149788689}
+  - {fileID: 499790036}
+  - {fileID: 518563608}
+  - {fileID: 1226954771}
+  - {fileID: 2109542900}
+  stationDistance: 520
+  stationNearest: 480
+  empStationNearest: 300
+  stationAngle: 110
+  stationWaitSeconds: 4
+  clearCallSeconds: 3
 --- !u!4 &742470722
 Transform:
   m_ObjectHideFlags: 0
@@ -22377,6 +22561,7 @@ Transform:
   - {fileID: 1424053464}
   - {fileID: 392491784}
   - {fileID: 369400789}
+  - {fileID: 1628194237}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &746495286
@@ -26926,6 +27111,37 @@ MonoBehaviour:
   drawOrbits: 1
   bob: 0.15
   seed: 3
+--- !u!1 &959467185
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 959467186}
+  m_Layer: 0
+  m_Name: Lock single point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &959467186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959467185}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 120, z: 7100}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 392491784}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &965488051
 GameObject:
   m_ObjectHideFlags: 0
@@ -28259,6 +28475,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000581161}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1007238741
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1007238742}
+  m_Layer: 0
+  m_Name: Lock pair point B
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1007238742
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007238741}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 35, y: 105, z: 7110}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 369400789}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1008106928
 GameObject:
   m_ObjectHideFlags: 0
@@ -29769,7 +30016,7 @@ Transform:
   m_GameObject: {fileID: 1041664286}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 110, y: 110, z: 6980}
+  m_LocalPosition: {x: -430, y: 90, z: 6470}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -34802,6 +35049,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1224828875}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1226954770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1226954771}
+  m_Layer: 0
+  m_Name: Station W
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1226954771
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226954770}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -520, y: 110, z: 6580}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1228887942
 GameObject:
   m_ObjectHideFlags: 0
@@ -36156,6 +36434,7 @@ MonoBehaviour:
   - {fileID: 398808866}
   hoopRadius: 10
   iris: {fileID: 1246815517}
+  testKeys: 0
 --- !u!114 &1293384981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37233,6 +37512,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1328040330}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1330323543
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1330323544}
+  m_Layer: 0
+  m_Name: Station E
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1330323544
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330323543}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 520, y: 110, z: 6580}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1332398482
 GameObject:
   m_ObjectHideFlags: 0
@@ -37651,7 +37961,7 @@ Transform:
   m_GameObject: {fileID: 1360815979}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 130, y: 155, z: 6840}
+  m_LocalPosition: {x: -430, y: 150, z: 6700}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -39538,7 +39848,7 @@ Transform:
   m_GameObject: {fileID: 1468998311}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -100, y: 100, z: 6880}
+  m_LocalPosition: {x: 364, y: 120, z: 6370}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -39832,6 +40142,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1481326626}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1488982085
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1488982086}
+  m_Layer: 0
+  m_Name: Station N
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1488982086
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1488982085}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 120, z: 7100}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1491195132
 GameObject:
   m_ObjectHideFlags: 0
@@ -42408,7 +42749,7 @@ Transform:
   m_GameObject: {fileID: 1580562551}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -90, y: 85, z: 6500}
+  m_LocalPosition: {x: 109, y: 100, z: 6986}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -42730,7 +43071,7 @@ Transform:
   m_GameObject: {fileID: 1588442526}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8, y: 14, z: 2140}
+  m_LocalPosition: {x: 8, y: 14, z: 2240}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -43580,6 +43921,45 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626888067}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1628194236
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1628194237}
+  m_Layer: 0
+  m_Name: Stations
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1628194237
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628194236}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1488982086}
+  - {fileID: 339801783}
+  - {fileID: 1330323544}
+  - {fileID: 149788689}
+  - {fileID: 499790036}
+  - {fileID: 518563608}
+  - {fileID: 1226954771}
+  - {fileID: 2109542900}
+  m_Father: {fileID: 742470722}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1630796577
 GameObject:
   m_ObjectHideFlags: 0
@@ -46809,7 +47189,7 @@ Transform:
   m_GameObject: {fileID: 1777568384}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 100, y: 95, z: 6620}
+  m_LocalPosition: {x: 297, y: 140, z: 6877}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -54742,6 +55122,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2109277562}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2109542899
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2109542900}
+  m_Layer: 0
+  m_Name: Station NW
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2109542900
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109542899}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -368, y: 140, z: 6948}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628194237}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2120717339
 GameObject:
   m_ObjectHideFlags: 0
@@ -54965,7 +55376,7 @@ Transform:
   m_GameObject: {fileID: 2130967511}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8, y: 18, z: 2050}
+  m_LocalPosition: {x: -8, y: 18, z: 2150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

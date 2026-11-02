@@ -70,6 +70,8 @@ namespace GeometricFlight.Combat
         }
 
         public void ResetCharge() { State.Reset(); Pulsing = false; }
+        /// <summary>No charge until <see cref="ResetCharge"/> (a tutorial, before its EMP lesson).</summary>
+        public void TakeOffline() { State.TakeOffline(); Pulsing = false; }
         private void OnApplicationFocus(bool focused) { if (!focused) State.Cancel(); }
         private void OnDisable() { State.Cancel(); Pulsing = false; }
     }

@@ -20,6 +20,8 @@ namespace GeometricFlight.Combat
         public int Capacity => capacity;
         public int CandidateId { get; private set; }
         public bool IsPainting { get; private set; }
+        /// <summary>No missiles were issued yet: the bank reads empty and does not refill until <see cref="Reset"/>.</summary>
+        public bool Unloaded { get; private set; }
         public float Progress => CandidateId == 0 ? 0f : Mathf.Clamp01(progress / AcquisitionTime);
         public float RefillProgress => Ammo == capacity ? 1f : refill / refillTime;
         private float AcquisitionTime => locks.Count == 0 ? firstLockTime : nextLockTime;
@@ -47,7 +49,7 @@ namespace GeometricFlight.Combat
             }
             if (deltaTime <= 0f) return Array.Empty<int>();
 
-            if (Ammo < capacity)
+            if (!Unloaded && Ammo < capacity)
             {
                 refill += deltaTime;
                 while (refill >= refillTime && Ammo < capacity)
@@ -110,6 +112,15 @@ namespace GeometricFlight.Combat
             Cancel();
             Ammo = capacity;
             refill = 0f;
+            Unloaded = false;
+        }
+
+        public void Unload()
+        {
+            Cancel();
+            Ammo = 0;
+            refill = 0f;
+            Unloaded = true;
         }
 
         private void ClearPaint()

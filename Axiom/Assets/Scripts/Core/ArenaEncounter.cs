@@ -33,6 +33,7 @@ namespace GeometricFlight.Core
         public event Action WaveCleared;
         public int SpawnCount => spawns == null ? 0 : spawns.Length;
         public Vector3 SpawnPosition(int index) => spawns[index].point.position;
+        public Transform SpawnPoint(int index) => spawns[index].point;
         /// <summary>This wave's spawned enemies, including ones already destroyed.</summary>
         public IReadOnlyList<ShootableTarget> Live => live;
 
@@ -117,6 +118,16 @@ namespace GeometricFlight.Core
         {
             State?.Stop();
             ClearWave();
+        }
+
+        /// <summary>Moves the arrival points together so their middle sits at <paramref name="centre"/>, keeping their
+        /// shape. Takes effect from the next arrival.</summary>
+        public void PlaceAt(Vector3 centre)
+        {
+            Vector3 middle = Vector3.zero;
+            foreach (Spawn spawn in spawns) middle += spawn.point.position;
+            Vector3 shift = centre - middle / spawns.Length;
+            foreach (Spawn spawn in spawns) spawn.point.position += shift;
         }
 
         private void ClearEnemyShots()

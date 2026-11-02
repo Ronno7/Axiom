@@ -46,6 +46,17 @@ namespace GeometricFlight.UI
         private float entryVisibility = 1f, throttleBuild = 1f, controllerBuild = 1f;
         private InstrumentBuild timeBuild, targetsBuild, controllerTag, ringsBuild;
         private Label ringsLabel;
+        private int courseDestroyed = -1, courseTotal, shownTargetTotal = -1;
+        private VisualElement shieldRow;
+        private ShieldGauge shieldGauge;
+        private int lastShield;
+
+        private Label shieldNote;
+        private IVisualElementScheduledItem hideShieldNote;
+
+        /// <summary>Where a level has its own announcement panel, its slot's messages go there instead (null clears).
+        /// Its lessons also speak for the throttle zones, so their calls stay on the gauge.</summary>
+        public System.Action<string> AddressSink { get; set; }
 
         /// <summary>Opt-in shared-menu handoff. The level remains bound while the menu owns the LCD.</summary>
         public bool CockpitEnabled { get; set; } = true;
@@ -67,6 +78,39 @@ namespace GeometricFlight.UI
             if (ringsLabel == null) return;
             ringsLabel.style.display = text == null ? DisplayStyle.None : DisplayStyle.Flex;
             if (text != null) ringsBuild.Text = text;
+        }
+
+        /// <summary>Counts this course's own targets instead of the whole run's (an arena after its rail, which starts
+        /// over). The results still carry the whole run.</summary>
+        public void SetTargetCount(int destroyed, int total)
+        {
+            courseDestroyed = destroyed;
+            courseTotal = total;
+        }
+
+        /// <summary>The one announcement slot at top centre; null clears it. Stays until replaced or cleared.</summary>
+        public void SetBanner(string text)
+        {
+            hideBanner?.Pause();
+            if (AddressSink != null)
+            {
+                AddressSink(text);
+                return;
+            }
+            if (zoneBanner == null) return;
+            if (text != null) zoneBanner.text = text;
+            zoneBanner.EnableInClassList("zone-banner--visible", text != null);
+        }
+
+        /// <summary>A short note beside the shield gauge, for what changed it ("CHECKPOINT").</summary>
+        public void ShowShieldNote(string text, float seconds = 2.5f)
+        {
+            if (shieldNote == null) return;
+            hideShieldNote?.Pause();
+            shieldNote.text = text;
+            shieldNote.style.display = DisplayStyle.Flex;
+            hideShieldNote = shieldNote.schedule.Execute(() => shieldNote.style.display = DisplayStyle.None);
+            hideShieldNote.ExecuteLater((long)(seconds * 1000f));
         }
 
         /// <summary>Shows or hides the whole HUD at once (reduced entry, reset).</summary>
@@ -106,6 +150,7 @@ namespace GeometricFlight.UI
             throttleCruise.style.opacity = throttleSetpoint.style.opacity = Partial(b >= 1f ? 1f : marks);
             throttleFill.style.opacity = Partial(Mathf.InverseLerp(0.6f, 0.85f, b));
             throttleReadouts.style.opacity = throttleReserve.style.opacity = Partial(Mathf.InverseLerp(0.75f, 1f, b));
+            shieldRow.style.opacity = Partial(Mathf.InverseLerp(0f, 0.4f, b));
         }
 
         private static StyleFloat Partial(float amount) =>
@@ -135,6 +180,9 @@ namespace GeometricFlight.UI
             targetsLabel = root.Q<Label>("hud-targets");
             speedLabel = root.Q<Label>("throttle-speed");
             throttle = root.Q("throttle");
+            shieldRow = root.Q("shield");
+            shieldNote = root.Q<Label>("shield-note");
+            shieldNote.style.display = DisplayStyle.None;
             throttleTrack = throttle.Q(className: "throttle-track");
             throttleReadouts = throttle.Q(className: "throttle-readouts");
             throttleTrack.style.transformOrigin = new TransformOrigin(0f, Length.Percent(50f));
@@ -192,7 +240,27 @@ namespace GeometricFlight.UI
             damageFeedback?.ResetPulse();
         }
 
-        private void OnShieldHit(int remaining) => damageFeedback.Pulse(remaining == 0);
+        private void Start() => lastShield = shield != null && shield.State != null ? shield.State.Current : 0;
+
+        /// <summary>Only a loss is damage: a restored shield (a checkpoint, a rebuild) shows in the gauge instead.</summary>
+        private void OnShieldHit(int remaining)
+        {
+            if (remaining < lastShield) damageFeedback.Pulse(remaining == 0);
+            lastShield = remaining;
+        }
+
+        private void UpdateShield()
+        {
+            if (shield == null || shield.State == null)
+            {
+                shieldRow.style.display = DisplayStyle.None;
+                return;
+            }
+            shieldGauge ??= new ShieldGauge(shieldRow.Q("shield-segments"), shield.State.Max);
+            shieldGauge.Show(shield.State.Current);
+            shieldGauge.Tick(Time.unscaledDeltaTime);
+            shieldRow.EnableInClassList("shield--low", shield.State.Current == 1);
+        }
 
         private void Retry()
         {
@@ -211,11 +279,15 @@ namespace GeometricFlight.UI
                 shownTenths = tenths;
                 timeBuild.Text = UiScreens.FormatTime(flow.ElapsedTime);
             }
-            if (flow.TargetsDestroyed != shownTargets)
+            int destroyed = courseDestroyed >= 0 ? courseDestroyed : flow.TargetsDestroyed;
+            int total = courseDestroyed >= 0 ? courseTotal : flow.TargetsTotal;
+            if (destroyed != shownTargets || total != shownTargetTotal)
             {
-                shownTargets = flow.TargetsDestroyed;
-                targetsBuild.Text = $"TARGETS {flow.TargetsDestroyed}/{flow.TargetsTotal}";
+                shownTargets = destroyed;
+                shownTargetTotal = total;
+                targetsBuild.Text = $"TARGETS {destroyed}/{total}";
             }
+            UpdateShield();
 
             throttleFill.style.width = Length.Percent(SpeedFraction(flight.CurrentSpeed) * 100f);
             throttleSetpoint.style.left = Length.Percent(ThrottleGauge.LeverFraction(flight.Lever) * 100f);
@@ -306,12 +378,18 @@ namespace GeometricFlight.UI
         /// <summary>Brief top-of-screen callout when a zone starts, so the floor cues are not missed.</summary>
         private void AnnounceZone(ThrottleZone zone)
         {
-            zoneBanner.text = zone.Type == ThrottleZone.Kind.Slow
-                ? "SLOW ZONE  ·  LOWER THROTTLE" : "FAST ZONE  ·  FULL THROTTLE";
-            zoneBanner.AddToClassList("zone-banner--visible");
-            hideBanner?.Pause();
-            hideBanner = zoneBanner.schedule.Execute(() => zoneBanner.RemoveFromClassList("zone-banner--visible"));
-            hideBanner.ExecuteLater(3000);
+            if (AddressSink != null) return;
+            Announce(zone.Type == ThrottleZone.Kind.Slow
+                ? "SLOW ZONE  ·  LOWER THROTTLE" : "FAST ZONE  ·  FULL THROTTLE");
+        }
+
+        /// <summary>A passing announcement in the top centre slot.</summary>
+        public void Announce(string text, float seconds = 3f)
+        {
+            if (zoneBanner == null) return;
+            SetBanner(text);
+            hideBanner = zoneBanner.schedule.Execute(() => SetBanner(null));
+            hideBanner.ExecuteLater((long)(seconds * 1000f));
         }
 
         private void ShowZone(ThrottleZone zone)
@@ -382,9 +460,11 @@ namespace GeometricFlight.UI
                     break;
                 case RunState.Paused: ShowPause(); break;
                 case RunState.Completed:
+                    SetBanner(null);
                     screen.schedule.Execute(ShowResults).ExecuteLater((long)(completedResultsDelay * 1000f));
                     break;
                 case RunState.Failed:
+                    SetBanner(null);
                     screen.schedule.Execute(ShowResults).ExecuteLater((long)(failedResultsDelay * 1000f));
                     break;
             }

@@ -7,8 +7,10 @@
 - Entry sequence that builds the passage, ship and HUD around the camera while terminals print the build.
 - One endless grid under the whole opening, beneath a dark cloud deck.
 - Tutorial rail with seven lessons, checkpoints, lethal walls and electrified obstacles.
-- First arena that seals the rail behind the ship and teaches LOCK and the EMP.
-- Tutorial guidance with a target flag, instruction card and key chips.
+- First arena that seals the rail behind the ship and teaches LOCK and the EMP across its whole space.
+- Tutorial guidance with one line at top centre, key chips, target flags and a lit next ring.
+- Weapons panel laid out like a stores page, with MASTER ARM shown on it and on the reticle.
+- Shield gauge above the throttle.
 - Nose led rail flight with proximity warnings.
 - Rechargeable boost on the throttle's final travel.
 - Free flight arena with full rotation flight, lasers, gun aim assist and repeating encounters.
@@ -22,6 +24,7 @@
 
 ### Changed
 - Roadmap: 0.2 is the playable opening, 0.3 the procedural loop and 0.4 the vertical slice.
+- HUD target count starts over for the arena.
 - Throttle gauge has eight segments with speed in m/s.
 - Cockpit stick and mouse hover drive menus like the keyboard.
 - Menu and level floors fade into the sky.

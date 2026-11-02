@@ -104,7 +104,7 @@ namespace GeometricFlight.Core
             cameraRotation = view.transform.rotation;
             cameraFov = view.fieldOfView;
             chase.enabled = false;
-            authority.WeaponsAvailable = false;
+            authority.PrepareRun(tutorial: true); // SAFE on the keyboard: the rail's weapons lesson teaches arming.
             hull.enabled = false;
             shield.TakesHits = false;
             foreach (GameObject detail in flightDetails) detail.SetActive(false);
@@ -403,7 +403,7 @@ namespace GeometricFlight.Core
             hiddenOutside.Clear();
         }
 
-        /// <summary>The missile/EMP panel draws itself in after the throttle (beats 13.4–15.2); weapons are
+        /// <summary>The weapons instrument draws itself in after the throttle (beats 13.4–15.2); weapons are
         /// still only released at control.</summary>
         private void SampleMissilePanel()
         {
@@ -449,14 +449,14 @@ namespace GeometricFlight.Core
             cover.style.opacity = 0f;
             titlePanel.style.display = DisplayStyle.None;
             Report(controlReport, "Flight control online.");
+            levelUi.Announce("WELCOME, USER.", 3.5f);
         }
 
-        /// <summary>A caption on the ship computer's line for a few seconds (lessons, checkpoints).</summary>
-        public void Announce(string caption, float seconds)
+        /// <summary>A passing message from the system (a lesson's idea, a rebuild) in the HUD's announcement slot.</summary>
+        public void Announce(string line, float seconds)
         {
             if (flow.State != RunState.Playing || !admitted) return;
-            presentation.SetCaption(caption);
-            captionUntil = clock + Mathf.Max(0.5f, seconds);
+            levelUi.Announce(line, seconds);
         }
 
         private void Report(AudioClip clip, string caption)
@@ -482,6 +482,7 @@ namespace GeometricFlight.Core
             if (state != RunState.Failed && state != RunState.Completed) return;
             if (voice != null) voice.Stop();
             if (music != null) music.Stop();
+            presentation.SetCaption(null);
             presentation.SuppressDecoration();
         }
 

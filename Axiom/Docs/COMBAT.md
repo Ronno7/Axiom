@@ -89,8 +89,19 @@ pause or a device change, each held weapon button must be released and pressed a
 doesn't unblock another. Pressing a weapon while SAFE shows MASTER ARM guidance and an optional short buzz.
 
 `MasterArmInput` wraps the combined input and `WeaponAuthority` inhibits weapon intent without touching
-steering, throttle or pause. The opening prototype and the shared entry study use it; the study's tutorial
-introduces it at its first weapons lesson.
+steering, throttle or pause. The opening prototype and the shared entry study use it. The study's tutorial starts
+SAFE on the keyboard and teaches arming at its first weapons lesson; a cockpit switch stays where it physically is.
+
+**How MASTER ARM shows:** the state lives where the eye already is and on the weapons panel. While SAFE, the aim diamonds dim
+under a quiet X with the word SAFE beside them, and the gun brackets no target, because no shot is coming. The X, the word and
+the panel's bar pulse when a lesson calls for arming, and a refused press turns them Ember with a low tone. Arming clears the X
+with a flare and a tone, and the word leaves the centre so normal flight stays quiet. The panel's bar reads hatched SAFE or solid
+ARMED, and each weapon below it is marked x while it can't fire and framed in `< >` while it can. This mixes the F/A-18's X
+through an unusable weapon, the F-16 and F-35 HUD's ARM or SAFE word, and the F-14's ready brackets. (`MissileDisplay`.)
+
+**Stores in the tutorial:** guns come first because missiles and the EMP aren't issued until the arena teaches them. The panel
+stays whole: MSL reads 0/4 and doesn't refill (`LockOnWeapon.Unload`), and EMP reads OFFLINE (`EmpWeapon.TakeOffline`). Holding LOCK
+then neither paints nor stops the gun.
 
 ## Arena combat
 
@@ -101,9 +112,9 @@ introduces it at its first weapons lesson.
   from a turning ship; on the rail this is the same forward speed as before.
 - **Aim assist** (`PlayerWeapon` → Aim Assist Cone and Range; off on the rail, 6° and 170 m in the arena): a shot
   goes straight through the target nearest the firing line, allowing for the ship's own motion
-  (`WeaponRules.ShotVelocityThrough`). In the Arena scene, cyan corner brackets (`AimAssistMarker`) frame that
-  target; the shared entry study has the assist but not yet the brackets. The assist is instant; a timed
-  "acquiring" display belongs to the LOCK missiles, not the gun.
+  (`WeaponRules.ShotVelocityThrough`). Cyan corner brackets frame that target (`MissileDisplay` → Gun Brackets, or
+  `AimAssistMarker` in the Arena scene). The assist is instant; a timed "acquiring" display belongs to the LOCK
+  missiles, not the gun.
 - **Turrets** use `EnemyTurret` → Measure Distance: they fire while the player is 20–180 m away in any
   direction, 40 m/s shots every 2.2 s, Lead 0.5 (aim halfway along the true intercept with the player's course).
   Rail turrets (Measure Distance off) fire only while the ship approaches them along the course; the tutorial's

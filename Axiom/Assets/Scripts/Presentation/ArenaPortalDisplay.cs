@@ -64,10 +64,14 @@ namespace GeometricFlight.Presentation
             float scale = incoming ? Mathf.Lerp(0.25f, 1f, progress) : Mathf.Clamp01(1f - wave.Elapsed / 0.6f);
             float pulse = 1.5f + progress * 2f + Mathf.Sin(wave.Elapsed * 9f) * 0.3f;
             color.SetVector(BaseColorId, AxiomPalette.ShaderColor(AxiomPalette.Orange, pulse));
+            Camera view = Camera.main;
             for (int i = 0; i < portals.Length; i++)
             {
                 portals[i].gameObject.SetActive(encounter.isActiveAndEnabled && (incoming || closing));
                 portals[i].localScale = Vector3.one * scale;
+                // A wave can be placed anywhere in the arena, so a portal follows its point and faces the viewer.
+                portals[i].position = encounter.SpawnPosition(i);
+                if (view != null) portals[i].rotation = view.transform.rotation;
                 for (int j = 0; j < 2; j++)
                 {
                     LineRenderer ring = rings[i * 2 + j];

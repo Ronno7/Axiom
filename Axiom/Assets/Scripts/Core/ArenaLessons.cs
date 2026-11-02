@@ -3,6 +3,7 @@ using GeometricFlight.Combat;
 using GeometricFlight.Input;
 using GeometricFlight.Player;
 using GeometricFlight.Presentation;
+using GeometricFlight.UI;
 using UnityEngine;
 
 namespace GeometricFlight.Core
@@ -11,7 +12,7 @@ namespace GeometricFlight.Core
     /// The tutorial's arena steps after the rail releases the ship (first arena room):
     /// <list type="number">
     /// <item>Free flight: an optional arc of rings around a tower; ends when its last ring is passed or after a while.</item>
-    /// <item>LOCK: one far target, then a close pair. A step completes on an actual missile launch at a painted lesson
+    /// <item>LOCK: one far target, then a pair. A step completes on an actual missile launch at a painted lesson
     /// target, and the volley's result plays out first. A target destroyed before that (guns, a crash) comes back
     /// through its portal.</item>
     /// <item>EMP: the guided encounter opens with a small drone group. The prompt appears only once several drones
@@ -21,9 +22,11 @@ namespace GeometricFlight.Core
     /// the results.</item>
     /// </list>
     /// Every step with targets is an <see cref="ArenaEncounter"/> (Start On Play off) that these steps start and stop,
-    /// so targets arrive through portals. A completed step adds its targets to the run's results. Where a step is
-    /// guided (the single LOCK target so far), the <see cref="GuidanceDisplay"/> card and flag replace its captions,
-    /// and every line comes from the weapon's and lesson's actual state.
+    /// so targets arrive through portals. The LOCK and EMP steps arrive at the station that suits where the ship is and
+    /// where it is heading (<see cref="ArenaStations"/>), so the lessons lap the arena with room to act. A completed step
+    /// adds its targets to the run's results, and the HUD's target count starts over for the arena. The
+    /// <see cref="GuidanceDisplay"/> panel and flag carry every instruction, each line from the weapons' and the lesson's
+    /// actual state. Each step issues the weapon it teaches.
     /// <see cref="TutorialCourse"/> owns retry and calls <see cref="ShipDestroyed"/> and <see cref="RestartStep"/>.
     /// </summary>
     [DisallowMultipleComponent]
@@ -60,16 +63,37 @@ namespace GeometricFlight.Core
         [SerializeField] private ArenaEncounter encounter;
         [Tooltip("Seconds of \"TRAINING COMPLETE\" in flight before the results.")]
         [SerializeField, Min(0.5f)] private float endingSeconds = 4f;
-        [Tooltip("Guidance card and flag on the HUD. Empty: captions only.")]
+        [Tooltip("Guidance panel and flag on the HUD.")]
         [SerializeField] private GuidanceDisplay guidance;
+        [Tooltip("Lights the next ring of the arc.")]
+        [SerializeField] private RingPassFlash rings;
+        [Tooltip("Where the LOCK and EMP steps can arrive, spread around the arena clear of its towers.")]
+        [SerializeField] private Transform[] stations = new Transform[0];
+        [Tooltip("The distance a step prefers to arrive at, in metres.")]
+        [SerializeField, Min(1f)] private float stationDistance = 520f;
+        [Tooltip("A LOCK step never arrives closer than this while a farther station exists, in metres: painting needs "
+               + "time before the minimum range.")]
+        [SerializeField, Min(1f)] private float stationNearest = 480f;
+        [Tooltip("The same for the EMP step, in metres. It is taught up close, so it can start nearer.")]
+        [SerializeField, Min(1f)] private float empStationNearest = 300f;
+        [Tooltip("An arrival waits until a station lies within this many degrees of the nose...")]
+        [SerializeField, Range(10f, 180f)] private float stationAngle = 110f;
+        [Tooltip("...or for this many seconds, then takes the best there is.")]
+        [SerializeField, Min(0f)] private float stationWaitSeconds = 4f;
+        [Tooltip("Seconds the final wave's opening call holds once it has arrived.")]
+        [SerializeField, Min(0f)] private float clearCallSeconds = 3f;
 
         private readonly HashSet<ShootableTarget> lockedLastFrame = new HashSet<ShootableTarget>();
         private MasterArmInput authority;
         private ShipFlight ship;
         private EmpWeapon emp;
-        private float stepStarted, launchedAt = -1f;
+        private LevelUi levelUi;
+        private int arenaDestroyed, arenaTotal;
+        private float stepStarted, launchedAt = -1f, waveArrivedAt = -1f;
         private int firedSeen;
-        private bool empPrompted, empOffered, empUsed, empHeldBefore, gunKilled;
+        private bool empOffered, empUsed, empHeldBefore, gunKilled, awaitingStation;
+        private ShootableTarget waveFlag;
+        private int lastStation = -1;
 
         public Step Current { get; private set; } = Step.Waiting;
         public bool Active => Current != Step.Waiting;
@@ -83,6 +107,9 @@ namespace GeometricFlight.Core
             authority = missiles != null ? missiles.GetComponent<MasterArmInput>() : null;
             ship = missiles != null ? missiles.GetComponent<ShipFlight>() : null;
             emp = missiles != null ? missiles.GetComponent<EmpWeapon>() : null;
+            levelUi = guidance != null ? guidance.GetComponent<LevelUi>() : null;
+            foreach (ArenaEncounter wave in new[] { lockSingleWave, lockPairWave, empGroup, encounter })
+                if (wave != null) arenaTotal += wave.SpawnCount;
         }
 
         private void Update()
@@ -93,16 +120,18 @@ namespace GeometricFlight.Core
                 if (rail.Released) Begin(Step.FreeFlight);
                 return;
             }
+            if (awaitingStation) TryPlaceWave();
             switch (Current)
             {
                 case Step.FreeFlight:
                     bool arcDone = arc.Length > 0 && arc[arc.Length - 1] != null && arc[arc.Length - 1].WasPassed;
                     if (arcDone || Time.time - stepStarted >= freeFlightSeconds) Begin(Step.LockSingle);
+                    else GuideArc();
                     break;
                 case Step.LockSingle:
                 case Step.LockPair:
                     WatchLock(CurrentWave);
-                    if (Current == Step.LockSingle && guidance != null) GuideLock(CurrentWave);
+                    if (Current == Step.LockSingle || Current == Step.LockPair) GuideLock(CurrentWave);
                     break;
                 case Step.EmpGroup:
                     WatchEmp();
@@ -112,6 +141,7 @@ namespace GeometricFlight.Core
                     break;
                 case Step.Encounter:
                     if (Cleared(encounter)) Begin(Step.Ending);
+                    else GuideWave();
                     break;
                 case Step.Ending:
                     if (Time.time - stepStarted >= endingSeconds && flow != null && flow.State == RunState.Playing)
@@ -121,10 +151,29 @@ namespace GeometricFlight.Core
                     }
                     break;
             }
+            ShowTargets();
+        }
+
+        /// <summary>The count starts over for the arena: every target its lessons hold, finished ones plus this wave's.</summary>
+        private void ShowTargets()
+        {
+            if (levelUi == null) return;
+            ArenaWaveState state = !awaitingStation && CurrentWave != null ? CurrentWave.State : null;
+            levelUi.SetTargetCount(arenaDestroyed + (state != null ? state.Total - state.Remaining : 0), arenaTotal);
+        }
+
+        /// <summary>Restocks whatever has been issued so far (a retry after the ship was rebuilt).</summary>
+        public void Restock()
+        {
+            if (!missiles.State.Unloaded) missiles.ResetBank();
+            if (emp != null && !emp.State.Offline) emp.ResetCharge();
         }
 
         /// <summary>The ship was just destroyed: a live wave stands down (its retry starts it again).</summary>
-        public void ShipDestroyed() => CurrentWave?.Defeat();
+        public void ShipDestroyed()
+        {
+            CurrentWave?.Defeat();
+        }
 
         /// <summary>Starts the current step again from its beginning (a retry after the ship was rebuilt).</summary>
         public void RestartStep()
@@ -146,39 +195,71 @@ namespace GeometricFlight.Core
             if (previous != null && previous != next) previous.Stop(); // Leftovers go; no next round is scheduled.
             Current = step;
             stepStarted = Time.time;
-            launchedAt = -1f;
+            launchedAt = waveArrivedAt = -1f;
             gunKilled = false;
-            guidance?.ClearCard();
-            guidance?.ClearObjective();
+            waveFlag = null;
+            ClearGuidance();
             firedSeen = missiles.MissilesFired;
             lockedLastFrame.Clear();
-            next?.Restart();
+            IssueWeapons(step);
+            awaitingStation = step == Step.LockSingle || step == Step.LockPair || step == Step.EmpGroup;
+            if (awaitingStation)
+            {
+                next?.Stop(); // A retry of this step: nothing stays while its new arrival is chosen.
+                TryPlaceWave();
+            }
+            else next?.Restart();
             switch (step)
             {
                 case Step.FreeFlight:
                     foreach (RingGate ring in arc) if (ring != null) ring.ResetPass();
-                    Say("FREE FLIGHT", 3f);
-                    break;
-                case Step.LockSingle:
-                    if (guidance == null) Say("MISSILES · HOLD {lock} TO PAINT · RELEASE TO FIRE", 6f);
-                    break;
-                case Step.LockPair:
-                    Say("AGAIN · PAINT BOTH, THEN RELEASE", 4f);
+                    Say("WELCOME TO THE ARENA", 4f);
                     break;
                 case Step.EmpGroup:
-                    empPrompted = empOffered = empUsed = false;
-                    Say("DRONES INBOUND", 3f);
-                    break;
-                case Step.Breather:
-                    Say("SHIELD AND MISSILES RESTORED", 3f);
-                    break;
-                case Step.Encounter:
-                    Say("FINAL TEST · USE EVERYTHING", 4f);
+                    empOffered = empUsed = false;
                     break;
                 case Step.Ending:
                     Say("TRAINING COMPLETE", endingSeconds);
                     break;
             }
+        }
+
+        /// <summary>Each step issues the weapon it teaches and says so; the instrument's empty stores load as it does.</summary>
+        private void IssueWeapons(Step step)
+        {
+            if (step >= Step.LockSingle && missiles.State.Unloaded)
+            {
+                missiles.ResetBank();
+                Say("MISSILES ONLINE", 2.5f);
+            }
+            if (step >= Step.EmpGroup && emp != null && emp.State.Offline)
+            {
+                emp.ResetCharge();
+                Say("EMP ONLINE", 2.5f);
+            }
+        }
+
+        /// <summary>Brings the step's wave in at the station that suits the ship, keeping the wave's shape. If every
+        /// station is behind the ship it waits a moment for the turn. Once the portals show, the wave is committed.</summary>
+        private void TryPlaceWave()
+        {
+            ArenaEncounter wave = CurrentWave;
+            if (wave != null && stations.Length > 0)
+            {
+                var points = new Vector3[stations.Length];
+                for (int i = 0; i < points.Length; i++) points[i] = stations[i].position;
+                Vector3 from = missiles.transform.position, nose = missiles.transform.forward;
+                LayerMask scenery = missiles.GetComponent<PlayerWeapon>().HitLayers;
+                int pick = ArenaStations.Pick(from, nose, points, stationDistance,
+                    Current == Step.EmpGroup ? empStationNearest : stationNearest,
+                    i => Physics.Linecast(from, points[i], scenery, QueryTriggerInteraction.Ignore), lastStation);
+                if (ArenaStations.AngleOff(from, nose, points[pick]) > stationAngle
+                    && Time.time - stepStarted < stationWaitSeconds) return;
+                wave.PlaceAt(points[pick]);
+                lastStation = pick;
+            }
+            awaitingStation = false;
+            wave?.Restart();
         }
 
         /// <summary>Whether the wave has just been cleared. If so it is stopped (no next round), the ship recovers
@@ -189,6 +270,8 @@ namespace GeometricFlight.Core
             wave.Stop();
             Recover();
             flow?.CountTargets(wave.SpawnCount, wave.SpawnCount);
+            arenaDestroyed += wave.SpawnCount;
+            Say("SECTOR CLEAR", 2.5f);
             return true;
         }
 
@@ -220,6 +303,7 @@ namespace GeometricFlight.Core
                 if (alive == 0 || Time.time - launchedAt >= volleySeconds)
                 {
                     flow?.CountTargets(destroyed, wave.SpawnCount);
+                    arenaDestroyed += destroyed;
                     Begin(Current == Step.LockSingle ? Step.LockPair : Step.EmpGroup);
                 }
                 return;
@@ -227,62 +311,184 @@ namespace GeometricFlight.Core
             // Destroyed without a launch (guns, a collision): the lesson's targets come back through their portals.
             if (destroyed > 0)
             {
-                if (Current == Step.LockSingle && guidance != null) gunKilled = true;
-                else Say("USE MISSILES · HOLD {lock}", 3f);
+                gunKilled = true;
                 wave.Restart();
             }
         }
 
-        /// <summary>The single LOCK lesson's card and flag (guidance room, build 1). Each line reports what the weapon
-        /// and the lesson actually observe; a held key only fills its chip. The flag gives way while the missile
-        /// system shows this target (candidate or lock) and comes back if that feedback goes.</summary>
-        private void GuideLock(ArenaEncounter wave)
+        private bool Guiding => guidance != null && ship != null && ship.isActiveAndEnabled && !ship.InputLocked;
+        private bool Safe => authority != null && !authority.Armed;
+
+        private void ClearGuidance()
         {
-            if (ship == null || !ship.isActiveAndEnabled || ship.InputLocked)
+            guidance?.ClearCard();
+            guidance?.ClearObjective();
+            rings?.MarkNext(null);
+        }
+
+        /// <summary>The panel's standing line; null leaves it empty.</summary>
+        private void Card(string line, bool held = false, bool emphasis = false, bool arrival = false)
+        {
+            if (line == null)
             {
                 guidance.ClearCard();
-                guidance.ClearObjective();
+                return;
+            }
+            guidance.SetCard(TutorialCaptions.Resolve(line, authority), emphasis, arrival);
+            guidance.ChipsLit = held;
+        }
+
+        private const string ArmLine = "ARM WITH {arm} TO FIRE";
+
+        /// <summary>Free flight asks for nothing but armed weapons: the arena's welcome has been said, and the arc's next
+        /// ring is lit for anyone who wants it.</summary>
+        private void GuideArc()
+        {
+            if (!Guiding)
+            {
+                ClearGuidance();
+                return;
+            }
+            Card(Safe ? ArmLine : null);
+            RingGate next = null;
+            for (int i = arc.Length - 1; i >= 0; i--)
+            {
+                if (arc[i] == null) continue;
+                if (arc[i].WasPassed) break;
+                next = arc[i];
+            }
+            rings?.MarkNext(next != null ? next.transform : null);
+            if (next != null) guidance.ShowObjective(next.transform);
+            else guidance.ClearObjective();
+        }
+
+        /// <summary>The LOCK lessons' line and flag (guidance room): hold, then release. Brackets show the painting
+        /// itself, so the line changes only when the action does. A held key only fills its chip. The flag gives way while
+        /// the missile system shows that target (candidate or lock) and comes back if that feedback goes.</summary>
+        private void GuideLock(ArenaEncounter wave)
+        {
+            if (!Guiding)
+            {
+                ClearGuidance();
                 return;
             }
             ShootableTarget target = null;
+            int alive = 0, painted = 0;
             foreach (ShootableTarget t in wave.Live)
-                if (t != null && !t.IsDestroyed)
-                {
-                    target = t;
-                    break;
-                }
-            if (target != null) gunKilled = false;
-            bool held = authority != null ? authority.RawInput.LockHeld : ship.CurrentInput.LockHeld;
-            bool flag = false, emphasis = false;
-            string text;
-            if (launchedAt >= 0f)
             {
-                text = "MISSILES AWAY";
-                emphasis = true;
+                if (t == null || t.IsDestroyed) continue;
+                alive++;
+                if (IsLocked(t)) painted++;
+                else if (target == null || missiles.State.CandidateId == t.GetInstanceID()) target = t;
             }
-            else if (gunKilled) text = "USE MISSILES";
-            else if (target == null) text = "TARGET INBOUND";
+            if (alive > 0) gunKilled = false;
+            bool held = authority != null ? authority.RawInput.LockHeld : ship.CurrentInput.LockHeld;
+            bool acquiring = target != null && missiles.State.CandidateId == target.GetInstanceID();
+            string line = null;
+            if (launchedAt >= 0f) line = null;
+            else if (gunKilled) line = "USE MISSILES";
+            else if (Safe) line = ArmLine;
+            else if (alive == 0) line = null;
+            else if (painted == alive) line = "RELEASE {lock} TO FIRE";
+            else if (missiles.State.Ammo == 0) line = "MISSILES RELOADING";
             else
             {
-                int id = target.GetInstanceID();
-                bool locked = false;
-                foreach (int lockId in missiles.State.Locks) locked |= lockId == id;
-                bool acquiring = missiles.State.CandidateId == id;
                 float distance = Vector3.Distance(missiles.transform.position, target.transform.position);
-                flag = !locked && !acquiring;
-                if (authority != null && !authority.Armed) text = "SAFE · {arm} TO ARM";
-                else if (locked) text = "PAINTED · RELEASE {lock} TO FIRE";
-                else if (missiles.State.Ammo == 0) text = "MISSILES RELOADING";
-                else if (!held) text = "HOLD {lock} TO PAINT THE TARGET";
-                else if (distance > missiles.MaximumRange) text = "CLOSE TO " + Mathf.RoundToInt(missiles.MaximumRange) + " m";
-                else if (distance < missiles.MinimumRange) text = "TOO CLOSE · OPEN THE RANGE";
-                else if (acquiring) text = "KEEP THE TARGET IN THE BRACKETS";
-                else text = "TURN TOWARD THE MARKED TARGET";
+                if (held && distance > missiles.MaximumRange) line = "CLOSE TO " + Mathf.RoundToInt(missiles.MaximumRange) + " m";
+                else if (held && distance < missiles.MinimumRange) line = "TOO CLOSE · OPEN THE RANGE";
+                else line = alive > 1 ? "PAINT BOTH · HOLD {lock}" : "HOLD {lock} TO PAINT";
             }
-            guidance.SetCard("MISSILES", TutorialCaptions.Resolve(text, authority, chips: true), emphasis);
-            guidance.ChipsLit = held;
-            if (flag) guidance.ShowObjective(target.transform, "LOCK TARGET");
+            Card(line, held);
+            if (launchedAt >= 0f) guidance.ClearObjective();
+            else if (alive == 0) FlagArrival(wave, "LOCK");
+            else if (target != null && !acquiring) guidance.ShowObjective(target.transform, "LOCK");
             else guidance.ClearObjective();
+        }
+
+        private bool IsLocked(ShootableTarget target)
+        {
+            int id = target.GetInstanceID();
+            foreach (int lockId in missiles.State.Locks) if (lockId == id) return true;
+            return false;
+        }
+
+        /// <summary>The EMP lesson's line: the approach first, then the press once it would surely reach them.</summary>
+        private void GuideEmp(int remaining, bool enough)
+        {
+            if (!Guiding)
+            {
+                ClearGuidance();
+                return;
+            }
+            bool arriving = empGroup.State == null || empGroup.State.Phase != ArenaWavePhase.Combat;
+            bool held = authority != null ? authority.RawInput.EmpHeld : ship.CurrentInput.EmpHeld;
+            string line = arriving ? null
+                : Safe ? ArmLine
+                : emp.Pulsing ? null
+                : !emp.State.Ready ? remaining > 0 && empOffered ? "PRESS {emp} TO RETRY" : null
+                : enough ? "PRESS {emp}"
+                : "CLOSE ON THE DRONES";
+            Card(line, held, emphasis: enough);
+            if (arriving) FlagArrival(empGroup, "INBOUND");
+            else if (emp.Pulsing || enough && emp.State.Ready) guidance.ClearObjective();
+            else
+            {
+                ShootableTarget drone = NearestLive(empGroup);
+                if (drone != null) guidance.ShowObjective(drone.transform, "CLOSE IN");
+                else guidance.ClearObjective();
+            }
+        }
+
+        /// <summary>The final wave's arrival and opening call, then nothing but the flag: it shows where the next fight
+        /// is, and stays on one enemy until it is destroyed so the pointer never jumps between directions.</summary>
+        private void GuideWave()
+        {
+            if (!Guiding)
+            {
+                ClearGuidance();
+                return;
+            }
+            ArenaWaveState wave = encounter.State;
+            bool arriving = wave == null || wave.Phase != ArenaWavePhase.Combat;
+            if (!arriving && waveArrivedAt < 0f) waveArrivedAt = Time.time;
+            if (arriving) Card("PROGRAMS INCOMING", arrival: true);
+            else if (Safe) Card(ArmLine);
+            else Card(Time.time - waveArrivedAt < clearCallSeconds ? "CLEAR THE SECTOR" : null);
+            if (arriving)
+            {
+                FlagArrival(encounter, "INBOUND");
+                return;
+            }
+            if (waveFlag == null || waveFlag.IsDestroyed) waveFlag = NearestLive(encounter);
+            if (waveFlag != null) guidance.ShowObjective(waveFlag.transform, "SHOOT");
+            else guidance.ClearObjective();
+        }
+
+        /// <summary>Flags the wave's nearest portal, once it has one.</summary>
+        private void FlagArrival(ArenaEncounter wave, string action)
+        {
+            if (awaitingStation)
+            {
+                guidance.ClearObjective();
+                return;
+            }
+            Vector3 from = missiles.transform.position;
+            Transform best = wave.SpawnPoint(0);
+            for (int i = 1; i < wave.SpawnCount; i++)
+                if ((wave.SpawnPosition(i) - from).sqrMagnitude < (best.position - from).sqrMagnitude) best = wave.SpawnPoint(i);
+            guidance.ShowObjective(best, action);
+        }
+
+        private ShootableTarget NearestLive(ArenaEncounter wave)
+        {
+            Vector3 from = missiles.transform.position;
+            ShootableTarget best = null;
+            foreach (ShootableTarget t in wave.Live)
+            {
+                if (t == null || t.IsDestroyed) continue;
+                if (best == null || (t.transform.position - from).sqrMagnitude < (best.transform.position - from).sqrMagnitude) best = t;
+            }
+            return best;
         }
 
         private static bool InWave(ArenaEncounter wave, ShootableTarget target)
@@ -291,8 +497,8 @@ namespace GeometricFlight.Core
             return false;
         }
 
-        /// <summary>The EMP lesson: prompt once enough drones are surely inside the pulse, offer a retry once the charge
-        /// is spent, and move on when the group is cleared by any means.</summary>
+        /// <summary>The EMP lesson: the press is asked for once enough drones are surely inside the pulse, a retry is
+        /// offered once the charge is spent, and the step ends when the group is cleared by any means.</summary>
         private void WatchEmp()
         {
             if (Cleared(empGroup))
@@ -303,9 +509,7 @@ namespace GeometricFlight.Core
             bool held = ship != null && ship.CurrentInput.EmpHeld;
             bool pressed = held && !empHeldBefore;
             empHeldBefore = held;
-            if (empGroup.State == null || empGroup.State.Phase != ArenaWavePhase.Combat || emp == null) return;
-            if (emp.Pulsing) empUsed = true;
-
+            if (emp == null) return;
             int remaining = 0, inside = 0;
             foreach (ShootableTarget drone in empGroup.Live)
             {
@@ -314,27 +518,19 @@ namespace GeometricFlight.Core
                 if (SurelyInsidePulse(drone)) inside++;
             }
             bool enough = remaining > 0 && inside >= Mathf.Min(empPromptCount, remaining);
-            if (emp.State.Ready)
+            if (empGroup.State != null && empGroup.State.Phase == ArenaWavePhase.Combat)
             {
-                if (enough && !empPrompted)
+                if (emp.Pulsing) empUsed = true;
+                if (!emp.State.Ready && !emp.Pulsing && remaining > 0 && (empUsed || enough)) empOffered = true;
+                if (empOffered && pressed && !emp.State.Ready && !emp.Pulsing)
                 {
-                    empPrompted = true;
-                    Say("EMP · PRESS {emp}", 4f);
+                    // An optional retry: the group again, with a fresh charge. The press itself never fires the pulse.
+                    emp.ResetCharge();
+                    Begin(Step.EmpGroup);
+                    return;
                 }
-                return;
             }
-            if (emp.Pulsing || remaining == 0) return;
-            if (!empOffered && (empUsed || enough))
-            {
-                empOffered = true;
-                Say("EMP SPENT · PRESS {emp} TO RETRY", 4f);
-            }
-            if (empOffered && pressed)
-            {
-                // An optional retry: the group again, with a fresh charge. The press itself never fires the pulse.
-                emp.ResetCharge();
-                Begin(Step.EmpGroup);
-            }
+            GuideEmp(remaining, enough);
         }
 
         /// <summary>Whether a pulse fired from the ship now would reach the drone wherever it is on its patrol.</summary>
@@ -352,7 +548,7 @@ namespace GeometricFlight.Core
             missiles.ResetBank();
         }
 
-        private void Say(string caption, float seconds) =>
-            entry.Announce(TutorialCaptions.Resolve(caption, authority), seconds);
+        private void Say(string line, float seconds) =>
+            entry.Announce(TutorialCaptions.Resolve(line, authority), seconds);
     }
 }
