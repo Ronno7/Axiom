@@ -179,3 +179,11 @@ First and returning players share the same entry.
 
 The entry's reports are captions for now; a calm British female voice is the later target. The rail
 obstacles will be reworked later.
+
+## Tests
+
+`OpeningRunTests` (PlayMode) plays the real scene on a simulated cockpit, once in each display mode: the entry,
+the pause menus, checkpoints, death and rebuild, an unplugged cockpit, every arena lesson, the results and the way
+back to the title. It jumps along the course with the hull off, so real collisions and keyboard input still need a
+person flying it. Run it from **Window > General > Test Runner > PlayMode**. Pictures of key moments go to
+`Temp/Captures/OpeningRun`.
