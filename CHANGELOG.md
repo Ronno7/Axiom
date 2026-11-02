@@ -2,8 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+- The entry's wall, roof and floor lines shoot out from behind the camera.
+
 ### Removed
 - Prototype, arena and study scenes that predate the opening.
+- The kit controller's firmware, wiring and enclosure, and the roomy cockpit model.
 
 ### Fixed
 - Checkpoints sounded the cockpit's shield hit tone.
@@ -24,13 +28,13 @@
 - Nose led rail flight with proximity warnings.
 - Rechargeable boost on the throttle's final travel.
 - Free flight arena with full rotation flight, lasers, gun aim assist and repeating encounters.
-- LOCK missiles for 90–650 m targets, on Left Shift or the cockpit's D11 button (reflash `AxiomCockpit`).
-- EMP on the cockpit dome or R: one destructive 180 m pulse per life.
+- LOCK missiles for 90–650 m targets.
+- EMP: one destructive 180 m pulse per life.
 - CRT display option that includes the HUD and menus.
 - Twelve color palette across art and UI.
 - Keyboard throttle option for use with the cockpit.
 - Swept Dart player ship with 4K renders and a materialization preview, not yet in the game.
-- UI showcase page (`docs/`).
+- UI showcase page.
 
 ### Changed
 - Roadmap: 0.2 is the playable opening, 0.3 the procedural loop and 0.4 the vertical slice.
@@ -43,7 +47,7 @@
 - Menu and level floors fade into the sky.
 
 ### Fixed
-- Cockpit: LCD standby mid game (reflash both sketches) and a paused run dismissed on reconnect.
+- Cockpit LCD dropped to standby mid game, and reconnecting dismissed a paused run.
 - HUD, results and LCD could miss updates or disagree.
 - Slanted menu buttons misdrew their captions and focus markers.
 - Shots flew crooked from a turning ship, and destroyed turrets could fire once more.
@@ -53,69 +57,63 @@
 ## [0.1.9] - 2026-10-20
 
 ### Added
-- 3D menu title: "aXiom" in Earth Orbiter Bold, extruded and chamfered, leaned to match the menu buttons,
-  with shadowed sides. A Furore "AXIOM" version is kept as an alternative.
-- Main-menu look: colour grade (bloom, vignette, grain), atmosphere (haze, horizon glow, stars, drifting
-  dust), interface details (scrim, corner frame, live cockpit status line, key hints, focus marker) and a
-  short signal glitch every 8–12 s while the menu is idle. All of it is tunable from one component.
-- Optional vector-monitor look for the menu: phosphor glow, red colour fringing and a CRT pass.
-- Cockpit controller: buzzer volume, light-string test and an EMP demo in standby.
-- Cockpit enclosure: a 1:1 laser-cut file for the top panel and a printable cardboard mock-up template.
+- 3D menu title in Earth Orbiter Bold.
+- Main menu look: colour grade, atmosphere, interface details and an idle signal glitch.
+- Optional vector monitor look for the menu.
+- Cockpit buzzer volume, light string test and EMP demo in standby.
+- Laser cut panel file and cardboard mock up template for the cockpit.
 
 ### Changed
-- Main-menu backdrop recomposed (construct placement, orbits and horizon distance).
-- Version numbering adopted (development stages); the build now shows its version on the menu.
+- Main menu backdrop recomposed.
+- Version numbers follow development stages, and the menu shows the build's version.
 
 ### Removed
 - Unused Unity template files.
 
 ### Fixed
-- Glitch blocks no longer stay on screen after an event.
-- 3D titles no longer import turned around.
+- Glitch blocks stayed on screen after an event.
+- 3D titles imported turned around.
 
 ## 0.1.8 - 2026-10-19
 
 ### Added
-- Throttle-responsive geometric engine exhaust.
-- Angular screen-edge pulse when the shield takes a hit.
+- Throttle responsive engine exhaust.
+- Angular screen edge pulse on a shield hit.
 
 ## 0.1.7 - 2026-10-18
 
 ### Added
-- Cockpit controller sketch: stick twist, EMP and MASTER ARM inputs, rumble with a safety timeout, EMP dome
-  lamp, and a standby self-test of every input.
-- The game accepts both controller generations and can drive rumble and the lamp.
+- Cockpit firmware: twist, EMP, MASTER ARM, rumble, dome lamp and a standby self test.
 
 ## 0.1.6 - 2026-10-02
 
 ### Added
-- Another geometric construct in the main-menu backdrop.
+- Another geometric construct in the menu backdrop.
 
 ## 0.1.5 - 2026-09-30
 
 ### Added
-- Cockpit box design: 3D model, wiring sheet and a parts list checked against the manufacturers.
-- 16×2 LCD on the controller with game-drawn screens for menus, calibration, flight and results.
-- Proximity beeps with a pulsing HUD warning.
+- Cockpit design: 3D model, wiring sheet and parts list.
+- 16×2 LCD with game drawn screens.
+- Proximity beeps with a HUD warning.
 
 ## 0.1.4 - 2026-09-29
 
 ### Added
-- Arduino controller support: checksummed serial protocol, automatic port search and reconnect, sonar throttle
-  with filtering, keyboard fallback, and a pause when the controller is lost.
-- Controller calibration screen (Options → Calibrate controller).
+- Arduino controller support, with automatic reconnect and keyboard fallback.
+- Controller calibration.
 
 ## 0.1.3 - 2026-09-29
 
 ### Added
-- Shield, enemy turret, barriers, and a complete run: pause, level complete, fail, retry and stats.
-- Main menu, options (saved), help, HUD, pause and results screens.
-- Throttle sections (slow lattice, fast closing iris) with floor cues and a par time.
+- Shield, turrets, barriers and a complete run: pause, finish, fail, retry and stats.
+- Main menu, options, help, HUD, pause and results.
+- Throttle sections with floor cues and a par time.
 
 ## 0.1.2 - 2026-09-29
 
 ### Added
-- Hold-to-fire weapon, aim reticles, breakable targets and a shatter effect.
+- Hold to fire guns, aim reticles, breakable targets and a shatter effect.
 
 ## 0.1.1 - 2026-09-28
 
@@ -133,7 +131,5 @@
 
 
 
-All notable changes to Axiom are documented in this file. The format is based on
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Axiom doesn't follow Semantic Versioning: versions follow the
-development stages on the [roadmap](README.md#roadmap), and each drop within a stage is a patch version.
-Versions before 0.1.9 were numbered from the project history and have no tags.
+Based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow the [roadmap](README.md#roadmap), not
+Semantic Versioning. Versions before 0.1.9 have no tags.

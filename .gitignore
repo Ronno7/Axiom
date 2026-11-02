@@ -102,6 +102,11 @@ __pycache__/
 # Local tool configuration
 /.mcp.json
 
+# Technical guides are retired for now and stay local
+/Axiom/Docs/*.md
+!/Axiom/Docs/ART_PALETTE.md
+/Axiom/ArtSource/Ships/SweptDart/docs/TECHNICAL_NOTES.md
+
 # Historical art is kept locally
 /Axiom/ArtSource/Archive/
 

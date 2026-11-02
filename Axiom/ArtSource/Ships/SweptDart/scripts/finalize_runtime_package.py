@@ -36,7 +36,7 @@ subprocess.run([ff,'-v','error','-xerror','-i',str(QA/'runtime-sequence.mp4'),'-
 reader=imageio_ffmpeg.read_frames(str(QA/'runtime-sequence.mp4'));meta=next(reader)
 count=sum(1 for _ in reader);reader.close()
 assert count==72 and abs(meta['duration']-3)<.01 and meta['fps']==24
-for path in [PACKAGE/'README.md',SHIP/'README.md',SHIP/'docs/TECHNICAL_NOTES.md']:
+for path in [PACKAGE/'README.md',SHIP/'docs/README.md',SHIP/'docs/TECHNICAL_NOTES.md']:
     for target in re.findall(r'\]\(([^)]+)\)',path.read_text(encoding='utf8')):
         if target.startswith(('https:','http:','#')):continue
         assert (path.parent/unquote(target.split('#')[0])).exists(),(path,target)
