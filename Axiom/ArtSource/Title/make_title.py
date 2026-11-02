@@ -4,8 +4,6 @@ chamfered edges.
 Run with Blender 5.x from this folder. The two titles in the MainMenu scene:
   blender -b --factory-startup --python make_title.py
       (current: Earth Orbiter Bold, "aXiom" -> AxiomTitle_EarthOrbiter)
-  blender -b --factory-startup --python make_title.py -- --font Furore.otf --text AXIOM --spacing 1.35 \
-      --name AxiomTitle_Furore
 Each writes <name>.blend here and Assets/Art/Models/<name>.fbx for Unity. --out-dir puts the FBX in a
 subfolder of Assets/Art/Models (for trials); --no-blend skips the .blend.
 

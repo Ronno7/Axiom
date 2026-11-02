@@ -1,9 +1,8 @@
 # Shared entry study
 
-Open **Tools > Axiom > Open Shared Entry Study**, enter Play Mode and choose **PLAY** (cockpit FIRE also
-starts when PLAY is focused). This scene is where the authored opening is being built: the original menu,
-the tutorial rail and the first arena in one continuous space. It is outside the release build settings, and
-the original scenes are unchanged.
+Open **Tools > Axiom > Open the Opening**, enter Play Mode and choose **PLAY** (cockpit FIRE also
+starts when PLAY is focused). This scene (`Opening`) is the game: the menu, the tutorial rail and the first arena in one
+continuous space. It is the first scene in the build settings, and the only one included.
 
 ## The entry
 
@@ -168,8 +167,8 @@ read TRAINING COMPLETE and count the rail's targets plus those of each completed
   - Escape or cockpit MENU pauses the entry, its construction and its score.
   - Reconnecting the cockpit with MENU held doesn't dismiss the pause.
 - **Retry** reloads the study from its menu.
-- **F5** at the menu toggles the saved reduced animation preference: a one-second quiet transfer to the
-  finished passage, without the terminals or score.
+- **Reduced entry animation** in Options is a one-second quiet transfer to the finished passage, without the
+  terminals or score.
 
 First and returning players share the same entry.
 
@@ -178,5 +177,5 @@ First and returning players share the same entry.
 - a skip;
 - a death sequence.
 
-The two voice clips are temporary Windows speech; a calm British female voice is the later target. The rail
+The entry's reports are captions for now; a calm British female voice is the later target. The rail
 obstacles will be reworked later.

@@ -17,9 +17,9 @@ namespace GeometricFlight.Editor
     /// <summary>Explicit one-time composition. Source scenes are never saved; existing studies are never regenerated.</summary>
     public static class SharedEntryStudyTools
     {
-        public const string ScenePath = "Assets/Scenes/SharedEntryStudy.unity";
+        public const string ScenePath = "Assets/Scenes/Opening.unity";
 
-        [MenuItem("Tools/Axiom/Open Shared Entry Study")]
+        [MenuItem("Tools/Axiom/Open the Opening")]
         public static void Open()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;

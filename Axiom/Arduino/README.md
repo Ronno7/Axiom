@@ -1,8 +1,8 @@
 # Axiom controller (Arduino Uno)
 
 Ultrasonic throttle, two-axis joystick, fire button, buzzer and a 16×2 cockpit LCD over USB serial.
-Firmware: `AxiomController/AxiomController.ino`. Unity finds the controller on its own; keyboard
-controls keep working whether or not it is connected.
+Firmware: `AxiomController/AxiomController.ino`. Turn on **Options → Cockpit controller** and the game finds it on its own;
+keyboard controls keep working whether or not it is connected.
 
 ## Wiring (default pins; change them at the top of the sketch)
 
@@ -43,7 +43,7 @@ two hex digits. Lines that fail the checksum, field count or ranges are ignored.
 
 ## Behavior in the game
 
-- **Connecting:** the game scans serial ports and connects to the first one that sends valid
+- **Connecting:** with **Options → Cockpit controller** on, the game scans serial ports and connects to the first one that sends valid
   `AX` packets within 3 s. The Uno resets when the port opens, so the first connection takes about 2 s.
   The last good port is tried first.
 - **Unplugging:** if packets stop for 1 s, the controller counts as disconnected. A run in progress

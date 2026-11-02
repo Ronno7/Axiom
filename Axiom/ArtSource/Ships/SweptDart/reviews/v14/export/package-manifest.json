@@ -1,0 +1,934 @@
+{
+  "revision": "v14",
+  "art_revision": "v13",
+  "source_sha256": "fca0c8db35ce2b341f69dc5e04c0f8b274fcc781f4e2d08a7859a595c356daf1",
+  "source_geometry_preserved": true,
+  "meshes": {
+    "Hull_Unified": {
+      "vertices": 784,
+      "triangles": 1564,
+      "submeshes": 5,
+      "materials": [
+        "Hull_Hull_Light",
+        "Hull_Secondary_facet_Text",
+        "Hull_Inset_Void",
+        "Hull_Chamfer_Edge",
+        "Hull_Shield_carrier_Structure"
+      ],
+      "role": "hull",
+      "group": "Unified",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Hull_Continuous"
+      ]
+    },
+    "Permanent_Core": {
+      "vertices": 504,
+      "triangles": 992,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Permanent_light_placement_Cyan"
+      ],
+      "role": "permanent_emission",
+      "group": "Core",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Nose_Channel_L",
+        "Belly_Channel_L",
+        "Nose_Channel_R",
+        "Belly_Channel_R"
+      ]
+    },
+    "Permanent_Wing_L": {
+      "vertices": 126,
+      "triangles": 248,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Permanent_light_placement_Cyan"
+      ],
+      "role": "permanent_emission",
+      "group": "Wing_L",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Wing_Channel_L"
+      ]
+    },
+    "Drive_Light_L": {
+      "vertices": 8,
+      "triangles": 12,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Shield_and_drive_core_placement_Light"
+      ],
+      "role": "permanent_emission",
+      "group": "Drive_L",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Drive_Light_L"
+      ]
+    },
+    "Weapon_Aperture_L": {
+      "vertices": 8,
+      "triangles": 12,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Permanent_light_placement_Cyan"
+      ],
+      "role": "permanent_emission",
+      "group": "Weapon_L",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Weapon_Aperture_L"
+      ]
+    },
+    "Permanent_Wing_R": {
+      "vertices": 126,
+      "triangles": 248,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Permanent_light_placement_Cyan"
+      ],
+      "role": "permanent_emission",
+      "group": "Wing_R",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Wing_Channel_R"
+      ]
+    },
+    "Drive_Light_R": {
+      "vertices": 8,
+      "triangles": 12,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Shield_and_drive_core_placement_Light"
+      ],
+      "role": "permanent_emission",
+      "group": "Drive_R",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Drive_Light_R"
+      ]
+    },
+    "Weapon_Aperture_R": {
+      "vertices": 8,
+      "triangles": 12,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Permanent_light_placement_Cyan"
+      ],
+      "role": "permanent_emission",
+      "group": "Weapon_R",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Weapon_Aperture_R"
+      ]
+    },
+    "Shield_Segment_1": {
+      "vertices": 66,
+      "triangles": 128,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Shield_and_drive_core_placement_Light"
+      ],
+      "role": "shield_state",
+      "group": "Core",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Shield_Segment_1"
+      ]
+    },
+    "Shield_Segment_2": {
+      "vertices": 66,
+      "triangles": 128,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Shield_and_drive_core_placement_Light"
+      ],
+      "role": "shield_state",
+      "group": "Core",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Shield_Segment_2"
+      ]
+    },
+    "Shield_Segment_3": {
+      "vertices": 66,
+      "triangles": 128,
+      "submeshes": 1,
+      "materials": [
+        "Systems_Shield_and_drive_core_placement_Light"
+      ],
+      "role": "shield_state",
+      "group": "Core",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Shield_Segment_3"
+      ]
+    },
+    "Interior_Chassis": {
+      "vertices": 96,
+      "triangles": 144,
+      "submeshes": 3,
+      "materials": [
+        "Interior_Interior_supports_Edge",
+        "Interior_Interior_frame_Structure",
+        "Interior_Interior_machinery_Text"
+      ],
+      "role": "interior_reveal",
+      "group": "Chassis",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "INT_Keel",
+        "INT_CockpitFloor",
+        "INT_CockpitRail_L",
+        "INT_Crossmember_L_0",
+        "INT_Crossmember_L_1",
+        "INT_DriveSaddle_L_0",
+        "INT_DriveSaddle_L_1",
+        "INT_CockpitRail_R",
+        "INT_Crossmember_R_0",
+        "INT_Crossmember_R_1",
+        "INT_DriveSaddle_R_0",
+        "INT_DriveSaddle_R_1"
+      ]
+    },
+    "Interior_Engine_L": {
+      "vertices": 420,
+      "triangles": 832,
+      "submeshes": 4,
+      "materials": [
+        "Interior_Interior_machinery_Text",
+        "Interior_Interior_frame_Structure",
+        "Interior_Interior_supports_Edge",
+        "Interior_Interior_circuits_Cyan"
+      ],
+      "role": "interior_reveal",
+      "group": "Engine_L",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "INT_DriveCore_L",
+        "INT_ExhaustThroat_L",
+        "INT_DriveCollar_L_0",
+        "INT_DriveCircuit_L_0",
+        "INT_DriveCollar_L_1",
+        "INT_DriveCircuit_L_1",
+        "INT_DriveCollar_L_2",
+        "INT_DriveCircuit_L_2",
+        "INT_NozzleRing_L"
+      ]
+    },
+    "Interior_Spar_L": {
+      "vertices": 40,
+      "triangles": 60,
+      "submeshes": 2,
+      "materials": [
+        "Interior_Interior_machinery_Text",
+        "Interior_Interior_supports_Edge"
+      ],
+      "role": "interior_reveal",
+      "group": "Spar_L",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "INT_MainSpar_L",
+        "INT_WingRibFront_L_0",
+        "INT_WingRibRear_L_0",
+        "INT_WingRibFront_L_1",
+        "INT_WingRibRear_L_1"
+      ]
+    },
+    "Interior_Services": {
+      "vertices": 32,
+      "triangles": 48,
+      "submeshes": 2,
+      "materials": [
+        "Interior_Interior_circuits_Cyan",
+        "Interior_Interior_supports_Edge"
+      ],
+      "role": "interior_reveal",
+      "group": "Services",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "INT_PowerFeed_L",
+        "INT_PowerFeed_R",
+        "INT_CoreDistribution",
+        "INT_CoreStatus"
+      ]
+    },
+    "Interior_Engine_R": {
+      "vertices": 420,
+      "triangles": 832,
+      "submeshes": 4,
+      "materials": [
+        "Interior_Interior_machinery_Text",
+        "Interior_Interior_frame_Structure",
+        "Interior_Interior_supports_Edge",
+        "Interior_Interior_circuits_Cyan"
+      ],
+      "role": "interior_reveal",
+      "group": "Engine_R",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "INT_DriveCore_R",
+        "INT_ExhaustThroat_R",
+        "INT_DriveCollar_R_0",
+        "INT_DriveCircuit_R_0",
+        "INT_DriveCollar_R_1",
+        "INT_DriveCircuit_R_1",
+        "INT_DriveCollar_R_2",
+        "INT_DriveCircuit_R_2",
+        "INT_NozzleRing_R"
+      ]
+    },
+    "Interior_Spar_R": {
+      "vertices": 40,
+      "triangles": 60,
+      "submeshes": 2,
+      "materials": [
+        "Interior_Interior_machinery_Text",
+        "Interior_Interior_supports_Edge"
+      ],
+      "role": "interior_reveal",
+      "group": "Spar_R",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "INT_MainSpar_R",
+        "INT_WingRibFront_R_0",
+        "INT_WingRibRear_R_0",
+        "INT_WingRibFront_R_1",
+        "INT_WingRibRear_R_1"
+      ]
+    },
+    "Interior_Cockpit": {
+      "vertices": 104,
+      "triangles": 156,
+      "submeshes": 6,
+      "materials": [
+        "Interior_Interior_seat_and_cavities_Void",
+        "Interior_Interior_machinery_Text",
+        "Interior_Interior_supports_Edge",
+        "Interior_Interior_controls_Light",
+        "Interior_Interior_frame_Structure",
+        "Interior_Interior_circuits_Cyan"
+      ],
+      "role": "interior_reveal",
+      "group": "Cockpit",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "INT_SeatPan",
+        "INT_SeatBack",
+        "INT_Headrest",
+        "INT_SeatRim_L",
+        "INT_ControlPod_L",
+        "INT_ControlGrip_L",
+        "INT_FootGuide_L",
+        "INT_SeatRim_R",
+        "INT_ControlPod_R",
+        "INT_ControlGrip_R",
+        "INT_FootGuide_R",
+        "INT_Console",
+        "INT_ConsoleScreen"
+      ]
+    },
+    "Construction_Traces": {
+      "vertices": 16312,
+      "triangles": 18240,
+      "submeshes": 1,
+      "materials": [
+        "Construction_Cyan"
+      ],
+      "role": "construction_only",
+      "group": "Trace",
+      "uv_layers": [
+        "SurfaceUV",
+        "LightmapReserved",
+        "RevealOrder",
+        "TraceIdentity"
+      ],
+      "source_objects": [
+        "Envelope_0",
+        "Envelope_1",
+        "Envelope_10",
+        "Envelope_11",
+        "Envelope_2",
+        "Envelope_3",
+        "Envelope_4",
+        "Envelope_5",
+        "Envelope_6",
+        "Envelope_7",
+        "Envelope_8",
+        "Envelope_9",
+        "Guide_CockpitVolume",
+        "Guide_Console",
+        "Guide_ControlRail_0",
+        "Guide_ControlRail_1",
+        "Guide_DriveConnection_0",
+        "Guide_DriveConnection_1",
+        "Guide_DriveRing_0_0",
+        "Guide_DriveRing_0_1",
+        "Guide_DriveRing_0_2",
+        "Guide_DriveRing_0_3",
+        "Guide_DriveRing_1_0",
+        "Guide_DriveRing_1_1",
+        "Guide_DriveRing_1_2",
+        "Guide_DriveRing_1_3",
+        "Guide_WingSection_0_0",
+        "Guide_WingSection_0_1",
+        "Guide_WingSection_1_0",
+        "Guide_WingSection_1_1",
+        "Guide_Wing_0",
+        "Guide_Wing_1",
+        "Resolve_INT_CockpitFloor",
+        "Resolve_INT_CockpitRail_L",
+        "Resolve_INT_CockpitRail_R",
+        "Resolve_INT_Console",
+        "Resolve_INT_ConsoleScreen",
+        "Resolve_INT_ControlGrip_L",
+        "Resolve_INT_ControlGrip_R",
+        "Resolve_INT_ControlPod_L",
+        "Resolve_INT_ControlPod_R",
+        "Resolve_INT_CoreDistribution",
+        "Resolve_INT_CoreStatus",
+        "Resolve_INT_Crossmember_L_0",
+        "Resolve_INT_Crossmember_L_1",
+        "Resolve_INT_Crossmember_R_0",
+        "Resolve_INT_Crossmember_R_1",
+        "Resolve_INT_DriveCircuit_L_0",
+        "Resolve_INT_DriveCircuit_L_1",
+        "Resolve_INT_DriveCircuit_L_2",
+        "Resolve_INT_DriveCircuit_R_0",
+        "Resolve_INT_DriveCircuit_R_1",
+        "Resolve_INT_DriveCircuit_R_2",
+        "Resolve_INT_DriveCollar_L_0",
+        "Resolve_INT_DriveCollar_L_1",
+        "Resolve_INT_DriveCollar_L_2",
+        "Resolve_INT_DriveCollar_R_0",
+        "Resolve_INT_DriveCollar_R_1",
+        "Resolve_INT_DriveCollar_R_2",
+        "Resolve_INT_DriveCore_L",
+        "Resolve_INT_DriveCore_R",
+        "Resolve_INT_DriveSaddle_L_0",
+        "Resolve_INT_DriveSaddle_L_1",
+        "Resolve_INT_DriveSaddle_R_0",
+        "Resolve_INT_DriveSaddle_R_1",
+        "Resolve_INT_ExhaustThroat_L",
+        "Resolve_INT_ExhaustThroat_R",
+        "Resolve_INT_FootGuide_L",
+        "Resolve_INT_FootGuide_R",
+        "Resolve_INT_Headrest",
+        "Resolve_INT_Keel",
+        "Resolve_INT_MainSpar_L",
+        "Resolve_INT_MainSpar_R",
+        "Resolve_INT_NozzleRing_L",
+        "Resolve_INT_NozzleRing_R",
+        "Resolve_INT_PowerFeed_L",
+        "Resolve_INT_PowerFeed_R",
+        "Resolve_INT_SeatBack",
+        "Resolve_INT_SeatPan",
+        "Resolve_INT_SeatRim_L",
+        "Resolve_INT_SeatRim_R",
+        "Resolve_INT_WingRibFront_L_0",
+        "Resolve_INT_WingRibFront_L_1",
+        "Resolve_INT_WingRibFront_R_0",
+        "Resolve_INT_WingRibFront_R_1",
+        "Resolve_INT_WingRibRear_L_0",
+        "Resolve_INT_WingRibRear_L_1",
+        "Resolve_INT_WingRibRear_R_0",
+        "Resolve_INT_WingRibRear_R_1",
+        "Seed_Control_0",
+        "Seed_Control_1"
+      ]
+    }
+  },
+  "materials": {
+    "Hull_Hull_Light": {
+      "palette_token": "Light",
+      "mode": "Hull",
+      "base_linear": [
+        0.7912979125976562,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.05000000074505806,
+      "roughness": 0.36000001430511475,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": "HullArrival.exr",
+      "reveal_mode": 1,
+      "retire_seconds": 4,
+      "front_seconds": 0.055
+    },
+    "Hull_Secondary_facet_Text": {
+      "palette_token": "Text",
+      "mode": "Hull",
+      "base_linear": [
+        0.47353148460388184,
+        0.5840784311294556,
+        0.637596845626831,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.07999999821186066,
+      "roughness": 0.41999998688697815,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": "HullArrival.exr",
+      "reveal_mode": 1,
+      "retire_seconds": 4,
+      "front_seconds": 0.055
+    },
+    "Hull_Inset_Void": {
+      "palette_token": "Void",
+      "mode": "Hull",
+      "base_linear": [
+        0.0018211619462817907,
+        0.0030352699104696512,
+        0.0036765073891729116,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.20000000298023224,
+      "roughness": 0.25,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": "HullArrival.exr",
+      "reveal_mode": 1,
+      "retire_seconds": 4,
+      "front_seconds": 0.055
+    },
+    "Hull_Chamfer_Edge": {
+      "palette_token": "Edge",
+      "mode": "Hull",
+      "base_linear": [
+        0.0423114113509655,
+        0.08650045841932297,
+        0.12213877588510513,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.44999998807907104,
+      "roughness": 0.3199999928474426,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": "HullArrival.exr",
+      "reveal_mode": 1,
+      "retire_seconds": 4,
+      "front_seconds": 0.055
+    },
+    "Hull_Shield_carrier_Structure": {
+      "palette_token": "Structure",
+      "mode": "Hull",
+      "base_linear": [
+        0.0036765073891729116,
+        0.006995410192757845,
+        0.013702083379030228,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.10000000149011612,
+      "roughness": 0.4300000071525574,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": "HullArrival.exr",
+      "reveal_mode": 1,
+      "retire_seconds": 4,
+      "front_seconds": 0.055
+    },
+    "Systems_Permanent_light_placement_Cyan": {
+      "palette_token": "Cyan",
+      "mode": "Systems",
+      "base_linear": [
+        0.15896083414554596,
+        0.5457244515419006,
+        0.7379103899002075,
+        1.0
+      ],
+      "emission_strength": 2.0,
+      "metallic": 0.10000000149011612,
+      "roughness": 0.30000001192092896,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 4,
+      "front_seconds": 0.05
+    },
+    "Systems_Shield_and_drive_core_placement_Light": {
+      "palette_token": "Light",
+      "mode": "Systems",
+      "base_linear": [
+        0.7912979125976562,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 2.5,
+      "metallic": 0.10000000149011612,
+      "roughness": 0.30000001192092896,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 4,
+      "front_seconds": 0.05
+    },
+    "Interior_Interior_supports_Edge": {
+      "palette_token": "Edge",
+      "mode": "Interior",
+      "base_linear": [
+        0.0423114113509655,
+        0.08650045841932297,
+        0.12213877588510513,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.10000000149011612,
+      "roughness": 0.44999998807907104,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 2.9166666666666665,
+      "front_seconds": 0.05
+    },
+    "Interior_Interior_frame_Structure": {
+      "palette_token": "Structure",
+      "mode": "Interior",
+      "base_linear": [
+        0.0036765073891729116,
+        0.006995410192757845,
+        0.013702083379030228,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.11999999731779099,
+      "roughness": 0.47999998927116394,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 2.9166666666666665,
+      "front_seconds": 0.05
+    },
+    "Interior_Interior_machinery_Text": {
+      "palette_token": "Text",
+      "mode": "Interior",
+      "base_linear": [
+        0.47353148460388184,
+        0.5840784311294556,
+        0.637596845626831,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.11999999731779099,
+      "roughness": 0.4000000059604645,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 2.9166666666666665,
+      "front_seconds": 0.05
+    },
+    "Interior_Interior_circuits_Cyan": {
+      "palette_token": "Cyan",
+      "mode": "Interior",
+      "base_linear": [
+        0.15896083414554596,
+        0.5457244515419006,
+        0.7379103899002075,
+        1.0
+      ],
+      "emission_strength": 0.550000011920929,
+      "metallic": 0.05000000074505806,
+      "roughness": 0.4000000059604645,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 2.9166666666666665,
+      "front_seconds": 0.05
+    },
+    "Interior_Interior_seat_and_cavities_Void": {
+      "palette_token": "Void",
+      "mode": "Interior",
+      "base_linear": [
+        0.0018211619462817907,
+        0.0030352699104696512,
+        0.0036765073891729116,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.019999999552965164,
+      "roughness": 0.5799999833106995,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 2.9166666666666665,
+      "front_seconds": 0.05
+    },
+    "Interior_Interior_controls_Light": {
+      "palette_token": "Light",
+      "mode": "Interior",
+      "base_linear": [
+        0.7912979125976562,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "metallic": 0.03999999910593033,
+      "roughness": 0.44999998807907104,
+      "shader": "GeometricFlight/Swept Dart Surface",
+      "arrival_texture": null,
+      "reveal_mode": 0,
+      "retire_seconds": 2.9166666666666665,
+      "front_seconds": 0.05
+    },
+    "Construction_Cyan": {
+      "palette_token": "Cyan",
+      "mode": "Trace",
+      "base_linear": [
+        0.15896083414554596,
+        0.5457244515419006,
+        0.7379103899002075,
+        1.0
+      ],
+      "shader": "GeometricFlight/Swept Dart Trace",
+      "timeline_texture": "TraceTimeline.exr"
+    }
+  },
+  "sockets": [
+    {
+      "name": "Muzzle_L",
+      "unity_local_position": [
+        -0.75,
+        0.0,
+        1.1
+      ],
+      "unity_local_forward": [
+        0,
+        0,
+        1
+      ],
+      "unity_local_up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "Muzzle_R",
+      "unity_local_position": [
+        0.75,
+        0.0,
+        1.1
+      ],
+      "unity_local_forward": [
+        0,
+        0,
+        1
+      ],
+      "unity_local_up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "Exhaust_L",
+      "unity_local_position": [
+        -0.85,
+        0.0,
+        -1.64
+      ],
+      "unity_local_forward": [
+        0,
+        0,
+        1
+      ],
+      "unity_local_up": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "Exhaust_R",
+      "unity_local_position": [
+        0.85,
+        0.0,
+        -1.64
+      ],
+      "unity_local_forward": [
+        0,
+        0,
+        1
+      ],
+      "unity_local_up": [
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "uv_contract": {
+    "0": "SurfaceUV; unique hull bake layout",
+    "1": "LightmapReserved; unused copy of UV0",
+    "2": "RevealOrder: U arrival seconds/3; V branch progress",
+    "3": "TraceIdentity: U row centre in 128-row timeline; V reserved"
+  },
+  "texture_contract": {
+    "HullArrival.exr": {
+      "size": [
+        2048,
+        2048
+      ],
+      "channel": "R arrival seconds/3",
+      "filter": "Bilinear"
+    },
+    "TraceTimeline.exr": {
+      "size": [
+        289,
+        128
+      ],
+      "channel": "RGBA as timeline.json",
+      "filter": "Point"
+    },
+    "common": {
+      "sRGB": false,
+      "mipmaps": false,
+      "compression": "None",
+      "format": "RGBAHalf or RGBAFloat",
+      "wrap": "Clamp",
+      "npot_scale": "None"
+    }
+  },
+  "shield": {
+    "segments": [
+      "Shield_Segment_1",
+      "Shield_Segment_2",
+      "Shield_Segment_3"
+    ],
+    "depletion_order": [
+      "Shield_Segment_3",
+      "Shield_Segment_2",
+      "Shield_Segment_1"
+    ],
+    "lit_token": "Light",
+    "lit_emission": 2.5,
+    "lost_token": "Edge",
+    "lost_emission": 0,
+    "blink_renderers": [
+      "Hull_Unified",
+      "Permanent_Core",
+      "Permanent_Wing_L",
+      "Drive_Light_L",
+      "Weapon_Aperture_L",
+      "Permanent_Wing_R",
+      "Drive_Light_R",
+      "Weapon_Aperture_R",
+      "Shield_Segment_1",
+      "Shield_Segment_2",
+      "Shield_Segment_3"
+    ],
+    "driver": "Existing ShieldDisplay; no new gameplay logic"
+  },
+  "timing": {
+    "duration": 3,
+    "interior_retire": 2.9166666666666665,
+    "surface_settled": 2.855,
+    "systems_arrive": 2.88,
+    "shader_clock": "Normalized _BuildProgress multiplied by 3; entry duration remains externally controlled"
+  },
+  "counts": {
+    "surface_meshes": 11,
+    "interior_meshes": 7,
+    "trace_meshes": 1,
+    "flight_triangles": 3484,
+    "interior_triangles": 2132,
+    "trace_triangles": 18240,
+    "flight_submeshes": 15,
+    "assembly_submeshes": 39
+  },
+  "verification": "Blender and data checks only. Unity import, shader compilation, palette audit, moving-camera review and runtime profiling deferred."
+}

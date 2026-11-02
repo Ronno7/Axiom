@@ -54,7 +54,7 @@ namespace GeometricFlight.Input
     [DisallowMultipleComponent]
     public sealed class ControllerService : MonoBehaviour
     {
-        private const string PortKey = "axiom.controllerPort";
+        private const string PortKey = GameSettings.ControllerPortKey;
         private const string CalibrationKey = "axiom.controllerCalibration";
         private static ControllerService instance;
 
@@ -120,6 +120,12 @@ namespace GeometricFlight.Input
         /// <summary>Swaps serial scanning for an in-memory simulated controller, or back (false).</summary>
         public void UseSimulator(bool enabled) => StartLink(enabled ? new SimulatedLineTransport() : null);
 
+        /// <summary>Applies the Options setting: starts the serial search or closes the port.</summary>
+        public void RefreshLink()
+        {
+            if (Simulator == null) StartLink(null);
+        }
+
         public void SaveCalibration()
         {
             PlayerPrefs.SetString(CalibrationKey, JsonUtility.ToJson(Calibration));
@@ -144,19 +150,19 @@ namespace GeometricFlight.Input
         private void StartLink(SimulatedLineTransport simulator)
         {
             link?.Dispose();
+            link = null;
             Simulator = simulator;
             Throttle.Reset();
             lastPacketCount = -1;
             string preferredPort = PlayerPrefs.GetString(PortKey, "");
-            link = simulator != null
-                ? new ControllerLink(() => new ILineTransport[] { simulator })
-                : new ControllerLink(() => ControllerLink.SerialCandidates(preferredPort));
-            link.Start();
+            if (simulator != null) link = new ControllerLink(() => new ILineTransport[] { simulator });
+            else if (GameSettings.CockpitEnabled) link = new ControllerLink(() => ControllerLink.SerialCandidates(preferredPort));
+            link?.Start();
         }
 
         private void Update()
         {
-            LinkSnapshot snapshot = link.Snapshot();
+            LinkSnapshot snapshot = link != null ? link.Snapshot() : default;
             Link = snapshot;
             bool connected = snapshot.State == LinkState.Connected;
             bool fresh = connected && snapshot.PacketCount != lastPacketCount;

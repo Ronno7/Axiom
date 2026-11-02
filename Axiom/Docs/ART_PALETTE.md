@@ -17,12 +17,12 @@ defaults listed in `shader_defaults`. Shader logic remains hand-authored; only t
 defaults are regenerated. Change the source and regenerate; do not maintain another list of nearly
 matching RGB values in a script, stylesheet or shader default.
 
-The constraint applies to authored color in the current game: SharedEntryStudy, MainMenu, Prototype, Arena
+The constraint applies to authored color in the current game: Opening, MainMenu, Prototype, Arena
 and the earlier study scenes; shared UI, runtime-generated graphics, shaders, materials, prefabs and
 serialized scene settings. Existing artwork should use these tokens or their defined derivatives. New
 art uses the same palette from its source-generation step onward.
 
-Historical look-development files in `ArtSource/LookDev`, reference images and earlier screenshots are
+Reference images and earlier screenshots are
 records, not current game assets to repaint. Archived UI-showcase captures retain their original colors
 and should be identified as historical. The title's source model and font are geometry, not an independent
 palette; the current title material supplies its colors. Numeric textures such as masks, normals and

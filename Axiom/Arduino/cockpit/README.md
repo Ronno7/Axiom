@@ -23,7 +23,7 @@ extra cycle. It works in the [shared entry study](../../Docs/SHARED_ENTRY_STUDY.
 prototype, with T as the keyboard equivalent; the original Prototype and Arena scenes don't use it.
 EMP's separate menu-confirm role remains under review.
 
-Until the throttle lever is installed, select **Options > Keyboard throttle with controller (Q / E)**.
+Turn on **Options > Cockpit controller (USB)** to connect. Until the throttle lever is installed, select **Options > Keyboard throttle with controller (Q / E)**.
 The keyboard holds the throttle setpoint; the cockpit keeps steering, FIRE, LOCK, EMP and MASTER ARM
 (where implemented). Turn the option off to use the physical throttle. No firmware change is needed.
 

@@ -2,7 +2,7 @@
 
 Three separate scenes tested parts of the opening before the [shared entry study](SHARED_ENTRY_STUDY.md)
 combined them. Each one answered a question; the answers carried forward and the scenes stay for comparison.
-None of them are in the release build settings, and the original MainMenu, Prototype and Arena scenes keep
+None of them are in the build settings, which hold only the `Opening` scene, and the original MainMenu, Prototype and Arena scenes keep
 their own flow.
 
 | Scene | Question | Outcome |

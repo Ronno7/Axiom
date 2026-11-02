@@ -9,12 +9,28 @@
                     <ui:Label text="Steer" class="key-action"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="key-row">
+                    <ui:Label text="Z / C" class="key"/>
+                    <ui:Label text="Twist" class="key-action"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="key-row">
                     <ui:Label text="Q / E" class="key"/>
-                    <ui:Label text="Lower / raise throttle. It stays where you leave it." class="key-action"/>
+                    <ui:Label text="Lower or raise the throttle. Hold E at full to boost." class="key-action"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="key-row">
+                    <ui:Label text="T" class="key"/>
+                    <ui:Label text="MASTER ARM: arm your weapons" class="key-action"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="key-row">
                     <ui:Label text="SPACE (HOLD)" class="key"/>
-                    <ui:Label text="Fire" class="key-action"/>
+                    <ui:Label text="Fire guns" class="key-action"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="key-row">
+                    <ui:Label text="SHIFT (HOLD)" class="key"/>
+                    <ui:Label text="Paint targets. Release to fire missiles." class="key-action"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="key-row">
+                    <ui:Label text="R" class="key"/>
+                    <ui:Label text="EMP: one pulse per life" class="key-action"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="key-row">
                     <ui:Label text="ESC" class="key"/>
@@ -22,11 +38,12 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="help-column">
-                <ui:Label text="MISSION" class="section-title"/>
-                <ui:Label text="Fly to the end of the level. Destroy targets along the way for a better result." class="body-text"/>
-                <ui:Label text="Your shield is the three lit blocks on the back of your ship." class="body-text"/>
+                <ui:Label text="THE RUN" class="section-title"/>
+                <ui:Label text="Fly the rail through its lessons into the arena, then clear the sector." class="body-text"/>
+                <ui:Label text="Your shield is the three segments above the throttle. Lose them all and you are rebuilt at the last checkpoint." class="body-text"/>
+                <ui:Label text="Weapons stay SAFE until you arm them. Flight is unaffected." class="body-text"/>
                 <ui:Label text="Cyan floor markings call for a throttle change. The throttle gauge shows the target speed." class="body-text"/>
-                <ui:Label text="Lose every segment and the run ends. Beat the par time by flying fast where it is safe." class="body-text"/>
+                <ui:Label text="Turn on Cockpit controller in Options to use the cockpit. The stick steers and twists and the lever sets the throttle. The MASTER ARM switch, FIRE, LOCK and the EMP dome do the rest." class="body-text"/>
             </ui:VisualElement>
         </ui:VisualElement>
         <GeometricFlight.UI.SlantButton name="help-back" text="BACK" class="menu-button"/>

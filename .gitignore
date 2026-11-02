@@ -58,6 +58,7 @@ ExportedObj/
 sysinfo.txt
 
 # Builds
+/Builds/
 *.apk
 *.aab
 *.unitypackage
@@ -94,3 +95,33 @@ AGENTS.md
 # Python bytecode from ArtSource and DevNotes tools
 __pycache__/
 *.pyc
+
+# Local visual research library; separate from authored game assets
+/Axiom/ArtSource/References/
+
+# Local tool configuration
+/.mcp.json
+
+# Historical art is kept locally
+/Axiom/ArtSource/Archive/
+
+# Ship: only the current import package and the showcase are public. Blender sources stay local.
+/AxiomPlayerShip.blend
+/Axiom/ArtSource/Ships/SweptDart/archive/
+/Axiom/ArtSource/Ships/SweptDart/references/
+/Axiom/ArtSource/Ships/SweptDart/reviews/v13/*
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v13/presentation/
+/Axiom/ArtSource/Ships/SweptDart/reviews/v13/presentation/*
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v13/presentation/ship-*.png
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v13/presentation/ship-sheet.jpg
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v13/presentation/sequence-sheet.jpg
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v13/presentation/sequence-*.mp4
+/Axiom/ArtSource/Ships/SweptDart/reviews/v14/*
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v14/export/
+/Axiom/ArtSource/Ships/SweptDart/reviews/v14/export/*.blend
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/
+/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/*
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/comparison.jpg
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/sequence-sheet.jpg
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/shield-sheet.jpg
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/runtime-sequence.mp4

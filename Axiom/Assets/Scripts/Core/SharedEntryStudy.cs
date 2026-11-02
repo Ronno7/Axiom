@@ -4,7 +4,6 @@ using GeometricFlight.Player;
 using GeometricFlight.Presentation;
 using GeometricFlight.UI;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace GeometricFlight.Core
@@ -54,7 +53,6 @@ namespace GeometricFlight.Core
         private ShipHull hull;
         private ShipShield shield;
         private VisualElement root, titlePanel, cover, threshold;
-        private Label studyHint;
         private UIDocument menuDocument, levelDocument;
         private Vector3 cameraStart, admission;
         private Quaternion cameraRotation;
@@ -165,7 +163,6 @@ namespace GeometricFlight.Core
             // The menu glides over the ground at the departure's starting speed; the camera takes the motion over.
             if (ground != null) ground.GlideSpeed = 0f;
             levelUi.CockpitEnabled = true;
-            studyHint.style.display = DisplayStyle.None;
             look.StudyControlled = true;
             look.CameraSuppliesMotion = true;
             backdrop.SetPresentationMotion(true, cameraStart.z);
@@ -186,15 +183,12 @@ namespace GeometricFlight.Core
                     root.focusController.focusedElement == root.Q<Button>("play-button")) Begin();
                 previousFire = fire;
                 previousConnection = device.Connected;
-                if (Keyboard.current != null && Keyboard.current.f5Key.wasPressedThisFrame)
+                // The choice is made in Options; the entry is prepared for whichever it is.
+                if (reduced != GameSettings.ReducedEntryAnimation)
                 {
-                    reduced = !reduced;
-                    GameSettings.ReducedEntryAnimation = reduced;
-                    GameSettings.Save();
+                    reduced = GameSettings.ReducedEntryAnimation;
                     presentation.Begin(reduced);
                 }
-                studyHint.text = reduced ? "ENTRY STUDY · REDUCED ANIMATION · F5 TO CHANGE"
-                    : $"ENTRY STUDY · {Duration:0.#} SECOND ENTRY · F5 REDUCED ANIMATION";
                 return;
             }
             bool paused = flow.State == RunState.Paused;
@@ -349,7 +343,8 @@ namespace GeometricFlight.Core
                 // Code-window values: lower-case, as a program would print them.
                 case "cockpit":
                     return ControllerService.Instance.State.Connected
-                        ? "linked " + ControllerService.Instance.Link.PortName : "not found";
+                        ? "linked " + ControllerService.Instance.Link.PortName
+                        : GameSettings.CockpitEnabled ? "not found" : "off";
                 case "invert": return GameSettings.InvertVertical ? "on" : "off";
                 case "display": return GameSettings.ArcadeMode ? "crt" : "standard";
                 case "width": return $"{passage.Width:0}";
@@ -540,12 +535,6 @@ namespace GeometricFlight.Core
             root.Add(threshold);
             root.Q("frame")?.BringToFront();
             root.Q("menu-footer")?.BringToFront();
-            studyHint = new Label { pickingMode = PickingMode.Ignore };
-            studyHint.style.position = Position.Absolute;
-            studyHint.style.right = 52f; studyHint.style.top = 52f;
-            studyHint.style.color = AxiomPalette.Muted;
-            studyHint.style.fontSize = 12f;
-            root.Add(studyHint);
         }
 
         private void OnDestroy()

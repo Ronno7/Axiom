@@ -1,5 +1,6 @@
 using System;
 using GeometricFlight.Core;
+using GeometricFlight.Input;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,9 +15,11 @@ namespace GeometricFlight.UI
 
         private readonly Slider sensitivity;
         private readonly Toggle invertVertical;
+        private readonly Toggle cockpit;
         private readonly Toggle buzzer;
         private readonly Toggle arcade;
         private readonly Toggle keyboardThrottle;
+        private readonly Toggle reducedEntry;
         private readonly Action back;
 
         public OptionsPanel(VisualElement root, Action back, Action calibrate)
@@ -24,9 +27,11 @@ namespace GeometricFlight.UI
             Root = root;
             sensitivity = root.Q<Slider>("steering-sensitivity");
             invertVertical = root.Q<Toggle>("invert-vertical");
+            cockpit = root.Q<Toggle>("cockpit-controller");
             buzzer = root.Q<Toggle>("controller-buzzer");
             arcade = root.Q<Toggle>("arcade-mode");
             keyboardThrottle = root.Q<Toggle>("keyboard-throttle");
+            reducedEntry = root.Q<Toggle>("reduced-entry");
 
             sensitivity.lowValue = GameSettings.MinSteeringSensitivity;
             sensitivity.highValue = GameSettings.MaxSteeringSensitivity;
@@ -43,18 +48,28 @@ namespace GeometricFlight.UI
 
             invertVertical.SetValueWithoutNotify(GameSettings.InvertVertical);
             invertVertical.RegisterValueChangedCallback(e => GameSettings.InvertVertical = e.newValue);
+            cockpit.SetValueWithoutNotify(GameSettings.CockpitEnabled);
+            cockpit.RegisterValueChangedCallback(e =>
+            {
+                GameSettings.CockpitEnabled = e.newValue;
+                ControllerService.Instance.RefreshLink();
+            });
             buzzer.SetValueWithoutNotify(GameSettings.BuzzerEnabled);
             buzzer.RegisterValueChangedCallback(e => GameSettings.BuzzerEnabled = e.newValue);
             arcade.SetValueWithoutNotify(GameSettings.ArcadeMode);
             arcade.RegisterValueChangedCallback(e => GameSettings.ArcadeMode = e.newValue);
             keyboardThrottle.SetValueWithoutNotify(GameSettings.KeyboardThrottleWithController);
             keyboardThrottle.RegisterValueChangedCallback(e => GameSettings.KeyboardThrottleWithController = e.newValue);
+            reducedEntry.SetValueWithoutNotify(GameSettings.ReducedEntryAnimation);
+            reducedEntry.RegisterValueChangedCallback(e => GameSettings.ReducedEntryAnimation = e.newValue);
 
             UiScreens.MarkFocusWithin(sensitivity);
             UiScreens.MarkFocusWithin(invertVertical);
+            UiScreens.MarkFocusWithin(cockpit);
             UiScreens.MarkFocusWithin(buzzer);
             UiScreens.MarkFocusWithin(arcade);
             UiScreens.MarkFocusWithin(keyboardThrottle);
+            UiScreens.MarkFocusWithin(reducedEntry);
             this.back = back;
             root.Q<Button>("options-calibrate").clicked += calibrate;
             root.Q<Button>("options-back").clicked += Close;

@@ -270,15 +270,15 @@ namespace GeometricFlight.Core
 
         public void ExportReport()
         {
-            if (flight == null || flow == null) return;
+            // Study data stays in the Editor; a player's disk is left alone.
+            if (!Application.isEditor || flight == null || flow == null) return;
             var report = new Report { candidate = candidate.ToString(), handling = flight.FullRotation ? "Roll & Pitch" : "Bank & Turn",
                 elapsed = flow.ElapsedTime, score = Score, hoopsHit = HoopsHit, hoopsTotal = HoopsTotal,
                 headingLimitSeconds = HeadingLimitSeconds, bankWithoutTurnSeconds = BankWithoutTurnSeconds,
                 outsideEnvelopeSeconds = OutsideEnvelopeSeconds, contactSeconds = ContactSeconds,
                 shieldLost = ShieldLost, stickReversals = StickReversals, irisCrossed = iris != null && iris.Crossed,
                 irisPassed = iris != null && iris.Passed, seam = Seam, samples = samples.ToArray() };
-            string directory = Application.isEditor ? Path.Combine(Application.dataPath, "..", "Logs", "RailStudy")
-                : Path.Combine(Application.persistentDataPath, "RailStudy");
+            string directory = Path.Combine(Application.dataPath, "..", "Logs", "RailStudy");
             Directory.CreateDirectory(directory);
             LastReportPath = Path.Combine(directory, DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff") + ".json");
             File.WriteAllText(LastReportPath, JsonUtility.ToJson(report, true));

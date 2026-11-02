@@ -19,12 +19,15 @@
 - CRT display option that includes the HUD and menus.
 - Twelve color palette across art and UI.
 - Keyboard throttle option for use with the cockpit.
-- Swept Dart player ship in Blender, not yet in the game.
+- Swept Dart player ship with 4K renders and a materialization preview, not yet in the game.
 - UI showcase page (`docs/`).
 
 ### Changed
 - Roadmap: 0.2 is the playable opening, 0.3 the procedural loop and 0.4 the vertical slice.
 - HUD target count starts over for the arena.
+- Desktop builds start on the authored opening.
+- Help screen covers every control.
+- Cockpit connection is an option, off by default.
 - Throttle gauge has eight segments with speed in m/s.
 - Cockpit stick and mouse hover drive menus like the keyboard.
 - Menu and level floors fade into the sky.

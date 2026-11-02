@@ -15,6 +15,9 @@ namespace GeometricFlight.Core
         private const string ArcadeKey = "axiom.arcadeMode";
         private const string KeyboardThrottleKey = "axiom.keyboardThrottleWithController";
         private const string ReducedEntryKey = "axiom.reducedEntryAnimation";
+        private const string CockpitKey = "axiom.cockpitEnabled";
+        /// <summary>The port of the last cockpit that connected, saved by ControllerService.</summary>
+        public const string ControllerPortKey = "axiom.controllerPort";
 
         private static bool loaded;
         private static float steeringSensitivity = 1f;
@@ -23,6 +26,7 @@ namespace GeometricFlight.Core
         private static bool arcadeMode;
         private static bool keyboardThrottleWithController;
         private static bool reducedEntryAnimation;
+        private static bool cockpitEnabled;
 
         /// <summary>Multiplies steering speed. 1 is the tuned default.</summary>
         public static float SteeringSensitivity
@@ -96,6 +100,19 @@ namespace GeometricFlight.Core
             }
         }
 
+        /// <summary>Search the serial ports for a cockpit. Off by default, because opening a port can
+        /// reset whatever else is plugged in. A PC whose cockpit has connected before starts on.</summary>
+        public static bool CockpitEnabled
+        {
+            get { Load(); return cockpitEnabled; }
+            set
+            {
+                Load();
+                cockpitEnabled = value;
+                PlayerPrefs.SetInt(CockpitKey, value ? 1 : 0);
+            }
+        }
+
         public static void Save() => PlayerPrefs.Save();
 
         private static void Load()
@@ -109,6 +126,7 @@ namespace GeometricFlight.Core
             arcadeMode = PlayerPrefs.GetInt(ArcadeKey, 0) == 1;
             keyboardThrottleWithController = PlayerPrefs.GetInt(KeyboardThrottleKey, 0) == 1;
             reducedEntryAnimation = PlayerPrefs.GetInt(ReducedEntryKey, 0) == 1;
+            cockpitEnabled = PlayerPrefs.GetInt(CockpitKey, PlayerPrefs.HasKey(ControllerPortKey) ? 1 : 0) == 1;
         }
     }
 }

@@ -1,0 +1,16 @@
+{
+  "data-validation.json": "02aff2981672c2257f60d0da053dd5921aeae551537a73008dcd989e06bafcd1",
+  "HullArrival.exr": "f1ff7426177daea9e6b5213d3984a8597ab7a707a9914caca95b73f2bded9729",
+  "material-bindings.json": "69edbdcb886e26b82956e45cc0956528b7198c88e4589c1d62a6c687cec2bd3b",
+  "package-manifest.json": "f41cb157e90e8ad9469a3e9912c0146f4d4a91ae8f6fe0de43b61983939e0abb",
+  "README.md": "5cf354108af6113295a5db004331cacc7d3ed6bebd2035ac8d227529b388a8b1",
+  "SweptDart.fbx": "30b7fea44a57b3e470ee3c34407a48076299100848064b4388e38d7e49d414a7",
+  "SweptDart_Construction.fbx": "63f7bd2e4f1f492d52503128f8db2a43f48e6b565d9d9adae4c7feef63f62734",
+  "SweptDart_export.blend": "bc30abea608a9db64402ab4be0f053001dbbee5a8978ea8040ff1d38ed158976",
+  "SweptDart_Interior.fbx": "5d93d84e91d1bc727f67a5250b3ba294e586145dc9a0fd68a116e6f270a48172",
+  "timeline.json": "be4e2ad4d9078acb4c5e13cc97a924a3961d60e3c64f66f1d22bad1425c8e554",
+  "TraceTimeline.exr": "127a5b3097554501b866ed8486438026b90c9688170aeab18bd03f380304ba48",
+  "validation.json": "d14931d560c5b860911b94fa1b8e872de0f0a0b7acb6a92714cdcb2934e62df1",
+  "Shaders/SweptDartSurface.shader": "ac03abcc9d6f0b9df41adb510414f17b13cf81f0113a223aa106840e76bf47da",
+  "Shaders/SweptDartTrace.shader": "035202b4448a144bf35e92b406d54498b73e18f55aabaa354ac24306a3475a2b"
+}

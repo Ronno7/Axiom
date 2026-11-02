@@ -3,9 +3,11 @@
         <ui:Label text="OPTIONS" class="panel-title" />
         <ui:Slider name="steering-sensitivity" label="Steering sensitivity" low-value="0.5" high-value="1.5" value="1" class="option" />
         <ui:Toggle name="invert-vertical" label="Invert vertical steering" class="option" />
+        <ui:Toggle name="cockpit-controller" label="Cockpit controller (USB)" class="option" />
         <ui:Toggle name="keyboard-throttle" label="Keyboard throttle with controller (Q / E)" class="option" />
         <ui:Toggle name="controller-buzzer" label="Controller buzzer" value="true" class="option" />
         <ui:Toggle name="arcade-mode" label="CRT display" class="option" />
+        <ui:Toggle name="reduced-entry" label="Reduced entry animation" class="option" />
         <GeometricFlight.UI.SlantButton name="options-calibrate" text="CALIBRATE CONTROLLER" class="menu-button options-calibrate" />
         <GeometricFlight.UI.SlantButton name="options-back" text="BACK" class="menu-button" />
     </ui:VisualElement>

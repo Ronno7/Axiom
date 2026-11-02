@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "fbx_meshes_verified": 19,
+  "triangle_uv_material_winding_round_trip": true,
+  "sockets_verified": 4,
+  "source_file_unchanged": true,
+  "source_meshes_unchanged": 71,
+  "trace_rows": 91,
+  "lut_max_round_trip_error": 0.0,
+  "hull_arrival_max_seconds": 2.777775526046753,
+  "hull_bake_nonzero_pixels": 1318070,
+  "scope": "Blender and data checks only. Unity import, shader compilation, palette audit, moving-camera review and runtime profiling deferred."
+}

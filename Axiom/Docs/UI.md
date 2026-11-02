@@ -31,7 +31,7 @@ Images can be enlarged; Standard / Arcade comparisons and layer views are intera
 
 **Approach:** UI Toolkit (UXML + USS) for menus, the HUD, missile brackets and guidance. The gun's aim
 brackets are world-space lines (`AimAssistMarker`). Original menu/level scenes each have one `UIDocument`;
-SharedEntryStudy keeps separate menu and level documents under one look/CRT component. They use
+The Opening scene keeps separate menu and level documents under one look/CRT component. They use
 `Assets/UI/AxiomPanelSettings` (1920×1080 reference, match 0.5) and an `EventSystem` with
 `InputSystemUIInputModule`, so menus work with mouse and keyboard (arrows, Enter, Esc). The cockpit drives
 them too (`CockpitMenuNavigation`, created at start-up): the stick moves focus like the arrow keys (one step
@@ -52,7 +52,7 @@ panel switching, quit, and time formatting. UI never owns gameplay rules: `Level
 `LevelFlow`/`PlayerFlight` and calls `Resume`, `Retry`, `Continue`, `ExitToMenu`.
 
 **Options** (`Core/GameSettings`, saved in PlayerPrefs): steering sensitivity (50–150%) and
-invert vertical, controller buzzer, **CRT display** (see below), and **Calibrate controller** (`CalibrationPanel`, a step wizard in `CalibrationWizard`). The game has an EMP sound effect and temporary entry voice clips. General volume controls are not implemented. Expanded sound and presentation settings remain planned.
+invert vertical, controller buzzer, **CRT display** (see below), reduced entry animation, **Cockpit controller** (off by default, because opening serial ports can reset other devices; a PC whose cockpit has connected before starts on), and **Calibrate controller** (`CalibrationPanel`, a step wizard in `CalibrationWizard`). The game has an EMP sound effect and temporary entry voice clips. General volume controls are not implemented. Expanded sound and presentation settings remain planned.
 
 **Keyboard throttle with controller (Q / E)** keeps the cockpit stick/buttons while using the keyboard's
 latched throttle. The rail HUD identifies this combination and keeps Q/E zone hints visible. Sensor-loss
@@ -92,7 +92,7 @@ flat chamfers (`Art/Models/AxiomTitle_EarthOrbiter.fbx`). The earlier Furore "AX
 (active) and `Title_Furore` (inactive); swap which is active. Both are built by
 `ArtSource/Title/make_title.py` in Blender (commands in its header); its options build other fonts, texts
 and shapes, always at the same 3.7 m width so the framing holds. Earth Orbiter is free for non-commercial
-use only (`ArtSource/earth-orbiter/earthorbiter.txt`); Furore's file carries no license. In
+use only (`ArtSource/earth-orbiter/earthorbiter.txt`). Furore's font file carries no license, so it isn't in this repository. In
 MainMenu, `MenuTitle/TitleCamera` renders only the `Title` layer into `UI/MenuTitle.renderTexture`
 (2048×512, transparent); `MainMenu` sets it as the background of the `game-title` element, so it
 follows the UI layout at any resolution. The main camera excludes the `Title` layer. Shading comes

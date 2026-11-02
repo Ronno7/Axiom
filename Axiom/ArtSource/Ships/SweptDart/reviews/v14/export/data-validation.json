@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "midpoint_draw_fraction_error": 0.00527346134185791,
+  "midpoint_emission_error": 1.0335941314697266,
+  "visibility_error": 0,
+  "retracing_curves": 91,
+  "brightness_dip_curves": 91,
+  "trace_rows_bound": 91,
+  "interior_arrivals_constant_per_part": true,
+  "material_palette_checks": 15,
+  "shield_bindings_exist": true,
+  "source_file_unchanged": true,
+  "shader_recipe_properties_exist": true,
+  "half_texture_arrival_error_seconds": 0.000732421875,
+  "half_texture_emission_error": 0.0078125,
+  "scope": "Source data and shader recipes only; not Unity shader compilation or runtime playback."
+}

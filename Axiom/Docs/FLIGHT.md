@@ -152,7 +152,7 @@ speed is back above 17.5 m/s. Off, speed follows the throttle only.
 | Max Bank / Bank Response | 65° / 0.15 s | Bank & Turn: how far and how quickly the ship rolls into a turn |
 | Pitch Rate / Max Pitch / Pitch Level Time | 75 / 65° / 1.2 s | Bank & Turn: pitch speed, limit, and how quickly a released nose levels |
 | Twist Yaw Rate | 27 | Bank & Turn rudder, degrees per second |
-| Boost | off (on in SharedEntryStudy) | Gate 0.75, release 0.65, 70 m/s at 60 m/s², up to 1.5 s, refill 6 s after 1 s |
+| Boost | off (on in Opening) | Gate 0.75, release 0.65, 70 m/s at 60 m/s², up to 1.5 s, refill 6 s after 1 s |
 | Stick Expo / Twist Expo | 1.7 / 2 | Response curves: finer control near the centre |
 | Cruise Snap | 0.08 | The soft cruise notch |
 | Gravity / Thrust Response / Drag Response | 0 / 0.7 / 0.3 | Energy (0 = off; try 15) |

@@ -1,4 +1,5 @@
 using System;
+using GeometricFlight.Core;
 using GeometricFlight.Input;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -92,6 +93,7 @@ namespace GeometricFlight.UI
             LinkSnapshot link = Service.Link;
             bool connected = link.State == LinkState.Connected;
             status.text = connected ? "Controller connected on " + link.PortName
+                : !GameSettings.CockpitEnabled ? "Turn on Cockpit controller in Options to connect."
                 : "No controller connected. Plug it in; it is detected automatically.";
             primary.SetEnabled(connected || wizard.Current == CalibrationWizard.Step.Check);
 
