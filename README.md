@@ -2,15 +2,15 @@
 
 A flight shooter set in a world of light lines and dark glass. Flown on a custom Arduino cockpit, or on the keyboard.
 
-![The main menu](Axiom/Docs/images/menu.gif)
+![The main menu](Axiom/Docs/images/menu.webp)
 
 <h3 align="center">
-  <a href="https://github.com/Ronno7/Axiom/releases/latest">Download 0.2.0</a> ·
+  <a href="https://github.com/Ronno7/Axiom/releases/latest">Download 0.2.1</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
   <a href="https://ronno7.github.io/Axiom/">Showcase</a>
 </h3>
 
-0.2.0 is the playable opening: a menu, a tutorial rail and a first arena, in one continuous flight. Windows only. The
+0.2 is the playable opening: a menu, a tutorial rail and a first arena, in one continuous flight. Windows only. The
 build isn't signed, so Windows may show a warning.
 
 ## Controls

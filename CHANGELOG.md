@@ -2,12 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-02
+
 ### Changed
 - The entry's wall, roof and floor lines shoot out from behind the camera.
 
 ### Removed
 - Prototype, arena and study scenes that predate the opening.
-- The kit controller's firmware, wiring and enclosure, and the roomy cockpit model.
+- The kit controller, including the game's support for it, and the roomy cockpit model.
 
 ### Fixed
 - Checkpoints sounded the cockpit's shield hit tone.
@@ -125,7 +127,8 @@
 ### Added
 - Prototype scene: geometric ship, corridor and camera.
 
-[Unreleased]: https://github.com/Ronno7/Axiom/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Ronno7/Axiom/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/Ronno7/Axiom/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Ronno7/Axiom/compare/v0.1.9...v0.2.0
 [0.1.9]: https://github.com/Ronno7/Axiom/releases/tag/v0.1.9
 
