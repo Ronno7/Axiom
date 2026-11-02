@@ -168,12 +168,6 @@
         "intensity": 1
       }
     },
-    "ArenaWall.shader": {
-      "_Color": {
-        "source": "Cyan",
-        "intensity": 1
-      }
-    },
     "GridFloor.shader": {
       "_BaseColor": {
         "source": "Structure",
