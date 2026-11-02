@@ -24554,7 +24554,6 @@ MonoBehaviour:
   ribSpacing: 24
   ribThickness: 0.4
   edgeThickness: 0.25
-  markingsStartZ: -150
   seamOffset: 8
   markerSpacing: 12
   markerPhase: 4

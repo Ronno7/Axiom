@@ -57,7 +57,7 @@ namespace GeometricFlight.Core
         private Vector3 cameraStart, admission;
         private Quaternion cameraRotation;
         private float cameraFov, clock, captionUntil;
-        private float markingsFrom = float.NaN, ribsFrom = float.NaN, surfacesFrom = float.NaN;
+        private float markingsFrom = float.NaN, ribsFrom = float.NaN, surfacesFrom = float.NaN, edgesFrom = float.NaN;
         private bool started, transferred, admitted, reduced, shieldReported, audioPaused, tailComplete, backdropRetired;
         private EntryTerminal terminal;
         private EntryCodeTerminals codeWindows;
@@ -313,7 +313,8 @@ namespace GeometricFlight.Core
             float surfaces = FrontFromCamera(ref surfacesFrom, EntrySequence.SurfacesBeat, EntrySequence.SurfaceSpeed);
             RevealBuilt(surfaces);
             passage.SetFronts(FrontFromCamera(ref markingsFrom, EntrySequence.MarkingsBeat, EntrySequence.MarkingSpeed),
-                FrontFromCamera(ref ribsFrom, EntrySequence.RibsBeat, EntrySequence.RibSpeed), surfaces);
+                FrontFromCamera(ref ribsFrom, EntrySequence.RibsBeat, EntrySequence.RibSpeed), surfaces,
+                FrontFromCamera(ref edgesFrom, EntrySequence.RibsBeat, EntrySequence.EdgeSpeed));
             terminal.Sample(clock, tempo, LiveValue);
             codeWindows.Sample(clock, tempo, LiveValue);
             float beat = clock / EntrySequence.BeatLength(tempo);

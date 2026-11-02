@@ -9,6 +9,26 @@ namespace GeometricFlight.Tests
     public sealed class EntryBuildTests
     {
         [Test]
+        public void EdgeLinesStartFromTheirLimitThenHoldTheirLeadOverTheRibs()
+        {
+            var go = new GameObject("Passage (test)") { hideFlags = HideFlags.DontSave };
+            try
+            {
+                var passage = go.AddComponent<EnclosedPassage>();
+                var front = typeof(EnclosedPassage).GetField("edgeFront",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                passage.SetFronts(0f, 0f, 0f, -10f);
+                Assert.That(front.GetValue(passage), Is.EqualTo(-10f), "behind the camera, not already ahead of the ribs");
+                passage.SetFronts(0f, 0f, 0f, 500f);
+                Assert.That(front.GetValue(passage), Is.EqualTo(60f), "overtaken: the lead holds");
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+            }
+        }
+
+        [Test]
         public void SixteenBeatsStayWithinTheEightToTenSecondEntry()
         {
             Assert.That(EntrySequence.Duration(EntrySequence.DefaultTempo), Is.EqualTo(9.4118f).Within(1e-3f));

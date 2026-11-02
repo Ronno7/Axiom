@@ -30,7 +30,6 @@ namespace GeometricFlight.Presentation
         [SerializeField, Min(0.02f)] private float edgeThickness = 0.25f;
 
         [Header("Floor markings (match the menu runway)")]
-        [SerializeField] private float markingsStartZ = -92f;
         [SerializeField, Min(0f)] private float seamOffset = 8f;
         [SerializeField, Min(1f)] private float markerSpacing = 12f;
         [Tooltip("World Z of one marker, modulo the spacing, so markers line up with the menu's.")]
@@ -40,7 +39,7 @@ namespace GeometricFlight.Presentation
         [Header("Construction")]
         [Tooltip("Front travel over which one rib draws from both feet to its apex.")]
         [SerializeField, Min(0.1f)] private float ribDrawLength = 40f;
-        [Tooltip("How far the edge lines race ahead of the ribs.")]
+        [Tooltip("How far the edge lines race ahead of the ribs, once they have overtaken them.")]
         [SerializeField] private float edgeLead = 60f;
         [SerializeField] private Material surfaceMaterial, ribMaterial, edgeMaterial, markingMaterial;
 
@@ -52,19 +51,17 @@ namespace GeometricFlight.Presentation
         private Renderer surfaces, roof, ribs, edges, markings;
         private MaterialPropertyBlock block;
         private bool rebuildRequested;
-        private float markingFront = Complete, ribFront = Complete, surfaceFront = Complete, roofFront = Complete;
+        private float markingFront = Complete, ribFront = Complete, surfaceFront = Complete, edgeFront = Complete;
 
         public float Width => width;
         public float Height => height;
         /// <summary>World Z of the mouth and the far end.</summary>
         public float MouthZ => transform.TransformPoint(0f, 0f, startZ).z;
         public float EndZ => transform.TransformPoint(0f, 0f, endZ).z;
-        public float MarkingsStartZ => transform.TransformPoint(0f, 0f, markingsStartZ).z;
         public int RibCount => RibPositions(startZ, endZ, ribSpacing).Count;
         /// <summary>World Z of rib <paramref name="index"/>, counting from the mouth.</summary>
         public float RibZ(int index) => transform.TransformPoint(0f, 0f, startZ + index * ribSpacing).z;
-        public bool IsComplete => surfaceFront >= EndZ && roofFront >= EndZ && ribFront >= EndZ + ribDrawLength
-            && markingFront >= EndZ;
+        public bool IsComplete => surfaceFront >= EndZ && ribFront >= EndZ + ribDrawLength && markingFront >= EndZ;
 
         private void OnEnable() => Rebuild();
         private void OnDisable() => Release();
@@ -75,15 +72,15 @@ namespace GeometricFlight.Presentation
             if (rebuildRequested) Rebuild();
         }
 
-        /// <summary>Advances construction. Each value is a world Z; geometry before it is built. The roof (bevels and
-        /// ceiling) follows the walls unless given its own front, and never runs ahead of them.</summary>
-        public void SetFronts(float markingsFront, float ribsFront, float surfacesFront, float? roofFront = null)
+        /// <summary>Advances construction. Each value is a world Z; geometry before it is built. The edge lines lead the
+        /// ribs, but no further than <paramref name="edgesLimit"/>, so they can start behind the camera and overtake.</summary>
+        public void SetFronts(float markingsFront, float ribsFront, float surfacesFront, float edgesLimit = Complete)
         {
             // A front that has not started is -infinity; keep GPU values finite.
             markingFront = Mathf.Clamp(markingsFront, -Complete, Complete);
             ribFront = Mathf.Clamp(ribsFront, -Complete, Complete);
             surfaceFront = Mathf.Clamp(surfacesFront, -Complete, Complete);
-            this.roofFront = Mathf.Min(surfaceFront, Mathf.Clamp(roofFront ?? surfacesFront, -Complete, Complete));
+            edgeFront = Mathf.Min(ribFront + edgeLead, Mathf.Clamp(edgesLimit, -Complete, Complete));
             ApplyFronts();
         }
 
@@ -150,10 +147,10 @@ namespace GeometricFlight.Presentation
         {
             if (block == null) return;
             Apply(surfaces, surfaceFront, 1f);
-            Apply(roof, roofFront, 1f);
+            Apply(roof, surfaceFront, 1f);
             Apply(ribs, ribFront, ribDrawLength);
             // Edge and marking lines draw along Z; the draw length sets their glowing tip (8% of it).
-            Apply(edges, ribFront + edgeLead, 100f);
+            Apply(edges, edgeFront, 100f);
             Apply(markings, markingFront, 60f);
         }
 
@@ -223,17 +220,15 @@ namespace GeometricFlight.Presentation
         {
             var mesh = new MeshBuilder();
             const float lift = 0.02f;
-            float from = markingsStartZ;
-            for (float z = from; z < endZ; z += ribSpacing)
+            for (float z = startZ; z < endZ; z += ribSpacing)
             {
                 float to = Mathf.Min(endZ, z + ribSpacing);
                 mesh.FloorStrip(-seamOffset - 0.05f, -seamOffset + 0.05f, z, to, lift, transform);
                 mesh.FloorStrip(seamOffset - 0.05f, seamOffset + 0.05f, z, to, lift, transform);
             }
             // Markers keep the menu's world phase, so they continue its scrolling floor exactly.
-            float worldFrom = transform.TransformPoint(0f, 0f, from).z;
-            float offset = Mathf.Repeat(markerPhase - worldFrom, markerSpacing);
-            for (float z = from + offset; z < endZ; z += markerSpacing)
+            float offset = Mathf.Repeat(markerPhase - MouthZ, markerSpacing);
+            for (float z = startZ + offset; z < endZ; z += markerSpacing)
                 mesh.FloorStrip(-markerWidth * 0.5f, markerWidth * 0.5f, z - 0.03f, z + 0.03f, lift, transform);
             return mesh.ToMesh("Passage floor markings");
         }

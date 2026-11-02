@@ -35,11 +35,11 @@ namespace GeometricFlight.Presentation
         /// <summary>The signal cover peaks on bar 3's downbeat, halfway through.</summary>
         public const float CoverCenter = 0.5f;
 
-        // Construction follows the systems readout: each part starts at the camera on the beat its row prints,
+        // Construction follows the systems readout: each part starts behind the camera on the beat its row prints,
         // so it forms around the viewer as it is announced, then races ahead and finishes during the first
-        // seconds of flight.
+        // seconds of flight. The edge lines leave with the ribs and overtake them.
         public const float MarkingsBeat = 4.8f, RibsBeat = 5.6f, SurfacesBeat = 6.4f;
-        public const float MarkingSpeed = 140f, RibSpeed = 95f, SurfaceSpeed = 95f;
+        public const float MarkingSpeed = 140f, RibSpeed = 95f, SurfaceSpeed = 95f, EdgeSpeed = 190f;
 
         public const float RetireBeat = 14f, CollapseBeat = 15f;
         /// <summary>Terminals wait until the menu has flown past the camera and the build is about to start.</summary>
