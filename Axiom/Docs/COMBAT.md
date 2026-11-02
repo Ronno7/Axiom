@@ -1,7 +1,7 @@
 # Shooting, aiming, and target feedback
 
 The first sections describe the original Prototype rail. Arena combat and its newer weapons are
-documented below. The tutorial in the [shared entry study](SHARED_ENTRY_STUDY.md) reuses these systems; light
+documented below. The tutorial in the [opening](OPENING.md) reuses these systems; light
 strips and pursuing fighters remain planned. Current art follows the shared [palette](ART_PALETTE.md).
 
 Open `Assets/Scenes/Prototype.unity`, press Play, click the Game view, and hold
@@ -89,7 +89,7 @@ pause or a device change, each held weapon button must be released and pressed a
 doesn't unblock another. Pressing a weapon while SAFE shows MASTER ARM guidance and an optional short buzz.
 
 `MasterArmInput` wraps the combined input and `WeaponAuthority` inhibits weapon intent without touching
-steering, throttle or pause. The opening prototype and the shared entry study use it. The study's tutorial starts
+steering, throttle or pause. The `OpeningPrototype` scene and the opening use it. The tutorial starts
 SAFE on the keyboard and teaches arming at its first weapons lesson; a cockpit switch stays where it physically is.
 
 **How MASTER ARM shows:** the state lives where the eye already is and on the weapons panel. While SAFE, the aim diamonds dim

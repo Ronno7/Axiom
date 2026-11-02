@@ -1,4 +1,4 @@
-# Shared entry study
+# The opening
 
 Open **Tools > Axiom > Open the Opening**, enter Play Mode and choose **PLAY** (cockpit FIRE also
 starts when PLAY is focused). This scene (`Opening`) is the game: the menu, the tutorial rail and the first arena in one
@@ -38,7 +38,7 @@ The entry currently plays without music. A temporary synthesized score written f
 - a full D minor hit lands on control.
 
 It is original placeholder music from `ArtSource/Audio/entry_build.py`. To hear it or any other track, assign
-it to the study's **Build Theme**. The Inspector's tempo (96–120 BPM) sets the entry between
+it to the scene's **Build Theme**. The Inspector's tempo (96–120 BPM) sets the entry between
 8 and 10 seconds; the score is written at 102 BPM.
 
 ## The passage and the tutorial rail
@@ -151,7 +151,7 @@ fresh press. It keeps its handling mode. Up to the LOCK steps it is rebuilt just
 EMP group on nearer the fight. A live wave stands down when the ship is destroyed, and the current step starts
 again. The rail stays sealed, and the entry never replays.
 
-The arena's placeholder targets are off. MAIN MENU (pause or results) reloads the study at its menu. The results
+The arena's placeholder targets are off. MAIN MENU (pause or results) reloads the scene at its menu. The results
 read TRAINING COMPLETE and count the rail's targets plus those of each completed arena step.
 
 ## Flying it
@@ -166,7 +166,7 @@ read TRAINING COMPLETE and count the rail's targets plus those of each completed
 - **Pause:**
   - Escape or cockpit MENU pauses the entry, its construction and its score.
   - Reconnecting the cockpit with MENU held doesn't dismiss the pause.
-- **Retry** reloads the study from its menu.
+- **Retry** reloads the scene from its menu.
 - **Reduced entry animation** in Options is a one-second quiet transfer to the finished passage, without the
   terminals or score.
 

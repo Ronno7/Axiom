@@ -239,7 +239,7 @@ presentation option is separate from flight handling.
    python Axiom/ArtSource/Palette/check_palette.py
    ```
 
-6. Inspect the menu, full rail HUD, arena, pause/options and shared entry study in both presentation
+6. Inspect the menu, full rail HUD, arena, pause/options and opening in both presentation
    modes. Confirm warning text, target identity, focus and ready/spent feedback at their actual size.
 
 The source guard runs the generator check and scans game/editor scripts and UI for independent literal

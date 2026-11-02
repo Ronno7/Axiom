@@ -6,13 +6,13 @@
     <title>Axiom — Interface &amp; interaction</title>
     <meta
       name="description"
-      content="Explore Axiom's interface: geometric flight, a physical cockpit, and a switch to the arcade screen. An interactive UI design study."
+      content="Explore Axiom's interface: a flight game's opening, its HUD, a CRT display mode and a physical cockpit. An interactive UI design study."
     />
-    <meta name="theme-color" content="#0b0c0e" />
+    <meta name="theme-color" content="#060a0c" />
     <meta property="og:title" content="Axiom — Interface &amp; interaction" />
     <meta
       property="og:description"
-      content="Geometric flight. A physical cockpit. Explore the interface."
+      content="A flight game. A physical cockpit. Explore the interface."
     />
     <meta
       property="og:image"
@@ -30,7 +30,7 @@
     <script src="showcase.js" defer></script>
   </head>
   <body>
-    <a class="skip" href="#screens">Skip to the showcase</a>
+    <a class="skip" href="#opening">Skip to the showcase</a>
     <header class="masthead">
       <div class="wrap masthead-inner">
         <a class="wordmark" href="#top" aria-label="Axiom, back to top"
@@ -38,13 +38,12 @@
         >
         <nav aria-label="Sections">
           <ol>
-            <li><a href="#screens"><span>01</span>Screens</a></li>
+            <li><a href="#opening"><span>01</span>Opening</a></li>
             <li><a href="#in-play"><span>02</span>In play</a></li>
-            <li><a href="#feedback"><span>03</span>Feedback</a></li>
-            <li><a href="#arcade"><span>04</span>Arcade</a></li>
-            <li><a href="#rendering"><span>05</span>Rendering</a></li>
-            <li><a href="#cockpit"><span>06</span>Cockpit</a></li>
-            <li><a href="#evolution"><span>07</span>Evolution</a></li>
+            <li><a href="#look"><span>03</span>Look</a></li>
+            <li><a href="#cockpit"><span>04</span>Cockpit</a></li>
+            <li><a href="#ship"><span>05</span>Ship</a></li>
+            <li><a href="#history"><span>06</span>History</a></li>
           </ol>
         </nav>
       </div>
@@ -57,20 +56,43 @@
             <h1>Interface &amp;<br />interaction.</h1>
           </div>
           <p>
-            A geometric flight game.<br />A physical cockpit.<br />One visual
-            language.
+            A flight game.<br />A physical cockpit.<br />One visual language.
           </p>
         </div>
-        <section id="screens">
+        <section id="opening">
           <header class="section-head">
             <div>
-              <span class="eyebrow">01 / Screens</span>
-              <h2>One route through the game.</h2>
+              <span class="eyebrow">01 / Opening</span>
+              <h2>One continuous flight.</h2>
             </div>
             <p>
-              Menu, flight, results. Select a screen on the map to see it.
+              The menu, tutorial rail and first arena share one space. Select a
+              step on the route to see it.
             </p>
           </header>
+          <figure class="film">
+            <div class="frame">
+              <video
+                data-play-in-view
+                controls
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                poster="img/opening-poster.jpg"
+                aria-label="The opening in one take: the menu, the passage and ship building themselves, then the first rings"
+              >
+                <source src="img/opening.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <figcaption>
+              The opening in one take: menu, entry and the first rings. Rendered
+              frame by frame from the game on a scripted flight, with no audio yet.
+            </figcaption>
+          </figure>
+          <div class="sub-head">
+            <h3>The route.</h3>
+          </div>
           <div class="gallery" aria-label="Game screens">
             <a
               class="frame image-link"
@@ -78,7 +100,7 @@
               aria-label="Enlarge main menu"
               ><img
                 src="img/menu.jpg"
-                alt="Axiom's current main menu with the geometric title and angular controls"
+                alt="Axiom's main menu with the geometric title and angular controls"
                 width="2560"
                 height="1440"
                 fetchpriority="high"
@@ -87,50 +109,74 @@
               class="controls flow-map"
               id="flow"
               role="group"
-              aria-label="Screen flow: choose a screen"
+              aria-label="The route through the opening: choose a step"
             >
               <button
                 type="button"
                 class="node-menu"
                 data-img="img/menu.jpg"
-                data-caption="The current title, atmosphere and menu."
+                data-caption="The title over an endless grid. PLAY flies you straight out of it."
               >
-                Main menu
+                Menu
               </button>
               <i class="arrow-1" aria-hidden="true">→</i>
               <button
                 type="button"
-                class="node-flight"
-                data-img="img/level.jpg"
-                data-caption="Guidance in the world. Status at the edges."
+                class="node-entry"
+                data-img="img/entry.jpg"
+                data-caption="The passage, ship and HUD build themselves around the camera while terminals print the build."
               >
-                In flight
+                Entry
               </button>
               <i class="arrow-2" aria-hidden="true">→</i>
-              <span class="flow-pending node-results"
-                >Results <small>capture pending</small></span
+              <button
+                type="button"
+                class="node-rail"
+                data-img="img/rail-safe.jpg"
+                data-caption="Seven lessons. One line of guidance appears only when there's something new to do."
               >
+                Rail
+              </button>
+              <i class="arrow-3" aria-hidden="true">→</i>
+              <button
+                type="button"
+                class="node-arena"
+                data-img="img/arena.jpg"
+                data-caption="The rail seals behind you. Open space teaches missiles and the EMP, then tests them."
+              >
+                Arena
+              </button>
+              <i class="arrow-4" aria-hidden="true">→</i>
+              <button
+                type="button"
+                class="node-results"
+                data-img="img/results.jpg"
+                data-caption="Time, targets, accuracy and shield, with a route back in."
+              >
+                Results
+              </button>
               <button
                 type="button"
                 class="branch node-options"
                 data-img="img/options.jpg"
-                data-caption="Flight controls, controller calibration and Arcade Mode. Opens from the main menu or Pause."
+                data-caption="Flight controls, the cockpit, calibration and the CRT display. Opens from the menu or Pause."
               >
                 Options
               </button>
               <button
                 type="button"
                 class="branch node-pause"
-                data-img="img/level-pause.jpg"
+                data-img="img/pause.jpg"
                 data-caption="A clear break in the action, with a direct route back to flight."
               >
                 Pause
               </button>
-              <span class="counter" aria-hidden="true">01 / 04</span>
+              <span class="counter" aria-hidden="true">01 / 07</span>
             </div>
             <div class="media-footer">
               <p class="caption" aria-live="polite">
-                The current title, atmosphere and menu.
+                The title over an endless grid. PLAY flies you straight out of
+                it.
               </p>
               <span class="caption-meta"
                 >Captured in Unity · click to explore</span
@@ -142,17 +188,54 @@
             <div class="details-body">
               <p>
                 Pause returns directly to flight. Options and Help open from the
-                main menu or Pause. Options leads to controller calibration.
-                Results offers Retry or Main menu; Continue is available when a
-                next level is configured.
+                menu or Pause, and Options leads to controller calibration.
+                Results offers Retry or Main menu. A destroyed ship is rebuilt at
+                the last checkpoint.
               </p>
               <p>
-                Losing focus or disconnecting the controller pauses the run. Mouse
-                and keyboard navigate menus; cockpit menu navigation is still in
-                development.
+                Losing focus or disconnecting the cockpit pauses the run. Mouse,
+                keyboard and the cockpit stick all drive the menus.
               </p>
             </div>
           </details>
+          <div class="sub-head" id="lessons">
+            <h3>One line at a time.</h3>
+            <p>The tutorial teaches each system when you first need it.</p>
+          </div>
+          <div class="stepper" data-start="0">
+            <ol class="steps">
+              <li data-img="img/lesson-rings.jpg">
+                <b>Rings</b><span>Steering first, with the next ring lit ahead.</span>
+              </li>
+              <li data-img="img/rail-safe.jpg">
+                <b>Arm</b><span>Weapons start SAFE. The X on the reticle says why nothing fires.</span>
+              </li>
+              <li data-img="img/lesson-shoot.jpg">
+                <b>Shoot</b><span>Armed, with a flag on the first target.</span>
+              </li>
+              <li data-img="img/lesson-slow.jpg">
+                <b>Slow</b><span>Tight turns ask for less throttle, with the key on the line.</span>
+              </li>
+              <li data-img="img/lesson-iris.jpg">
+                <b>Iris</b><span>A closing iris only admits a fast ship.</span>
+              </li>
+              <li data-img="img/lesson-boost.jpg">
+                <b>Boost</b><span>A burst on the throttle's final travel.</span>
+              </li>
+              <li data-img="img/lesson-arena.jpg">
+                <b>Arena</b><span>The rail seals behind you and the space opens up.</span>
+              </li>
+              <li data-img="img/arena.jpg">
+                <b>Lock</b><span>Paint targets, then release to fire. Missiles arrive only now.</span>
+              </li>
+              <li data-img="img/lesson-emp.jpg">
+                <b>EMP</b><span>One pulse per life, offered once the drones are in range.</span>
+              </li>
+              <li data-img="img/lesson-wave.jpg">
+                <b>Final wave</b><span>No more lessons. Clear the sector.</span>
+              </li>
+            </ol>
+          </div>
         </section>
         <section id="in-play">
           <header class="section-head">
@@ -169,108 +252,124 @@
             class="hotspots"
             data-title="UI in play"
             data-kinds='{"diegetic":"Diegetic","spatial":"Spatial","non-diegetic":"HUD","meta":"Meta"}'
-            data-img="img/level-hit.jpg"
-            data-alt="The ship flying into a slow zone, with the HUD, floor chevrons and a red damage pulse at the screen edges"
+            data-img="img/hud-hit.jpg"
+            data-alt="The ship in the rail's passage just after a hit, with the HUD, a target flag and a red pulse at the screen edges"
           >
             <div class="side">
               <ul class="items">
                 <li
                   class="item"
                   data-kind="diegetic"
-                  data-rect="47.5,61.2,5.0,2.6"
+                  data-rect="46.8,62.8,6.4,2.4"
                 >
                   <b>Shield segments</b
-                  ><span
-                    >Three blue cells on the ship's tail. Take a hit, lose a
-                    cell.</span
-                  >
+                  ><span>Three cells on the ship's tail. Take a hit, lose one.</span>
                 </li>
                 <li
                   class="item"
                   data-kind="diegetic"
-                  data-rect="44.8,63.0,10.3,5.0"
+                  data-rect="43.5,64.5,13,7.8"
                 >
                   <b>Engine exhaust</b
-                  ><span
-                    >The jets stretch with the throttle you ask for, before the
-                    ship has actually sped up.</span
-                  >
+                  ><span>The jets stretch with the throttle you ask for.</span>
                 </li>
                 <li
                   class="item"
                   data-kind="spatial"
-                  data-rect="48.0,43.8,4.0,10.2"
+                  data-rect="48,46,4,9.4"
                 >
                   <b>Aim reticles</b
                   ><span
-                    >Two diamonds at 10 m and 25 m. Line them up on a target and
-                    fire.</span
+                    >Two diamonds at 10 m and 25 m. They dim under an X while
+                    weapons are SAFE.</span
                   >
                 </li>
                 <li
                   class="item"
                   data-kind="spatial"
-                  data-rect="37.7,63.7,24.6,31.8"
+                  data-rect="45,38,11,8.8"
                 >
-                  <b>Floor chevrons</b
+                  <b>Target flag</b
                   ><span
-                    >Blue chevrons lead you into slow and fast sections.</span
+                    >A verb and a distance on the target itself: SHOOT here, LOCK
+                    in the arena.</span
                   >
                 </li>
                 <li
                   class="item"
                   data-kind="non-diegetic"
-                  data-rect="2.6,3.4,7.4,5.2"
+                  data-rect="40.5,3,19,6"
                 >
-                  <b>Run time</b
+                  <b>Guidance line</b
                   ><span
-                    >Ticks up from the start line; par time shows on the
-                    results.</span
+                    >One centred line, silent unless there's something new to do.
+                    Key chips name your own controls.</span
                   >
                 </li>
                 <li
                   class="item"
                   data-kind="non-diegetic"
-                  data-rect="82.4,3.4,14.9,5.2"
+                  data-rect="2,3.4,7.4,5.2"
+                >
+                  <b>Run time</b><span>Ticks up from the moment you get control.</span>
+                </li>
+                <li
+                  class="item"
+                  data-kind="non-diegetic"
+                  data-rect="81.7,3.4,16.3,8.2"
                 >
                   <b>Targets</b
-                  ><span>How many of the course's targets you've broken.</span>
+                  ><span>What you've broken, plus rings on the tutorial.</span>
                 </li>
                 <li
                   class="item"
                   data-kind="non-diegetic"
-                  data-rect="28.6,10.9,42.8,5.4"
+                  data-rect="2.7,79.6,17.7,2.8"
                 >
-                  <b>Zone banner</b
-                  ><span>Says what the section wants. Here: slow down.</span>
+                  <b>Shield gauge</b
+                  ><span
+                    >The ship's three cells again, readable at a glance. Flashes
+                    on a loss, sweeps back at a checkpoint.</span
+                  >
                 </li>
                 <li
                   class="item"
                   data-kind="non-diegetic"
-                  data-rect="2.4,85.2,24.9,10.9"
+                  data-rect="2.7,84,24.3,11.6"
                 >
                   <b>Throttle gauge</b
                   ><span
-                    >Speed bar with the recommended band and a hint, including
-                    the key to press.</span
+                    >The lever's travel in eight segments, with boost at the end
+                    and speed in m/s.</span
                   >
                 </li>
                 <li
                   class="item"
                   data-kind="non-diegetic"
-                  data-rect="89.4,92.4,7.9,3.4"
+                  data-rect="79.5,75.5,17.5,16"
                 >
-                  <b>Input badge</b
+                  <b>Weapons panel</b
                   ><span
-                    >Keyboard or controller, and a warning if the throttle
-                    sensor drops out.</span
+                    >Laid out like a stores page: the MASTER ARM bar, then guns,
+                    missiles and EMP.</span
+                  >
+                </li>
+                <li
+                  class="item"
+                  data-kind="non-diegetic"
+                  data-rect="81.5,93.4,15.5,2.2"
+                >
+                  <b>Input tag</b
+                  ><span
+                    >Which controls are live, and a warning if a sensor drops
+                    out.</span
                   >
                 </li>
                 <li class="item" data-kind="meta" data-rect="edge">
                   <b>Damage pulse</b
                   ><span
-                    >Angular red edges flash for half a second on a hit. Shape
-                    and timing carry the warning, not just the colour.</span
+                    >Angular edges flash on a hit. Shape and timing carry the
+                    warning, not just the colour.</span
                   >
                 </li>
               </ul>
@@ -287,209 +386,98 @@
                 condition through the screen itself.
               </p>
               <p>
-                Blue guides. Red warns. Shape, text and timing support the
-                colour cues. Classification follows Fagerholt and Lorentzon’s
-                <em>Beyond the HUD</em> (2009).
+                Cyan is your own systems. Red is damage. Shape, text and timing
+                support the colour. Classification follows Fagerholt and
+                Lorentzon’s <em>Beyond the HUD</em> (2009).
+              </p>
+              <p>
+                This frame comes from a scripted flight, with the hit triggered
+                for the capture.
               </p>
             </div>
           </details>
-        </section>
-        <section id="feedback">
-          <header class="section-head">
-            <div>
-              <span class="eyebrow">03 / Feedback</span>
-              <h2>One event.<br />More than one cue.</h2>
-            </div>
-            <p>
-              Every warning reaches the screen, the world and the controller.
-              Choose an event.
-            </p>
-          </header>
-          <div class="gallery" aria-label="Feedback examples">
-            <a class="frame image-link" href="img/level-proximity.jpg"
-              ><img
-                src="img/level-proximity.jpg"
-                alt="A pulsing proximity warning as an obstacle closes in"
-                loading="lazy"
-                width="2560"
-                height="1440"
-            /></a>
-            <div class="controls" role="group" aria-label="Choose feedback">
-              <button
-                type="button"
-                data-img="img/level-proximity.jpg"
-                data-alt="A pulsing proximity warning as an obstacle closes in"
-                data-caption="A collision warning grows more urgent as the gap closes."
-                data-screen="A pulsing PROXIMITY label."
-                data-world="The obstacle stays visible ahead."
-                data-controller="Parking-sensor beeps and an LCD warning."
-              >
-                Proximity
-              </button>
-              <button
-                type="button"
-                data-img="img/level-hit.jpg"
-                data-alt="Red screen edges signal a shield hit"
-                data-caption="A shield hit: brief, unmistakable, then out of the way."
-                data-screen="Angular red pulse."
-                data-world="Ship blink and one lost shield cell."
-                data-controller="Hit tone and an LCD warning."
-              >
-                Shield hit
-              </button>
-              <button
-                type="button"
-                data-img="img/level.jpg"
-                data-alt="The throttle gauge and floor chevrons in a throttle zone"
-                data-caption="Throttle guidance pairs world cues with a precise readout."
-                data-screen="Speed, recommended band and a key hint in throttle zones."
-                data-world="Exhaust responds to throttle; chevrons mark zones."
-                data-controller="Speed bar, zone guidance and warning tones."
-              >
-                Throttle
-              </button>
-            </div>
-            <p class="caption" aria-live="polite">
-              A collision warning grows more urgent as the gap closes.
-            </p>
-            <div class="feedback-copy">
-              <p>
-                <b>Screen</b
-                ><span data-feedback-channel="screen"
-                  >A pulsing PROXIMITY label.</span
-                >
-              </p>
-              <p>
-                <b>World</b
-                ><span data-feedback-channel="world"
-                  >The obstacle stays visible ahead.</span
-                >
-              </p>
-              <p>
-                <b>Controller</b
-                ><span data-feedback-channel="controller"
-                  >Parking-sensor beeps and an LCD warning.</span
-                >
-              </p>
-            </div>
+          <div class="sub-head" id="weapons">
+            <h3>One panel, four states.</h3>
+            <p>The panel stays on screen and changes state instead of hiding.</p>
           </div>
-          <details id="feedback-channels">
-            <summary>All feedback channels</summary>
-            <div class="details-body">
-              <p class="legend">
-                <span><i class="on"></i>Implemented</span
-                ><span><i class="off"></i>Planned</span>
-              </p>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Screen</th>
-                      <th>World</th>
-                      <th>Buzzer</th>
-                      <th>Cockpit LCD</th>
-                      <th>Lights and rumble</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th>Shield hit</th>
-                      <td><i class="on"></i>Red edge pulse</td>
-                      <td>
-                        <i class="on"></i>Ship blinks, a tail cell goes dark
-                      </td>
-                      <td>
-                        <i class="on"></i>Short tone, long and low on the last
-                        one
-                      </td>
-                      <td><i class="on"></i>SHIELD HIT 2/3</td>
-                      <td>
-                        <i class="off"></i>Shield light out, rumble jolt
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Throttle zone</th>
-                      <td>
-                        <i class="on"></i>Banner, gauge band, RAISE / LOWER
-                        hint
-                      </td>
-                      <td><i class="on"></i>Blue floor chevrons</td>
-                      <td>
-                        <i class="on"></i>High tone for fast, low for slow
-                      </td>
-                      <td><i class="on"></i>Band on the speed bar, arrows</td>
-                      <td>
-                        <i class="off"></i>SLOW / FAST light, range on the
-                        throttle lights
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Collision ahead</th>
-                      <td><i class="on"></i>PROXIMITY label pulses</td>
-                      <td></td>
-                      <td>
-                        <i class="on"></i>Parking-sensor beeps, then a solid
-                        tone
-                      </td>
-                      <td><i class="on"></i>! PROXIMITY !</td>
-                      <td>
-                        <i class="off"></i>PROX light blinks with the beeps
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Engine demand</th>
-                      <td><i class="on"></i>Speed readout</td>
-                      <td><i class="on"></i>Exhaust jets stretch</td>
-                      <td></td>
-                      <td><i class="on"></i>Speed bar and percentage</td>
-                      <td>
-                        <i class="off"></i>Rumble grows with speed, lever
-                        light
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Sensor or link lost</th>
-                      <td>
-                        <i class="on"></i>Warning badge, or a pause with a
-                        notice
-                      </td>
-                      <td></td>
-                      <td><i class="on"></i>Warning tone</td>
-                      <td><i class="on"></i>HOLDING CRUISE, RECONNECTED</td>
-                      <td><i class="off"></i>LINK light</td>
-                    </tr>
-                  </tbody>
-                </table>
+          <ul class="panel-states">
+            <li>
+              <img src="img/panel-safe.jpg" alt="Weapons panel with a hatched SAFE bar and every weapon crossed out" width="480" height="270" loading="lazy" />
+              <b>Safe</b><span>Hatched bar, every weapon crossed out.</span>
+            </li>
+            <li>
+              <img src="img/panel-armed.jpg" alt="Weapons panel with a solid ARMED bar and guns ready" width="480" height="270" loading="lazy" />
+              <b>Armed</b><span>Guns ready. Missiles read 0/4 until they're issued.</span>
+            </li>
+            <li>
+              <img src="img/panel-locked.jpg" alt="Weapons panel showing two targets locked and release to fire" width="480" height="270" loading="lazy" />
+              <b>Locked</b><span>Painted targets and the cue to release.</span>
+            </li>
+            <li>
+              <img src="img/panel-emp.jpg" alt="Weapons panel with the EMP marked ready" width="480" height="270" loading="lazy" />
+              <b>EMP ready</b><span>Everything online.</span>
+            </li>
+          </ul>
+          <div class="sub-head" id="motion">
+            <h3>In motion.</h3>
+            <p>The same systems at speed.</p>
+          </div>
+          <ul class="clips">
+            <li>
+              <div class="frame">
+                <video data-play-in-view muted loop playsinline preload="none" poster="img/clip-arm-poster.jpg" aria-label="The weapons panel going from SAFE to ARMED, then guns breaking targets on the rail">
+                  <source src="img/clip-arm.mp4" type="video/mp4" />
+                </video>
               </div>
-              <p class="note">
-                Planned items are waiting on game integration; the hardware has
-                been bench-tested.
-              </p>
-            </div>
-          </details>
+              <b>Arm and fire</b><span>SAFE clears, the flag calls the target, and the guns open up.</span>
+            </li>
+            <li>
+              <div class="frame">
+                <video data-play-in-view muted loop playsinline preload="none" poster="img/clip-seal-poster.jpg" aria-label="The ship leaving the passage for the arena and flying through a ring">
+                  <source src="img/clip-seal.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <b>Into the arena</b><span>The passage ends and the space opens around the next ring.</span>
+            </li>
+            <li>
+              <div class="frame">
+                <video data-play-in-view muted loop playsinline preload="none" poster="img/clip-lock-poster.jpg" aria-label="A target painted in the arena and a missile launched at it">
+                  <source src="img/clip-lock.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <b>Lock</b><span>Paint, release, and the missile goes.</span>
+            </li>
+            <li>
+              <div class="frame">
+                <video data-play-in-view muted loop playsinline preload="none" poster="img/clip-emp-poster.jpg" aria-label="The EMP pulse expanding from the ship and destroying four drones">
+                  <source src="img/clip-emp.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <b>EMP</b><span>One pulse clears the drones around the ship.</span>
+            </li>
+          </ul>
         </section>
-        <section id="arcade">
+        <section id="look">
           <header class="section-head">
             <div>
-              <span class="eyebrow">04 / Arcade</span>
+              <span class="eyebrow">03 / Look</span>
               <h2>Same world.<br />Different screen.</h2>
             </div>
             <p>
-              Switch to Arcade Mode. The world, title and interface share the
-              glow and curvature of one CRT.
+              Turn on the CRT display. The world, title and interface share the
+              glow and curvature of one tube.
             </p>
           </header>
           <div
             class="compare"
-            data-labels='["Standard","Arcade"]'
-            data-sets='[["Menu","img/menu.jpg","img/menu-arcade.jpg"],["In flight","img/level.jpg","img/level-arcade.jpg"]]'
-            data-caption="Matching views from the current build. Drag the divider, or use arrow keys on the slider."
+            data-labels='["Standard","CRT"]'
+            data-sets='[["Menu","img/menu.jpg","img/menu-crt.jpg"],["In flight","img/rail.jpg","img/rail-crt.jpg"]]'
+            data-caption="Matching frames from the current build. Drag the divider, or use arrow keys on the slider."
           ></div>
           <noscript
             ><p>
-              <a href="img/menu-arcade.jpg">View the Arcade menu</a> ·
-              <a href="img/level-arcade.jpg">View Arcade flight</a>
+              <a href="img/menu-crt.jpg">View the CRT menu</a> ·
+              <a href="img/rail-crt.jpg">View CRT flight</a>
             </p></noscript
           >
           <p class="caption">
@@ -500,113 +488,57 @@
             <summary>How the CRT pass works</summary>
             <div class="details-body">
               <p>
-                Standard Mode draws UI after scene effects. Arcade Mode
-                composites the interface before the CRT pass, so menus and HUD
-                curve with the image. Pointer positions are mapped to the curved
+                Standard draws the UI after scene effects. The CRT display
+                composites the interface before its pass, so menus and HUD curve
+                with the image. Pointer positions are mapped to the curved
                 controls.
               </p>
             </div>
           </details>
-        </section>
-        <section id="rendering">
-          <header class="section-head">
-            <div>
-              <span class="eyebrow">05 / Rendering</span>
-              <h2>Build the frame.</h2>
-            </div>
-            <p>
-              Start with the finished frame and peel it back, then watch the
-              title break up.
-            </p>
-          </header>
           <div class="sub-head" id="layers">
             <h3>Visual layers.</h3>
             <p>Seven steps from bare geometry to the finished menu.</p>
           </div>
-          <div class="stepper" data-start="5">
+          <div class="stepper" data-start="6">
             <ol class="steps">
               <li data-img="img/layer-1-geometry.jpg">
                 <b>Geometry</b
-                ><span>Flat-shaded constructs against a dark sky.</span>
+                ><span>Flat-shaded constructs and the grid against a black sky.</span>
               </li>
               <li data-img="img/layer-2-haze.jpg">
                 <b>Haze</b
-                ><span
-                  >Fog and sky share a colour, softening the distant
-                  floor.</span
-                >
+                ><span>Fog and sky share a colour, softening the distant floor.</span>
               </li>
               <li data-img="img/layer-3-atmosphere.jpg">
                 <b>Atmosphere</b
-                ><span>Horizon glow, stars and drifting dust add depth.</span>
+                ><span>A cloud deck, horizon glow, stars and drifting dust add depth.</span>
               </li>
               <li data-img="img/layer-4-grade.jpg">
                 <b>Grade</b
-                ><span
-                  >Tonemapping, exposure and contrast bring the scene
-                  together.</span
-                >
+                ><span>Tonemapping, exposure and contrast bring the scene together.</span>
               </li>
               <li data-img="img/layer-5-bloom.jpg">
                 <b>Bloom</b
-                ><span
-                  >Bright geometry spills a little light into the dark.</span
-                >
+                ><span>Bright geometry spills a little light into the dark.</span>
               </li>
               <li data-img="img/layer-6-finish.jpg">
                 <b>Finish</b><span>Vignette and grain finish the image.</span>
               </li>
               <li data-img="img/menu.jpg">
                 <b>Interface</b
-                ><span
-                  >The title, controls and status line complete the
-                  standard-mode frame.</span
-                >
+                ><span>The title, controls and status line complete the frame.</span>
               </li>
             </ol>
-          </div>
-          <div class="sub split" id="glitch">
-            <figure>
-              <a
-                class="frame image-link"
-                href="img/menu-glitch.jpg"
-                data-image
-                data-title="Signal glitch"
-                ><img
-                  src="img/menu-glitch.jpg"
-                  alt="The current Axiom title at the peak of its signal glitch"
-                  width="2560"
-                  height="1440"
-                  loading="lazy"
-              /></a>
-              <figcaption>The signal glitch, held at its peak.</figcaption>
-            </figure>
-            <div class="split-copy">
-              <h3>A brief interruption.</h3>
-              <p>
-                A tear in the title. A red echo. Then calm. The menu’s glitch
-                waits until you stop interacting.
-              </p>
-              <details>
-                <summary>Timing</summary>
-                <div class="details-body">
-                  <p>
-                    An 18-frame sequence at 25 fps: 0.72 seconds, scheduled
-                    every 8–12 seconds while idle.
-                  </p>
-                </div>
-              </details>
-            </div>
           </div>
         </section>
         <section id="cockpit">
           <header class="section-head">
             <div>
-              <span class="eyebrow">06 / Cockpit</span>
+              <span class="eyebrow">04 / Cockpit</span>
               <h2>A physical interface.</h2>
             </div>
             <p>
-              A stick, throttle and a second instrument panel. The cockpit
+              A stick, a throttle and a second instrument panel. The cockpit
               brings flight into your hands.
             </p>
           </header>
@@ -627,8 +559,8 @@
                 >
                   <b>Stick and FIRE</b
                   ><span
-                    >Steer and hold FIRE to shoot. The twist axis has no game
-                    function yet.</span
+                    >Steer and hold FIRE to shoot. In the arena, twist is a rudder
+                    for fine aim.</span
                   >
                 </li>
                 <li class="item" data-kind="live" data-rect="13.6,28.7,9.8,20">
@@ -636,6 +568,35 @@
                   ><span
                     >Measured by an ultrasonic sensor. Push forward to go
                     faster; cruise sits in the middle.</span
+                  >
+                </li>
+                <li
+                  class="item"
+                  data-kind="live"
+                  data-rect="30.8,20,6.6,15.3"
+                >
+                  <b>MASTER ARM</b
+                  ><span
+                    >A flip-cover switch. SAFE inhibits weapons while flight
+                    carries on.</span
+                  >
+                </li>
+                <li
+                  class="item"
+                  data-kind="live"
+                  data-rect="44.8,45.3,16,26.4"
+                >
+                  <b>EMP dome</b
+                  ><span
+                    >One 180 m pulse per life. The lamp stays lit while it's
+                    ready.</span
+                  >
+                </li>
+                <li class="item" data-kind="live">
+                  <b>LOCK button</b
+                  ><span
+                    >Hold to paint up to four targets, release to fire missiles.
+                    Not on this model yet.</span
                   >
                 </li>
                 <li
@@ -650,10 +611,7 @@
                   >
                 </li>
                 <li class="item" data-kind="live" data-rect="49,30.7,7.7,12.9">
-                  <b>MENU</b
-                  ><span
-                    >Pause in flight. Back/menu navigation is planned.</span
-                  >
+                  <b>MENU</b><span>Pause in flight.</span>
                 </li>
                 <li class="item" data-kind="live">
                   <b>Buzzer</b
@@ -664,18 +622,14 @@
                 </li>
                 <li class="item" data-kind="bench" data-rect="25.8,19.3,1.8,36">
                   <b>Throttle lights</b
-                  ><span
-                    >Planned: a dot at the lever and a recommended throttle
-                    range.</span
-                  >
+                  ><span>A dot at the lever and a recommended throttle range.</span>
                 </li>
                 <li
                   class="item"
                   data-kind="bench"
                   data-rect="62.8,20.3,7.8,3.2"
                 >
-                  <b>Shield lights</b
-                  ><span>Planned: one light per shield segment.</span>
+                  <b>Shield lights</b><span>One light per shield segment.</span>
                 </li>
                 <li
                   class="item"
@@ -683,162 +637,94 @@
                   data-rect="38.9,8.7,27.8,3.6"
                 >
                   <b>Warning lights</b
-                  ><span
-                    >Planned: LINK, SLOW, FAST, PROX and EMP cues behind printed
-                    labels.</span
-                  >
-                </li>
-                <li class="item" data-kind="bench" data-rect="30.8,20,6.6,15.3">
-                  <b>Master arm</b
-                  ><span>Planned: arm to launch; flip to safe to pause.</span>
-                </li>
-                <li
-                  class="item"
-                  data-kind="bench"
-                  data-rect="44.8,45.3,16,26.4"
-                >
-                  <b>EMP dome</b
-                  ><span>Planned: a once-per-run blast with a ready lamp.</span>
+                  ><span>LINK, SLOW, FAST, PROX and EMP cues behind printed labels.</span>
                 </li>
                 <li class="item" data-kind="bench">
-                  <b>Rumble</b
-                  ><span>Planned: engine rumble and a jolt on hits.</span>
+                  <b>Engine rumble</b
+                  ><span>Rumble with speed and a jolt on hits. Today it only kicks on the EMP.</span>
                 </li>
               </ul>
             </div>
           </div>
           <p class="legend">
             <span><i class="on"></i>Implemented: working in the game</span
-            ><span><i class="off"></i>Planned: bench-tested, integration in
-              progress</span>
+            ><span><i class="off"></i>Planned: not in the game yet</span>
           </p>
-          <p class="note">
-            Enclosure concept render. The enclosure itself is still in progress.
-          </p>
-          <div class="sub split" id="lcd">
-            <div class="lcd-demo">
-              <div class="tabs" role="group" aria-label="LCD states">
-                <button
-                  data-top="* AXIOM  STANDBY"
-                  data-bottom="  CRUISE   100%"
-                >
-                  Standby
-                </button>
-                <button
-                  data-top="█████       100%"
-                  data-bottom="▮▮▮ ◆0/3  0:12.4"
-                >
-                  Cruise
-                </button>
-                <button
-                  data-top="█████  ▭▭▭  100%"
-                  data-bottom="FAST    →→ RAISE"
-                >
-                  Fast zone
-                </button>
-                <button
-                  data-top="█████       100%"
-                  data-bottom=" SHIELD HIT 2/3"
-                >
-                  Hit
-                </button>
-                <button
-                  data-top="█████       100%"
-                  data-bottom=" ! PROXIMITY !"
-                >
-                  Proximity
-                </button>
-                <button data-top="     PAUSED" data-bottom="→ RESUME">
-                  Paused
-                </button>
-                <button
-                  data-top="◆LEVEL COMPLETE◆"
-                  data-bottom="TIME      1:04.2"
-                >
-                  Results
-                </button>
-              </div>
-            </div>
-            <div class="split-copy">
-              <span class="eyebrow">16 × 2 characters</span>
-              <h3>The right message.<br />At the right moment.</h3>
-              <p>
-                Speed and status give way to guidance, damage and warnings.
-                Select a state to try the display.
-              </p>
-              <p class="note">
-                Illustrative LCD states. The physical display uses custom
-                glyphs.
-              </p>
-            </div>
-          </div>
+          <p class="note">Concept render of the enclosure.</p>
         </section>
-        <section id="evolution">
+        <section id="ship">
           <header class="section-head">
             <div>
-              <span class="eyebrow">07 / Evolution</span>
-              <h2>From blockout to now.</h2>
+              <span class="eyebrow">05 / Ship</span>
+              <h2>Next: the Swept Dart.</h2>
             </div>
             <p>
-              Archive captures beside the current build. Step through each
-              stage.
+              A new player ship with a modelled interior and a three-second
+              materialization. It isn't in the game yet.
             </p>
           </header>
-          <div class="sub-head">
-            <h3>The menu.</h3>
+          <div class="ship-media">
+            <a
+              class="frame image-link"
+              href="img/ship.jpg"
+              data-image
+              data-title="Swept Dart"
+              ><img
+                src="img/ship.jpg"
+                alt="The finished Swept Dart from above, a white low-poly hull"
+                width="2560"
+                height="1440"
+                loading="lazy"
+            /></a>
+            <div class="frame">
+              <video
+                controls
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                poster="img/ship-poster.jpg"
+                aria-label="The ship's three-second materialization sequence"
+              >
+                <source src="img/ship-sequence.mp4" type="video/mp4" />
+              </video>
+            </div>
           </div>
-          <div class="stepper" data-start="2">
+          <p class="caption">
+            Studio renders, not game captures.
+            <a
+              href="https://github.com/Ronno7/Axiom/tree/dev/Axiom/ArtSource/Ships/SweptDart"
+              >The full package is in the repository ↗</a
+            >
+          </p>
+        </section>
+        <section id="history">
+          <header class="section-head">
+            <div>
+              <span class="eyebrow">06 / History</span>
+              <h2>From blockout to now.</h2>
+            </div>
+            <p>The menu through the project so far. Step through each stage.</p>
+          </header>
+          <div class="stepper" data-start="3">
             <ol class="steps">
               <li data-img="img/history-menu-1.jpg">
                 <b>Blockout</b
-                ><span
-                  >Archive: the first menu, with a flat title and a bare
-                  scene.</span
-                >
+                ><span>Archive: the first menu, with a flat title and a bare scene.</span>
               </li>
               <li data-img="img/history-menu-2.jpg">
                 <b>Early 3D</b
-                ><span
-                  >Archive: an earlier title treatment and lighting pass.</span
-                >
+                ><span>Archive: an earlier title treatment and lighting pass.</span>
+              </li>
+              <li data-img="img/history-menu-3.jpg">
+                <b>Version 0.1.9</b
+                ><span>Archive: the geometric wordmark, before the shared palette.</span>
               </li>
               <li data-img="img/menu.jpg">
                 <b>Current</b
-                ><span
-                  >The updated geometric wordmark, atmosphere and
-                  interface.</span
-                >
+                ><span>One palette, and an endless grid under a cloud deck.</span>
               </li>
             </ol>
-          </div>
-          <div class="sub">
-            <div class="sub-head">
-              <h3>The level.</h3>
-            </div>
-            <div class="stepper" data-start="2">
-              <ol class="steps">
-                <li data-img="img/history-level-1.jpg">
-                  <b>Blockout</b
-                  ><span
-                    >Archive: flat grey geometry against a black sky.</span
-                  >
-                </li>
-                <li data-img="img/history-level-2.jpg">
-                  <b>Atmosphere</b
-                  ><span
-                    >Archive: haze, horizon glow and stars, from the same
-                    camera.</span
-                  >
-                </li>
-                <li data-img="img/level.jpg">
-                  <b>Current</b
-                  ><span
-                    >The current level with its HUD. The camera differs from
-                    the archive captures.</span
-                  >
-                </li>
-              </ol>
-            </div>
           </div>
         </section>
       </main>
@@ -846,8 +732,8 @@
         <div>
           <a class="wordmark" href="#top">AXIOM</a>
           <p>
-            Prototype 0.1.9 · Updated 23 Oct 2026<br />Unity 6 · URP · UI
-            Toolkit · Arduino
+            Version 0.2.0 · Updated 1 Nov 2026<br />Unity 6 · URP · UI Toolkit ·
+            Arduino
           </p>
         </div>
         <nav aria-label="Project links">

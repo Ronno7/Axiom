@@ -1,33 +1,31 @@
 # UI showcase
 
-A static, image-led tour of Axiom's interface, intended for GitHub Pages at
+A static, image-led tour of Axiom's interface, served by GitHub Pages at
 <https://ronno7.github.io/Axiom/>. No build step or JavaScript dependencies.
 
 Open `index.html` locally, or run `python -m http.server 8765 --bind 127.0.0.1 --directory docs`
-from the repository root and visit <http://127.0.0.1:8765/>. Publishing is a separate step.
+from the repository root and visit <http://127.0.0.1:8765/>. Pages serves this folder from the `dev` branch, so
+pushing `dev` publishes it.
 
 ## Editing
 
 Keep headings and captions short. Put implementation detail in the expandable notes and let the
 screenshots lead. Update the footer date when refreshing the page.
 
-The page runs in seven numbered sections: Screens, In play, Feedback, Arcade, Rendering, Cockpit and
-Evolution. Each section's `id`, eyebrow (`01 / Screens`) and masthead link share one name. The masthead
-marks the section in view, and each section ends with a "Next" link generated from the masthead, so
-adding a section means adding a `<section id>` and a matching masthead link. Subsections have their
-own anchors too (`#flow`, `#feedback-channels`, `#layers`, `#glitch`, `#lcd`).
+The page runs in six numbered sections: Opening, In play, Look, Cockpit, Ship and History. Each section's `id`,
+eyebrow (`01 / Opening`) and masthead link share one name. The masthead marks the section in view, and each section
+ends with a "Next" link generated from the masthead, so adding a section means adding a `<section id>` and a matching
+masthead link.
 
 | Part | Where to edit |
 | --- | --- |
 | Copy, section order, links | `index.html` |
 | Typography, layout, responsive rules | `showcase.css` |
-| Screen flow map | Buttons in `.flow-map` with `data-img` and `data-caption`; a `node-*` class places each one on the map. Results stays a dashed placeholder until a natural results capture exists |
-| Feedback gallery | Buttons with `data-img`, `data-alt`, `data-caption` and the three channel texts |
-| Standard / Arcade comparisons | `data-sets` on `.compare`, with labels in `data-labels` |
-| Layer and evolution steppers | One `<li data-img="...">` per step; `data-start` picks the opening step |
+| Route map | Buttons in `.flow-map` with `data-img` and `data-caption`; a `node-*` class places each one on the map |
+| Standard / CRT comparisons | `data-sets` on `.compare`, with labels in `data-labels` |
+| Layer and history steppers | One `<li data-img="...">` per step; `data-start` picks the opening step |
 | Annotations | `.item` with `data-kind` and `data-rect="left,top,width,height"`, in percentages |
 | Implemented / Planned | `.legend` with `.on` / `.off` markers; use the same two words everywhere |
-| Cockpit LCD | Buttons with `data-top` and `data-bottom`, exactly 16 characters per row |
 | Viewer, navigation and interactions | `showcase.js` |
 
 Click a gallery image or an annotated image to enlarge it. Comparisons have a separate Expand button
@@ -37,30 +35,24 @@ Actual-size images can be scrolled or dragged. Expanded comparisons keep their s
 
 ## Captures
 
-Current game images in `img/` are 2560 × 1440 JPGs, captured from Unity's Game view in Play Mode.
-The historical images remain intentionally older; the cockpit illustration is a concept render.
-Replace an existing filename to update all its uses. Annotation coordinates are percentages of the
-source image: divide the pixel box by the actual width and height, then multiply by 100.
+Game images in `img/` are 2560 × 1440 JPGs, captured from Unity's Game view in Play Mode with Standard display unless
+named `-crt`. The cockpit illustration is a concept render, and the ship images are Cycles studio renders copied from
+the [ship package](../Axiom/ArtSource/Ships/SweptDart/README.md). `history-*` images stay intentionally older, in
+chronological order. Replace an existing filename to update all its uses. Annotation coordinates are percentages of
+the source image.
 
-Refresh the current menu, Options, glitch, render-layer sequence, flight, pause, hit/proximity feedback,
-and both Arcade comparisons together when the game's presentation changes. Preserve the archive.
-Capture Standard and Arcade from the same frozen camera and geometry. The two archive level shots share
-a camera; the current level shot does not, and its caption says so.
+Refresh the menu, Options, entry, rail, arena, pause, results, layers and both CRT comparisons together when the
+game's presentation changes. Move the outgoing menu into the history stepper first. Capture Standard and CRT from the
+same frozen camera and restore saved settings afterwards.
 
-On a 2560 × 1440 monitor, **F11** in Play Mode (Window → General → Fullscreen Game View) gives a
-native-resolution Game view with no toolbar; press F11 again or leave Play Mode to close it.
+Films are rendered rather than screen recorded: `Time.captureFramerate = 60` with a screenshot saved each frame, encoded
+with ffmpeg at 1920 × 1080 (the opening) or 1280 × 720 (the `clip-*` loops). They have no audio. The README's `Axiom/Docs/images/menu.gif` shows only the
+menu, on purpose: the opening stays a surprise until someone chooses to watch it here.
 
-For captures, let the Game view finish rendering after each state change. If the editor is unfocused,
-frames may stop updating; a temporary Play Mode run-in-background setting can help. Restore runtime
-settings and leave Play Mode afterwards. Do not save staged scenes or change saved player preferences.
-The layer sequence removes interface, bloom, grade and atmosphere progressively at runtime only.
-
-The feedback images are staged UI examples (including a real shield hit held for capture), not evidence
-of an end-to-end playthrough. Add the results panel from a natural completed/failed run with meaningful
-stats. Keep planned cockpit effects distinguished from working integration.
+The flight images come from a scripted run with a simulated cockpit, which hides the port name on the status line.
+The shield hit is triggered for the capture, and the autopilot's accuracy on the results screen isn't a player's.
 
 ## Verification
 
-Interactions and asset references were checked with DOM tests, and layout in headless Chrome at 320, 390, 768
-and 1440 px. Still to check in a real browser before publishing: dialog focus and Escape, image zoom and panning,
-touch comparisons and scrolling, reduced motion, and fonts unavailable.
+Check layout at phone, tablet and desktop widths after a change, and the viewer, comparisons, steppers and annotations
+in a real browser before publishing.

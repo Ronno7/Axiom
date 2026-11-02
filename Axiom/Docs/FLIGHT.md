@@ -1,7 +1,7 @@
 # Forward flight, throttle, and bounded steering
 
 This guide covers the original Prototype rail, the arena, and the nose-led rail flown in the
-[shared entry study](SHARED_ENTRY_STUDY.md). A rechargeable boost on the throttle's final travel is in test
+[opening](OPENING.md). A rechargeable boost on the throttle's final travel is in test
 there (below). A broader keyboard/mouse control scheme is still to come; Q/E support doesn't complete it.
 
 Open `Assets/Scenes/Prototype.unity`, use a 16:9 Game view, and press Play.
@@ -51,7 +51,7 @@ steering and a cruise target; speed returns smoothly to cruise.
 below the ship, the lowest surface under it, so it slides beneath obstacles rather than onto
 them. It shrinks slightly with height. It is the main cue for position and altitude.
 Its **Light Direction** defaults to straight down; a slanted direction casts it ahead of the ship, which
-a chase camera can still see at altitude. The shared entry study's passage doesn't use the shadow.
+a chase camera can still see at altitude. The opening's passage doesn't use the shadow.
 
 The camera retains its authored position relative to the course and follows only
 forward travel in `LateUpdate`. Steering therefore moves the aircraft across the
@@ -126,7 +126,7 @@ the middle 8 % of travel as cruise exactly; the readout at the bottom left says 
 ship turns itself back toward the middle; it can't leave the arena or go below 2 m or above the ceiling. Escape or
 MENU pauses.
 
-**Boost (shared entry study only, in test).** The throttle's final eighth is a boost gate; normal full
+**Boost (opening only).** The throttle's final eighth is a boost gate; normal full
 throttle (45 m/s) is reached where the gate begins. Pushing into the gate with a full charge fires a burst:
 up to 1.5 s at 70 m/s. The charge is spent when the burst starts. Pulling back below 0.65 ends it early,
 and speed then eases back at normal acceleration. The charge refills over 6 s, starting 1 s after the
@@ -180,5 +180,5 @@ to leave the middle open; exterior columns and skyline remain outside the expand
 
 The new rail handling was chosen in the [rail handling study](STUDIES.md#rail-handling-study). **Nose-led** rail flight
 uses the arena controls, and the same ship carries straight into an arena with its inputs and weapons intact.
-The shared entry study uses it, with lethal passage walls and a seal behind the ship at release. Tuning and
+The opening uses it, with lethal passage walls and a seal behind the ship at release. Tuning and
 curved rails are still to come; the original scenes keep their handling.

@@ -226,7 +226,7 @@
     ]);
   });
 
-  // Screen and feedback galleries share real buttons, not incomplete ARIA tabs.
+  // The screen gallery uses real buttons, not incomplete ARIA tabs.
   all(".gallery").forEach((root) => {
     const controls = all(".controls button", root),
       link = root.querySelector(".image-link"),
@@ -254,10 +254,6 @@
           String(i + 1).padStart(2, "0") +
           " / " +
           String(items.length).padStart(2, "0");
-      all("[data-feedback-channel]", root).forEach((node) => {
-        node.textContent =
-          controls[i].dataset[node.dataset.feedbackChannel] || "";
-      });
     }
     controls.forEach((b, i) => b.addEventListener("click", () => select(i)));
     wireImageLink(link, items, () => selected);
@@ -473,35 +469,20 @@
     filter(null);
   });
 
-  all(".lcd-demo").forEach((root) => {
-    const lcd = make("div", "lcd");
-    lcd.setAttribute("role", "img");
-    const rows = [make("div", "row"), make("div", "row")];
-    rows.forEach((r) => r.setAttribute("aria-hidden", "true"));
-    lcd.append(...rows);
-    root.prepend(lcd);
-    const status = make("span", "sr-only");
-    status.setAttribute("aria-live", "polite");
-    root.append(status);
-    const buttons = all("button", root);
-    function show(b) {
-      pressed(buttons, b);
-      const texts = [b.dataset.top, b.dataset.bottom];
-      rows.forEach((row, i) =>
-        row.replaceChildren(
-          ...Array.from(texts[i].padEnd(16))
-            .slice(0, 16)
-            .map((c) => make("span", "cell", c === " " ? "\u00a0" : c)),
-        ),
-      );
-      const description =
-        b.textContent + ": " + texts.map((t) => t.trim()).join(". ");
-      lcd.setAttribute("aria-label", description);
-      status.textContent = description;
-    }
-    buttons.forEach((b) => b.addEventListener("click", () => show(b)));
-    show(buttons[1] || buttons[0]);
-  });
+  // Films play while they're on screen, unless the reader prefers less motion.
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const watcher = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) e.target.play().catch(() => {});
+          else e.target.pause();
+        }),
+      { threshold: 0.4 },
+    );
+    all("video[data-play-in-view]").forEach((v) => watcher.observe(v));
+  } else {
+    all("video[data-play-in-view]").forEach((v) => (v.controls = true));
+  }
 
   // The masthead marks the section in view, and each section ends with a link onward.
   const nav = document.querySelector(".masthead nav");

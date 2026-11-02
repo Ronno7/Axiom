@@ -1,6 +1,6 @@
 # Earlier studies
 
-Three separate scenes tested parts of the opening before the [shared entry study](SHARED_ENTRY_STUDY.md)
+Three separate scenes tested parts of the game before the [opening](OPENING.md)
 combined them. Each one answered a question; the answers carried forward and the scenes stay for comparison.
 None of them are in the build settings, which hold only the `Opening` scene, and the original MainMenu, Prototype and Arena scenes keep
 their own flow.
@@ -57,5 +57,5 @@ the rail; steering hard sideways slows progress. **B / Course-driven:** the thro
 the nose only adds sideways travel; the ship can point anywhere. Both share the course, throttle range,
 weapons and camera. Neither adds hidden steering help at the arena exit.
 
-This study has no one-way exit. The [shared entry study](SHARED_ENTRY_STUDY.md#the-first-arena) seals its rail
+This study has no one-way exit. The [opening](OPENING.md#the-first-arena) seals its rail
 behind the ship.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-01
+
 ### Added
 - Authored opening: menu, tutorial rail and first arena as one continuous flight.
 - Entry sequence that builds the passage, ship and HUD around the camera while terminals print the build.
@@ -40,7 +42,7 @@
 - Closing iris ignored the ship's rotated hull.
 - Horizon glow painted over nearby scenery, and fog was uneven.
 
-## [0.1.9] - 2026-10-20 — Main menu presentation
+## [0.1.9] - 2026-10-20
 
 ### Added
 - 3D menu title: "aXiom" in Earth Orbiter Bold, extruded and chamfered, leaned to match the menu buttons,
@@ -56,69 +58,74 @@
 - Main-menu backdrop recomposed (construct placement, orbits and horizon distance).
 - Version numbering adopted (development stages); the build now shows its version on the menu.
 
+### Removed
+- Unused Unity template files.
+
 ### Fixed
 - Glitch blocks no longer stay on screen after an event.
 - 3D titles no longer import turned around.
 
-### Removed
-- Unused Unity template files.
-
-## [0.1.8] - 2026-10-19 — Feedback
+## 0.1.8 - 2026-10-19
 
 ### Added
 - Throttle-responsive geometric engine exhaust.
 - Angular screen-edge pulse when the shield takes a hit.
 
-## [0.1.7] - 2026-10-18 — Cockpit sketch
+## 0.1.7 - 2026-10-18
 
 ### Added
 - Cockpit controller sketch: stick twist, EMP and MASTER ARM inputs, rumble with a safety timeout, EMP dome
   lamp, and a standby self-test of every input.
 - The game accepts both controller generations and can drive rumble and the lamp.
 
-## [0.1.6] - 2026-10-02 — Menu construct
+## 0.1.6 - 2026-10-02
 
 ### Added
 - Another geometric construct in the main-menu backdrop.
 
-## [0.1.5] - 2026-09-30 — Cockpit design
+## 0.1.5 - 2026-09-30
 
 ### Added
 - Cockpit box design: 3D model, wiring sheet and a parts list checked against the manufacturers.
 - 16×2 LCD on the controller with game-drawn screens for menus, calibration, flight and results.
 - Proximity beeps with a pulsing HUD warning.
 
-## [0.1.4] - 2026-09-29 — Controller
+## 0.1.4 - 2026-09-29
 
 ### Added
 - Arduino controller support: checksummed serial protocol, automatic port search and reconnect, sonar throttle
   with filtering, keyboard fallback, and a pause when the controller is lost.
 - Controller calibration screen (Options → Calibrate controller).
 
-## [0.1.3] - 2026-09-29 — Game loop
+## 0.1.3 - 2026-09-29
 
 ### Added
 - Shield, enemy turret, barriers, and a complete run: pause, level complete, fail, retry and stats.
 - Main menu, options (saved), help, HUD, pause and results screens.
 - Throttle sections (slow lattice, fast closing iris) with floor cues and a par time.
 
-## [0.1.2] - 2026-09-29 — Combat
+## 0.1.2 - 2026-09-29
 
 ### Added
 - Hold-to-fire weapon, aim reticles, breakable targets and a shatter effect.
 
-## [0.1.1] - 2026-09-28 — Flight
+## 0.1.1 - 2026-09-28
 
 ### Added
 - Keyboard flight with throttle and a rear camera.
 
-## [0.1.0] - 2026-09-24 — Prototype scene
+## 0.1.0 - 2026-09-24
 
 ### Added
 - Prototype scene: geometric ship, corridor and camera.
 
+[Unreleased]: https://github.com/Ronno7/Axiom/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Ronno7/Axiom/compare/v0.1.9...v0.2.0
+[0.1.9]: https://github.com/Ronno7/Axiom/releases/tag/v0.1.9
 
-All notable changes to Axiom. The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
-follow the development stages on the [roadmap](README.md#roadmap): **0.1.x prototype**, 0.2 playable opening,
-0.3 procedural loop, 0.4 vertical slice, 0.5 alpha, 0.9 beta, 1.0 release. Within a stage, each drop is a patch version. Versions before 0.1.9 were
-numbered from the project history.
+
+
+All notable changes to Axiom are documented in this file. The format is based on
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Axiom doesn't follow Semantic Versioning: versions follow the
+development stages on the [roadmap](README.md#roadmap), and each drop within a stage is a patch version.
+Versions before 0.1.9 were numbered from the project history and have no tags.

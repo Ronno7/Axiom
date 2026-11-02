@@ -19,7 +19,7 @@ has 28 solder joints including the added LOCK button.
 
 Only the parts marked ✓ are in the game so far; the rest is planned. MASTER ARM is introduced at the tutorial's
 first weapons lesson, and SAFE inhibits all weapons while flight continues. An already armed switch needs no
-extra cycle. It works in the [shared entry study](../../Docs/SHARED_ENTRY_STUDY.md) and the earlier opening
+extra cycle. It works in the [opening](../../Docs/OPENING.md) and the earlier opening
 prototype, with T as the keyboard equivalent; the original Prototype and Arena scenes don't use it.
 EMP's separate menu-confirm role remains under review.
 
@@ -34,7 +34,7 @@ The keyboard holds the throttle setpoint; the cockpit keeps steering, FIRE, LOCK
 | Throttle lever | Push forward = faster, cruise detent in the middle ✓ | |
 | EMP (60 mm dome) | Arena: one 180 m destructive pulse per life; clears nearby enemies and hostile shots. Lamp lit while ready, off when spent; rumble on discharge ✓ | Confirm/retry role under review; original ARM-then-EMP launch plan superseded |
 | MENU | Pause ✓ | Back |
-| MASTER ARM | Shared entry study ✓: ARM enables guns, LOCK and EMP; SAFE inhibits weapons while flight continues | Position shown as status ✓; does not start a run |
+| MASTER ARM | Opening ✓: ARM enables guns, LOCK and EMP; SAFE inhibits weapons while flight continues | Position shown as status ✓; does not start a run |
 | LOCK (D11, 30 mm button) | Hold to paint up to four distinct targets at 90–650 m; release to fire missiles in the arena ✓. Gun stops while held | |
 | Twist | Arena: rudder for fine aim ✓ (rail: unused; a barrel-roll flick is an idea to test) | |
 

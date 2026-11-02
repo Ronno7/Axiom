@@ -1,6 +1,6 @@
 # UI
 
-The current HUD work happens in the [shared entry study](SHARED_ENTRY_STUDY.md); earlier experiments are
+The current HUD is in the [opening](OPENING.md); earlier experiments are
 summarized in [studies](STUDIES.md).
 
 ## Entry and flight HUD
@@ -107,7 +107,7 @@ the fog colour, so the floor fades into the background with no visible edge; the
 far floor (depth-faded, beyond about 85 m) to hide the horizon line. A construct can combine a
 counter-rotating star tetrahedron, a golden-ratio cage tumbling under Euler's rigid-body equations,
 a trefoil-knot band, and satellites on Kepler orbits; keep each background one to a single idea.
-MainMenu's floor and dust drift at 5 m/s. The shared entry study replaces the scrolling floor with one
+MainMenu's floor and dust drift at 5 m/s. The opening replaces the scrolling floor with one
 endless grid (`InfiniteGround`) whose lines glide toward the camera at the same 5 m/s (**Glide Speed**, a
 shader offset), with dust drifting alongside and floating slightly (**Dust Float**). At PLAY both stop as the
 camera starts moving at that speed; the dust clears at the passage threshold. Its hero trefoil uses the existing bright Orange light material with a
@@ -239,7 +239,7 @@ gives it and knows nothing about lessons:
 
 Lessons take their lines from the systems' real state, so a held key never reads as success, and the flag steps
 aside while weapon feedback shows the same object. Guidance is Cyan with Light emphasis; targets keep Orange. Every
-tutorial lesson uses it, on the rail and in the arena ([lessons](SHARED_ENTRY_STUDY.md)). Pause hides it.
+tutorial lesson uses it, on the rail and in the arena ([lessons](OPENING.md)). Pause hides it.
 
 ## Arena encounter display
 
