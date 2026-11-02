@@ -1,5 +1,4 @@
-// Axiom cockpit controller (v2) firmware for Arduino Uno on a Gravity IO shield. Wiring: ../cockpit/README.md.
-// Protocol v2 extends v1 (../README.md); Unity accepts v1, the original v2, and this version with LOCK appended.
+// Axiom cockpit controller firmware for Arduino Uno on a Gravity IO shield. Wiring and protocol: ../README.md.
 // Sends one packet every 20 ms:   AX,<x>,<y>,<mm>,<fire>,<menu>,<twist>,<emp>,<arm>,<lock>*HH
 // Accepts buzzer commands:        BZ,<hz>,<ms>*HH
 // Accepts LCD rows:               LT,<row>,<text>*HH

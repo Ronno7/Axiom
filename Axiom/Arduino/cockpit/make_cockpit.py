@@ -1,9 +1,9 @@
 """Axiom cockpit controller (v2), built in Blender from the design dimensions.
 
 Run with Blender 5.x:
-  blender -b --factory-startup --python make_cockpit.py                        (compact: build, save .blend + .glb)
-  blender -b --factory-startup --python make_cockpit.py -- --roomy --render    (roomy preset, plus preview renders)
-  blender -b --factory-startup --python make_cockpit.py -- --panel             (only the panel cut file + template)
+  blender -b --factory-startup --python make_cockpit.py               (build, save .blend + .glb)
+  blender -b --factory-startup --python make_cockpit.py -- --render    (plus preview renders)
+  blender -b --factory-startup --python make_cockpit.py -- --panel     (only the panel cut file + template)
 
 All sizes are millimetres. Panel coordinates: x from the left edge, y from the front edge measured
 along the sloped top, z up from the top surface. Change the numbers below and rerun.
@@ -18,20 +18,13 @@ from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
 RENDER = "--render" in sys.argv
-PRESET = "roomy" if "--roomy" in sys.argv else "compact"
 
 # ---------------- Design dimensions ----------------
 # The footprint is set by two things: the throttle's front-to-back travel (depth) and the spacing
 # between the throttle hand and the stick hand (width).
-PRESETS = {
-    "compact": dict(W=420.0, D=245.0, PALM=65.0, THR_X=72.0, TRAVEL=100.0, NEAR=40.0, SLED=40.0,
-                    KNOB=(42.0, 50.0), STICK=(345.0, 130.0), CENTRE=222.0, BIG_Y=103.0, BTN_Y=160.0,
-                    ARM=(140.0, 185.0), LCD_Y=200.0, ANN_Y=230.0, WORD_Y=215.0),
-    "roomy": dict(W=500.0, D=280.0, PALM=80.0, THR_X=90.0, TRAVEL=120.0, NEAR=50.0, SLED=50.0,
-                  KNOB=(46.0, 56.0), STICK=(405.0, 150.0), CENTRE=250.0, BIG_Y=125.0, BTN_Y=185.0,
-                  ARM=(172.0, 205.0), LCD_Y=228.0, ANN_Y=262.0, WORD_Y=252.0),
-}
-globals().update(PRESETS[PRESET])
+W, D, PALM, THR_X, TRAVEL, NEAR, SLED = 420.0, 245.0, 65.0, 72.0, 100.0, 40.0, 40.0
+KNOB, STICK, ARM = (42.0, 50.0), (345.0, 130.0), (140.0, 185.0)
+CENTRE, BIG_Y, BTN_Y, LCD_Y, ANN_Y, WORD_Y = 222.0, 103.0, 160.0, 200.0, 230.0, 215.0
 H_FRONT = 60.0                 # front height (top of the panel), back is higher by the slope
 SLOPE = 8.0                    # degrees
 T_TOP, T_WOOD = 3.0, 6.0       # acrylic top, Baltic birch body
@@ -55,8 +48,7 @@ SHIELD_YS, SHIELD_XS = LCD_Y, [CENTRE + 48.0 + 13.0 * i for i in range(3)]
 ANNUNCIATORS = [("LINK", CENTRE - 50.0, (0.1, 1.0, 0.25), True), ("SLOW", CENTRE - 25.0, (0.15, 0.45, 1.0), True),
                 ("FAST", CENTRE, (1.0, 0.55, 0.05), False), ("PROX", CENTRE + 25.0, (1.0, 0.08, 0.05), False),
                 ("EMP", CENTRE + 50.0, (1.0, 0.75, 0.05), True)]   # EMP lit = still available this round
-NAME = "axiom_cockpit" if PRESET == "compact" else "axiom_cockpit_roomy"
-SUFFIX = "" if PRESET == "compact" else "_roomy"   # panel cut file and template names
+NAME = "axiom_cockpit"
 
 A = math.radians(SLOPE)
 D_SLOPE = D / math.cos(A)      # panel length along the slope
@@ -369,7 +361,7 @@ def write_panel_files():
     panel_template.html: that template tiled over 4 landscape Letter pages for printing at 100 %."""
     shapes = "\n".join(svg_shape(o) for o in OPENINGS)
     outline = f'<rect x="0" y="0" width="{W:g}" height="{D_SLOPE:.2f}"/>'
-    (HERE / f"panel_cut{SUFFIX}.svg").write_text(
+    (HERE / "panel_cut.svg").write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W:g}mm" height="{D_SLOPE:.2f}mm" '
         f'viewBox="0 0 {W:g} {D_SLOPE:.2f}">\n<g fill="none" stroke="#000" stroke-width="0.1">\n'
         f'{outline}\n{shapes}\n</g>\n</svg>\n', encoding="utf-8")
@@ -402,7 +394,7 @@ def write_panel_files():
             + "\n".join(svg_shape(f) for f in feet) + '\n</g>\n'
             f'<g fill="none" stroke="#000" stroke-width="0.3">\n{outline}\n{shapes}\n</g>\n'
             f'<g font-family="Arial, sans-serif">\n' + "\n".join(labels) + '\n</g>\n')
-    (HERE / f"panel_template{SUFFIX}.svg").write_text(
+    (HERE / "panel_template.svg").write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W:g}mm" height="{D_SLOPE:.2f}mm" '
         f'viewBox="0 0 {W:g} {D_SLOPE:.2f}">\n{body}</svg>\n', encoding="utf-8")
 
@@ -417,14 +409,14 @@ def write_panel_files():
     pages = []
     for i, ((y0, y1), (x0, x1)) in enumerate((r, c) for r in rows for c in cols):
         pages.append(
-            f'<div class="page"><div class="head">Axiom cockpit panel, {PRESET} ({W:g} × {D_SLOPE:.1f} mm): '
+            f'<div class="page"><div class="head">Axiom cockpit panel, compact ({W:g} × {D_SLOPE:.1f} mm): '
             f'page {i + 1} of 4, {names[i]}. Box: {W:g} × {D:g} mm, front {H_FRONT:g} mm, '
             f'back {H_FRONT + D * math.tan(A):.0f} mm tall</div>\n'
             f'<svg width="{x1 - x0:.2f}mm" height="{y1 - y0:.2f}mm" viewBox="{x0:.2f} {y0:.2f} {x1 - x0:.2f} '
             f'{y1 - y0:.2f}">\n{shade}\n{body}</svg>\n'
             f'<div class="foot"><span class="bar"></span> must measure 100 mm (print at 100 % / Actual size). '
             f'Overlap the shaded strips so the grid lines up.</div></div>')
-    (HERE / f"panel_template{SUFFIX}.html").write_text(
+    (HERE / "panel_template.html").write_text(
         '<!doctype html>\n<html><head><meta charset="utf-8"><title>Axiom panel template</title>\n<style>\n'
         '@page { size: 279.4mm 215.9mm; margin: 0 }\n'
         'body { margin: 0; font-family: Arial, sans-serif; background: #fff; color: #222 }\n'
@@ -434,7 +426,7 @@ def write_panel_files():
         '.foot { position: absolute; left: 12mm; bottom: 7mm; font-size: 9pt }\n'
         '.bar { display: inline-block; width: 100mm; height: 2.5mm; background: #000; vertical-align: middle }\n'
         '</style></head><body>\n' + "\n".join(pages) + '\n</body></html>\n', encoding="utf-8")
-    print(f"Wrote panel_cut{SUFFIX}.svg, panel_template{SUFFIX}.svg, panel_template{SUFFIX}.html")
+    print("Wrote panel_cut.svg, panel_template.svg, panel_template.html")
 
 
 write_panel_files()
@@ -665,7 +657,7 @@ bpy.ops.export_scene.gltf(filepath=str(HERE / f"{NAME}.glb"), export_format="GLB
 print("Saved", HERE / f"{NAME}.blend", f"({W:g} x {D:g} mm)")
 
 if RENDER:
-    out = HERE / "renders" / PRESET
+    out = HERE / "renders"
     out.mkdir(parents=True, exist_ok=True)
     top_panel = bpy.data.objects["Top panel (3 mm acrylic)"]
     palm = bpy.data.objects["Palm rest"]
