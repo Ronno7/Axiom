@@ -181,6 +181,15 @@ namespace GeometricFlight.Core
             Begin(Current);
         }
 
+        /// <summary>Developer skip: ends the current step and starts the next, issuing its weapons as usual. Steps from
+        /// the encounter on run out by themselves, so the last one this skips to is the ending.</summary>
+        public bool SkipStep()
+        {
+            if (Current == Step.Waiting || Current >= Step.Ending) return false;
+            Begin(Current + 1);
+            return true;
+        }
+
         private ArenaEncounter WaveFor(Step step) => step == Step.LockSingle ? lockSingleWave
             : step == Step.LockPair ? lockPairWave : step == Step.EmpGroup ? empGroup
             : step == Step.Encounter ? encounter : null;

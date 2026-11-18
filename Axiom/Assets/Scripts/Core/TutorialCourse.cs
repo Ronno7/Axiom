@@ -306,6 +306,35 @@ namespace GeometricFlight.Core
             while (nextCue < cues.Length && cues[nextCue].z < z) nextCue++;
         }
 
+        /// <summary>Developer skip: the ship jumps to the next checkpoint, which then registers as if flown to. Rings and
+        /// captions passed over don't count. Rail only, outside a rebuild.</summary>
+        public bool SkipToNextCheckpoint()
+        {
+            if (!CanSkip || reached + 1 >= checkpoints.Length) return false;
+            float z = checkpoints[reached + 1].z;
+            Teleport(new Vector3(0f, flightLineY, z));
+            while (nextCue < cues.Length && cues[nextCue].z < z) nextCue++;
+            return true;
+        }
+
+        /// <summary>Developer skip: the ship jumps from the rail to the arena's retry point, which releases it there and
+        /// starts the arena's lessons. The rail seals behind as usual.</summary>
+        public bool SkipToArena()
+        {
+            if (!CanSkip || arena == null) return false;
+            Teleport(arena.RetryPosition);
+            return true;
+        }
+
+        private bool CanSkip => flow.State == RunState.Playing && OnRail && !Rebuilding;
+
+        private void Teleport(Vector3 position)
+        {
+            weapon?.ClearProjectiles();
+            flight.Respawn(position);
+            chase?.ResetToTarget();
+        }
+
         /// <summary>An arena retry: rebuilt at the step's arena checkpoint with whatever weapons have been issued so far
         /// restocked, and the current step started again. The rail stays sealed.</summary>
         private void RebuildInArena()

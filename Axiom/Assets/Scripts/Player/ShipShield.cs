@@ -1,5 +1,6 @@
 using System;
 using GeometricFlight.Combat;
+using GeometricFlight.Dev;
 using UnityEngine;
 
 namespace GeometricFlight.Player
@@ -7,7 +8,7 @@ namespace GeometricFlight.Player
     /// <summary>The ship's shield. Enemy shots (IDamageable) and ShipHull collisions call ApplyHit.
     /// Presentation observes Changed and Depleted; this component owns no visuals. LevelFlow clears
     /// TakesHits when the run ends, so a late shot can't play hit feedback over the results (the
-    /// protection timer keeps running, so a post-hit blink still ends).</summary>
+    /// protection timer keeps running, so a post-hit blink still ends). The developer god mode refuses every hit too.</summary>
     [DisallowMultipleComponent]
     public sealed class ShipShield : MonoBehaviour, IDamageable
     {
@@ -38,7 +39,7 @@ namespace GeometricFlight.Player
         /// <summary>Destroys the ship regardless of remaining segments or protection.</summary>
         public bool Destroy()
         {
-            if (!TakesHits || !State.Deplete()) return false;
+            if (!TakesHits || DevCheats.GodMode || !State.Deplete()) return false;
             RaiseHit();
             Depleted?.Invoke();
             return true;
@@ -46,7 +47,7 @@ namespace GeometricFlight.Player
 
         public bool ApplyHit(int damage = 1)
         {
-            if (!TakesHits || !State.TryHit()) return false;
+            if (!TakesHits || DevCheats.GodMode || !State.TryHit()) return false;
             RaiseHit();
             if (State.IsDepleted) Depleted?.Invoke();
             return true;

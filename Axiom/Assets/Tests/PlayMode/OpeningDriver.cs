@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using GeometricFlight.Combat;
 using GeometricFlight.Core;
+using GeometricFlight.Dev;
 using GeometricFlight.Input;
 using GeometricFlight.Player;
 using GeometricFlight.Presentation;
@@ -99,6 +100,7 @@ namespace GeometricFlight.Tests
                 GameSettings.CockpitEnabled = wasCockpit;
                 GameSettings.Save();
             };
+            DevCheats.Suspended = true; // A developer's saved god mode would hide the hits these tests count.
             GameSettings.CockpitEnabled = false;
             GameSettings.ArcadeMode = crt;
             GameSettings.ReducedEntryAnimation = false;
@@ -120,6 +122,7 @@ namespace GeometricFlight.Tests
         {
             Application.logMessageReceived -= RecordWarning;
             restoreSettings?.Invoke();
+            DevCheats.Suspended = false;
             if (keyboard == null) return;
             InputSystem.RemoveDevice(keyboard);
             InputSystem.settings.backgroundBehavior = realBackground;

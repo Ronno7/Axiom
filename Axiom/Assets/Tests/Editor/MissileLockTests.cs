@@ -160,5 +160,18 @@ namespace GeometricFlight.Tests
             Assert.AreEqual(0, state.Locks.Count);
             Assert.AreEqual(0, state.Step(0.1f, false, true, 7, seen, seen).Length);
         }
+
+        [Test]
+        public void Refill_TopsUpASpentBankButNotAnUnissuedOne()
+        {
+            Step(0.25f);
+            Step(0.01f, false);
+            Assert.AreEqual(7, state.Ammo);
+            state.Refill();
+            Assert.AreEqual(8, state.Ammo);
+            state.Unload();
+            state.Refill();
+            Assert.AreEqual(0, state.Ammo);
+        }
     }
 }

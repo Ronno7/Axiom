@@ -37,6 +37,14 @@ namespace GeometricFlight.Combat
             Ammo = this.capacity;
         }
 
+        /// <summary>Tops the bank up at once (the developer infinite missiles). A bank not issued yet stays empty.</summary>
+        public void Refill()
+        {
+            if (Unloaded) return;
+            Ammo = capacity;
+            refill = 0f;
+        }
+
         /// <param name="valid">Alive, in range, and unobstructed targets, including those outside the cone.</param>
         /// <param name="inCone">Visible targets inside the acquisition cone.</param>
         public int[] Step(float deltaTime, bool held, bool allowed, int candidate,

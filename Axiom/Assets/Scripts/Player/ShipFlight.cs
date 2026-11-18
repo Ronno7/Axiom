@@ -98,6 +98,13 @@ namespace GeometricFlight.Player
             transform.SetPositionAndRotation(state.Position, state.Rotation);
         }
 
+        /// <summary>Full boost charge with no recharge delay (the developer infinite boost). A burst in progress runs on.</summary>
+        public void RefillBoost()
+        {
+            state.Boost.Charge = 1f;
+            state.Boost.Delay = 0f;
+        }
+
         public void HoldForEntry() => EntryHeld = true;
 
         /// <summary>Stages the complete actor state during entry. After admission presentation can no
