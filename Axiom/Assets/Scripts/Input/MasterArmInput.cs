@@ -3,7 +3,8 @@ using UnityEngine.InputSystem;
 
 namespace GeometricFlight.Input
 {
-    /// <summary>Weapons authority: the MASTER ARM switch while a cockpit is connected, T on the keyboard otherwise.</summary>
+    /// <summary>Weapons authority: the MASTER ARM switch while a cockpit is connected, T on the keyboard or View on a
+    /// gamepad otherwise.</summary>
     [DefaultExecutionOrder(-25), DisallowMultipleComponent]
     public sealed class MasterArmInput : FlightInputSource
     {
@@ -19,7 +20,11 @@ namespace GeometricFlight.Input
         public FlightInput RawInput { get; private set; }
         public bool RefusedThisFrame => authority.RefusedThisFrame;
 
-        private void Awake() => toggle = new InputAction("Master Arm", InputActionType.Button, "<Keyboard>/t");
+        private void Awake()
+        {
+            toggle = new InputAction("Master Arm", InputActionType.Button, "<Keyboard>/t");
+            toggle.AddBinding("<Gamepad>/select");
+        }
         private void OnEnable() => toggle.Enable();
         private void OnDisable() { toggle.Disable(); authority.RequireRelease(); }
         private void OnDestroy() => toggle.Dispose();

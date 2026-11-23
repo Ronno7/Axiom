@@ -23,6 +23,9 @@ namespace GeometricFlight.Input
         private InputAction pause;
         private float throttleSetting;
 
+        /// <summary>True when this frame's read had a key in use: the keyboard is the one being flown.</summary>
+        public bool Actuated { get; private set; }
+
         private void Awake()
         {
             steering = new InputAction("Flight Steering", InputActionType.Value);
@@ -92,12 +95,17 @@ namespace GeometricFlight.Input
 
         public override FlightInput ReadInput(float deltaTime)
         {
+            Actuated = false;
             if (!isActiveAndEnabled || steering == null) return default;
-            throttleSetting = Mathf.Clamp(throttleSetting + throttle.ReadValue<float>()
+            float change = throttle.ReadValue<float>();
+            throttleSetting = Mathf.Clamp(throttleSetting + change
                 * Mathf.Max(0f, throttleChangeRate) * Mathf.Max(0f, deltaTime), -1f, 1f);
-            return new FlightInput(steering.ReadValue<Vector2>(), throttleSetting,
+            var input = new FlightInput(steering.ReadValue<Vector2>(), throttleSetting,
                 fire.IsPressed(), pause.WasPressedThisFrame(), twist.ReadValue<float>(), missileLock.IsPressed(),
                 empHeld: emp.IsPressed());
+            Actuated = change != 0f || input.Steering.sqrMagnitude > 0f || input.Twist != 0f || input.FireHeld
+                || input.LockHeld || input.EmpHeld || input.PausePressed;
+            return input;
         }
     }
 }
