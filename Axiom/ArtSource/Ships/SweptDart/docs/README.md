@@ -7,6 +7,6 @@ game yet.
   [rear](../reviews/v13/presentation/ship-rear.png) and [underside](../reviews/v13/presentation/ship-underside.png)
 - [Sequence stages](../reviews/v13/presentation/sequence-sheet.jpg), [full speed](../reviews/v13/presentation/sequence-normal.mp4)
   and [quarter speed](../reviews/v13/presentation/sequence-slow.mp4)
-- [Import package](../reviews/v14/export/README.md)
+- [Import package](../reviews/v15/export/README.md)
 
 These are studio renders, not game captures. Blender sources stay local.

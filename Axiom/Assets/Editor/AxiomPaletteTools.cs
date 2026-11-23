@@ -65,7 +65,23 @@ namespace GeometricFlight.Editor
             { "GroundGrid", new[] { new Tint("_BaseColor", AxiomPalette.Structure), new Tint("_LineColor", AxiomPalette.Cyan, 0.9f) } },
             { "PassageMarking", new[] { new Tint("_BaseColor", AxiomPalette.Text), new Tint("_EdgeColor", AxiomPalette.Cyan, 2.5f) } },
             { "DarkRed", new[] { new Tint("_BaseColor", AxiomPalette.Ember, 0.4f), new Tint("_EmissionColor", AxiomPalette.Ember, 1.5f), new Tint("_SpecColor", AxiomPalette.White, 0.2f) } },
-            { "GeometricExhaust", Array.Empty<Tint>() }
+            { "GeometricExhaust", Array.Empty<Tint>() },
+            // The Swept Dart (material-bindings.json): one palette base each, the construction front in Cyan.
+            { "SweptDart_Hull_Hull_Light", SweptDart(AxiomPalette.Light) },
+            { "SweptDart_Hull_Secondary_facet_Text", SweptDart(AxiomPalette.Text) },
+            { "SweptDart_Hull_Inset_Void", SweptDart(AxiomPalette.Void) },
+            { "SweptDart_Hull_Chamfer_Edge", SweptDart(AxiomPalette.Edge) },
+            { "SweptDart_Hull_Shield_carrier_Structure", SweptDart(AxiomPalette.Structure) },
+            { "SweptDart_Systems_Permanent_light_placement_Cyan", SweptDart(AxiomPalette.Cyan) },
+            { "SweptDart_Systems_Shield_and_drive_core_placement_Light", SweptDart(AxiomPalette.Light) },
+            { "SweptDart_Interior_Interior_supports_Edge", SweptDart(AxiomPalette.Edge) },
+            { "SweptDart_Interior_Interior_frame_Structure", SweptDart(AxiomPalette.Structure) },
+            { "SweptDart_Interior_Interior_machinery_Text", SweptDart(AxiomPalette.Text) },
+            { "SweptDart_Interior_Interior_circuits_Cyan", SweptDart(AxiomPalette.Cyan) },
+            { "SweptDart_Interior_Interior_seat_and_cavities_Void", SweptDart(AxiomPalette.Void) },
+            { "SweptDart_Interior_Interior_controls_Light", SweptDart(AxiomPalette.Light) },
+            { "SweptDart_Construction_Cyan", Base(AxiomPalette.Cyan) },
+            { "SweptDart_Shield_Lost_Edge", SweptDart(AxiomPalette.Edge) },
         };
 
         /// <returns>Number of changed properties. Assets are marked dirty but are not saved.</returns>
@@ -139,6 +155,8 @@ namespace GeometricFlight.Editor
         }
 
         private static Tint[] Base(Color color, float intensity = 1f) => new[] { new Tint("_BaseColor", color, intensity) };
+        private static Tint[] SweptDart(Color color) =>
+            new[] { new Tint("_BaseColor", color), new Tint("_EdgeColor", AxiomPalette.Cyan) };
 
         private static void VisitAssets(Pass pass, bool includePrefabs)
         {

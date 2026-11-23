@@ -1,0 +1,168 @@
+{
+  "scope": "Unity ModelImporter in an isolated headless project. FBX assets only. The live Axiom scene, materials, EXRs and gameplay were not opened or exercised.",
+  "editor_version": "6000.3.24f1",
+  "passed": true,
+  "units": "metres",
+  "import_settings": {
+    "bake_axis_conversion": true,
+    "scale_factor": 1,
+    "convert_units": true,
+    "read_write": false,
+    "source": "Exact copy of existing Axiom model importer .meta files for v15; v14 used identical settings with distinct GUIDs."
+  },
+  "v14_control": {
+    "reproduced_three_faults": true,
+    "surface_z_min_max": [
+      -2.5,
+      1.644
+    ],
+    "left_aperture_center": [
+      -0.75,
+      0.0,
+      -1.103
+    ],
+    "left_drive_center": [
+      -0.85,
+      0.0,
+      1.643
+    ],
+    "socket_names_and_local_positions": {
+      "Muzzle_L.011": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Muzzle_R.011": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Exhaust_L.011": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Exhaust_R.011": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "v15": {
+    "surface_bounds": {
+      "min": [
+        -2.0,
+        -0.28,
+        -1.644
+      ],
+      "max": [
+        2.0,
+        0.51,
+        2.5
+      ]
+    },
+    "left_aperture_center": [
+      -0.75,
+      0.0,
+      1.103
+    ],
+    "left_drive_center": [
+      -0.85,
+      0.0,
+      -1.643
+    ],
+    "all_model_roots_identity": true,
+    "all_nodes_positive_unit_scale": true,
+    "four_uv_channels_on_all_19_renderers": true,
+    "hull_winding": {
+      "triangles": 1564,
+      "alignedWinding": 1564,
+      "reversedWinding": 0,
+      "degenerate": 0
+    },
+    "sockets_local_and_world": {
+      "Muzzle_L": [
+        -0.75,
+        0.0,
+        1.1
+      ],
+      "Muzzle_R": [
+        0.75,
+        0.0,
+        1.1
+      ],
+      "Exhaust_L": [
+        -0.85,
+        0.0,
+        -1.64
+      ],
+      "Exhaust_R": [
+        0.85,
+        0.0,
+        -1.64
+      ]
+    },
+    "all_socket_local_and_world_forward": [
+      0,
+      0,
+      1
+    ],
+    "all_socket_local_and_world_up": [
+      0,
+      1,
+      0
+    ],
+    "files": {
+      "SweptDart.fbx": {
+        "sha256": "9fcae327e49b0f08d2991da87ab5abc5ed605856a1c6210bdb49a21abadee1df",
+        "meshes": 11,
+        "triangles": 3484,
+        "submeshes": 15,
+        "renderer_names": [
+          "Drive_Light_L",
+          "Drive_Light_R",
+          "Hull_Unified",
+          "Permanent_Core",
+          "Permanent_Wing_L",
+          "Permanent_Wing_R",
+          "Shield_Segment_1",
+          "Shield_Segment_2",
+          "Shield_Segment_3",
+          "Weapon_Aperture_L",
+          "Weapon_Aperture_R"
+        ]
+      },
+      "SweptDart_Interior.fbx": {
+        "sha256": "73a46bf471cae1cf0fc2b20dd0f8747ca0e222239c0f3761f385d04db23d11bf",
+        "meshes": 7,
+        "triangles": 2132,
+        "submeshes": 23,
+        "renderer_names": [
+          "Interior_Chassis",
+          "Interior_Cockpit",
+          "Interior_Engine_L",
+          "Interior_Engine_R",
+          "Interior_Services",
+          "Interior_Spar_L",
+          "Interior_Spar_R"
+        ]
+      },
+      "SweptDart_Construction.fbx": {
+        "sha256": "8c1349a04225ab777a0ff2479b175d7c8680224496e52efce0bd80e49aa36e68",
+        "meshes": 1,
+        "triangles": 18240,
+        "submeshes": 1,
+        "renderer_names": [
+          "Construction_Traces"
+        ]
+      }
+    },
+    "all_mesh_winding": {
+      "triangles": 23856,
+      "alignedWinding": 23856,
+      "reversedWinding": 0,
+      "degenerate": 0
+    }
+  }
+}

@@ -130,3 +130,9 @@ __pycache__/
 !/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/sequence-sheet.jpg
 !/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/shield-sheet.jpg
 !/Axiom/ArtSource/Ships/SweptDart/reviews/v14/qa/runtime-sequence.mp4
+/Axiom/ArtSource/Ships/SweptDart/reviews/v15/*
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v15/export/
+/Axiom/ArtSource/Ships/SweptDart/reviews/v15/export/*.blend
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v15/qa/
+/Axiom/ArtSource/Ships/SweptDart/reviews/v15/qa/*
+!/Axiom/ArtSource/Ships/SweptDart/reviews/v15/qa/unity-import-proof.json

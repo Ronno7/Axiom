@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "scope": "Serialized FBX in the basis measured in Unity 6000.3.24f1 with Bake Axis Conversion on.",
+  "fbx_sha256": {
+    "SweptDart.fbx": "9fcae327e49b0f08d2991da87ab5abc5ed605856a1c6210bdb49a21abadee1df",
+    "SweptDart_Interior.fbx": "73a46bf471cae1cf0fc2b20dd0f8747ca0e222239c0f3761f385d04db23d11bf",
+    "SweptDart_Construction.fbx": "8c1349a04225ab777a0ff2479b175d7c8680224496e52efce0bd80e49aa36e68"
+  },
+  "mesh_count": 19,
+  "triangle_count": 23856,
+  "unity_socket_positions": {
+    "Exhaust_L": [
+      -0.8500000238418579,
+      0.0,
+      -1.6399999856948853
+    ],
+    "Exhaust_R": [
+      0.8500000238418579,
+      0.0,
+      -1.6399999856948853
+    ],
+    "Muzzle_L": [
+      -0.75,
+      0.0,
+      1.100000023841858
+    ],
+    "Muzzle_R": [
+      0.75,
+      0.0,
+      1.100000023841858
+    ]
+  },
+  "unity_aperture_and_drive_centers": {
+    "Drive_Light_L": [
+      -0.8500000238418579,
+      0.0,
+      -1.6430000066757202
+    ],
+    "Drive_Light_R": [
+      0.8500000238418579,
+      0.0,
+      -1.6430000066757202
+    ],
+    "Weapon_Aperture_L": [
+      -0.75,
+      0.0,
+      1.102999985218048
+    ],
+    "Weapon_Aperture_R": [
+      0.75,
+      0.0,
+      1.102999985218048
+    ]
+  },
+  "max_normal_delta_degrees": 0.013095564429481555,
+  "unity_surface_bounds": [
+    [
+      -2.0,
+      -0.2800000011920929,
+      -1.6440000534057617
+    ],
+    [
+      2.0,
+      0.5099999904632568,
+      2.5
+    ]
+  ]
+}
