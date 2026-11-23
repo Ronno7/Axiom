@@ -1,5 +1,5 @@
 // Axiom cockpit controller firmware for Arduino Uno on a Gravity IO shield. Wiring and protocol: ../README.md.
-// Sends one packet every 20 ms:   AX,<x>,<y>,<mm>,<fire>,<menu>,<twist>,<emp>,<arm>,<lock>*HH
+// Sends one packet every 20 ms:   AX,<x>,<y>,<throttle>,<fire>,<menu>,<twist>,<emp>,<arm>,<lock>*HH
 // Accepts buzzer commands:        BZ,<hz>,<ms>*HH
 // Accepts LCD rows:               LT,<row>,<text>*HH
 // Accepts rumble:                 RM,<level 0-255>,<ms>*HH   ms = 0 sets the steady level; ms > 0 is a pulse
@@ -16,6 +16,7 @@
 const uint8_t PIN_JOY_X  = A0;   // stick left-right, right = high
 const uint8_t PIN_JOY_Y  = A1;   // stick forward-back, forward = high
 const uint8_t PIN_TWIST  = A2;   // stick twist, clockwise = high
+const uint8_t PIN_THROTTLE = A3; // 100 mm fader's wiper; its ends on 5 V and GND (calibration sets the direction)
 const uint8_t PIN_FIRE   = 2;    // stick top button to GND
 const uint8_t PIN_EMP    = 3;    // 60 mm dome, NO to GND
 const uint8_t PIN_MENU   = 4;    // 30 mm button, NO to GND
@@ -23,15 +24,11 @@ const uint8_t PIN_LIGHTS = 6;    // WS2812B string DIN, through 330 Ohm
 const uint8_t PIN_RUMBLE = 5;   // DFR0440 vibration module (PWM; Timer0, so beep() on Timer2 doesn't disturb it)
 const uint8_t PIN_ARM    = 7;    // MASTER ARM: +5 V when armed, 10 kOhm pull-down when safe
 const uint8_t PIN_BUZZER = 8;    // DFR0032 passive buzzer (PB0: beep()'s interrupts switch it directly)
-const uint8_t PIN_TRIG   = 9;    // HC-SR04 TRIG
-const uint8_t PIN_ECHO   = 10;   // HC-SR04 ECHO
 const uint8_t PIN_LOCK   = 11;   // missile button, COM to GND and NO to D11
 const uint8_t PIN_LAMP   = 12;   // EMP dome's lamp (12 V part with its own resistor: a few mA at 5 V)
 
 // ---- Timing ----
 const unsigned long SEND_INTERVAL_MS  = 20;     // 50 packets per second
-const unsigned long SONAR_INTERVAL_MS = 60;     // HC-SR04 needs ~60 ms between pings
-const unsigned long ECHO_TIMEOUT_US   = 25000;  // ~4 m; no echo in time -> -1
 const unsigned long DEBOUNCE_MS       = 15;
 const unsigned long GAME_SILENCE_MS   = 3000;   // no commands for this long -> standby screen and self-test
 const unsigned long RUMBLE_HOLD_MS    = 1500;   // steady rumble lasts this long after the last RM
@@ -84,9 +81,7 @@ const uint8_t BUTTON_COUNT = sizeof(buttons) / sizeof(buttons[0]);
 
 Adafruit_NeoPixel lights(LIGHT_COUNT, PIN_LIGHTS, NEO_GRB + NEO_KHZ800);
 
-long distanceMm = -1;
 unsigned long lastSend = 0;
-unsigned long lastSonar = 0;
 unsigned long lastCommand = 0;   // any valid command from the game
 bool gameActive = false;
 char command[48];  // an LT row with every cell escaped is 40 characters
@@ -115,10 +110,7 @@ void setup() {
   pinMode(PIN_ARM, INPUT);         // external 10 kOhm pull-down
   pinMode(PIN_RUMBLE, OUTPUT);
   pinMode(PIN_LAMP, OUTPUT);
-  pinMode(PIN_TRIG, OUTPUT);
-  pinMode(PIN_ECHO, INPUT);
   pinMode(PIN_BUZZER, OUTPUT);
-  digitalWrite(PIN_TRIG, LOW);
   analogWrite(PIN_RUMBLE, 0);
   lights.begin();
   lights.setBrightness(LIGHT_BRIGHTNESS);
@@ -134,10 +126,6 @@ void loop() {
   unsigned long now = millis();
   for (Button *b : buttons) updateButton(*b, now);
 
-  if (now - lastSonar >= SONAR_INTERVAL_MS) {
-    lastSonar = now;
-    distanceMm = readDistanceMm();
-  }
   if (now - lastSend >= SEND_INTERVAL_MS) {
     lastSend = now;
     updateLights(now);
@@ -164,17 +152,6 @@ void updateButton(Button &b, unsigned long now) {
   }
 }
 
-long readDistanceMm() {
-  digitalWrite(PIN_TRIG, LOW);
-  delayMicroseconds(2);
-  digitalWrite(PIN_TRIG, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(PIN_TRIG, LOW);
-  unsigned long echoUs = pulseIn(PIN_ECHO, HIGH, ECHO_TIMEOUT_US);
-  if (echoUs == 0) return -1;             // no echo: out of range or nothing in front
-  return (long)(echoUs * 343UL / 2000UL); // speed of sound 343 m/s, there and back
-}
-
 uint8_t checksum(const char *body) {
   uint8_t sum = 0;
   while (*body) sum ^= (uint8_t)*body++;
@@ -183,8 +160,8 @@ uint8_t checksum(const char *body) {
 
 void sendPacket() {
   char body[48];
-  snprintf(body, sizeof(body), "AX,%d,%d,%ld,%d,%d,%d,%d,%d,%d",
-           analogRead(PIN_JOY_X), analogRead(PIN_JOY_Y), distanceMm,
+  snprintf(body, sizeof(body), "AX,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+           analogRead(PIN_JOY_X), analogRead(PIN_JOY_Y), analogRead(PIN_THROTTLE),
            fireButton.stable ? 1 : 0, menuButton.stable ? 1 : 0,
            analogRead(PIN_TWIST), empButton.stable ? 1 : 0, armSwitch.stable ? 1 : 0,
            lockButton.stable ? 1 : 0);
@@ -488,7 +465,7 @@ void lcdText(uint8_t row, const char *text) {
 
 // Without the game, the display shows a spinning octahedron and a live self-test of every input:
 //   row 0: octahedron, AXIOM, and F E M A when FIRE, EMP, MENU are pressed and MASTER ARM is armed
-//   row 1: distance, then stick X, Y and twist (0-99)
+//   row 1: throttle (0-99 %), then stick X, Y and twist (0-99)
 void drawStandby(unsigned long now) {
   if (now - lastStandbyFrame < STANDBY_FRAME_MS) return;
   lastStandbyFrame = now;
@@ -504,8 +481,8 @@ void drawStandby(unsigned long now) {
   int x = (int)(analogRead(PIN_JOY_X) * 99L / 1023);
   int y = (int)(analogRead(PIN_JOY_Y) * 99L / 1023);
   int twist = (int)(analogRead(PIN_TWIST) * 99L / 1023);
-  if (distanceMm < 0) snprintf(text, sizeof(text), "---mm X%02dY%02dT%02d", x, y, twist);
-  else snprintf(text, sizeof(text), "%4ldmm X%02dY%02dT%02d", min(distanceMm, 9999L), x, y, twist);
+  int throttle = (int)(analogRead(PIN_THROTTLE) * 99L / 1023);
+  snprintf(text, sizeof(text), "THR%02d X%02dY%02dT%02d", throttle, x, y, twist);
   lcdText(1, text);
 }
 

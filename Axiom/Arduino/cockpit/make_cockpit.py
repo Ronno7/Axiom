@@ -1,12 +1,15 @@
-"""Axiom cockpit controller (v2), built in Blender from the design dimensions.
+"""Axiom cockpit controller (v3), built in Blender from the design dimensions.
 
 Run with Blender 5.x:
-  blender -b --factory-startup --python make_cockpit.py               (build, save .blend + .glb)
+  blender -b --factory-startup --python make_cockpit.py               (build, save .blend + .glb, cut files)
   blender -b --factory-startup --python make_cockpit.py -- --render    (plus preview renders)
-  blender -b --factory-startup --python make_cockpit.py -- --panel     (only the panel cut file + template)
+  blender -b --factory-startup --python make_cockpit.py -- --cut       (only the cut files + template)
 
 All sizes are millimetres. Panel coordinates: x from the left edge, y from the front edge measured
 along the sloped top, z up from the top surface. Change the numbers below and rerun.
+
+Every flat part (panel, body, posts, knob, light boxes) is one outline, used both for its laser cut file in
+cut/ (DXF, inches, one part per file, quantities in cut/parts.csv) and for the model.
 """
 import math
 import sys
@@ -22,24 +25,29 @@ RENDER = "--render" in sys.argv
 # ---------------- Design dimensions ----------------
 # The footprint is set by two things: the throttle's front-to-back travel (depth) and the spacing
 # between the throttle hand and the stick hand (width).
-W, D, PALM, THR_X, TRAVEL, NEAR, SLED = 420.0, 245.0, 65.0, 72.0, 100.0, 40.0, 40.0
-KNOB, STICK, ARM = (42.0, 50.0), (345.0, 130.0), (140.0, 185.0)
+W, D, PALM, THR_X, TRAVEL = 420.0, 245.0, 65.0, 72.0, 100.0
+KNOB, STICK, ARM = (30.0, 26.0), (345.0, 130.0), (140.0, 185.0)
 CENTRE, BIG_Y, BTN_Y, LCD_Y, ANN_Y, WORD_Y = 222.0, 103.0, 160.0, 200.0, 230.0, 215.0
 H_FRONT = 60.0                 # front height (top of the panel), back is higher by the slope
 SLOPE = 8.0                    # degrees
-T_TOP, T_WOOD = 3.0, 6.0       # acrylic top, Baltic birch body
+T_TOP, T_WOOD = 3.0, 6.35      # 3 mm black acrylic top; SendCutSend's .250" Baltic birch body
 FEET = 5.0
 
-# Throttle: HC-SR04 at the front of the tunnel facing back; the plate travels NEAR..NEAR+TRAVEL
-# from the transducers; the stem sits 25 behind the plate and runs in the slot.
-SENSOR_FACE_Y = 44.0
-STEM_MIN = SENSOR_FACE_Y + NEAR + 25.0
+# Throttle: a Bourns PTL01-15W0-103B1 fader (100 mm travel) screwed under the panel, its lever up through
+# the slot. From its datasheet: M3 tapped holes 120 mm apart, body 128 x 9.3 x 7, lever 2.05 x 6.0 and
+# 15 mm above the mounting face. Cruise is the middle of the travel; push away is faster.
+STEM_MIN = 109.0                                   # lever centre at minimum, along the slope
 STEM_MAX = STEM_MIN + TRAVEL
-SLOT_W = 8.0
-SLOT_Y0, SLOT_Y1 = STEM_MIN - SLOT_W / 2, STEM_MAX + SLOT_W / 2
-LEVER_Y = (STEM_MIN + STEM_MAX) / 2                        # knob shown at cruise
-LED_X = THR_X + KNOB[0] / 2 + 15.0                         # LED bar just clear of the knob
+LEVER_Y = (STEM_MIN + STEM_MAX) / 2                # shown at cruise
+FADER_L, FADER_W, FADER_H, FADER_HOLES = 128.0, 9.3, 7.0, 120.0
+LEVER_T, LEVER_W, LEVER_L = 2.05, 6.0, 15.0        # across, along the travel, above the mounting face
+SLOT_W = 3.5
+SLOT_Y0, SLOT_Y1 = STEM_MIN - LEVER_W / 2 - 1.0, STEM_MAX + LEVER_W / 2 + 1.0
+KNOB_LAYERS, KNOB_LIFT, KNOB_R = 5, 1.0, 5.0       # 3 mm acrylic layers glued on the lever; 1 mm felt under it
+KNOB_SLOT = (2.5, 6.5)                             # the lever's hole, with room for glue
+LED_X = THR_X + 36.0                               # LED bar beside the knob
 LED_YS = [STEM_MIN + TRAVEL / 16 + TRAVEL / 8 * i for i in range(8)]   # LED 1 (min) at the front
+LED_HOLE_R = 2.55
 
 BIG = (CENTRE, BIG_Y)          # EMP: 60 mm red dome arcade button, 24 mm hole (menus: confirm / launch)
 MENU = (CENTRE, BTN_Y)         # 30 mm: pause in flight, back in menus
@@ -53,6 +61,63 @@ NAME = "axiom_cockpit"
 A = math.radians(SLOPE)
 D_SLOPE = D / math.cos(A)      # panel length along the slope
 MM = 0.001
+
+
+def under_h(y):
+    """Height of the panel's underside above the bottom of the box (feet excluded), at plan depth y."""
+    return H_FRONT - T_TOP / math.cos(A) + y * math.tan(A)
+
+
+# ---------------- Body joints ----------------
+# Sides run the full depth; the front and back walls sit between them. Every wall stands on the bottom with
+# tabs down into notches in its edge, and the front and back walls' end tabs fill notches in the sides.
+# Thickness errors only change how flush a joint is, never whether it fits.
+TW = T_WOOD
+CL = 0.15                      # extra length in every notch and mortise, for glue
+SLACK = 0.5                    # extra width across the board in mortises, since plywood runs thick
+H_FRONT_WALL = under_h(0.0)    # touches the panel along its outer top edge
+H_BACK_WALL = under_h(D - TW)  # touches the panel along its inner top edge
+
+
+def tabs(a, b, width, pitch):
+    """Evenly spaced tab spans of one width, centred in a..b."""
+    n = max(1, int((b - a - width) / pitch) + 1)
+    start = (a + b) / 2 - ((n - 1) * pitch + width) / 2
+    return [(start + i * pitch, start + i * pitch + width) for i in range(n)]
+
+
+SIDE_TABS = tabs(TW + 40, D - TW - 40, 20, 50)              # clear of the corner posts' mortises
+WALL_TABS = tabs(3 * TW + 10, W - 3 * TW - 10, 20, 60)
+FRONT_END_TABS = tabs(TW + 6, H_FRONT_WALL - 6, 12, 22)
+BACK_END_TABS = tabs(TW + 6, H_BACK_WALL - 6, 12, 22)
+
+# Posts carry the panel screws: two layers each, parallel to the sides so their tops follow the slope exactly,
+# standing in a mortise in the bottom. Each screw is centred in one layer.
+POST_LEN, POST_TAB = 30.0, (8.0, 22.0)
+POSTS = [  # name, x of the left layer, y of the front end
+    ("front left", TW, TW), ("front right", W - 3 * TW, TW), ("front middle", W / 2 - TW, TW),
+    ("back left", TW, D - TW - POST_LEN), ("back right", W - 3 * TW, D - TW - POST_LEN)]
+SCREW_IN, SCREW_UP = 1.5 * TW, 15.0
+PANEL_SCREWS = [(SCREW_IN, SCREW_UP), (W - SCREW_IN, SCREW_UP), (SCREW_IN, D_SLOPE - SCREW_UP),
+                (W - SCREW_IN, D_SLOPE - SCREW_UP), (W / 2 - TW / 2, SCREW_UP)]
+
+# Uno + Gravity IO shield on M3 standoffs near the back wall, USB jack to the right (towards the panel-mount
+# socket). Its four holes, rotated 180 degrees from Arduino's drawing.
+UNO = (W / 2, D - TW - 6 - 53.34 / 2)
+UNO_HOLES = [(54.61, 50.80), (53.34, 2.54), (2.54, 45.72), (2.54, 17.78)]
+
+# Warning lights: a stack of 3 mm black acrylic plates under the five windows, each cut with the same five
+# windows, so every light has its own tunnel; a floor plate holds the LED modules. A printed paper legend sits
+# between the panel and the stack. In front of the windows 4.5 mm of acrylic (SendCutSend's 1.5x thickness for
+# acrylic), behind them 3.25 mm, all the sloped back wall leaves: the stack clears it by about 1 mm.
+LB_X0, LB_LEN, LB_LAYERS, PAPER = CENTRE - 67.0, 134.0, 3, 0.2
+LB_FRONT, LB_BACK, LB_FLOOR_BACK = 9.5, 8.25, 7.5     # from the windows' centre line to each edge
+LB_WINDOW = (22.0, 10.0)
+
+# Not yet checked against the real parts (measure before ordering): the USB socket's cutout and screws, so the
+# back wall has no USB opening yet; the LED modules (the panel's 5.1 mm holes); the openings in PANEL_TODO.
+USB_SOCKET = None              # (x, z, width, height, screw spacing, screw hole diameter) once measured
+PANEL_TODO = "joystick, EMP, MENU, MASTER ARM, LCD"
 
 
 # ---------------- Scene ----------------
@@ -120,6 +185,7 @@ M = {
     "ply": plywood(),
     "palm": leatherette(),
     "rubber": material("Rubber", (0.02, 0.02, 0.02), rough=0.75),
+    "felt": material("Felt", (0.05, 0.05, 0.055), rough=1.0),
     "metal": material("Metal", (0.72, 0.72, 0.74), rough=0.3, metal=1.0),
     "dark_metal": material("Dark metal", (0.12, 0.12, 0.13), rough=0.35, metal=1.0),
     "red": material("Red plastic", (0.75, 0.02, 0.02), rough=0.22, coat=0.4),
@@ -127,6 +193,8 @@ M = {
     "ink": material("Black print", (0.01, 0.01, 0.01), rough=0.5),
     "red_cover": material("Red cover", (0.85, 0.03, 0.02), rough=0.2, coat=0.5),
     "white": material("White plastic", (0.88, 0.88, 0.86), rough=0.3),
+    "lever": material("Fader lever", (0.9, 0.92, 0.95), rough=0.25, emit=(0.8, 0.85, 1.0), strength=0.6),
+    "paper": material("Legend paper", (0.9, 0.9, 0.88), rough=0.9),
     "black_plastic": material("Black plastic", (0.03, 0.03, 0.03), rough=0.35),
     "label": material("Label print", (0.82, 0.82, 0.8), rough=0.5),
     "led_off": material("LED off", (0.18, 0.18, 0.2), rough=0.1),
@@ -137,11 +205,9 @@ M = {
     "lcd_text": material("LCD text", (1, 1, 1), emit=(0.9, 0.95, 1.0), strength=6),
     "ann_back": material("Annunciator back", (0.015, 0.015, 0.015), rough=0.4),
     "ann_off": material("Annunciator legend off", (0.1, 0.1, 0.1), rough=0.5),
-    "foam": material("Foam board", (0.9, 0.9, 0.88), rough=0.9),
     "pcb_blue": material("PCB blue", (0.02, 0.18, 0.45), rough=0.4),
     "pcb_green": material("PCB green", (0.03, 0.3, 0.12), rough=0.4),
     "terminal": material("Screw terminals", (0.05, 0.45, 0.2), rough=0.4),
-    "sled": material("Sled", (0.83, 0.75, 0.6), rough=0.8),
     "desk": material("Desk", (0.08, 0.075, 0.07), rough=0.55),
 }
 
@@ -205,21 +271,6 @@ def dome(name, cx, cy, z0, r, h, mat, parent=None, coll="Cockpit"):
     return mesh_obj(name, bm, mat, (cx, cy, z0), (0, 0, 0), parent, coll, smooth=True)
 
 
-def prism(name, x0, x1, profile, mat, coll="Cockpit"):
-    """Extrudes a (y, z) polygon from x0 to x1 (used for the sloped side walls)."""
-    bm = bmesh.new()
-    left = [bm.verts.new((x0, y, z)) for y, z in profile]
-    right = [bm.verts.new((x1, y, z)) for y, z in profile]
-    bm.faces.new(list(reversed(left)))
-    bm.faces.new(right)
-    n = len(profile)
-    for i in range(n):
-        j = (i + 1) % n
-        bm.faces.new((left[i], left[j], right[j], right[i]))
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return mesh_obj(name, bm, mat, coll=coll)
-
-
 FONTS = {}
 
 
@@ -254,22 +305,98 @@ def text(name, body, cx, cy, size, mat, parent, z=0.05, rot_z=0.0, face="segoeui
     return ob
 
 
+# ---------------- Flat parts: outlines (mm) ----------------
+# A loop is a closed list of (u, v, bulge) points; bulge is the DXF arc factor for the edge to the next point
+# (0 for a straight edge, 1 for a half circle, positive counter-clockwise). ("circle", cx, cy, r) is a hole.
+def rect(u0, v0, u1, v1):
+    return [(u0, v0, 0), (u1, v0, 0), (u1, v1, 0), (u0, v1, 0)]
+
+
+def rounded_rect(u0, v0, u1, v1, r):
+    b = math.tan(math.pi / 8)
+    return [(u0 + r, v0, 0), (u1 - r, v0, b), (u1, v0 + r, 0), (u1, v1 - r, b), (u1 - r, v1, 0), (u0 + r, v1, b),
+            (u0, v1 - r, 0), (u0, v0 + r, b)]
+
+
+def slot_loop(cu, v0, v1, w):
+    r = w / 2
+    return [(cu + r, v0 + r, 0), (cu + r, v1 - r, 1), (cu - r, v1 - r, 0), (cu - r, v0 + r, 1)]
+
+
+def edge(p0, p1, spans, off):
+    """The points of a straight, axis-aligned edge from p0 up to (not including) p1, stepping out by the vector
+    `off` over each span (a, b) along the edge. A notch steps inwards, a tab outwards."""
+    (u0, v0), (u1, v1) = p0, p1
+    along_u = v0 == v1
+    forward = (u1 > u0) if along_u else (v1 > v0)
+    pts = [(u0, v0)]
+    for a, b in sorted(spans, reverse=not forward):
+        s, e = (a, b) if forward else (b, a)
+        q0, q1 = ((s, v0), (e, v0)) if along_u else ((u0, s), (u0, e))
+        pts += [q0, (q0[0] + off[0], q0[1] + off[1]), (q1[0] + off[0], q1[1] + off[1]), q1]
+    return pts
+
+
+def outline(*runs):
+    out = []
+    for p in (p for run in runs for p in run):
+        if not out or abs(p[0] - out[-1][0]) > 1e-9 or abs(p[1] - out[-1][1]) > 1e-9:
+            out.append(p)
+    if abs(out[0][0] - out[-1][0]) < 1e-9 and abs(out[0][1] - out[-1][1]) < 1e-9:
+        out.pop()
+    return [(u, v, 0) for u, v in out]
+
+
+def widen(spans, by=CL):
+    return [(a - by / 2, b + by / 2) for a, b in spans]
+
+
+def wall_outline(height, end_tabs):
+    """Front or back wall in (x, z): tabs down into the bottom and out into both sides."""
+    return outline(edge((TW, TW), (W - TW, TW), WALL_TABS, (0, -TW)),
+                   edge((W - TW, TW), (W - TW, height), end_tabs, (TW, 0)),
+                   [(W - TW, height)],
+                   edge((TW, height), (TW, TW), end_tabs, (-TW, 0)))
+
+
+def post_outline(y0):
+    """One layer of a panel post in (y, z): its top follows the panel, one tab into the bottom."""
+    y1 = y0 + POST_LEN
+    return outline(edge((y0, TW), (y1, TW), [(y0 + POST_TAB[0], y0 + POST_TAB[1])], (0, -TW)),
+                   [(y1, TW), (y1, under_h(y1)), (y0, under_h(y0))])
+
+
+BOTTOM = outline(edge((0, 0), (W, 0), widen(WALL_TABS), (0, TW)),
+                 edge((W, 0), (W, D), widen(SIDE_TABS), (-TW, 0)),
+                 edge((W, D), (0, D), widen(WALL_TABS), (0, -TW)),
+                 edge((0, D), (0, 0), widen(SIDE_TABS), (TW, 0)))
+BOTTOM_HOLES = [rect(x - SLACK / 2, y + POST_TAB[0] - CL / 2, x + 2 * TW + SLACK / 2, y + POST_TAB[1] + CL / 2)
+                for _, x, y in POSTS]
+BOTTOM_HOLES += [("circle", UNO[0] - 68.58 / 2 + u, UNO[1] - 53.34 / 2 + v, 1.6) for u, v in UNO_HOLES]
+SIDE = outline(edge((0, TW), (D, TW), SIDE_TABS, (0, -TW)),
+               edge((D, TW), (D, under_h(D)), widen(BACK_END_TABS), (-TW, 0)),
+               [(D, under_h(D))],
+               edge((0, under_h(0)), (0, TW), widen(FRONT_END_TABS), (TW, 0)))
+FRONT = wall_outline(H_FRONT_WALL, FRONT_END_TABS)
+BACK = wall_outline(H_BACK_WALL, BACK_END_TABS)
+BACK_HOLES = []
+if USB_SOCKET:
+    ux_, uz_, uw_, uh_, us_, ud_ = USB_SOCKET
+    BACK_HOLES = [rect(ux_ - uw_ / 2, uz_ - uh_ / 2, ux_ + uw_ / 2, uz_ + uh_ / 2)]
+    BACK_HOLES += [("circle", ux_ + s * us_ / 2, uz_, ud_ / 2) for s in (-1, 1)]
+
+KNOB_LAYER = [rounded_rect(0, 0, *KNOB, KNOB_R),
+              rect((KNOB[0] - KNOB_SLOT[0]) / 2, (KNOB[1] - KNOB_SLOT[1]) / 2,
+                   (KNOB[0] + KNOB_SLOT[0]) / 2, (KNOB[1] + KNOB_SLOT[1]) / 2)]
+KNOB_TOP = [rounded_rect(0, 0, *KNOB, KNOB_R)]
+LB_LAYER = [rect(0, 0, LB_LEN, LB_FRONT + LB_BACK)] + [
+    rect(x - LB_X0 - LB_WINDOW[0] / 2, LB_FRONT - LB_WINDOW[1] / 2, x - LB_X0 + LB_WINDOW[0] / 2,
+         LB_FRONT + LB_WINDOW[1] / 2) for _, x, _, _ in ANNUNCIATORS]
+LB_FLOOR = [rect(0, 0, LB_LEN, LB_FRONT + LB_FLOOR_BACK)] + [
+    ("circle", x - LB_X0, LB_FRONT, LED_HOLE_R) for _, x, _, _ in ANNUNCIATORS]
+
 # ---------------- Body (world coordinates) ----------------
-def under_panel_z(y):
-    """Height of the panel's underside above the bottom of the box, at plan depth y."""
-    return FEET + H_FRONT - T_TOP / math.cos(A) + y * math.tan(A)
-
-
 base = FEET
-box("Bottom", W / 2, D / 2, base + T_WOOD / 2, W, D, T_WOOD, M["ply"])
-side_profile = [(0, base + T_WOOD), (D, base + T_WOOD), (D, under_panel_z(D)), (0, under_panel_z(0))]
-prism("Side left", 0, T_WOOD, side_profile, M["ply"])
-prism("Side right", W - T_WOOD, W, side_profile, M["ply"])
-prism("Front wall", T_WOOD, W - T_WOOD,
-      [(0, base + T_WOOD), (T_WOOD, base + T_WOOD), (T_WOOD, under_panel_z(T_WOOD)), (0, under_panel_z(0))], M["ply"])
-prism("Back wall", T_WOOD, W - T_WOOD,
-      [(D - T_WOOD, base + T_WOOD), (D, base + T_WOOD), (D, under_panel_z(D)), (D - T_WOOD, under_panel_z(D - T_WOOD))],
-      M["ply"])
 for i, (fx, fy) in enumerate(((25, 25), (W - 25, 25), (25, D - 25), (W - 25, D - 25))):
     cyl(f"Foot {i + 1}", fx, fy, 0, 10, FEET, M["rubber"])
 # Panel-mount USB-B on the back wall, beside the Uno (its jack faces this way)
@@ -282,31 +409,21 @@ frame.location = Vector((0, 0, FEET + H_FRONT)) * MM
 frame.rotation_euler = (A, 0, 0)
 COLL["Cockpit"].objects.link(frame)
 
-# Top plate with every opening cut out. OPENINGS keeps each one for the cut file and template.
-cut = bmesh.new()
+# Every opening in the top panel, for its cut file, the template and the model.
 OPENINGS = []
 
 
-def cut_cyl(cx, cy, r, record=True):
-    if record:
-        OPENINGS.append(("circle", cx, cy, r))
-    bmesh.ops.create_cone(cut, cap_ends=True, segments=64, radius1=r, radius2=r, depth=20,
-                          matrix=Matrix.Translation((cx, cy, 0)))
+def cut_cyl(cx, cy, r):
+    OPENINGS.append(("circle", cx, cy, r))
 
 
-def cut_box(cx, cy, sx, sy, record=True):
-    if record:
-        OPENINGS.append(("rect", cx, cy, sx, sy))
-    m = Matrix.Translation((cx, cy, 0)) @ Matrix.Diagonal((sx, sy, 20, 1))
-    bmesh.ops.create_cube(cut, size=1.0, matrix=m)
+def cut_box(cx, cy, sx, sy):
+    OPENINGS.append(("rect", cx, cy, sx, sy))
 
 
 def cut_slot(cx, y0, y1, w):
-    """A slot with round ends, y0..y1 overall, recorded as one closed outline."""
+    """A slot with round ends, y0..y1 overall."""
     OPENINGS.append(("slot", cx, y0, y1, w))
-    cut_box(cx, (y0 + y1) / 2, w, y1 - y0 - w, record=False)
-    cut_cyl(cx, y0 + w / 2, w / 2, record=False)
-    cut_cyl(cx, y1 - w / 2, w / 2, record=False)
 
 
 cut_cyl(*STICK, 20.0)
@@ -314,10 +431,12 @@ for dx in (-16.25, 16.25):
     for dy in (-16.25, 16.25):
         cut_cyl(STICK[0] + dx, STICK[1] + dy, 1.4)
 cut_slot(THR_X, SLOT_Y0, SLOT_Y1, SLOT_W)
+for dy in (-FADER_HOLES / 2, FADER_HOLES / 2):
+    cut_cyl(THR_X, LEVER_Y + dy, 1.7)                  # M3 screws into the fader's tapped holes
 for y in LED_YS:
-    cut_cyl(LED_X, y, 2.55)
+    cut_cyl(LED_X, y, LED_HOLE_R)
 for x in SHIELD_XS:
-    cut_cyl(x, SHIELD_YS, 2.55)
+    cut_cyl(x, SHIELD_YS, LED_HOLE_R)
 cut_cyl(*BIG, 12.0)    # uxcell 60 mm dome: 23.5 mm hole
 cut_cyl(*MENU, 14.0)    # Happ-style 30 mm button: 28 mm hole
 cut_cyl(*ARM, 6.0)
@@ -327,9 +446,99 @@ for dx in (-37.5, 37.5):
         cut_cyl(LCD[0] + dx, LCD[1] + dy, 1.6)
 for _, x, _, _ in ANNUNCIATORS:
     cut_box(x, ANN_Y, 22.0, 10.0)
-# Corner and front-middle screws. No back-middle one: it would sit ~1 mm from the FAST window.
-for cx, cy in ((10, 10), (W - 10, 10), (10, D_SLOPE - 10), (W - 10, D_SLOPE - 10), (W / 2, 10)):
+# Five screws into the posts. No back-middle one: it would sit ~1 mm from the FAST window.
+for cx, cy in PANEL_SCREWS:
     cut_cyl(cx, cy, 1.6)
+
+
+def opening_loop(o):
+    if o[0] == "circle":
+        return o
+    if o[0] == "rect":
+        _, cx, cy, sx, sy = o
+        return rect(cx - sx / 2, cy - sy / 2, cx + sx / 2, cy + sy / 2)
+    _, cx, y0, y1, w = o
+    return slot_loop(cx, y0, y1, w)
+
+
+ACRYLIC, BIRCH = "Acrylic 0.118 in black (3 mm)", "Baltic birch plywood 0.250 in (6.35 mm)"
+PARTS = [  # file name, material, quantity, loops (outline first)
+    ("panel", ACRYLIC, 1, [rect(0, 0, W, D_SLOPE)] + [opening_loop(o) for o in OPENINGS]),
+    ("knob_layer", ACRYLIC, 2 * (KNOB_LAYERS - 1), KNOB_LAYER),          # two knobs: one spare
+    ("knob_top", ACRYLIC, 2, KNOB_TOP),
+    ("light_box_layer", ACRYLIC, LB_LAYERS, LB_LAYER),
+    ("light_box_floor", ACRYLIC, 1, LB_FLOOR),
+    ("bottom", BIRCH, 1, [BOTTOM] + BOTTOM_HOLES),
+    ("side", BIRCH, 2, [SIDE]),
+    ("front", BIRCH, 1, [FRONT]),
+    ("back", BIRCH, 1, [BACK] + BACK_HOLES),
+    ("post_front", BIRCH, 2 * 3, [post_outline(TW)]),
+    ("post_back", BIRCH, 2 * 2, [post_outline(D - TW - POST_LEN)]),
+]
+
+
+def loop_points(lp, seg_deg=6.0):
+    """A loop as plain (u, v) points, arcs expanded."""
+    if lp[0] == "circle":
+        _, cx, cy, r = lp
+        n = 48
+        return [(cx + r * math.cos(2 * math.pi * i / n), cy + r * math.sin(2 * math.pi * i / n)) for i in range(n)]
+    pts = []
+    for i, (u, v, b) in enumerate(lp):
+        pts.append((u, v))
+        if not b:
+            continue
+        u1, v1, _ = lp[(i + 1) % len(lp)]
+        chord = math.hypot(u1 - u, v1 - v)
+        off = chord / 2 * (1 - b * b) / (2 * b)              # from the chord's middle to the centre, leftwards
+        cx = (u + u1) / 2 - (v1 - v) / chord * off
+        cy = (v + v1) / 2 + (u1 - u) / chord * off
+        sweep = 4 * math.atan(b)
+        r, a0 = math.hypot(u - cx, v - cy), math.atan2(v - cy, u - cx)
+        n = max(2, int(abs(math.degrees(sweep)) / seg_deg))
+        pts += [(cx + r * math.cos(a0 + sweep * k / n), cy + r * math.sin(a0 + sweep * k / n)) for k in range(1, n)]
+    return pts
+
+
+def write_dxf(path, loops):
+    """One part as an R12 DXF in inches, shifted so its lower left corner is at the origin."""
+    pts = [p for lp in loops for p in loop_points(lp)]
+    u0, v0 = min(p[0] for p in pts), min(p[1] for p in pts)
+    inch = lambda x: f"{x / 25.4:.6f}"
+    out = ["0", "SECTION", "2", "HEADER", "9", "$ACADVER", "1", "AC1009", "9", "$INSUNITS", "70", "1",
+           "0", "ENDSEC", "0", "SECTION", "2", "ENTITIES"]
+    for lp in loops:
+        if lp[0] == "circle":
+            _, cx, cy, r = lp
+            out += ["0", "CIRCLE", "8", "0", "10", inch(cx - u0), "20", inch(cy - v0), "30", "0", "40", inch(r)]
+            continue
+        out += ["0", "POLYLINE", "8", "0", "66", "1", "70", "1", "10", "0", "20", "0", "30", "0"]
+        for u, v, b in lp:
+            out += ["0", "VERTEX", "8", "0", "10", inch(u - u0), "20", inch(v - v0), "30", "0"]
+            if b:
+                out += ["42", f"{b:.6f}"]
+        out += ["0", "SEQEND", "8", "0"]
+    out += ["0", "ENDSEC", "0", "EOF"]
+    path.write_text("\n".join(out) + "\n", encoding="ascii")
+    return max(p[0] for p in pts) - u0, max(p[1] for p in pts) - v0
+
+
+def write_cut_files():
+    """cut/<part>.dxf for every flat part, and cut/parts.csv with material, quantity and size."""
+    out = HERE / "cut"
+    out.mkdir(exist_ok=True)
+    for old in out.glob("*.dxf"):          # parts that no longer exist
+        if old.stem not in {p[0] for p in PARTS}:
+            old.unlink()
+    rows = ["file,material,quantity,width_in,height_in,width_mm,height_mm"]
+    for name, mat, qty, loops in PARTS:
+        w, h = write_dxf(out / f"{name}.dxf", loops)
+        rows.append(f'{name}.dxf,"{mat}",{qty},{w / 25.4:.3f},{h / 25.4:.3f},{w:.1f},{h:.1f}')
+    (out / "parts.csv").write_text("\n".join(rows) + "\n", encoding="utf-8")
+    print(f"Wrote {len(PARTS)} cut files to {out}")
+    if not USB_SOCKET:
+        print("NOTE: the back wall has no USB opening until USB_SOCKET is measured.")
+    print(f"NOTE: panel openings from listings, not measured: {PANEL_TODO}; LED holes {2 * LED_HOLE_R} mm.")
 
 
 # ---------------- Panel cut file and printable template ----------------
@@ -356,28 +565,30 @@ def svg_text(x, y, body, size=3.5, anchor="middle", rot=0, color="#333"):
 
 
 def write_panel_files():
-    """panel_cut.svg: 1:1 outline + openings for the laser cutter (mm, hairlines, no text).
+    """panel_cut.svg: 1:1 outline + openings (a preview; the order uses cut/panel.dxf).
     panel_template.svg: the same with part footprints, labels and a 10 mm grid, for a cardboard mock-up.
     panel_template.html: that template tiled over 4 landscape Letter pages for printing at 100 %."""
     shapes = "\n".join(svg_shape(o) for o in OPENINGS)
-    outline = f'<rect x="0" y="0" width="{W:g}" height="{D_SLOPE:.2f}"/>'
+    outline_ = f'<rect x="0" y="0" width="{W:g}" height="{D_SLOPE:.2f}"/>'
     (HERE / "panel_cut.svg").write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W:g}mm" height="{D_SLOPE:.2f}mm" '
         f'viewBox="0 0 {W:g} {D_SLOPE:.2f}">\n<g fill="none" stroke="#000" stroke-width="0.1">\n'
-        f'{outline}\n{shapes}\n</g>\n</svg>\n', encoding="utf-8")
+        f'{outline_}\n{shapes}\n</g>\n</svg>\n', encoding="utf-8")
 
     grid = "".join(f'<line x1="{x}" y1="0" x2="{x}" y2="{D_SLOPE:.2f}"/>' for x in range(10, int(W), 10))
     grid += "".join(f'<line x1="0" y1="{svg_y(y):.2f}" x2="{W:g}" y2="{svg_y(y):.2f}"/>'
                     for y in range(10, int(D_SLOPE), 10))
     ax_, ay_ = ARM
-    feet = [  # footprints of the parts above the panel (dashed), from the listings
+    feet = [  # footprints of the parts above and below the panel (dashed), from the listings
         ("circle", STICK[0], STICK[1], 26.75), ("rect", THR_X, LEVER_Y, KNOB[0], KNOB[1]),
+        ("rect", THR_X, LEVER_Y, FADER_W, FADER_L),
         ("circle", BIG[0], BIG[1], 30.0), ("circle", MENU[0], MENU[1], 16.65),
         ("rect", ax_, ay_, 28.0, 40.0), ("rect", LCD[0], LCD[1], 80.0, 36.0),
     ]
     labels = [
         svg_text(STICK[0], STICK[1] - 33, "STICK: 40 mm hole, M3 on a 32.5 mm square"),
-        svg_text(THR_X - KNOB[0] / 2 - 5, LEVER_Y, "THROTTLE: 8 mm slot, knob at cruise", rot=-90),
+        svg_text(THR_X - KNOB[0] / 2 - 5, LEVER_Y, "THROTTLE: 100 mm fader under a 3.5 mm slot, knob at cruise",
+                 rot=-90),
         svg_text(LED_X + 7, (LED_YS[0] + LED_YS[-1]) / 2, "8 throttle lights", rot=-90),
         svg_text(BIG[0], BIG[1] - 20, "EMP: 60 mm dome, 24 mm hole"),
         svg_text(MENU[0] - 20, MENU[1] - 1, "MENU: 28 mm hole", anchor="end"),
@@ -392,7 +603,7 @@ def write_panel_files():
             f'stroke-width="0.25" stroke-dasharray="3 2"/>\n'
             f'<g fill="none" stroke="#888" stroke-width="0.25" stroke-dasharray="2 1.5">\n'
             + "\n".join(svg_shape(f) for f in feet) + '\n</g>\n'
-            f'<g fill="none" stroke="#000" stroke-width="0.3">\n{outline}\n{shapes}\n</g>\n'
+            f'<g fill="none" stroke="#000" stroke-width="0.3">\n{outline_}\n{shapes}\n</g>\n'
             f'<g font-family="Arial, sans-serif">\n' + "\n".join(labels) + '\n</g>\n')
     (HERE / "panel_template.svg").write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W:g}mm" height="{D_SLOPE:.2f}mm" '
@@ -428,31 +639,95 @@ def write_panel_files():
         '</style></head><body>\n' + "\n".join(pages) + '\n</body></html>\n', encoding="utf-8")
     print("Wrote panel_cut.svg, panel_template.svg, panel_template.html")
 
+    # The legend strip behind the warning windows: white words on black, so only the words glow. Print at 100 %,
+    # cut along the outline (the light box stack's size) and lay it face up between the panel and the stack.
+    h = LB_FRONT + LB_BACK
+    words = "\n".join(
+        f'<text x="{x - LB_X0 + 10:.2f}" y="{LB_BACK + 1.9:.2f}" font-size="5.2" font-weight="bold" '
+        f'text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">{name}</text>'
+        for name, x, _, _ in ANNUNCIATORS)
+    (HERE / "legends.svg").write_text(
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{LB_LEN + 20:g}mm" height="{h + 24:g}mm" '
+        f'viewBox="0 0 {LB_LEN + 20:g} {h + 24:g}">\n'
+        f'<rect x="10" y="10" width="{LB_LEN:g}" height="{h:g}" fill="#000" stroke="#888" stroke-width="0.2"/>\n'
+        f'<g transform="translate(0 10)">\n{words}\n</g>\n'
+        f'<rect x="10" y="{h + 14:g}" width="50" height="2" fill="#000"/>\n'
+        f'<text x="63" y="{h + 16:g}" font-size="3" fill="#555" font-family="Arial, sans-serif">must measure 50 mm. '
+        f'Cut on the grey line; face up, this edge towards you.</text>\n</svg>\n',
+        encoding="utf-8")
+    print("Wrote legends.svg")
 
+
+write_cut_files()
 write_panel_files()
-if "--panel" in sys.argv:
+if "--cut" in sys.argv:
     sys.exit(0)
 
-cutter = mesh_obj("Cutter", cut, None, parent=frame)
 
-top = box("Top panel (3 mm acrylic)", W / 2, D_SLOPE / 2, -T_TOP / 2, W, D_SLOPE, T_TOP, M["acrylic"], frame)
-boolean = top.modifiers.new("Openings", "BOOLEAN")
-boolean.operation = "DIFFERENCE"
-boolean.solver = "EXACT"
-boolean.object = cutter
-bpy.context.view_layer.update()
-dg = bpy.context.evaluated_depsgraph_get()
-baked = bpy.data.meshes.new_from_object(top.evaluated_get(dg))
-top.modifiers.clear()
-top.data = baked
-bpy.data.objects.remove(cutter)
+# ---------------- Flat parts in the model ----------------
+def flat_part(name, loops, thick, mat, ex, ey, origin, parent=None, coll="Cockpit"):
+    """Extrudes a part's loops (holes included) to its thickness. ex and ey are where the outline's u and v
+    axes point; origin is where (0, 0) lands, on the board's middle plane."""
+    cu = bpy.data.curves.new(name, "CURVE")
+    cu.dimensions = "2D"
+    cu.fill_mode = "BOTH"
+    cu.extrude = thick / 2 * MM
+    for lp in loops:
+        pts = loop_points(lp)
+        sp = cu.splines.new("POLY")
+        sp.points.add(len(pts) - 1)
+        for p, (u, v) in zip(sp.points, pts):
+            p.co = (u * MM, v * MM, 0, 1)
+        sp.use_cyclic_u = True
+    tmp = bpy.data.objects.new(name, cu)
+    scene.collection.objects.link(tmp)
+    bpy.context.view_layer.update()
+    me = bpy.data.meshes.new_from_object(tmp.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    bpy.data.objects.remove(tmp)
+    bpy.data.curves.remove(cu)
+    bm = bmesh.new()                      # the caps and sides come out separate: weld them into one solid
+    bm.from_mesh(me)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-7)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    me.materials.clear()
+    me.materials.append(mat)
+    ob = bpy.data.objects.new(name, me)
+    link(ob, coll, parent)
+    ez = Vector(ex).cross(Vector(ey))
+    m = Matrix((ex, ey, ez)).transposed().to_4x4()
+    m.translation = Vector(origin) * MM
+    ob.matrix_basis = m
+    return ob
+
+
+X, Y, Z = (1, 0, 0), (0, 1, 0), (0, 0, 1)
+flat_part("Bottom", [BOTTOM] + BOTTOM_HOLES, TW, M["ply"], X, Y, (0, 0, FEET + TW / 2))
+for side, x in (("left", TW / 2), ("right", W - TW / 2)):
+    flat_part(f"Side {side}", [SIDE], TW, M["ply"], Y, Z, (x, 0, FEET))
+flat_part("Front wall", [FRONT], TW, M["ply"], X, Z, (0, TW / 2, FEET))
+flat_part("Back wall", [BACK] + BACK_HOLES, TW, M["ply"], X, Z, (0, D - TW / 2, FEET))
+for name, x, y in POSTS:
+    for layer in range(2):
+        flat_part(f"Post {name} {layer + 1}", [post_outline(y)], TW, M["ply"], Y, Z,
+                  (x + TW / 2 + layer * TW, 0, FEET), coll="Internals")
+
+flat_part("Top panel (3 mm acrylic)", PARTS[0][3], T_TOP, M["acrylic"], X, Y, (0, 0, -T_TOP / 2), frame)
 
 # Palm rest
 rounded(box("Palm rest", W / 2, PALM / 2 + 1, 3.5, W - 4, PALM - 2, 7, M["palm"], frame), 3.4, 6)
 
 # ---------------- Throttle ----------------
-rounded(box("Throttle knob", THR_X, LEVER_Y, 27, KNOB[0], KNOB[1], 30, M["black_plastic"], frame), 9, 6)
-cyl("Throttle stem", THR_X, LEVER_Y, -39.0, 3.0, 53, M["metal"], frame)   # 6 mm rod in the 8 mm slot
+IN = "Internals"
+box("Throttle fader", THR_X, LEVER_Y, -T_TOP - FADER_H / 2, FADER_W, FADER_L, FADER_H, M["dark_metal"], frame, IN)
+box("Throttle lever", THR_X, LEVER_Y, -T_TOP + LEVER_L / 2, LEVER_T, LEVER_W, LEVER_L, M["lever"], frame)
+for i, dy in enumerate((-FADER_HOLES / 2, FADER_HOLES / 2)):
+    cyl(f"Fader screw {i + 1}", THR_X, LEVER_Y + dy, 0, 2.75, 1.6, M["dark_metal"], frame, segs=24)
+box("Knob felt", THR_X, LEVER_Y, KNOB_LIFT / 2, KNOB[0] - 2, KNOB[1] - 2, KNOB_LIFT, M["felt"], frame)
+for i in range(KNOB_LAYERS):
+    flat_part(f"Knob layer {i + 1}", KNOB_TOP if i == KNOB_LAYERS - 1 else KNOB_LAYER, T_TOP, M["acrylic"], X, Y,
+              (THR_X - KNOB[0] / 2, LEVER_Y - KNOB[1] / 2, KNOB_LIFT + T_TOP / 2 + i * T_TOP), frame)
 for i, y in enumerate(LED_YS):
     # Example state: slow-zone band (LEDs 1-2) and the lever's own LED at cruise.
     lit = M["led_band"] if i < 2 else M["led_white"] if i == 4 else M["led_off"]
@@ -461,6 +736,8 @@ for i, y in enumerate(LED_YS):
 text("Label THROTTLE", "THROTTLE", LED_X + 11, (LED_YS[0] + LED_YS[-1]) / 2, 5, M["label"], frame, rot_z=math.pi / 2)
 text("Label MAX", "MAX", LED_X, SLOT_Y1 + 9, 3.6, M["label"], frame)
 text("Label MIN", "MIN", LED_X, SLOT_Y0 - 1, 3.6, M["label"], frame)
+# Rumble under the palm rest, where the throttle hand rests: it ticks at cruise and buzzes into boost.
+box("Vibration module", THR_X, 38.0, -T_TOP - 4.0, 30, 22, 8, M["pcb_blue"], frame, IN)
 
 # ---------------- Stick: JH-D400X-R4 with button ----------------
 sx, sy = STICK
@@ -506,14 +783,18 @@ for label, x, color, lit in ANNUNCIATORS:
     box(f"{label} window", x, ANN_Y, -1.6, 21.5, 9.5, 0.6, M["ann_back"], frame)
     mat = material(f"{label} legend", color, emit=color, strength=10) if lit else M["ann_off"]
     text(f"{label} legend", label, x, ANN_Y, 5.2, mat, frame, z=-1.2)
+# Behind the windows: the printed legend, the stack of window plates that keeps neighbours from bleeding into
+# each other, and its floor with an LED module under each window.
+lb_top = -T_TOP - PAPER
+box("Legend paper", CENTRE, ANN_Y + (LB_BACK - LB_FRONT) / 2, -T_TOP - PAPER / 2, LB_LEN, LB_FRONT + LB_BACK, PAPER,
+    M["paper"], frame, IN)
+for i in range(LB_LAYERS + 1):
+    flat_part(f"Light box {'floor' if i == LB_LAYERS else f'layer {i + 1}'}", LB_FLOOR if i == LB_LAYERS else LB_LAYER,
+              T_TOP, M["acrylic"], X, Y, (LB_X0, ANN_Y - LB_FRONT, lb_top - T_TOP / 2 - i * T_TOP), frame, IN)
+lb_bottom = lb_top - (LB_LAYERS + 1) * T_TOP
 for label, x, color, lit in ANNUNCIATORS:
-    # Behind each window: a diffuser with the printed legend, a black light box so neighbours
-    # don't bleed into each other, and a pre-wired LED module at the bottom shining up.
-    box(f"{label} diffuser", x, ANN_Y, -3.4, 24, 12, 0.8, M["white"], frame, "Internals")
-    for dx, dy, sx_, sy_ in ((-12.5, 0, 1.5, 14), (12.5, 0, 1.5, 14), (0, -6.25, 26.5, 1.5), (0, 6.25, 26.5, 1.5)):
-        box(f"{label} light box", x + dx, ANN_Y + dy, -3.8 - 7, sx_, sy_, 14, M["black_plastic"], frame, "Internals")
     pixel = material(f"{label} pixel", color, emit=color, strength=12) if lit else M["led_off"]
-    cyl(f"{label} LED module", x, ANN_Y, -3.8 - 17, 5.0, 3.0, pixel, frame, "Internals")
+    cyl(f"{label} LED module", x, ANN_Y, lb_bottom - 3.0, 5.0, 3.0, pixel, frame, IN)
 for i, x in enumerate(SHIELD_XS):
     cyl(f"Shield LED {i + 1}", x, SHIELD_YS, -3.0, 2.5, 5.6, M["led_blue"], frame)
     dome(f"Shield LED {i + 1} dome", x, SHIELD_YS, 2.6, 2.5, 2.5, M["led_blue"], frame)
@@ -521,23 +802,6 @@ text("Label SHIELD", "SHIELD", SHIELD_XS[1], SHIELD_YS + 11, 3.6, M["label"], fr
 text("Wordmark", "AXIOM", STICK[0], WORD_Y, 13, M["label"], frame, face="segoeuil.ttf", spacing=1.35)
 
 # ---------------- Internals (hang from the panel unless noted) ----------------
-IN = "Internals"
-under = -T_TOP
-tun_y0, tun_y1, tun_depth = 30.0, STEM_MAX - 25.0 + SLED + 6.0, 40.0
-for side in (-1, 1):
-    box(f"Tunnel wall {'L' if side < 0 else 'R'}", THR_X + side * 27.5, (tun_y0 + tun_y1) / 2,
-        under - tun_depth / 2, 5, tun_y1 - tun_y0, tun_depth, M["foam"], frame, IN)
-box("Tunnel floor", THR_X, (tun_y0 + tun_y1) / 2, under - tun_depth - 2.5, 60, tun_y1 - tun_y0, 5, M["foam"], frame, IN)
-box("Sensor wall", THR_X, SENSOR_FACE_Y - 9.5, under - tun_depth / 2, 50, 5, tun_depth, M["foam"], frame, IN)
-box("HC-SR04 board", THR_X, SENSOR_FACE_Y - 14.0, under - tun_depth / 2, 45, 1.6, 20, M["pcb_blue"], frame, IN)
-for dx in (-13.0, 13.0):
-    cyl(f"HC-SR04 can {'L' if dx < 0 else 'R'}", THR_X + dx, SENSOR_FACE_Y - 12.0, under - tun_depth / 2, 8.0, 12.0,
-        M["metal"], frame, IN, rot=(-math.pi / 2, 0, 0))
-plate_y = LEVER_Y - 25.0
-box("Reflector plate", THR_X, plate_y, under - tun_depth / 2, 48, 3, 36, M["white"], frame, IN)
-box("Sled base", THR_X, plate_y + SLED / 2, under - tun_depth + 2, 48, SLED, 4, M["sled"], frame, IN)
-# Gravity vibration module glued to the back of the plate: the sonar only sees the front face
-box("Vibration module", THR_X, plate_y + 1.5 + 4.0, under - tun_depth / 2, 30, 8, 22, M["pcb_blue"], frame, IN)
 box("Stick body", sx, sy, -3 - 12.75, 40.4, 40.4, 25.5, M["black_plastic"], frame, IN)
 cyl("EMP body", BIG[0], BIG[1], -3 - 33, 12, 33, M["black_plastic"], frame, IN)
 box("EMP microswitch", BIG[0], BIG[1], -3 - 33 - 9, 20, 10, 18, M["black_plastic"], frame, IN)
@@ -545,15 +809,18 @@ for name, (bx, by) in (("MENU", MENU),):
     cyl(f"{name} body", bx, by, -3 - 30.3, 14, 30.3, M["black_plastic"], frame, IN)
 cyl("ARM body", ax, ay, -3 - 35, 6, 35, M["dark_metal"], frame, IN)
 box("LCD module", lx, ly, -3 - 7, 80, 36, 8, M["pcb_green"], frame, IN)
-# Uno + Gravity IO shield on the floor against the back wall, turned sideways so its plugs clear
-# the MENU button's microswitch (world coordinates)
-ux, uy = W / 2, D - T_WOOD - 6 - 53.4 / 2
-box("Arduino Uno", ux, uy, FEET + T_WOOD + 6, 68.6, 53.4, 1.6, M["pcb_blue"], coll=IN)
-box("Gravity IO shield", ux, uy, FEET + T_WOOD + 20, 68.6, 53.4, 1.6, M["pcb_green"], coll=IN)
+# Uno + Gravity IO shield on the floor near the back wall, turned sideways so its plugs clear the MENU
+# button's microswitch (world coordinates)
+ux, uy = UNO
+floor = FEET + TW
+for i, (u, v) in enumerate(UNO_HOLES):
+    cyl(f"Uno standoff {i + 1}", ux - 68.58 / 2 + u, uy - 53.34 / 2 + v, floor, 2.75, 10, M["metal"], coll=IN, segs=6)
+box("Arduino Uno", ux, uy, floor + 10.8, 68.58, 53.34, 1.6, M["pcb_blue"], coll=IN)
+box("Gravity IO shield", ux, uy, floor + 24, 68.58, 53.34, 1.6, M["pcb_green"], coll=IN)
 for side in (-1, 1):
-    box(f"Shield headers {'front' if side < 0 else 'back'}", ux, uy + side * 21, FEET + T_WOOD + 25, 60, 8, 9,
+    box(f"Shield headers {'front' if side < 0 else 'back'}", ux, uy + side * 21, floor + 29, 60, 8, 9,
         M["terminal"], coll=IN)
-box("Buzzer module", ux - 60, uy, FEET + T_WOOD + 3, 30, 22, 6, M["pcb_blue"], coll=IN)
+box("Buzzer module", ux - 60, uy, floor + 3, 30, 22, 6, M["pcb_blue"], coll=IN)
 
 # ---------------- Text to meshes (so exports keep them) ----------------
 dg = bpy.context.evaluated_depsgraph_get()

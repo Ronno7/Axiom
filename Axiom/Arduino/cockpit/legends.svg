@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="154mm" height="41.75mm" viewBox="0 0 154 41.75">
+<rect x="10" y="10" width="134" height="17.75" fill="#000" stroke="#888" stroke-width="0.2"/>
+<g transform="translate(0 10)">
+<text x="27.00" y="10.15" font-size="5.2" font-weight="bold" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">LINK</text>
+<text x="52.00" y="10.15" font-size="5.2" font-weight="bold" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">SLOW</text>
+<text x="77.00" y="10.15" font-size="5.2" font-weight="bold" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">FAST</text>
+<text x="102.00" y="10.15" font-size="5.2" font-weight="bold" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">PROX</text>
+<text x="127.00" y="10.15" font-size="5.2" font-weight="bold" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">EMP</text>
+</g>
+<rect x="10" y="31.75" width="50" height="2" fill="#000"/>
+<text x="63" y="33.75" font-size="3" fill="#555" font-family="Arial, sans-serif">must measure 50 mm. Cut on the grey line; face up, this edge towards you.</text>
+</svg>

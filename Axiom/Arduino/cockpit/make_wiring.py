@@ -19,7 +19,7 @@ BLUE, YELLOW, GRAVITY_GREEN = "#1971c2", "#f2b705", "#2f9e44"
 SOLDER, SOLDER_EDGE = "#f08c00", "#7a4300"
 PLUGIN = "#495057"
 SIG = {"A0": "#2b8a3e", "A1": "#1864ab", "A2": "#5f3dc4", "D2": "#e8590c", "D3": "#c92a2a", "D4": "#7048e8", "D5": "#0c8599",
-       "D6": "#e64980", "D7": "#a61e4d", "D8": "#5c940d", "D9": "#f76707", "D10": "#0ca678", "D12": "#9c36b5"}
+       "D6": "#e64980", "D7": "#a61e4d", "D8": "#5c940d", "A3": "#f76707", "D12": "#9c36b5"}
 I2C = [("GND", BLACK), ("VCC", RED), ("SDA", BLUE), ("SCL", YELLOW)]
 STICK_WIRE = "#adb5bd"   # factory leads (the joystick's twist and button wires, the light string)
 
@@ -169,8 +169,8 @@ t(1330, ly + 4, "H1–H10: see section 2", "small")
 # 1  Overview
 # =====================================================================
 S1 = 140
-section(S1, "1", "Overview", "Which shield row each part plugs into. 26 solder joints in the whole build; "
-                             "the buzzer, rumble, sonar, LCD and USB just plug in.")
+section(S1, "1", "Overview", "Which shield row each part plugs into. 31 solder joints in the whole build; "
+                             "the buzzer, rumble, LCD and USB just plug in.")
 
 LX, RX = 640, 920
 PX, QX = 500, 1000
@@ -211,8 +211,8 @@ def ov_box(x, y, w, h, title, lines, chip_text, chip_color=SOLDER):
 left = [("A0", TOP + 100, "stick X (left–right)"), ("A1", TOP + 140, "stick Y (fwd–back)"),
         ("A2", TOP + 180, "stick twist"), ("D2", TOP + 220, "FIRE (stick top)"),
         ("D3", TOP + 296, "EMP"), ("D12", TOP + 330, "EMP lamp"), ("D4", TOP + 380, "MENU"), ("D7", TOP + 470, "MASTER ARM"),
-        ("D9", TOP + 540, "sonar TRIG + power"), ("D10", TOP + 580, "sonar ECHO")]
-used_l = {"A0": "GVS", "A1": "GVS", "A2": "GVS", "D2": "GS", "D3": "GS", "D12": "GS", "D4": "GS", "D7": "GVS", "D9": "GVS", "D10": "S"}
+        ("A3", TOP + 560, "throttle fader")]
+used_l = {"A0": "GVS", "A1": "GVS", "A2": "GVS", "D2": "GS", "D3": "GS", "D12": "GS", "D4": "GS", "D7": "GVS", "A3": "GVS"}
 for name, y, desc in left:
     row("L", y, name, desc, used_l[name])
 ly_ = {n: y for n, y, _ in left}
@@ -233,10 +233,9 @@ cable("L", ly_["D4"], PX, [("G", BLACK), ("S", SIG["D4"])])
 ov_box(40, TOP + 432, PX - 40, 80, "H4  MASTER ARM (DaierTek flip-cover toggle)", [
     "+1 → V, +2 → S, − → G", "10 kΩ from S to G, spliced into the cable"], "5 solder")
 cable("L", ly_["D7"], PX, [("G", BLACK), ("V", RED), ("S", SIG["D7"])])
-ov_box(40, TOP + 530, PX - 40, 90, "H5  HC-SR04 throttle sonar (kit)", [
-    "4 single jumpers: VCC → V, TRIG → S, GND → G (D9)", "ECHO → S (D10)"], "plug-in", PLUGIN)
-cable("L", ly_["D9"], PX, [("G", BLACK), ("V", RED), ("S", SIG["D9"])], plugmark)
-cable("L", ly_["D10"], PX, [("S", SIG["D10"])], plugmark)
+ov_box(40, TOP + 530, PX - 40, 90, "H5  Throttle fader: Bourns PTL01, 100 mm", [
+    "Track ends: pin 1 → G, pin 3 → V", "Wiper, pin 2 → S. LED pins B and E unwired"], "3 solder")
+cable("L", ly_["A3"], PX, [("G", BLACK), ("V", RED), ("S", SIG["A3"])])
 
 # Right side
 right = [("D6", TOP + 110, "light data"), ("D5", TOP + 300, "rumble (PWM)"), ("D8", TOP + 380, "buzzer")]
@@ -279,7 +278,7 @@ line([(RX + 30, TOP + 560), (QX, TOP + 560)], GRAY, 6)
 ov_box(QX, TOP + 530, W - 40 - QX, 60, "H10  Panel USB cable (StarTech USBPNLBFBM1)", ["Uno to a socket in the back wall"],
        "plug-in", PLUGIN)
 t(QX + 12, TOP + 610, "D11 LOCK: COM → G, NO → S; V and NC unused. Same wiring as H3.", "tiny")
-t(QX + 12, TOP + 628, "Free: A3, D13 and I2C #2.", "tiny")
+t(QX + 12, TOP + 628, "Free: D9, D10, D13 and I2C #2.", "tiny")
 
 # =====================================================================
 # 2  Harness details
@@ -394,29 +393,31 @@ notes(16, 240, [
     "LED lit = armed; rated 12 V, so it may be dim at 5 V. Hole: 12 mm. The second is a spare."], 17)
 add("</g>")
 
-# H5 sonar -----------------------------------------------------------------------
-panel(COLS[1], R2, PW, PH, "H5  HC-SR04 throttle sonar (D9, D10)", "plug-in", PLUGIN)
-d9 = header(44, 74, "D9")
-d10 = header(44, 134, "D10", used="S")
-sensor = {"VCC": 80, "TRIG": 100, "ECHO": 120, "GND": 140}
-SXX = TX + 60
-wires = [(d9[0], "GND", BLACK), (d9[1], "VCC", RED), (d9[2], "TRIG", SIG["D9"]), (d10[2], "ECHO", SIG["D10"])]
-for py, pin, c in wires:
-    line([(60, py), (150, py), (230, sensor[pin]), (SXX, sensor[pin])], c, 2.5)
-    plugmark(70, py)
-    plugmark(SXX - 10, sensor[pin])
-add(f'<rect x="{SXX}" y="70" width="14" height="80" rx="3" fill="#212529"/>')
-for pin, y_ in sensor.items():
-    t(SXX + 22, y_ + 4, pin, "tinyb")
-add(f'<rect x="{SXX + 60}" y="66" width="44" height="88" rx="4" fill="#1c7ed6"/>')
-add(f'<circle cx="{SXX + 82}" cy="90" r="14" fill="#dee2e6"/><circle cx="{SXX + 82}" cy="130" r="14" fill="#dee2e6"/>')
-t(190, 182, "4 single female–female jumpers, 40 cm", "tiny", "middle")
-notes(16, 220, [
-    "No solder: one jumper per pin. The sensor is ~22 cm from the Uno; 40 cm jumpers leave slack.",
-    "Pins left to right, facing the transducers: VCC  TRIG  ECHO  GND (printed on the board).",
-    "The D10 row only uses S. A dab of hot glue on each plug once it all works.",
-    "It sits at the front of the throttle tunnel, facing the sliding plate. Keep wires out of the tunnel:",
-    "the sonar sees anything in front of the plate."], 17)
+# H5 fader -----------------------------------------------------------------------
+panel(COLS[1], R2, PW, PH, "H5  Throttle fader: Bourns PTL01-15W0-103B1 (A3)", "3 solder")
+ys = header(44, 90, "A3")
+add(f'<rect x="{TX - 40}" y="64" width="200" height="22" rx="4" fill="#495057"/>')
+add(f'<rect x="{TX + 56}" y="42" width="8" height="22" rx="2" fill="#e9ecef" stroke="#495057"/>')
+t(TX + 70, 52, "lever", "tiny")
+P1, P2, P3 = TX - 28, TX - 4, TX + 148
+# V first, so the wiper's wire (drawn last, with its halo) visibly passes over it
+line([(60, ys[1]), (TX - 85, ys[1]), (TX - 85, 150), (P3, 150), (P3, 86)], RED, 2.5)
+line([(60, ys[0]), (TX - 70, ys[0]), (TX - 70, 112), (P1, 112), (P1, 86)], BLACK, 2.5)
+line([(60, ys[2]), (TX - 100, ys[2]), (TX - 100, 131), (P2, 131), (P2, 86)], SIG["A3"], 2.5)
+for px in (P1, P2, P3):
+    joint(px, 90)
+t(P1 - 4, 178, "pin 1", "tinyb", "end")
+t(P2 + 4, 178, "pin 2", "tinyb")
+t(P3, 178, "pin 3", "tinyb", "middle")
+t(TX + 70, 112, "B, E, L unwired", "tiny", "middle")
+notes(16, 202, [
+    "Pin 1 and the wiper (pin 2) sit at one end, pin 3 at the other: check the moulded numbers.",
+    "Meter first: 1 to 3 reads about 10 kΩ; 1 to 2 changes as the lever moves.",
+    "Put the pin 1 end at the back, towards the Uno; the pin 3 wire runs along the body to the front.",
+    "It is about 16 cm from the shield: cut a 3-pin cable well off centre, so the long end reaches.",
+    "Which end gets 5 V only sets the direction. Calibration takes min and max, so either way works.",
+    "Two M3 × 6 screws through the panel into its tapped holes. The LED in the lever stays unwired.",
+    "Replaces the HC-SR04 on D9 and D10, which are free now."], 17)
 add("</g>")
 
 # H6 buzzer ------------------------------------------------------------------------
@@ -464,12 +465,11 @@ for py, sy, c in zip(ys, sock, (BLACK, RED, GRAVITY_GREEN)):
 add(f'<circle cx="{TX + 110}" cy="102" r="12" fill="#adb5bd" stroke="#495057" stroke-width="2"/>')
 t(170, 168, "Gravity cable + 3 M–F jumpers, slack loop", "tiny", "middle")
 notes(16, 206, [
-    "No solder. Glue the module to the back of the throttle's reflector plate: it moves with the knob,",
-    "and the sonar only sees the plate's front face. The cable leaves the tunnel at the back.",
-    "Leave a loop of at least 120 mm so the plate slides its full 100 mm without tugging.",
+    "No solder. Glue the module under the palm rest beside the throttle, where the throttle hand rests:",
+    "the game ticks it as the lever crosses cruise and buzzes it entering boost. Nothing moves, so no loop.",
     "Its 30 cm cable is too short: add 3 male–female jumpers (40 cm) and tape the joins together.",
     "D5 is a PWM pin: the sketch sets the strength (engine rumble rises with speed, a jolt on hits).",
-    "Too weak through the stem? It can move into the knob later, with its cable down a hollow stem."], 17)
+    "Too weak through the panel? Try it on the floor under the throttle hand before gluing it."], 17)
 add("</g>")
 
 # H10 USB -------------------------------------------------------------------------
@@ -544,7 +544,7 @@ notes(16, ty + 22, [
     "4  Glue each module LED-side against the underside of the panel, centred on its hole (hot glue round the edge).",
     "    Throttle bar: 10 mm modules on a 12.5 mm pitch, so they sit 2.5 mm apart. Order on the map →",
     "5  Fold the spare wire between modules into flat loops and tape or hot-glue them to the panel.",
-    "    Keep them on the outside of the throttle tunnel: the sonar would see anything inside it.",
+    "    Keep them clear of the fader's slot and lever.",
     "6  Never connect 5V and GND the wrong way round. Check the joins with the meter before plugging in.",
     "7  A dead module stops everything after it: cut it out and splice in a spare (6 joints, rare).",
     "8  The sketch caps brightness at 20 %: plenty behind the panel, and it keeps USB under its limit."], 17)
@@ -552,16 +552,15 @@ add("</g>")
 
 # Panel map with the light route (compact preset: same numbers as make_cockpit.py)
 PANEL_W, PANEL_D = 420.0, 245.0
-THR_X, KNOB_W, SENSOR_FACE_Y, NEAR, TRAVEL = 72.0, 42.0, 44.0, 40.0, 100.0
+THR_X, TRAVEL, STEM_MIN, FADER_L, FADER_W = 72.0, 100.0, 109.0, 128.0, 9.3
 CENTRE, BIG, MENU, STICK, ARM = 222.0, (222.0, 103.0), (222.0, 160.0), (345.0, 130.0), (140.0, 185.0)
 LCD_Y, ANN_Y = 200.0, 230.0
-STEM_MIN = SENSOR_FACE_Y + NEAR + 25.0
-LED_X = THR_X + KNOB_W / 2 + 15.0
+LED_X = THR_X + 36.0
 throttle = [(LED_X, STEM_MIN + TRAVEL / 16 + TRAVEL / 8 * i) for i in range(8)]
 lights = [(CENTRE + d, ANN_Y) for d in (-50.0, -25.0, 0.0, 25.0, 50.0)]
 shield = [(CENTRE + 48.0 + 13.0 * i, LCD_Y) for i in range(3)]
 chain = throttle + lights + shield
-UNO = (PANEL_W / 2, PANEL_D - 6.0 - 6.0 - 53.4 / 2)       # turned sideways against the back wall
+UNO = (PANEL_W / 2, PANEL_D - 6.35 - 6.0 - 53.34 / 2)     # turned sideways near the back wall
 
 panel(790, NY, W - 830, 600, "Where the modules sit: top view of the panel", "route", "#e64980")
 S = 1.35
@@ -580,14 +579,14 @@ t(x0 + PANEL_W * S / 2, y0 + PANEL_D * S + 16, "front (your side)", "map", "midd
 ux, uy = m(*UNO)
 add(f'<rect x="{ux - 34.3 * S}" y="{uy - 26.7 * S}" width="{68.6 * S}" height="{53.4 * S}" rx="4" fill="none" '
     f'stroke="#74c0fc" stroke-width="2" stroke-dasharray="5 4"/>')
-# tunnel, slot and controls for orientation
-tun_y1 = STEM_MIN + TRAVEL - 25.0 + 40.0 + 6.0                 # as make_cockpit.py
-tx0, ty0 = m(THR_X - 30, tun_y1)
-add(f'<rect x="{tx0}" y="{ty0}" width="{60 * S}" height="{(tun_y1 - 30.0) * S}" fill="none" stroke="#ffa94d" stroke-width="1.5" '
-    f'stroke-dasharray="3 3"/>')
+# the fader under its slot, and the controls, for orientation
 sx_, sy_ = m(THR_X, STEM_MIN + TRAVEL / 2)
-add(f'<rect x="{sx_ - 4 * S}" y="{m(0, STEM_MIN + TRAVEL + 4)[1]}" width="{8 * S}" height="{(TRAVEL + 8) * S}" rx="6" fill="#868e96"/>')
-t(tx0 - 6, sy_, "tunnel", "map", "end", 'style="fill:#ffa94d"')
+fx0, fy0 = m(THR_X - FADER_W / 2, STEM_MIN + TRAVEL / 2 + FADER_L / 2)
+add(f'<rect x="{fx0}" y="{fy0}" width="{FADER_W * S}" height="{FADER_L * S}" rx="3" fill="none" stroke="#ffa94d" '
+    f'stroke-width="1.5" stroke-dasharray="3 3"/>')
+add(f'<rect x="{sx_ - 1.75 * S}" y="{m(0, STEM_MIN + TRAVEL + 4)[1]}" width="{3.5 * S}" height="{(TRAVEL + 8) * S}" '
+    f'rx="2" fill="#868e96"/>')
+t(fx0 - 6, sy_, "fader", "map", "end", 'style="fill:#ffa94d"')
 for (cx_, cy_), r, lab in ((STICK, 20, "stick"), (BIG, 30, "EMP"), (MENU, 14, "MENU"), (ARM, 6, "ARM")):
     px_, py_ = m(cx_, cy_)
     add(f'<circle cx="{px_}" cy="{py_}" r="{r * S}" fill="#495057"/>')
@@ -605,7 +604,7 @@ for i, p in enumerate(chain):
     t(px_ + off[0], py_ + off[1], str(i + 1), "mapb", off[2], 'style="fill:#fff"')
 mx_, my_ = m(*UNO)
 add(f'<circle cx="{mx_:g}" cy="{my_:g}" r="5" fill="#e64980"/>')
-t(MX - 60, MY + PANEL_D * S + 34, "Dashed blue: Uno + shield on the floor below. Orange: throttle tunnel (keep wires out). "
+t(MX - 60, MY + PANEL_D * S + 34, "Dashed blue: Uno + shield on the floor below. Orange: the fader under its slot. "
                                   "Pink: data from D6 through modules 1–16.", "map")
 
 LY = MY + PANEL_D * S + 72
@@ -624,7 +623,7 @@ add("</g>")
 # =====================================================================
 S4 = NY + 600 + 40
 section(S4, "4", "Soldering summary, build order and rules",
-        "28 joints in all, every one on a tab or a wire-to-wire join. No small boards to solder.")
+        "31 joints in all, every one on a tab, a pin or a wire-to-wire join. No small boards to solder.")
 TY = S4 + 80
 cols = [56, 400, 500, 1060]
 for x, h in zip(cols, ("Harness", "Joints", "What you solder", "Difficulty")):
@@ -635,7 +634,7 @@ table = [
     ("H2  EMP 60 mm dome", "4", "COM and NO tabs + the 2 lamp tabs (or crimp spades)", "Easy"),
     ("H3  MENU + LOCK buttons", "4", "COM and NO tabs on each button (or crimp spades)", "Easy: good first practice"),
     ("H4  MASTER ARM", "5", "3 tabs + 2 splices for the 10 kΩ in the cable", "Easy"),
-    ("H5  Sonar", "0", "4 single jumpers", "None"),
+    ("H5  Throttle fader", "3", "pins 1, 2 and 3 on a 3-pin cable", "Easy"),
     ("H6  Buzzer module", "0", "Gravity cable", "None"),
     ("H7  Light string", "4", "3 input wires + the 330 Ω; capacitor shares the joins", "Easy: get the input end and 5V/GND right"),
     ("H8  LCD", "0", "4-pin cable", "None"),
@@ -658,14 +657,14 @@ notes(56, BY + 28, [
     "3  Practise on the tabs: MENU, EMP, then MASTER ARM with its 10 kΩ.",
     "4  Joystick: solder the X and Y lugs, then splice the twist and button leads.",
     "5  Mount everything, plug each cable on its row (photo of the shield first),",
-    "    then run the standby self-test on the LCD: stick, FIRE, distance.",
+    "    then run the standby self-test on the LCD: stick, FIRE, throttle.",
     "6  A dab of hot glue on each plug stops it working loose."], 19)
 RX0 = 40 + (W - 100) / 2 + 20
 add(f'<rect x="{RX0}" y="{BY - 20}" width="{(W - 100) / 2}" height="{BH}" rx="8" fill="#fff4e6" stroke="#f0c29a"/>')
 t(RX0 + 16, BY + 4, "Rules", "sec")
 notes(RX0 + 16, BY + 28, [
-    "Power from USB (500 mA fuse): Uno 50 + LCD 25 + sonar 15 + lights ≤ 180 (16 × ~55 mA × 20 %)",
-    "+ rumble ~80 + buzzer ~30 ≈ 380 mA. The 20 % brightness cap is what keeps it there.",
+    "Power from USB (500 mA fuse): Uno 50 + LCD 25 + fader 1 + lights ≤ 180 (16 × ~55 mA × 20 %)",
+    "+ rumble ~80 + buzzer ~30 ≈ 366 mA. The 20 % brightness cap is what keeps it there.",
     "Buttons use the Uno's internal pull-ups: pressed = LOW. MASTER ARM is the exception: armed = HIGH.",
     "Lights: 330 Ω on data and 470–1000 µF at the start (Adafruit Überguide); 5 V data is fine.",
     "Sketch: update the lights right before each AX packet and have the game send right after it.",
