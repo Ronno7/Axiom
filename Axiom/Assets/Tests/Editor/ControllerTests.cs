@@ -18,16 +18,18 @@ namespace GeometricFlight.Tests
             Assert.That(ControllerProtocol.TryParse(line, out ControllerPacket p), Is.True);
             Assert.That(p.StickX, Is.EqualTo(1023));
             Assert.That(p.StickY, Is.EqualTo(0));
-            Assert.That(p.DistanceMm, Is.EqualTo(245));
+            Assert.That(p.ThrottleRaw, Is.EqualTo(245));
             Assert.That(p.Fire, Is.True);
             Assert.That(p.Menu, Is.False);
         }
 
-        [Test]
-        public void ParsesMissingEcho()
+        [TestCase(0)]
+        [TestCase(1023)]
+        public void ParsesTheFadersWholeRange(int raw)
         {
-            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame("AX,512,512,-1,0,0,512,0,0,0"), out ControllerPacket p), Is.True);
-            Assert.That(p.DistanceMm, Is.EqualTo(-1));
+            Assert.That(ControllerProtocol.TryParse(ControllerProtocol.Frame($"AX,512,512,{raw},0,0,512,0,0,0"),
+                out ControllerPacket p), Is.True);
+            Assert.That(p.ThrottleRaw, Is.EqualTo(raw));
         }
 
         [TestCase(0)]
@@ -38,7 +40,7 @@ namespace GeometricFlight.Tests
                 out ControllerPacket p), Is.True);
             Assert.That(p.StickX, Is.EqualTo(700));
             Assert.That(p.StickY, Is.EqualTo(300));
-            Assert.That(p.DistanceMm, Is.EqualTo(180));
+            Assert.That(p.ThrottleRaw, Is.EqualTo(180));
             Assert.That(p.Fire && p.Menu && p.Emp, Is.True);
             Assert.That(p.Twist, Is.EqualTo(1023));
             Assert.That(p.Armed, Is.False);
@@ -56,6 +58,8 @@ namespace GeometricFlight.Tests
         }
 
         [TestCase("AX,2000,512,200,0,0,512,0,0,0")] // axis out of range
+        [TestCase("AX,512,512,-1,0,0,512,0,0,0")]   // the sonar's "no echo": the fader always reads
+        [TestCase("AX,512,512,1024,0,0,512,0,0,0")] // throttle out of range
         [TestCase("AX,512,512,200,2,0,512,0,0,0")]  // button not 0/1
         [TestCase("AX,512,512,200,0")]              // missing field
         [TestCase("AX,512,512,200,0,0")]            // the retired kit packet
@@ -108,14 +112,23 @@ namespace GeometricFlight.Tests
             Assert.That(c.NormalizeStick(500, 1023).y, Is.EqualTo(-1f).Within(0.001f));
         }
 
-        [TestCase(60, 300)]
-        [TestCase(300, 60)]
-        public void ThrottleMapsCalibratedRangeInEitherDirection(int minMm, int maxMm)
+        [TestCase(40, 990)]
+        [TestCase(990, 40)]
+        public void ThrottleMapsCalibratedRangeInEitherDirection(int min, int max)
         {
-            var c = new ControllerCalibration { throttleMinMm = minMm, throttleMaxMm = maxMm };
-            Assert.That(c.ThrottleFromDistance(minMm), Is.EqualTo(-1f).Within(0.001f));
-            Assert.That(c.ThrottleFromDistance(maxMm), Is.EqualTo(1f).Within(0.001f));
-            Assert.That(c.ThrottleFromDistance(180), Is.EqualTo(0f).Within(0.001f));
+            var c = new ControllerCalibration { throttleMin = min, throttleMax = max };
+            Assert.That(c.ThrottleFromRaw(min), Is.EqualTo(-1f).Within(0.001f));
+            Assert.That(c.ThrottleFromRaw(max), Is.EqualTo(1f).Within(0.001f));
+            Assert.That(c.ThrottleFromRaw(515), Is.EqualTo(0f).Within(0.001f));
+        }
+
+        [Test]
+        public void DefaultCalibrationPutsCruiseInTheMiddleOfTheFader()
+        {
+            var c = new ControllerCalibration();
+            Assert.That(c.ThrottleFromRaw(0), Is.EqualTo(-1f).Within(0.001f));
+            Assert.That(c.ThrottleFromRaw(511.5f), Is.EqualTo(0f).Within(0.001f));
+            Assert.That(c.ThrottleFromRaw(1023), Is.EqualTo(1f).Within(0.001f));
         }
 
         [Test]
@@ -123,26 +136,67 @@ namespace GeometricFlight.Tests
         {
             var c = new ControllerCalibration();
             var f = new ThrottleFilter { SmoothingTime = 0.001f };
-            foreach (int mm in new[] { 180, 180, 900, 180 }) f.Update(0.02f, true, mm, c);
-            Assert.That(f.FilteredMm, Is.EqualTo(180f).Within(1f));
+            foreach (int raw in new[] { 500, 500, 1000, 500 }) f.Update(0.02f, true, raw, c);
+            Assert.That(f.Filtered, Is.EqualTo(500f).Within(1f));
         }
 
         [Test]
-        public void MissingEchoesHoldThenEaseToCruise()
+        public void ReadsBothEndsOfTheFader()
         {
             var c = new ControllerCalibration();
             var f = new ThrottleFilter { SmoothingTime = 0.001f };
-            for (int i = 0; i < 5; i++) f.Update(0.02f, true, 300, c);   // full throttle
+            for (int i = 0; i < 5; i++) f.Update(0.02f, true, 0, c);
+            Assert.That(f.Setpoint, Is.EqualTo(-1f).Within(0.01f), "0 is a reading, not a missing one");
+            for (int i = 0; i < 5; i++) f.Update(0.02f, true, 1023, c);
             Assert.That(f.Setpoint, Is.EqualTo(1f).Within(0.01f));
-            for (int i = 0; i < 20; i++) f.Update(0.02f, true, -1, c);    // 0.4 s of no echo: held
+        }
+
+        [Test]
+        public void PacketGapsHoldThenEaseToCruise()
+        {
+            var c = new ControllerCalibration();
+            var f = new ThrottleFilter { SmoothingTime = 0.001f };
+            for (int i = 0; i < 5; i++) f.Update(0.02f, true, 1023, c);  // full throttle
+            Assert.That(f.Setpoint, Is.EqualTo(1f).Within(0.01f));
+            for (int i = 0; i < 20; i++) f.Update(0.02f, false, 0, c);    // 0.4 s without packets: held
             Assert.That(f.SignalLost, Is.False);
             Assert.That(f.Setpoint, Is.EqualTo(1f).Within(0.01f));
-            for (int i = 0; i < 100; i++) f.Update(0.02f, true, -1, c);   // lost: eases to cruise
+            for (int i = 0; i < 100; i++) f.Update(0.02f, false, 0, c);   // lost: eases to cruise
             Assert.That(f.SignalLost, Is.True);
             Assert.That(f.Setpoint, Is.EqualTo(0f).Within(0.01f));
-            f.Update(0.02f, true, 60, c);                                  // recovers immediately
+            f.Update(0.02f, true, 0, c);                                   // recovers immediately
             Assert.That(f.SignalLost, Is.False);
             Assert.That(f.Setpoint, Is.EqualTo(-1f).Within(0.01f));
+        }
+
+        // ---------- The cruise tick ----------
+
+        [Test]
+        public void CruiseTicksOnceEachTimeTheLeverComesIntoTheNotch()
+        {
+            const float notch = 0.08f;
+            bool armed = false;
+            Assert.That(GeometricFlight.UI.CockpitFeel.CruiseClick(ref armed, 0f, notch), Is.False,
+                "no tick for a lever that starts at cruise");
+            int ticks = 0;
+            foreach (float lever in new[] { 0.5f, 0.3f, 0.05f, 0f, -0.04f, 0.06f })
+                if (GeometricFlight.UI.CockpitFeel.CruiseClick(ref armed, lever, notch)) ticks++;
+            Assert.That(ticks, Is.EqualTo(1), "one tick on the way in, none while it stays");
+            foreach (float lever in new[] { -0.6f, -0.07f })
+                if (GeometricFlight.UI.CockpitFeel.CruiseClick(ref armed, lever, notch)) ticks++;
+            Assert.That(ticks, Is.EqualTo(2), "from the slow side too");
+        }
+
+        [Test]
+        public void ALeverRestingOnTheNotchEdgeDoesNotChatter()
+        {
+            const float notch = 0.08f;
+            bool armed = false;
+            int ticks = 0;
+            GeometricFlight.UI.CockpitFeel.CruiseClick(ref armed, 0.4f, notch);
+            foreach (float lever in new[] { 0.079f, 0.081f, 0.079f, 0.09f, 0.078f, 0.1f, 0.075f })
+                if (GeometricFlight.UI.CockpitFeel.CruiseClick(ref armed, lever, notch)) ticks++;
+            Assert.That(ticks, Is.EqualTo(1));
         }
 
         // ---------- Merging with the keyboard ----------
@@ -262,7 +316,7 @@ namespace GeometricFlight.Tests
                 link.Start();
                 Assert.That(WaitFor(() => link.Snapshot().State == LinkState.Connected), Is.True, "connects");
 
-                sim.Set(1023, 0, 250, true);
+                sim.Set(1023, 0, 700, true);
                 Assert.That(WaitFor(() => link.Snapshot().Packet.Fire), Is.True, "reads fresh values");
 
                 long rejected = link.Snapshot().RejectedCount;

@@ -29,12 +29,13 @@ namespace GeometricFlight.Presentation
         [SerializeField, Min(0.05f)] private float ribThickness = 0.4f;
         [SerializeField, Min(0.02f)] private float edgeThickness = 0.25f;
 
-        [Header("Floor markings (match the menu runway)")]
-        [SerializeField, Min(0f)] private float seamOffset = 8f;
+        [Header("Floor markings (on the ground's grid)")]
+        [Tooltip("Distance of the two runway seams from the centre line. 12 puts them on the ground's 12 m lines. The "
+               + "floor markers run from seam to seam.")]
+        [SerializeField, Min(0f)] private float seamOffset = 12f;
         [SerializeField, Min(1f)] private float markerSpacing = 12f;
-        [Tooltip("World Z of one marker, modulo the spacing, so markers line up with the menu's.")]
-        [SerializeField] private float markerPhase = 4f;
-        [SerializeField, Min(0.1f)] private float markerWidth = 16f;
+        [Tooltip("World Z of one marker, modulo the spacing. 0 puts every marker on one of the ground's 12 m lines.")]
+        [SerializeField] private float markerPhase;
 
         [Header("Construction")]
         [Tooltip("Front travel over which one rib draws from both feet to its apex.")]
@@ -226,11 +227,19 @@ namespace GeometricFlight.Presentation
                 mesh.FloorStrip(-seamOffset - 0.05f, -seamOffset + 0.05f, z, to, lift, transform);
                 mesh.FloorStrip(seamOffset - 0.05f, seamOffset + 0.05f, z, to, lift, transform);
             }
-            // Markers keep the menu's world phase, so they continue its scrolling floor exactly.
-            float offset = Mathf.Repeat(markerPhase - MouthZ, markerSpacing);
-            for (float z = startZ + offset; z < endZ; z += markerSpacing)
-                mesh.FloorStrip(-markerWidth * 0.5f, markerWidth * 0.5f, z - 0.03f, z + 0.03f, lift, transform);
+            foreach (float z in MarkerPositions(startZ, endZ, markerSpacing, markerPhase, MouthZ - startZ))
+                mesh.FloorStrip(-seamOffset, seamOffset, z - 0.03f, z + 0.03f, lift, transform);
             return mesh.ToMesh("Passage floor markings");
+        }
+
+        /// <summary>Local Z of each floor marker between the ends: one every <paramref name="spacing"/> metres at world
+        /// Z ≡ <paramref name="phase"/> (mod spacing), where <paramref name="originZ"/> is the world Z of local 0.</summary>
+        public static List<float> MarkerPositions(float startZ, float endZ, float spacing, float phase, float originZ)
+        {
+            var positions = new List<float>();
+            if (spacing <= 0f) return positions;
+            for (float z = startZ + Mathf.Repeat(phase - originZ - startZ, spacing); z < endZ; z += spacing) positions.Add(z);
+            return positions;
         }
 
         private void BuildColliders(Vector2[] outline)

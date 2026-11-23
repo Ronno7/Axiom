@@ -29,6 +29,9 @@ namespace GeometricFlight.Core
         [Tooltip("Hidden when the ship is destroyed (aircraft visuals, reticles).")]
         [SerializeField] private GameObject[] hideWhenDestroyed;
         [SerializeField] private ShatterEffect shipDestruction;
+        [Tooltip("Shown again during a rebuild, before control returns: the hull being built and its shadow. The rest of "
+               + "Hide When Destroyed (the reticles) comes back with control.")]
+        [SerializeField] private GameObject[] showWhileRebuilding = Array.Empty<GameObject>();
         [SerializeField] private string menuScene = "Opening";
         [Tooltip("Loaded by Continue. Empty returns to the menu.")]
         [SerializeField] private string nextScene = "";
@@ -58,12 +61,15 @@ namespace GeometricFlight.Core
         /// <summary>Set by a course with checkpoints. Returning true takes over a destroyed ship (shattered and
         /// hidden here; the course rebuilds it with <see cref="SetShipDestroyed"/>) instead of ending the run.</summary>
         public Func<bool> CheckpointRecovery { get; set; }
+        /// <summary>The ship's way back after a crash, set by the course that recovers it; for displays.</summary>
+        public IShipRecovery Recovery { get; set; }
         /// <summary>Set by the pause menu. The pause input leaves a submenu first (returning true) before it resumes.</summary>
         public Func<bool> LeaveSubmenu { get; set; }
 
         private ShootableTarget[] targets;
         private readonly RunRecord record = new RunRecord();
         private int controllerConnectedFrame = -1;
+        private bool shipDestroyed;
 
         private void Awake()
         {
@@ -98,7 +104,10 @@ namespace GeometricFlight.Core
         private void Step(float deltaTime)
         {
             if (EntryHeld && !EntryStarted) return;
-            bool pausePressed = flight.isActiveAndEnabled && flight.CurrentInput.PausePressed
+            if (State != RunState.Playing && State != RunState.Paused) return;
+            // While the ship is destroyed flight is off, but pause must still work through the rebuild.
+            bool pausePressed = (shipDestroyed ? flight.ReadPausePress()
+                    : flight.isActiveAndEnabled && flight.CurrentInput.PausePressed)
                 && Time.frameCount != controllerConnectedFrame;
             if (State == RunState.Paused)
             {
@@ -197,12 +206,21 @@ namespace GeometricFlight.Core
         /// <summary>Shatters and hides the ship, or brings it back for a checkpoint retry.</summary>
         public void SetShipDestroyed(bool destroyed)
         {
+            shipDestroyed = destroyed;
             flight.enabled = !destroyed;
             weapon.enabled = !destroyed;
             hull.enabled = !destroyed;
             shield.TakesHits = !destroyed;
             foreach (GameObject go in hideWhenDestroyed) go.SetActive(!destroyed);
+            if (destroyed) foreach (GameObject go in showWhileRebuilding) if (go != null) go.SetActive(false);
             if (destroyed && shipDestruction != null) shipDestruction.Play();
+        }
+
+        /// <summary>A rebuild has placed the ship: show the hull being built (and its shadow), but not the reticles, which
+        /// return with control.</summary>
+        public void ShowShipForRebuild()
+        {
+            foreach (GameObject go in showWhileRebuilding) if (go != null) go.SetActive(true);
         }
 
         private bool Finish(bool completed) => record.TryFinish(new RunResults(completed, ElapsedTime,

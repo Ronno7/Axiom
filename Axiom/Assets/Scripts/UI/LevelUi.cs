@@ -25,6 +25,7 @@ namespace GeometricFlight.UI
         private ThrottleInstrument throttle;
         private RunMenus menus;
         private CockpitDisplay cockpit;
+        private CockpitFeel feel;
         private ShieldGauge shieldGauge;
         private DamageFeedback damageFeedback;
         private InstrumentBuild timeBuild, targetsBuild, controllerTag, ringsBuild;
@@ -150,6 +151,7 @@ namespace GeometricFlight.UI
 
             throttle = new ThrottleInstrument(root, flight);
             cockpit = new CockpitDisplay(flow, flight);
+            feel = new CockpitFeel(flight);
             hull = flight.GetComponent<ShipHull>();
             ApplyEntryPresentation(1f);
             flow.StateChanged += OnStateChanged;
@@ -211,20 +213,22 @@ namespace GeometricFlight.UI
             if (CockpitEnabled)
             {
                 cockpit.Show(throttle.Zone, throttle.Band, throttle.Guidance, proximity, UiScreens.FocusedLabel(screen));
+                feel.Tick(flow.State == RunState.Playing && flight.isActiveAndEnabled && !flight.InputLocked
+                    && !flight.EntryHeld);
                 menus.TickCalibration();
             }
         }
 
         /// <summary>Which device is driving the ship, and a warning (paired with a buzzer cue) when the
-        /// throttle sensor has no signal. While paused by a disconnect, the pause panel explains it.</summary>
+        /// throttle has no signal. While paused by a disconnect, the pause panel explains it.</summary>
         private void UpdateControllerStatus()
         {
             ControllerState controller = ControllerService.Instance.State;
             bool keyboardThrottle = GameSettings.KeyboardThrottleWithController;
             bool warning = controller.Connected && !keyboardThrottle && !controller.ThrottleValid;
-            string text = !controller.Connected ? "KEYBOARD"
+            string text = !controller.Connected ? (CombinedFlightInput.GamepadInUse ? "GAMEPAD" : "KEYBOARD")
                 : keyboardThrottle ? "CONTROLLER + KEYBOARD THROTTLE"
-                : warning ? "THROTTLE SENSOR: NO SIGNAL" : "CONTROLLER";
+                : warning ? "THROTTLE: NO SIGNAL" : "CONTROLLER";
             if (text != shownController)
             {
                 shownController = text;

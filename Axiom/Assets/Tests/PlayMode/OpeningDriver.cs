@@ -249,8 +249,9 @@ namespace GeometricFlight.Tests
             yield return null;
         }
 
-        /// <summary>Stick centred, throttle mid range, with the given buttons held.</summary>
-        public void Hands(bool fire = false, bool menuButton = false) => Cockpit.Set(512, 512, 200, fire, menuButton);
+        /// <summary>Stick centred, throttle a sixth above cruise (as the sonar's 200 mm was), with the given buttons
+        /// held.</summary>
+        public void Hands(bool fire = false, bool menuButton = false) => Cockpit.Set(512, 512, 597, fire, menuButton);
 
         /// <summary>Presses a key on a virtual keyboard inside the engine, so nothing reaches the rest of the PC. The
         /// settings let it through while the Editor is out of focus.</summary>

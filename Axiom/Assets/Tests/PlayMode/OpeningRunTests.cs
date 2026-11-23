@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GeometricFlight.Combat;
 using GeometricFlight.Core;
 using GeometricFlight.Input;
+using GeometricFlight.Presentation;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -82,6 +83,25 @@ namespace GeometricFlight.Tests
         }
 
         [UnityTest]
+        public IEnumerator TheMenuGlidesTheViewOverAStillGridAndTheRunStartsFromThere()
+        {
+            MenuBackdrop backdrop = Object.FindAnyObjectByType<MenuBackdrop>();
+            Transform view = Camera.main.transform;
+            float startZ = view.position.z;
+            Vector3 framing = backdrop.transform.position - view.position;
+            yield return game.Wait(1f);
+            Assert.That(view.position.z - startZ, Is.InRange(3f, 7f), "the view flies forward at about 5 m/s");
+            Assert.That(Vector3.Distance(backdrop.transform.position - view.position, framing), Is.LessThan(1e-3f),
+                "the constructs fly with it");
+
+            float glided = backdrop.Travelled;
+            game.ClickMenu("play-button");
+            yield return game.Until("control to arrive", () => !game.Flow.EntryHeld, 15f);
+            Assert.That(game.Flight.transform.position.z - glided, Is.InRange(-1f, 20f),
+                "control comes where the glide left off: the course start, moved along by the glide");
+        }
+
+        [UnityTest]
         public IEnumerator FiringWhileSafeExplainsItselfAndFiresNothing()
         {
             yield return game.ReachControl();
@@ -130,18 +150,35 @@ namespace GeometricFlight.Tests
             yield return game.Wait(0.3f);
             Assert.That(game.Flight.enabled, Is.False, "the ship is gone while destroyed");
             Assert.That(game.Header, Does.Contain("SIGNAL"));
+            Assert.That(game.Flow.Recovery.SignalLost, "the camera holds the crash until the cut");
             yield return game.Capture("signal-lost");
 
             game.Flow.Pause();
             yield return game.Wait(2.5f);
             Assert.That(game.Course.Rebuilding, "the rebuild waits during a pause");
+            Assert.That(game.Flow.Recovery.SignalLost, "a pause holds the sequence where it was");
+            game.Flow.Resume();
+            yield return game.Until("the cut to the checkpoint", () => !game.Flow.Recovery.SignalLost, 2f);
+            yield return game.Wait(0.4f);
+            Assert.That(game.Flight.enabled, Is.False, "the ship stands still while it is rebuilt");
+            Assert.That(game.Flight.transform.position.z, Is.EqualTo(retryZ).Within(30f), "rebuilt at the checkpoint");
+            Assert.That(game.Flow.Recovery.BuildProgress, Is.GreaterThan(0f).And.LessThan(1f), "the hull is building");
+            Assert.That(game.Header, Does.Not.Contain("SIGNAL"), "SIGNAL LOST clears at the cut");
+            yield return game.Capture("rebuilding");
+
+            game.Flow.Pause();
+            float progress = game.Flow.Recovery.BuildProgress;
+            int segments = game.Shield.State.Current;
+            yield return game.Wait(1f);
+            Assert.That(game.Flow.Recovery.BuildProgress, Is.EqualTo(progress), "a pause mid build holds the hull");
+            Assert.That(game.Shield.State.Current, Is.EqualTo(segments), "and the shield gauge");
             game.Flow.Resume();
             yield return game.Rebuilt();
             yield return game.Wait(0.2f);
             Assert.That(game.Shield.State.Current, Is.EqualTo(3), "the shield is full");
+            Assert.That(game.Shield.State.IsProtected, "control starts with hit protection");
             Assert.That(game.Flight.transform.position.z, Is.EqualTo(retryZ).Within(30f), "rebuilt at the checkpoint");
             Assert.That(game.Flight.InputLocked, Is.False, "input is back");
-            Assert.That(game.Header, Does.Contain("REBUILT"));
             yield return game.Capture("rebuilt");
 
             game.Shield.Destroy();

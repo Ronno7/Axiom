@@ -6,8 +6,9 @@ namespace GeometricFlight.Presentation
     /// <summary>
     /// One endless ground: a large plane that follows the camera across the menu, passage and arena.
     /// Its grid is drawn in world space by the material, so the lines stay fixed in the world while the
-    /// plane moves with the view, and the far edge dissolves into fog. Visual only: collision belongs to
-    /// the surfaces that need it. Nothing generated here is saved.
+    /// plane moves with the view, and the far edge dissolves into fog. The grid itself never moves; motion
+    /// across it is the camera's. Visual only: collision belongs to the surfaces that need it. Nothing
+    /// generated here is saved.
     /// </summary>
     [ExecuteAlways]
     [DisallowMultipleComponent]
@@ -21,23 +22,13 @@ namespace GeometricFlight.Presentation
         [SerializeField] private float height;
         [Tooltip("Plane size, in metres. Fog should hide its edge.")]
         [SerializeField, Min(10f)] private float size = 4000f;
-        [Tooltip("In Play Mode the grid slides toward the camera at this speed (m/s), as if gliding over the ground. "
-               + "0 = still. A sequence can change it through GlideSpeed.")]
-        [SerializeField, Min(0f)] private float glideSpeed;
 
-        private static readonly int GridOffset = Shader.PropertyToID("_GridOffset");
         private GameObject plane;
         private Mesh mesh;
-        private MaterialPropertyBlock block;
-        private float glided;
 
-        /// <summary>Metres per second the grid slides toward the camera. The menu glides; a flight sets it to 0
-        /// as the camera starts to move, so the motion carries on without a hitch.</summary>
-        public float GlideSpeed
-        {
-            get => glideSpeed;
-            set => glideSpeed = Mathf.Max(0f, value);
-        }
+        /// <summary>Distance after which the grid repeats exactly (its major spacing), or 0 without a grid material.</summary>
+        public float RepeatLength => material != null && material.HasProperty("_MajorSpacing")
+            ? Mathf.Max(0f, material.GetFloat("_MajorSpacing")) : 0f;
 
         private void OnEnable() => Build();
 
@@ -60,15 +51,6 @@ namespace GeometricFlight.Presentation
             if (plane == null || target == null) return;
             Vector3 eye = target.transform.position;
             plane.transform.position = new Vector3(eye.x, height, eye.z);
-            if (!Application.isPlaying || glideSpeed <= 0f) return;
-            // Lines sit where (world + offset) meets the grid, so a growing offset moves them toward the camera.
-            // Wrap on a whole number of major cells so the lines never jump.
-            float wrap = material != null && material.HasProperty("_MajorSpacing")
-                ? Mathf.Max(1f, material.GetFloat("_MajorSpacing")) * 10f : 1000f;
-            glided = Mathf.Repeat(glided + glideSpeed * Time.deltaTime, wrap);
-            block ??= new MaterialPropertyBlock();
-            block.SetVector(GridOffset, new Vector4(0f, glided, 0f, 0f));
-            plane.GetComponent<MeshRenderer>().SetPropertyBlock(block);
         }
 
         private void Build()

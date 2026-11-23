@@ -27,6 +27,9 @@ namespace GeometricFlight.Player
         [Tooltip("Extra field of view at full throttle.")]
         [SerializeField, Range(0f, 30f)] private float speedFieldOfView = 10f;
 
+        /// <summary>The camera stays exactly where it is: it holds on a crash, and still over a rebuild.</summary>
+        public bool Held { get; set; }
+
         private Camera view;
         private Vector3 springVelocity;
         private bool placed;
@@ -89,6 +92,7 @@ namespace GeometricFlight.Player
 
         private void LateUpdate()
         {
+            if (Held) return;
             ArenaFlightState s = target.State;
             Quaternion heading = s.Heading;
             Vector3 ideal = s.Position + heading * new Vector3(0f, height, -distance);

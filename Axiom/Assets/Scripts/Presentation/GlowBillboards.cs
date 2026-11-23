@@ -59,6 +59,8 @@ namespace GeometricFlight.Presentation
                 vertices[v + 3] = Centers[i] - right + up;
             }
             Mesh.vertices = vertices;
+            // Dust moves with a flying camera; stale bounds would let Unity cull it out of view.
+            Mesh.RecalculateBounds();
         }
 
         private static float Range(System.Random random, float a, float b) => a + (float)random.NextDouble() * (b - a);

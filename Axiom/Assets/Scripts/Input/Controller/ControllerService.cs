@@ -9,7 +9,7 @@ namespace GeometricFlight.Input
     {
         public readonly bool Connected;
         public readonly Vector2 Stick;
-        /// <summary>Throttle setpoint, -1 (minimum) to +1 (maximum). Eases to 0 if the sensor is lost.</summary>
+        /// <summary>Throttle setpoint, -1 (minimum) to +1 (maximum). Eases to 0 if its readings stop.</summary>
         public readonly float Throttle;
         public readonly bool ThrottleValid;
         public readonly bool Fire;
@@ -166,7 +166,7 @@ namespace GeometricFlight.Input
             lastPacketCount = snapshot.PacketCount;
 
             // Unscaled: calibration and menus run while gameplay time is paused.
-            Throttle.Update(Time.unscaledDeltaTime, fresh, fresh ? snapshot.Packet.DistanceMm : -1, Calibration);
+            Throttle.Update(Time.unscaledDeltaTime, fresh, snapshot.Packet.ThrottleRaw, Calibration);
 
             ControllerPacket p = snapshot.Packet;
             if (!connected || !wasConnected) empNeedsRelease = true;

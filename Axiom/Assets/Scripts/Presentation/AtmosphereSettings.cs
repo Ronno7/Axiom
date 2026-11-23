@@ -56,9 +56,6 @@ namespace GeometricFlight.Presentation
         public Vector2 dustDepth = new Vector2(3f, 30f);
         public Vector2 dustSize = new Vector2(0.02f, 0.06f);
         [Range(0f, 2f)] public float dustBrightness = 0.55f;
-        [Tooltip("Metres per second toward the camera, for a still camera (the menu: 4 matches the floor markers). "
-               + "Leave at 0 where the camera flies.")]
-        [Min(0f)] public float dustDrift = 4f;
         [Tooltip("Metres per second each mote floats on its own slow course, so a still screen keeps a little "
                + "motion. Keeps going while the camera flies. 0 = still.")]
         [Min(0f)] public float dustFloat;

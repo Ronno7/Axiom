@@ -21,6 +21,12 @@ namespace GeometricFlight.Player
             protectionDuration = Mathf.Max(0f, protectionSeconds);
         }
 
+        /// <summary>Sets the segment count directly: a rebuild refills the shield one segment at a time.</summary>
+        public void Refill(int segments) => Current = Mathf.Clamp(segments, 0, Max);
+
+        /// <summary>Starts the protection window without a hit (control returning after a rebuild).</summary>
+        public void Protect() => ProtectionRemaining = protectionDuration;
+
         /// <summary>Returns true if the hit removed a segment.</summary>
         public bool TryHit()
         {

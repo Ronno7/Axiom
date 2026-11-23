@@ -107,6 +107,11 @@ namespace GeometricFlight.Player
 
         public void HoldForEntry() => EntryHeld = true;
 
+        /// <summary>The pause press while flight is switched off (the ship destroyed and rebuilding), so pause still works
+        /// then. Reads the input source with no time step, so nothing it integrates moves.</summary>
+        public bool ReadPausePress() =>
+            inputSource != null && inputSource.isActiveAndEnabled && inputSource.ReadInput(0f).PausePressed;
+
         /// <summary>Stages the complete actor state during entry. After admission presentation can no
         /// longer reposition the ship through this API. Input and weapon authority are never reset here.</summary>
         public void StageEntry(ArenaFlightState entryState)

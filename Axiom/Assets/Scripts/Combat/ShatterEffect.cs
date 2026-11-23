@@ -16,6 +16,11 @@ namespace GeometricFlight.Combat
         [Tooltip("Fraction of velocity lost per second.")]
         [SerializeField, Range(0f, 0.99f)] private float drag = 0.85f;
         [SerializeField, Min(0.05f)] private float duration = 0.9f;
+        [Tooltip("Optional local points (a ship's nose, wingtips and tail): the first shards start there, larger, and hold "
+               + "the silhouette for a moment before they separate, so the breakup still reads as the ship.")]
+        [SerializeField] private Vector3[] anchors = Array.Empty<Vector3>();
+        [SerializeField, Min(0f)] private float anchorHold = 0.15f;
+        [SerializeField, Min(1f)] private float anchorScale = 2.5f;
 
         private static Mesh shardMesh;
         private Transform[] shards;
@@ -37,10 +42,13 @@ namespace GeometricFlight.Combat
             if (shards == null) CreateShards();
             for (int i = 0; i < shards.Length; i++)
             {
-                Vector3 direction = UnityEngine.Random.onUnitSphere;
-                shards[i].localPosition = direction * (shardSize * 0.5f);
+                bool anchored = i < anchors.Length;
+                Vector3 direction = anchored && anchors[i].sqrMagnitude > 1e-4f
+                    ? (anchors[i].normalized + UnityEngine.Random.insideUnitSphere * 0.3f).normalized
+                    : UnityEngine.Random.onUnitSphere;
+                shards[i].localPosition = anchored ? anchors[i] : direction * (shardSize * 0.5f);
                 shards[i].localRotation = UnityEngine.Random.rotationUniform;
-                shards[i].localScale = Vector3.one * shardSize * UnityEngine.Random.Range(0.6f, 1.4f);
+                shards[i].localScale = Vector3.one * shardSize * (anchored ? anchorScale : UnityEngine.Random.Range(0.6f, 1.4f));
                 shards[i].gameObject.SetActive(true);
                 velocities[i] = direction * UnityEngine.Random.Range(burstSpeed.x, burstSpeed.y);
                 spins[i] = UnityEngine.Random.onUnitSphere * UnityEngine.Random.Range(180f, 720f);
@@ -60,10 +68,13 @@ namespace GeometricFlight.Combat
 
             for (int i = 0; i < shards.Length; i++)
             {
+                bool anchored = i < anchors.Length;
+                // Anchored pieces keep the silhouette for a moment, then separate like the rest.
+                if (anchored && elapsed < anchorHold) continue;
                 velocities[i] *= damping;
                 shards[i].position += velocities[i] * deltaTime;
                 shards[i].Rotate(spins[i] * deltaTime, Space.Self);
-                shards[i].localScale = Vector3.one * (shardSize * shrink * shrink);
+                shards[i].localScale = Vector3.one * (shardSize * (anchored ? anchorScale : 1f) * shrink * shrink);
             }
 
             if (elapsed < duration) return;

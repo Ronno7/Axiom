@@ -41,6 +41,10 @@ namespace GeometricFlight.Presentation
         public const float MarkingsBeat = 4.8f, RibsBeat = 5.6f, SurfacesBeat = 6.4f;
         public const float MarkingSpeed = 140f, RibSpeed = 95f, SurfaceSpeed = 95f, EdgeSpeed = 190f;
 
+        /// <summary>The ship materializes over its authored three seconds: from beat 8, as it crosses the threshold
+        /// (<see cref="CoverCenter"/>), to beat 13, while the first instruments assemble.</summary>
+        public const float ShipBeat = 8f, ShipSettledBeat = 13f;
+
         public const float RetireBeat = 14f, CollapseBeat = 15f;
         /// <summary>Terminals wait until the menu has flown past the camera and the build is about to start.</summary>
         public const float TerminalsBeat = 4f;

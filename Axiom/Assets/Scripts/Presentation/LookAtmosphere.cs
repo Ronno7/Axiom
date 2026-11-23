@@ -113,22 +113,21 @@ namespace GeometricFlight.Presentation
             }
         }
 
-        /// <summary>Keeps the horizon and stars with the camera and moves the dust: drift toward a still camera
-        /// (<paramref name="deltaTime"/>), each mote's own float (<paramref name="floatTime"/>), then wrap.</summary>
-        public void Follow(Camera camera, float deltaTime, float floatTime = 0f)
+        /// <summary>Keeps the horizon and stars with the camera and moves the dust: each mote's own float
+        /// (<paramref name="floatTime"/>), then wrap around the camera.</summary>
+        public void Follow(Camera camera, float floatTime = 0f)
         {
             if (root == null || camera == null) return;
             Vector3 eye = camera.transform.position;
             far.transform.position = eye - builtEye;
             if (dust == null) return;
 
-            float step = settings.dustDrift * deltaTime;
             float spread = settings.dustSpread;
             Vector2 height = settings.dustHeight;
             for (int i = 0; i < dust.Centers.Length; i++)
             {
                 Vector3 c = dust.Centers[i] + dustCourse[i] * floatTime;
-                c.z = WrapDepth(c.z - step, eye.z, settings.dustDepth);
+                c.z = WrapDepth(c.z, eye.z, settings.dustDepth);
                 if (floatTime > 0f)
                 {
                     c.x = eye.x - spread + Mathf.Repeat(c.x - (eye.x - spread), spread * 2f);
@@ -137,6 +136,13 @@ namespace GeometricFlight.Presentation
                 dust.Centers[i] = c;
             }
             dust.Write(eye);
+        }
+
+        /// <summary>Moves every mote by <paramref name="delta"/>, as when the view it surrounds steps by that much.</summary>
+        public void MoveDust(Vector3 delta)
+        {
+            if (dust == null) return;
+            for (int i = 0; i < dust.Centers.Length; i++) dust.Centers[i] += delta;
         }
 
         /// <summary>Scales the dust's glow (0 hides it). Survives a rebuild only if called again.</summary>

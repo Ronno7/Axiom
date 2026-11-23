@@ -1,6 +1,7 @@
 // The arena floor: dark glass with self-lit grid lines in world space (minor and major spacing). Line width is
 // in screen pixels (fwidth), so lines stay crisp near and far without shimmering, and they fade out with
 // distance from the camera so the far grid doesn't turn to moiré. Line colour is HDR, so lines feed bloom.
+// Nothing offsets the lines: they are the world's grid, and motion across it comes from the camera.
 Shader "GeometricFlight/Grid Floor"
 {
     Properties
@@ -14,7 +15,6 @@ Shader "GeometricFlight/Grid Floor"
         _MinorStrength ("Minor strength", Range(0, 1)) = 0.35
         _Fade ("Fade start, end (m)", Vector) = (60, 320, 0, 0)
         [Toggle] _UseFog ("Scene fog (an infinite ground fades into the haze)", Float) = 0
-        _GridOffset ("Grid offset (m, xz; set by script for a gliding ground)", Vector) = (0, 0, 0, 0)
     }
     SubShader
     {
@@ -42,7 +42,6 @@ Shader "GeometricFlight/Grid Floor"
                 half _MinorStrength;
                 float4 _Fade;
                 half _UseFog;
-                float4 _GridOffset;
             CBUFFER_END
 
             Varyings Vert(Attributes i)
@@ -64,7 +63,7 @@ Shader "GeometricFlight/Grid Floor"
 
             half4 Frag(Varyings i) : SV_Target
             {
-                float2 p = i.positionWS.xz + _GridOffset.xy;
+                float2 p = i.positionWS.xz;
                 float major = Grid(p, _MajorSpacing, _MajorWidth);
                 float minor = Grid(p, _MinorSpacing, _MinorWidth) * _MinorStrength;
                 float distance = length(i.positionWS - _WorldSpaceCameraPos);

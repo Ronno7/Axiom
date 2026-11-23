@@ -34,6 +34,9 @@ namespace GeometricFlight.Presentation
         {
             public string Text;
             public bool Emphasis, Arrival;
+            /// <summary>From the HUD's announcement slot: it ends exactly when withdrawn (SIGNAL LOST clears at the
+            /// rebuild's cut), with no reading hold.</summary>
+            public bool Announced;
             public bool Same(Line other) => other != null && Text == other.Text && Emphasis == other.Emphasis
                 && Arrival == other.Arrival;
         }
@@ -65,7 +68,8 @@ namespace GeometricFlight.Presentation
 
         public void ClearCard() => card = null;
 
-        private void SetAnnouncement(string text) => announcement = text == null ? null : new Line { Text = text };
+        private void SetAnnouncement(string text) =>
+            announcement = text == null ? null : new Line { Text = text, Announced = true };
 
         /// <summary>Fills the chips while their control is held: the input arrived, nothing more.</summary>
         public bool ChipsLit
@@ -167,7 +171,7 @@ namespace GeometricFlight.Presentation
         {
             bool paused = Time.timeScale <= 0f;
             Line line = paused ? null : announcement ?? card;
-            if (!paused && announcement == null && shown != null && !shown.Same(line)
+            if (!paused && announcement == null && shown != null && !shown.Announced && !shown.Same(line)
                 && UiClock.Now - lineAt < lineHoldSeconds) line = shown;
             addressLine.style.display = line != null ? DisplayStyle.Flex : DisplayStyle.None;
             if (line == null)

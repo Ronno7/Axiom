@@ -109,21 +109,21 @@ namespace GeometricFlight.UI
                 }
                 ControllerPacket p = link.Packet;
                 ControllerState s = Service.State;
-                float mm = Service.Throttle.FilteredMm;
-                readings.text = $"Stick {p.StickX}, {p.StickY}   ·   Distance "
-                    + (s.ThrottleValid && !float.IsNaN(mm) ? Mathf.RoundToInt(mm) + " mm" : "no echo")
+                float raw = Service.Throttle.Filtered;
+                readings.text = $"Stick {p.StickX}, {p.StickY}   ·   Throttle "
+                    + (s.ThrottleValid && !float.IsNaN(raw) ? Mathf.RoundToInt(raw).ToString() : "no reading")
                     + $"   ·   Fire {(p.Fire ? "pressed" : "released")}";
                 stickDot.style.left = Length.Percent((s.Stick.x + 1f) * 50f);
                 stickDot.style.top = Length.Percent((1f - s.Stick.y) * 50f);
                 throttleFill.style.width = Length.Percent((s.Throttle + 1f) * 50f);
-                ShowOnLcd(p, s, mm);
+                ShowOnLcd(p, s, raw);
             }
             else readings.text = "Waiting for data…";
         }
 
         /// <summary>The step on top, the live reading it needs below, so the player can calibrate
         /// looking at the controller. An error blinks the top row.</summary>
-        private void ShowOnLcd(ControllerPacket p, ControllerState s, float mm)
+        private void ShowOnLcd(ControllerPacket p, ControllerState s, float raw)
         {
             bool blink = Time.unscaledTime % 0.8f < 0.4f;
             string top = wizard.Error != null && blink ? "! SEE THE SCREEN" : LcdSteps[(int)wizard.Current];
@@ -131,7 +131,7 @@ namespace GeometricFlight.UI
             {
                 CalibrationWizard.Step.Center => $"X {p.StickX,4}   Y {p.StickY,4}",
                 CalibrationWizard.Step.Check => LcdGlyph.Bar((s.Throttle + 1f) * 0.5f, LcdGlyph.Columns),
-                _ => s.ThrottleValid && !float.IsNaN(mm) ? $"DISTANCE {Mathf.RoundToInt(mm),4} mm" : "DISTANCE NO ECHO",
+                _ => s.ThrottleValid && !float.IsNaN(raw) ? $"THROTTLE {Mathf.RoundToInt(raw),4}" : "NO THROTTLE",
             };
             Service.Display.Show(LcdGlyph.Center(top), bottom);
         }
@@ -147,7 +147,7 @@ namespace GeometricFlight.UI
             }
             LinkSnapshot link = Service.Link;
             if (link.State != LinkState.Connected) return;
-            wizard.Capture(link.Packet, Service.Throttle.FilteredMm, Service.State.ThrottleValid);
+            wizard.Capture(link.Packet, Service.Throttle.Filtered, Service.State.ThrottleValid);
             Refresh();
         }
 

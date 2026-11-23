@@ -10,7 +10,7 @@ namespace GeometricFlight.UI
     /// <summary>
     /// The controller LCD during a level: an instrument panel on the player's hands that complements
     /// the HUD. Top row: speed bar and speed, with the recommended band inside a throttle zone. Bottom
-    /// row: shield, targets and time, replaced by zone guidance, a hit, a proximity warning or a lost throttle sensor when
+    /// row: shield, targets and time, replaced by zone guidance, a hit, a proximity warning or a lost throttle when
     /// those matter. Pause mirrors the selected menu item; results page through the run's stats.
     /// </summary>
     public sealed class CockpitDisplay
@@ -56,6 +56,14 @@ namespace GeometricFlight.UI
                     bottom = resultPages[(int)(now / PageSeconds) % resultPages.Count];
                     break;
                 default:
+                    IShipRecovery recovery = flow.Recovery;
+                    if (recovery != null && recovery.Active)
+                    {
+                        // SIGNAL LOST over the crash, then the rebuild's progress until control returns.
+                        top = LcdGlyph.Center(recovery.SignalLost ? "SIGNAL LOST" : "REBUILDING");
+                        bottom = recovery.SignalLost ? "" : LcdGlyph.Bar(recovery.BuildProgress, LcdGlyph.Columns);
+                        break;
+                    }
                     float speedFraction = ThrottleGauge.SpeedFraction(flight, flight.CurrentSpeed);
                     int speed = Mathf.RoundToInt(flight.CurrentSpeed);
                     top = (zone == null ? LcdGlyph.Bar(speedFraction, BarCells) : LcdGlyph.Bar(speedFraction, BarCells, band.x, band.y))
@@ -70,7 +78,7 @@ namespace GeometricFlight.UI
         {
             ControllerState controller = ControllerService.Instance.State;
             if (controller.Connected && !GameSettings.KeyboardThrottleWithController && !controller.ThrottleValid)
-                return LcdGlyph.Center(now % 1f < 0.5f ? "THROTTLE NO ECHO" : "HOLDING CRUISE");
+                return LcdGlyph.Center(now % 1f < 0.5f ? "THROTTLE LOST" : "HOLDING CRUISE");
             if (proximity.Active)
                 return LcdGlyph.Center(proximity.Pulse ? "! PROXIMITY !" : "");
             if (now < hitUntil && blink)

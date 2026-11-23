@@ -66,21 +66,22 @@ namespace GeometricFlight.Input
     }
 
     /// <summary>In-memory controller for development and tests without hardware. Emits packets from
-    /// settable values at ~50 Hz; can inject malformed lines, drop echoes, or simulate unplugging.</summary>
+    /// settable values at ~50 Hz; can inject malformed lines or simulate unplugging.</summary>
     public sealed class SimulatedLineTransport : ILineTransport
     {
         private readonly object gate = new object();
         private readonly List<string> sent = new List<string>();
-        private int stickX = 512, stickY = 512, distanceMm = 180;
+        private int stickX = 512, stickY = 512, throttleRaw = 512;
         private bool fire, menu, unplugged;
         private bool lockHeld, empHeld, armed;
         private string injected;
 
         public string Name => "Simulator";
 
-        public void Set(int x, int y, int mm, bool fireHeld, bool menuPressed = false)
+        /// <param name="throttle">Raw fader reading, 0–1023 (512 is cruise with the default calibration).</param>
+        public void Set(int x, int y, int throttle, bool fireHeld, bool menuPressed = false)
         {
-            lock (gate) { stickX = x; stickY = y; distanceMm = mm; fire = fireHeld; menu = menuPressed; }
+            lock (gate) { stickX = x; stickY = y; throttleRaw = throttle; fire = fireHeld; menu = menuPressed; }
         }
 
         public void SetLock(bool held) { lock (gate) lockHeld = held; }
@@ -115,7 +116,7 @@ namespace GeometricFlight.Input
                     injected = null;
                     return line;
                 }
-                return ControllerProtocol.Frame($"AX,{stickX},{stickY},{distanceMm},{(fire ? 1 : 0)},{(menu ? 1 : 0)},"
+                return ControllerProtocol.Frame($"AX,{stickX},{stickY},{throttleRaw},{(fire ? 1 : 0)},{(menu ? 1 : 0)},"
                     + $"512,{(empHeld ? 1 : 0)},{(armed ? 1 : 0)},{(lockHeld ? 1 : 0)}");
             }
         }

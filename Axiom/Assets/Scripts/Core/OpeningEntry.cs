@@ -41,8 +41,6 @@ namespace GeometricFlight.Core
         [Tooltip("Course pieces inside the passage. Each appears once the walls around it are built, so "
                + "nothing floats outside unfinished walls.")]
         [SerializeField] private GameObject[] buildWithPassage;
-        [Tooltip("The endless ground; it glides under the menu until PLAY.")]
-        [SerializeField] private InfiniteGround ground;
         [Tooltip("Monospace font for the pop-up code windows.")]
         [SerializeField] private Font codeFont;
         [Tooltip("Both destinations use the same entry. Actual progression routing belongs to the later journey work.")]
@@ -158,12 +156,14 @@ namespace GeometricFlight.Core
                 music.Play();
             }
             menu.Suspended = true;
-            // The menu glides over the ground at the departure's starting speed; the camera takes the motion over.
-            if (ground != null) ground.GlideSpeed = 0f;
+            // The menu glided the view over the world grid at the departure's starting speed. The camera takes the
+            // motion over from where it got to, and the whole entry, control point included, moves along with it.
+            backdrop.StopGlide();
+            Vector3 glided = Vector3.forward * backdrop.Travelled;
+            cameraStart += glided;
+            admission += glided;
             levelUi.CockpitEnabled = true;
             look.EntryControlled = true;
-            look.CameraSuppliesMotion = true;
-            backdrop.SetPresentationMotion(true, cameraStart.z);
             // Menu input has ended. The existing run document now owns all navigation and pause UI.
             menuDocument.sortingOrder = levelDocument.sortingOrder - 1f;
             root.pickingMode = PickingMode.Ignore;
@@ -242,7 +242,8 @@ namespace GeometricFlight.Core
                 SampleWeaponsPanel();
                 ApplyDeparture();
                 SampleBuild();
-                if (!reduced && !shieldReported && clock >= Duration * 0.72f)
+                // Shields come online as the ship finishes materializing.
+                if (!reduced && !shieldReported && clock >= Duration * EntryPresentation.BuildEnd)
                 {
                     shieldReported = true;
                     // No queue: a missed or no longer truthful report is simply omitted.
@@ -274,7 +275,6 @@ namespace GeometricFlight.Core
             {
                 view.transform.SetPositionAndRotation(cameraStart, cameraRotation);
                 view.fieldOfView = cameraFov;
-                backdrop.SetPresentationMotion(true, cameraStart.z);
                 return;
             }
             ArenaFlightState state = flight.State;
@@ -297,7 +297,6 @@ namespace GeometricFlight.Core
                 Quaternion.Slerp(cameraRotation, rotation, rise));
             view.fieldOfView = Mathf.Lerp(cameraFov, fov, rise)
                 + Current.FovSurge * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.6f, 0.94f, progress)));
-            if (!backdropRetired) backdrop.SetPresentationMotion(true, view.transform.position.z);
         }
 
         /// <summary>Construction, terminal and haze all follow the same clock as the camera.</summary>
@@ -330,7 +329,7 @@ namespace GeometricFlight.Core
                 case "route": return returning ? "RETURN RUN" : "TRAINING";
                 case "input":
                     ControllerState device = ControllerService.Instance.State;
-                    return !device.Connected ? "KEYBOARD"
+                    return !device.Connected ? (CombinedFlightInput.GamepadInUse ? "GAMEPAD" : "KEYBOARD")
                         : GameSettings.KeyboardThrottleWithController ? "COCKPIT + KEYBOARD THROTTLE" : "COCKPIT";
                 case "handling": return flight.FullRotation ? "ROLL & PITCH" : "BANK & TURN";
                 case "passage": return $"PASSAGE {passage.Width:0} X {passage.Height:0} M";
@@ -445,6 +444,9 @@ namespace GeometricFlight.Core
         }
 
         /// <summary>A passing message from the system (a lesson's idea, a rebuild) in the HUD's announcement slot.</summary>
+        /// <summary>The ship and instrument reveal; a rebuild reuses its construction look.</summary>
+        public EntryPresentation Presentation => presentation;
+
         public void Announce(string line, float seconds)
         {
             if (flow.State != RunState.Playing || !admitted) return;

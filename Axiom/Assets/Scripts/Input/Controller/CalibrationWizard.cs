@@ -4,7 +4,7 @@ namespace GeometricFlight.Input
 {
     /// <summary>
     /// Step logic for calibrating the controller, independent of UI: stick centre, then the throttle's
-    /// minimum and maximum distances, then a check. Each Capture validates its reading and either
+    /// minimum and maximum readings, then a check. Each Capture validates its reading and either
     /// advances or leaves an Error explaining what to fix. Throttle values are written to the
     /// calibration only once both ends are captured, so the mapping never sits half-changed.
     /// </summary>
@@ -12,12 +12,13 @@ namespace GeometricFlight.Input
     {
         public enum Step { Center, ThrottleMin, ThrottleMax, Check }
 
-        public const int MinThrottleTravelMm = 30;
+        /// <summary>Fewest raw counts between the throttle's two ends (the fader's full travel is about 1023).</summary>
+        public const int MinThrottleTravel = 200;
         /// <summary>How far from the middle of the 0–1023 range a released stick may rest.</summary>
         public const int MaxCenterOffset = 200;
 
         private readonly ControllerCalibration target;
-        private int capturedMinMm;
+        private int capturedMin;
 
         public Step Current { get; private set; } = Step.Center;
         public string Error { get; private set; }
@@ -30,10 +31,10 @@ namespace GeometricFlight.Input
             Error = null;
         }
 
-        /// <param name="filteredMm">Smoothed sonar distance at the moment of capture.</param>
-        /// <param name="throttleValid">False when the sensor currently has no echo.</param>
+        /// <param name="filteredThrottle">Smoothed raw fader reading at the moment of capture.</param>
+        /// <param name="throttleValid">False when the throttle currently has no readings.</param>
         /// <returns>True if the step was accepted and the wizard advanced.</returns>
-        public bool Capture(ControllerPacket packet, float filteredMm, bool throttleValid)
+        public bool Capture(ControllerPacket packet, float filteredThrottle, bool throttleValid)
         {
             Error = null;
             switch (Current)
@@ -52,20 +53,20 @@ namespace GeometricFlight.Input
                     return true;
 
                 case Step.ThrottleMin:
-                    if (!ThrottleReading(filteredMm, throttleValid, out capturedMinMm)) return false;
+                    if (!ThrottleReading(filteredThrottle, throttleValid, out capturedMin)) return false;
                     Current = Step.ThrottleMax;
                     return true;
 
                 case Step.ThrottleMax:
-                    if (!ThrottleReading(filteredMm, throttleValid, out int maxMm)) return false;
-                    if (Mathf.Abs(maxMm - capturedMinMm) < MinThrottleTravelMm)
+                    if (!ThrottleReading(filteredThrottle, throttleValid, out int max)) return false;
+                    if (Mathf.Abs(max - capturedMin) < MinThrottleTravel)
                     {
-                        Error = $"Minimum and maximum are only {Mathf.Abs(maxMm - capturedMinMm)} mm apart. "
+                        Error = $"Minimum and maximum read only {Mathf.Abs(max - capturedMin)} apart. "
                               + "Slide the throttle all the way to its maximum and try again.";
                         return false;
                     }
-                    target.throttleMinMm = capturedMinMm;
-                    target.throttleMaxMm = maxMm;
+                    target.throttleMin = capturedMin;
+                    target.throttleMax = max;
                     Current = Step.Check;
                     return true;
 
@@ -74,11 +75,11 @@ namespace GeometricFlight.Input
             }
         }
 
-        private bool ThrottleReading(float filteredMm, bool valid, out int mm)
+        private bool ThrottleReading(float filtered, bool valid, out int raw)
         {
-            mm = Mathf.RoundToInt(filteredMm);
-            if (valid && !float.IsNaN(filteredMm)) return true;
-            Error = "No echo from the throttle sensor. Check the card is square in front of it.";
+            raw = Mathf.RoundToInt(filtered);
+            if (valid && !float.IsNaN(filtered)) return true;
+            Error = "No reading from the throttle. Check the fader's cable on the A3 row.";
             return false;
         }
     }

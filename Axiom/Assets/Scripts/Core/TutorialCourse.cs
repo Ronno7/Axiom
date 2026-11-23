@@ -69,8 +69,6 @@ namespace GeometricFlight.Core
         [SerializeField] private float flightLineY = 16f;
         [Tooltip("Before the first checkpoint, a retry rebuilds the ship here (the start of the clear lead-in).")]
         [SerializeField] private float startZ;
-        [Tooltip("Seconds between the shatter and the rebuild.")]
-        [SerializeField, Min(0.5f)] private float rebuildDelay = 2f;
         [SerializeField] private Checkpoint[] checkpoints = Array.Empty<Checkpoint>();
         [SerializeField] private Cue[] cues = Array.Empty<Cue>();
 
@@ -82,11 +80,12 @@ namespace GeometricFlight.Core
         private bool wasArmed, showingLesson, showingFlag, lessonAsksToArm, weaponsIntroduced;
         private RingScore.Snapshot saved;
         private ShipRebuild rebuild;
+        private AudioSource rebuildSound;
 
         /// <summary>Z where the next retry rebuilds the ship.</summary>
         public float RetryZ => reached < 0 ? startZ : checkpoints[reached].z;
         public int CheckpointsReached => reached + 1;
-        public bool Rebuilding => rebuild.Pending;
+        public bool Rebuilding => rebuild.Active;
 
         private void OnEnable()
         {
@@ -97,7 +96,15 @@ namespace GeometricFlight.Core
                 return;
             }
             authority = flight.GetComponent<MasterArmInput>();
-            rebuild = new ShipRebuild(flow, flight, shield, weapon, authority, chase);
+            if (rebuildSound == null)
+            {
+                rebuildSound = gameObject.AddComponent<AudioSource>();
+                rebuildSound.playOnAwake = false;
+                rebuildSound.spatialBlend = 0f;
+                rebuildSound.volume = 0.55f;
+            }
+            rebuild = new ShipRebuild(flow, flight, shield, weapon, authority, chase, entry.Presentation, rebuildSound);
+            flow.Recovery = rebuild;
             irises = FindObjectsByType<ClosingIris>(FindObjectsSortMode.None);
             Array.Sort(checkpoints, (a, b) => a.z.CompareTo(b.z));
             Array.Sort(cues, (a, b) => a.z.CompareTo(b.z));
@@ -115,6 +122,7 @@ namespace GeometricFlight.Core
         private void OnDisable()
         {
             if (flow != null && flow.CheckpointRecovery == TakeOverDestroyedShip) flow.CheckpointRecovery = null;
+            if (flow != null && flow.Recovery == rebuild) flow.Recovery = null;
         }
 
         private bool OnRail => !flow.EntryHeld && !flight.RailReleased;
@@ -123,9 +131,15 @@ namespace GeometricFlight.Core
         private bool TakeOverDestroyedShip()
         {
             if (!OnRail && !InArenaLessons) return false;
-            if (!OnRail) arena.ShipDestroyed();
-            rebuild.Begin(rebuildDelay);
-            entry.Announce("SIGNAL LOST", rebuildDelay);
+            if (OnRail) rebuild.Begin(new Vector3(0f, flightLineY, RetryZ), RestoreRailBehind);
+            else
+            {
+                arena.ShipDestroyed();
+                // The arena step waits for control, so nothing can shoot a ship still being built.
+                rebuild.Begin(arena.RetryPosition, RestockArena, arena.RestartStep);
+            }
+            // Held until the cut clears it: a pause during the crash mustn't let a real-time timer clear it early.
+            entry.Announce("SIGNAL LOST", ShipRebuild.ControlSeconds + 30f);
             return true;
         }
 
@@ -142,7 +156,7 @@ namespace GeometricFlight.Core
             if (Rebuilding)
             {
                 ClearLesson();
-                if (rebuild.Due) Rebuild();
+                rebuild.Update();
                 return;
             }
             if (!OnRail)
@@ -286,17 +300,11 @@ namespace GeometricFlight.Core
             levelUi.SetRingsReadout(text);
         }
 
-        private void Rebuild()
+        /// <summary>At the rebuild's cut, with the ship placed at the checkpoint: the rail behind it is restored.</summary>
+        private void RestoreRailBehind()
         {
-            if (flight.RailReleased) RebuildInArena();
-            else RebuildOnRail();
-            entry.Announce("REBUILT", 1.5f);
-        }
-
-        private void RebuildOnRail()
-        {
+            levelUi?.SetBanner(null);
             float z = RetryZ;
-            rebuild.Finish(new Vector3(0f, flightLineY, z));
             railRings.RestoreScore(saved);
             // Obstacles ahead of the retry point start fresh.
             foreach (ClosingIris iris in irises)
@@ -335,13 +343,12 @@ namespace GeometricFlight.Core
             chase?.ResetToTarget();
         }
 
-        /// <summary>An arena retry: rebuilt at the step's arena checkpoint with whatever weapons have been issued so far
-        /// restocked, and the current step started again. The rail stays sealed.</summary>
-        private void RebuildInArena()
+        /// <summary>At the rebuild's cut in the arena: issued weapons are restocked; the step itself waits for control.</summary>
+        private void RestockArena()
         {
-            rebuild.Finish(arena.RetryPosition);
+            levelUi?.SetBanner(null);
             arena.Restock();
-            arena.RestartStep();
         }
+
     }
 }

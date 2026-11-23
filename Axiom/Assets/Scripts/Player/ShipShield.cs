@@ -29,10 +29,20 @@ namespace GeometricFlight.Player
 
         private void Update() => State.Tick(Time.deltaTime);
 
-        /// <summary>Back to full strength (arena restarts after the ship is destroyed).</summary>
-        public void Restore()
+        /// <summary>Back to full strength (checkpoints, and control returning after a rebuild, which also starts the
+        /// protection window so the first frames of flight are safe).</summary>
+        public void Restore(bool protect = false)
         {
             State = new Shield(segments, protectionAfterHit);
+            if (protect) State.Protect();
+            Changed?.Invoke(State.Current);
+        }
+
+        /// <summary>Shows a rebuild's progress: the segments come back one at a time while the ship is down.</summary>
+        public void Refill(int count)
+        {
+            if (State.Current == count) return;
+            State.Refill(count);
             Changed?.Invoke(State.Current);
         }
 

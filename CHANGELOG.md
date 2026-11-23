@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Changed
+- The cockpit's throttle is a 100 mm fader.
+- The menu flies over a fixed floor grid, and the wider passage's walls, ribs, seams and floor bars sit on its lines.
+
+### Added
+- The Swept Dart is the player ship, and it materializes in the entry and after every crash.
+- Xbox controller support, with prompts that name its buttons.
+- A death sequence: the ship breaks apart, the view cuts to the checkpoint, and the ship rebuilds before you fly on.
+- Laser cut files for the cockpit's panel, body, knob and warning light boxes.
+- The cockpit's rumble ticks as the throttle settles into cruise and buzzes when a boost fires.
+
+### Fixed
+- Pause didn't work while the ship was being rebuilt.
+
 ## [0.2.1] - 2026-11-02
 
 ### Changed

@@ -9,16 +9,16 @@ namespace GeometricFlight.Input
     {
         /// <summary>Stick and twist axes, raw 0–1023.</summary>
         public readonly int StickX, StickY, Twist;
-        /// <summary>Ultrasonic distance in millimetres, or -1 when the sensor got no echo.</summary>
-        public readonly int DistanceMm;
+        /// <summary>The throttle fader's position, raw 0–1023.</summary>
+        public readonly int ThrottleRaw;
         public readonly bool Fire, Menu, Emp, Armed, LockHeld;
 
-        public ControllerPacket(int stickX, int stickY, int distanceMm, bool fire = false, bool menu = false,
+        public ControllerPacket(int stickX, int stickY, int throttleRaw, bool fire = false, bool menu = false,
             int twist = 512, bool emp = false, bool armed = false, bool lockHeld = false)
         {
             StickX = stickX;
             StickY = stickY;
-            DistanceMm = distanceMm;
+            ThrottleRaw = throttleRaw;
             Fire = fire;
             Menu = menu;
             Twist = twist;
@@ -31,7 +31,7 @@ namespace GeometricFlight.Input
     /// <summary>
     /// Serial protocol (Arduino/README.md). ASCII lines ending in newline, 115200 baud, with an
     /// NMEA-style checksum: XOR of every character before '*', written as two hex digits.
-    ///   cockpit → PC, ~50 Hz:  AX,&lt;x 0-1023&gt;,&lt;y 0-1023&gt;,&lt;mm or -1&gt;,&lt;fire 0/1&gt;,&lt;menu 0/1&gt;,
+    ///   cockpit → PC, ~50 Hz:  AX,&lt;x 0-1023&gt;,&lt;y 0-1023&gt;,&lt;throttle 0-1023&gt;,&lt;fire 0/1&gt;,&lt;menu 0/1&gt;,
     ///                          &lt;twist 0-1023&gt;,&lt;emp 0/1&gt;,&lt;arm 0/1&gt;,&lt;lock 0/1&gt;*HH
     ///   PC → cockpit:          BZ,&lt;hz&gt;,&lt;ms&gt;*HH   (buzzer tone)
     ///   PC → cockpit:          LT,&lt;row 0/1&gt;,&lt;text&gt;*HH   (one LCD row, see FormatLcdRow)
@@ -42,7 +42,6 @@ namespace GeometricFlight.Input
     public static class ControllerProtocol
     {
         public const int BaudRate = 115200;
-        public const int MaxDistanceMm = 4000;
 
         public static bool TryParse(string line, out ControllerPacket packet)
         {
@@ -60,12 +59,12 @@ namespace GeometricFlight.Input
             string[] f = body.Split(',');
             if (f.Length != 10 || f[0] != "AX") return false;
             if (!TryInt(f[1], 0, 1023, out int x) || !TryInt(f[2], 0, 1023, out int y)
-                || !TryInt(f[3], -1, MaxDistanceMm, out int mm)
+                || !TryInt(f[3], 0, 1023, out int throttle)
                 || !TryInt(f[4], 0, 1, out int fire) || !TryInt(f[5], 0, 1, out int menu)
                 || !TryInt(f[6], 0, 1023, out int twist) || !TryInt(f[7], 0, 1, out int emp)
                 || !TryInt(f[8], 0, 1, out int arm) || !TryInt(f[9], 0, 1, out int missileLock))
                 return false;
-            packet = new ControllerPacket(x, y, mm, fire == 1, menu == 1, twist, emp == 1, arm == 1, missileLock == 1);
+            packet = new ControllerPacket(x, y, throttle, fire == 1, menu == 1, twist, emp == 1, arm == 1, missileLock == 1);
             return true;
         }
 

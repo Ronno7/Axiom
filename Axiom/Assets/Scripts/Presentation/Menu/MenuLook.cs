@@ -121,13 +121,14 @@ namespace GeometricFlight.Presentation
         // Set by the entry. Until then the menu keeps its serialized look and idle behavior.
         public bool EntryControlled { get; set; }
         public float DepartureAmount { get; set; }
-        public bool CameraSuppliesMotion { get; set; }
         /// <summary>0–1: lets a sequence fade the dust out (the entry clears it before the passage).</summary>
         public float DustVisibility { get; set; } = 1f;
         public bool PresentationPaused { get; set; }
         /// <summary>A departing camera can see farther than the menu's close haze.</summary>
         public float FogDistanceScale { get; set; } = 1f;
         public void RebuildAtmosphere() => atmosphereDirty = true;
+        /// <summary>Moves the dust with the view when the menu steps back a repeat of the grid.</summary>
+        public void MoveDust(Vector3 delta) => air.MoveDust(delta);
 
         /// <summary>Keeps every supplied document inside the same CRT surface as the menu.
         /// Call when the document set changes, not every frame.</summary>
@@ -192,8 +193,7 @@ namespace GeometricFlight.Presentation
 
             float now = UiClock.Now;
             TrackInput(now);
-            air.Follow(menuCamera, PresentationPaused || CameraSuppliesMotion ? 0f : Time.deltaTime,
-                PresentationPaused ? 0f : Time.deltaTime);
+            air.Follow(menuCamera, PresentationPaused ? 0f : Time.deltaTime);
             air.SetDustVisibility(DustVisibility);
             UpdateStatus(now);
 
