@@ -25,6 +25,7 @@ const uint8_t PIN_RUMBLE = 5;   // DFR0440 vibration module (PWM; Timer0, so bee
 const uint8_t PIN_ARM    = 7;    // MASTER ARM: +5 V when armed, 10 kOhm pull-down when safe
 const uint8_t PIN_BUZZER = 8;    // DFR0032 passive buzzer (PB0: beep()'s interrupts switch it directly)
 const uint8_t PIN_LOCK   = 11;   // missile button, COM to GND and NO to D11
+const uint8_t PIN_RIBBON = 9;    // light ribbon button, COM to GND and NO to D9 (standby test only: not sent yet)
 const uint8_t PIN_LAMP   = 12;   // EMP dome's lamp (12 V part with its own resistor: a few mA at 5 V)
 
 // ---- Timing ----
@@ -75,8 +76,9 @@ Button fireButton = { PIN_FIRE, true, false, false, 0 };
 Button empButton  = { PIN_EMP,  true, false, false, 0 };
 Button menuButton = { PIN_MENU, true, false, false, 0 };
 Button lockButton = { PIN_LOCK, true, false, false, 0 };
+Button ribbonButton = { PIN_RIBBON, true, false, false, 0 };
 Button armSwitch  = { PIN_ARM,  false, false, false, 0 };
-Button *const buttons[] = { &fireButton, &empButton, &menuButton, &armSwitch, &lockButton };
+Button *const buttons[] = { &fireButton, &empButton, &menuButton, &armSwitch, &lockButton, &ribbonButton };
 const uint8_t BUTTON_COUNT = sizeof(buttons) / sizeof(buttons[0]);
 
 Adafruit_NeoPixel lights(LIGHT_COUNT, PIN_LIGHTS, NEO_GRB + NEO_KHZ800);
@@ -107,6 +109,7 @@ void setup() {
   pinMode(PIN_EMP, INPUT_PULLUP);
   pinMode(PIN_MENU, INPUT_PULLUP);
   pinMode(PIN_LOCK, INPUT_PULLUP);
+  pinMode(PIN_RIBBON, INPUT_PULLUP);
   pinMode(PIN_ARM, INPUT);         // external 10 kOhm pull-down
   pinMode(PIN_RUMBLE, OUTPUT);
   pinMode(PIN_LAMP, OUTPUT);
@@ -473,9 +476,10 @@ void drawStandby(unsigned long now) {
   lcdGlyph(7, SPIN[spinFrame]);
 
   char text[17];
-  snprintf(text, sizeof(text), "  AXIOM    %c%c%c%c%c",
+  snprintf(text, sizeof(text), "  AXIOM   %c%c%c%c%c%c",
            fireButton.stable ? 'F' : '.', empButton.stable ? 'E' : '.',
-           menuButton.stable ? 'M' : '.', armSwitch.stable ? 'A' : '.', lockButton.stable ? 'K' : '.');
+           menuButton.stable ? 'M' : '.', armSwitch.stable ? 'A' : '.', lockButton.stable ? 'K' : '.',
+           ribbonButton.stable ? 'R' : '.');
   lcdText(0, text);
   lcdWant[0][0] = 7;
   int x = (int)(analogRead(PIN_JOY_X) * 99L / 1023);
