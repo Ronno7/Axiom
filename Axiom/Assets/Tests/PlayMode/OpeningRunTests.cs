@@ -586,6 +586,8 @@ namespace GeometricFlight.Tests
             int clears = game.Tones(WaveClearedTone);
             foreach (ShootableTarget target in new List<ShootableTarget>(game.Lessons.CurrentWave.Live))
                 if (target != null) target.ApplyHit(999);
+            // As when a shot lands before the lessons' Update: they stop the cleared wave within the same frame.
+            game.Lessons.SendMessage("Update");
             yield return game.Until("the ending", () => game.Lessons.Current == ArenaLessons.Step.Ending, 4f);
             yield return game.Wait(0.3f);
             Assert.That(game.Tones(WaveClearedTone), Is.GreaterThan(clears), "the clear sounds on the cockpit");

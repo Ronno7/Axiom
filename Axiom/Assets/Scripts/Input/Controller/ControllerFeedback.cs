@@ -19,7 +19,6 @@ namespace GeometricFlight.Input
 
         private ThrottleZone[] zones;
         private ThrottleZone currentZone;
-        private ArenaWavePhase[] wavePhases;
         private MasterArmInput authority;
         private LockOnWeapon missiles;
         private bool armKnown, wasArmed;
@@ -28,7 +27,6 @@ namespace GeometricFlight.Input
         private void Awake()
         {
             zones = FindObjectsByType<ThrottleZone>(FindObjectsSortMode.None);
-            wavePhases = new ArenaWavePhase[waves.Length];
             authority = flight.GetComponent<MasterArmInput>();
             missiles = flight.GetComponent<LockOnWeapon>();
         }
@@ -41,6 +39,24 @@ namespace GeometricFlight.Input
         private void OnDisable()
         {
             if (shield != null) shield.Hit -= OnShieldHit;
+        }
+
+        // Each wave builds its state in Awake, so the phases are followed from Start.
+        private void Start()
+        {
+            foreach (ArenaEncounter wave in waves) if (wave.State != null) wave.State.PhaseChanged += SoundWavePhase;
+        }
+
+        private void OnDestroy()
+        {
+            foreach (ArenaEncounter wave in waves)
+                if (wave != null && wave.State != null) wave.State.PhaseChanged -= SoundWavePhase;
+        }
+
+        private static void SoundWavePhase(ArenaWavePhase phase)
+        {
+            if (phase == ArenaWavePhase.Incoming) ControllerService.Instance.PlayTone(440, 180);
+            else if (phase == ArenaWavePhase.Cleared) ControllerService.Instance.PlayTone(1320, 220);
         }
 
         private void OnShieldHit(int remaining) =>
@@ -57,11 +73,7 @@ namespace GeometricFlight.Input
             if (zone != null) ControllerService.Instance.PlayTone(zone.Type == ThrottleZone.Kind.Slow ? 523 : 1047, 90);
         }
 
-        private void LateUpdate()
-        {
-            SoundWavePhases();
-            SoundWeapons();
-        }
+        private void LateUpdate() => SoundWeapons();
 
         /// <summary>Arming answers, a press while SAFE is refused aloud, and painting rises in pitch. Quiet until the
         /// entry hands the weapons over.</summary>
@@ -86,18 +98,6 @@ namespace GeometricFlight.Input
             toneStep = step;
             lastLocks = state.Locks.Count;
             lastFired = missiles.MissilesFired;
-        }
-
-        private void SoundWavePhases()
-        {
-            for (int i = 0; i < waves.Length; i++)
-            {
-                ArenaWaveState state = waves[i].State;
-                if (state == null || state.Phase == wavePhases[i]) continue;
-                wavePhases[i] = state.Phase;
-                if (state.Phase == ArenaWavePhase.Incoming) ControllerService.Instance.PlayTone(440, 180);
-                else if (state.Phase == ArenaWavePhase.Cleared) ControllerService.Instance.PlayTone(1320, 220);
-            }
         }
     }
 }

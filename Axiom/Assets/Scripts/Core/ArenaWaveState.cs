@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +21,9 @@ namespace GeometricFlight.Core
         public float TimeLeft => Phase == ArenaWavePhase.Incoming ? Mathf.Max(0f, warningTime - Elapsed)
             : Phase == ArenaWavePhase.Cleared ? Mathf.Max(0f, recoveryTime - Elapsed) : 0f;
         public float WarningProgress => Mathf.Clamp01(Elapsed / warningTime);
+        /// <summary>Raised as the phase changes, so a phase shorter than a frame is still heard: the tutorial stops a
+        /// cleared wave in the same frame its last enemy falls.</summary>
+        public event Action<ArenaWavePhase> PhaseChanged;
 
         public ArenaWaveState(int enemyCount, float warningTime, float recoveryTime)
         {
@@ -59,8 +63,10 @@ namespace GeometricFlight.Core
 
         private void Enter(ArenaWavePhase phase)
         {
+            bool changed = phase != Phase;
             Phase = phase;
             Elapsed = 0f;
+            if (changed) PhaseChanged?.Invoke(phase);
         }
     }
 }

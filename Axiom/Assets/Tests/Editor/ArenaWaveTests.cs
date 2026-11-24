@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GeometricFlight.Core;
 using NUnit.Framework;
 
@@ -7,6 +8,21 @@ namespace GeometricFlight.Tests
     {
         private ArenaWaveState wave;
         [SetUp] public void SetUp() { wave = new ArenaWaveState(6, 3f, 6f); wave.Restart(); }
+
+        [Test] public void AClearStoppedInTheSameFrameIsStillAnnounced()
+        {
+            var heard = new List<ArenaWavePhase>();
+            wave.PhaseChanged += heard.Add;
+            wave.Step(3f);
+            for (int slot = 0; slot < 6; slot++) wave.ReportDestroyed(slot);
+            wave.Stop(); // the tutorial ends a cleared wave at once
+            wave.Restart();
+            wave.Restart(); // a retry while incoming changes nothing
+            Assert.That(heard, Is.EqualTo(new[]
+            {
+                ArenaWavePhase.Combat, ArenaWavePhase.Cleared, ArenaWavePhase.Inactive, ArenaWavePhase.Incoming,
+            }));
+        }
 
         [Test] public void EnemiesWaitForTheFullWarning()
         {

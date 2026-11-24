@@ -16,6 +16,7 @@
 
 ### Fixed
 - Pause didn't work while the ship was being rebuilt.
+- The cockpit could stay silent when a wave was cleared.
 
 ## [0.2.1] - 2026-11-02
 
