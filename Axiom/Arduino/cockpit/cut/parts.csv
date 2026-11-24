@@ -1,12 +1,12 @@
 file,material,quantity,width_in,height_in,width_mm,height_mm
-panel.dxf,"Acrylic 0.118 in black (3 mm)",1,16.535,9.740,420.0,247.4
+panel.dxf,"Acrylic 0.118 in black (3 mm)",1,13.780,9.740,350.0,247.4
 knob_layer.dxf,"Acrylic 0.118 in black (3 mm)",8,1.181,1.024,30.0,26.0
 knob_top.dxf,"Acrylic 0.118 in black (3 mm)",2,1.181,1.024,30.0,26.0
 light_box_layer.dxf,"Acrylic 0.118 in black (3 mm)",3,5.276,0.699,134.0,17.8
 light_box_floor.dxf,"Acrylic 0.118 in black (3 mm)",1,5.276,0.669,134.0,17.0
-bottom.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",1,16.535,9.646,420.0,245.0
+bottom.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",1,13.780,9.646,350.0,245.0
 side.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",2,9.646,3.599,245.0,91.4
-front.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",1,16.535,2.243,420.0,57.0
-back.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",1,16.535,3.563,420.0,90.5
+front.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",1,13.780,2.243,350.0,57.0
+back.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",1,13.780,3.563,350.0,90.5
 post_front.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",6,1.181,2.444,30.0,62.1
 post_back.dxf,"Baltic birch plywood 0.250 in (6.35 mm)",4,1.181,3.563,30.0,90.5

@@ -25,9 +25,12 @@ RENDER = "--render" in sys.argv
 # ---------------- Design dimensions ----------------
 # The footprint is set by two things: the throttle's front-to-back travel (depth) and the spacing
 # between the throttle hand and the stick hand (width).
-W, D, PALM, THR_X, TRAVEL = 420.0, 245.0, 65.0, 72.0, 100.0
-KNOB, STICK, ARM = (30.0, 26.0), (345.0, 130.0), (140.0, 185.0)
-CENTRE, BIG_Y, BTN_Y, LCD_Y, ANN_Y, WORD_Y = 222.0, 103.0, 160.0, 200.0, 230.0, 215.0
+# Left to right: the throttle at the left edge and its lights; one column of MASTER ARM, LOCK and RIBBON; the
+# middle column (warning lights, LCD, MENU, EMP) centred on the panel; the stick.
+W, D, PALM, THR_X, TRAVEL = 350.0, 245.0, 65.0, 32.0, 100.0
+KNOB, STICK, ARM = (30.0, 26.0), (277.0, 130.0), (94.0, 212.0)   # stick centred between the EMP bezel and the edge
+CENTRE, BIG_Y, BTN_Y, LCD_Y, ANN_Y = W / 2, 103.0, 160.0, 200.0, 230.0
+WORD = (W - 50.0, 229.0)       # the AXIOM wordmark (renders only), in the back right corner
 H_FRONT = 60.0                 # front height (top of the panel), back is higher by the slope
 SLOPE = 8.0                    # degrees
 T_TOP, T_WOOD = 3.0, 6.35      # 3 mm black acrylic top; SendCutSend's .250" Baltic birch body
@@ -51,7 +54,10 @@ LED_HOLE_R = 2.55
 
 BIG = (CENTRE, BIG_Y)          # EMP: 60 mm red dome arcade button, 24 mm hole (menus: confirm / launch)
 MENU = (CENTRE, BTN_Y)         # 30 mm: pause in flight, back in menus
+LOCK = (ARM[0], 166.0)         # 30 mm: hold to paint targets, release to fire; below MASTER ARM
+RIBBON = (ARM[0], 119.0)       # 30 mm: lays a light ribbon (not in the game yet); in front of LOCK
 LCD = (CENTRE, LCD_Y)
+LCD_WINDOW = (69.0, 24.0)      # inside the 1602's 71.3 x 26.3 frame, outside its 64.5 x 16.4 display
 SHIELD_YS, SHIELD_XS = LCD_Y, [CENTRE + 48.0 + 13.0 * i for i in range(3)]
 ANNUNCIATORS = [("LINK", CENTRE - 50.0, (0.1, 1.0, 0.25), True), ("SLOW", CENTRE - 25.0, (0.15, 0.45, 1.0), True),
                 ("FAST", CENTRE, (1.0, 0.55, 0.05), False), ("PROX", CENTRE + 25.0, (1.0, 0.08, 0.05), False),
@@ -101,10 +107,11 @@ SCREW_IN, SCREW_UP = 1.5 * TW, 15.0
 PANEL_SCREWS = [(SCREW_IN, SCREW_UP), (W - SCREW_IN, SCREW_UP), (SCREW_IN, D_SLOPE - SCREW_UP),
                 (W - SCREW_IN, D_SLOPE - SCREW_UP), (W / 2 - TW / 2, SCREW_UP)]
 
-# Uno + Gravity IO shield on M3 standoffs near the back wall, USB jack to the right (towards the panel-mount
-# socket). Its four holes, rotated 180 degrees from Arduino's drawing.
-UNO = (W / 2, D - TW - 6 - 53.34 / 2)
-UNO_HOLES = [(54.61, 50.80), (53.34, 2.54), (2.54, 45.72), (2.54, 17.78)]
+# Uno + Gravity IO shield on M3 standoffs behind the stick, where nothing hangs low; leads that fall short get
+# jumpers. USB jack to the left, towards the socket in the middle of the back wall. Its four holes as in Arduino's
+# drawing.
+UNO = (295.0, 186.0)
+UNO_HOLES = [(13.97, 2.54), (15.24, 50.80), (66.04, 7.62), (66.04, 35.56)]
 
 # Warning lights: a stack of 3 mm black acrylic plates under the five windows, each cut with the same five
 # windows, so every light has its own tunnel; a floor plate holds the LED modules. A printed paper legend sits
@@ -114,10 +121,12 @@ LB_X0, LB_LEN, LB_LAYERS, PAPER = CENTRE - 67.0, 134.0, 3, 0.2
 LB_FRONT, LB_BACK, LB_FLOOR_BACK = 9.5, 8.25, 7.5     # from the windows' centre line to each edge
 LB_WINDOW = (22.0, 10.0)
 
-# Not yet checked against the real parts (measure before ordering): the USB socket's cutout and screws, so the
-# back wall has no USB opening yet; the LED modules (the panel's 5.1 mm holes); the openings in PANEL_TODO.
-USB_SOCKET = None              # (x, z, width, height, screw spacing, screw hole diameter) once measured
-PANEL_TODO = "joystick, EMP, MENU, MASTER ARM, LCD"
+# Openings come from the makers' drawings and listings: the stick's hole and screw pattern (JH-D400X-R4
+# drawing), the EMP dome's 23.5 mm thread (checked on the part) in a 24 mm hole, MASTER ARM's 12.2 mm, the 30 mm
+# buttons' 28.6 mm (Happ drawing), the LCD's frame and 75 x 31 holes (standard 1602 drawing) and the USB socket's
+# template (StarTech manual).
+USB_SOCKET = (W / 2, 40.0, 12.5, 11.5, 26.0, 3.4)   # x, z on the back wall; cutout; screws 26 apart
+# Holes in the 6.35 mm birch are 3.4 mm: SendCutSend's laser needs holes at least half the sheet's thickness.
 
 
 # ---------------- Scene ----------------
@@ -127,7 +136,7 @@ scene.unit_settings.system = "METRIC"
 scene.unit_settings.length_unit = "MILLIMETERS"
 
 COLL = {}
-for name in ("Cockpit", "Internals", "Studio"):
+for name in ("Cockpit", "Internals", "Studio", "Checks"):   # Checks: clearance volumes, never rendered or exported
     c = bpy.data.collections.new(name)
     scene.collection.children.link(c)
     COLL[name] = c
@@ -372,7 +381,7 @@ BOTTOM = outline(edge((0, 0), (W, 0), widen(WALL_TABS), (0, TW)),
                  edge((0, D), (0, 0), widen(SIDE_TABS), (TW, 0)))
 BOTTOM_HOLES = [rect(x - SLACK / 2, y + POST_TAB[0] - CL / 2, x + 2 * TW + SLACK / 2, y + POST_TAB[1] + CL / 2)
                 for _, x, y in POSTS]
-BOTTOM_HOLES += [("circle", UNO[0] - 68.58 / 2 + u, UNO[1] - 53.34 / 2 + v, 1.6) for u, v in UNO_HOLES]
+BOTTOM_HOLES += [("circle", UNO[0] - 68.58 / 2 + u, UNO[1] - 53.34 / 2 + v, 1.7) for u, v in UNO_HOLES]
 SIDE = outline(edge((0, TW), (D, TW), SIDE_TABS, (0, -TW)),
                edge((D, TW), (D, under_h(D)), widen(BACK_END_TABS), (-TW, 0)),
                [(D, under_h(D))],
@@ -399,9 +408,12 @@ LB_FLOOR = [rect(0, 0, LB_LEN, LB_FRONT + LB_FLOOR_BACK)] + [
 base = FEET
 for i, (fx, fy) in enumerate(((25, 25), (W - 25, 25), (25, D - 25), (W - 25, D - 25))):
     cyl(f"Foot {i + 1}", fx, fy, 0, 10, FEET, M["rubber"])
-# Panel-mount USB-B on the back wall, beside the Uno (its jack faces this way)
-box("USB-B socket", W / 2 + 70, D + 1.5, base + 40, 26, 3, 20, M["dark_metal"])
-box("USB-B port", W / 2 + 70, D + 3.1, base + 40, 12, 0.4, 11, M["black_plastic"])
+# Panel-mount USB-B on the back wall, beside the Uno (its jack faces this way). StarTech's drawing: a 39 x 14.5 flange
+# outside, and 39 mm of body and strain relief behind the flange's face, through the cutout.
+usb_x, usb_z, usb_w, usb_h = USB_SOCKET[:4]
+box("USB-B socket", usb_x, D + 1.0, base + usb_z, 39, 2, 14.5, M["dark_metal"])
+box("USB-B port", usb_x, D + 2.1, base + usb_z, 12, 0.4, 11, M["black_plastic"])
+box("USB-B socket body", usb_x, D - 39 / 2, base + usb_z, usb_w - 0.5, 39, usb_h - 0.5, M["black_plastic"], coll="Internals")
 
 # ---------------- Top panel frame: everything mounted on the slope ----------------
 frame = bpy.data.objects.new("Panel frame", None)
@@ -426,10 +438,10 @@ def cut_slot(cx, y0, y1, w):
     OPENINGS.append(("slot", cx, y0, y1, w))
 
 
-cut_cyl(*STICK, 20.0)
+cut_cyl(*STICK, 20.3)    # 40.6 mm: the drawing says 41, but that leaves 1.2 mm of acrylic to the screw holes
 for dx in (-16.25, 16.25):
     for dy in (-16.25, 16.25):
-        cut_cyl(STICK[0] + dx, STICK[1] + dy, 1.4)
+        cut_cyl(STICK[0] + dx, STICK[1] + dy, 1.1)    # M2 close fit; 1.58 mm web, over half the sheet
 cut_slot(THR_X, SLOT_Y0, SLOT_Y1, SLOT_W)
 for dy in (-FADER_HOLES / 2, FADER_HOLES / 2):
     cut_cyl(THR_X, LEVER_Y + dy, 1.7)                  # M3 screws into the fader's tapped holes
@@ -437,10 +449,12 @@ for y in LED_YS:
     cut_cyl(LED_X, y, LED_HOLE_R)
 for x in SHIELD_XS:
     cut_cyl(x, SHIELD_YS, LED_HOLE_R)
-cut_cyl(*BIG, 12.0)    # uxcell 60 mm dome: 23.5 mm hole
-cut_cyl(*MENU, 14.0)    # Happ-style 30 mm button: 28 mm hole
-cut_cyl(*ARM, 6.0)
-cut_box(LCD[0], LCD[1], 72.0, 25.0)
+cut_cyl(*BIG, 12.0)    # uxcell 60 mm dome: 23.5 mm thread
+cut_cyl(*MENU, 14.3)    # Happ-style 30 mm button: 1-1/8 in (28.6 mm) hole for its 27.9 mm thread
+cut_cyl(*LOCK, 14.3)    # the same button
+cut_cyl(*RIBBON, 14.3)   # the same button
+cut_cyl(*ARM, 6.1)
+cut_box(LCD[0], LCD[1], *LCD_WINDOW)
 for dx in (-37.5, 37.5):
     for dy in (-15.5, 15.5):
         cut_cyl(LCD[0] + dx, LCD[1] + dy, 1.6)
@@ -538,7 +552,6 @@ def write_cut_files():
     print(f"Wrote {len(PARTS)} cut files to {out}")
     if not USB_SOCKET:
         print("NOTE: the back wall has no USB opening until USB_SOCKET is measured.")
-    print(f"NOTE: panel openings from listings, not measured: {PANEL_TODO}; LED holes {2 * LED_HOLE_R} mm.")
 
 
 # ---------------- Panel cut file and printable template ----------------
@@ -582,18 +595,20 @@ def write_panel_files():
     feet = [  # footprints of the parts above and below the panel (dashed), from the listings
         ("circle", STICK[0], STICK[1], 26.75), ("rect", THR_X, LEVER_Y, KNOB[0], KNOB[1]),
         ("rect", THR_X, LEVER_Y, FADER_W, FADER_L),
-        ("circle", BIG[0], BIG[1], 30.0), ("circle", MENU[0], MENU[1], 16.65),
-        ("rect", ax_, ay_, 28.0, 40.0), ("rect", LCD[0], LCD[1], 80.0, 36.0),
+        ("circle", BIG[0], BIG[1], 30.0), ("circle", MENU[0], MENU[1], 16.65), ("circle", LOCK[0], LOCK[1], 16.65),
+        ("circle", RIBBON[0], RIBBON[1], 16.65), ("rect", ax_, ay_, 28.0, 40.0), ("rect", LCD[0], LCD[1], 80.0, 36.0),
     ]
     labels = [
-        svg_text(STICK[0], STICK[1] - 33, "STICK: 40 mm hole, M3 on a 32.5 mm square"),
+        svg_text(STICK[0] + 15, STICK[1] - 33, "STICK: 40.6 mm hole, 2.2 mm holes on a 32.5 mm square"),
         svg_text(THR_X - KNOB[0] / 2 - 5, LEVER_Y, "THROTTLE: 100 mm fader under a 3.5 mm slot, knob at cruise",
                  rot=-90),
         svg_text(LED_X + 7, (LED_YS[0] + LED_YS[-1]) / 2, "8 throttle lights", rot=-90),
         svg_text(BIG[0], BIG[1] - 20, "EMP: 60 mm dome, 24 mm hole"),
-        svg_text(MENU[0] - 20, MENU[1] - 1, "MENU: 28 mm hole", anchor="end"),
-        svg_text(ax_, ay_ - 24, "MASTER ARM: 12 mm hole"),
-        svg_text(LCD[0], LCD[1] - 1.2, "LCD window 72 × 25", size=3),
+        svg_text(MENU[0] + 20, MENU[1] - 1, "MENU: 28.6 mm hole", anchor="start"),
+        svg_text(LOCK[0], LOCK[1] - 22, "LOCK: 28.6 mm hole"),
+        svg_text(RIBBON[0], RIBBON[1] - 22, "RIBBON: 28.6 mm hole"),
+        svg_text(ax_, ay_ - 24, "ARM: 12.2 mm hole"),
+        svg_text(LCD[0], LCD[1] - 1.2, f"LCD window {LCD_WINDOW[0]:g} × {LCD_WINDOW[1]:g}", size=3),
         svg_text(SHIELD_XS[1], SHIELD_YS + 5, "SHIELD", size=3),
         svg_text(W - 60, PALM + 2, f"palm rest ({PALM:g} mm)", color="#888"),
         svg_text(W / 2, 3, "FRONT EDGE", size=3, color="#888"),
@@ -642,13 +657,14 @@ def write_panel_files():
     # The legend strip behind the warning windows: white words on black, so only the words glow. Print at 100 %,
     # cut along the outline (the light box stack's size) and lay it face up between the panel and the stack.
     h = LB_FRONT + LB_BACK
+    page_w = LB_LEN + 41                   # wide enough for the note beside the scale bar
     words = "\n".join(
         f'<text x="{x - LB_X0 + 10:.2f}" y="{LB_BACK + 1.9:.2f}" font-size="5.2" font-weight="bold" '
         f'text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">{name}</text>'
         for name, x, _, _ in ANNUNCIATORS)
     (HERE / "legends.svg").write_text(
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{LB_LEN + 20:g}mm" height="{h + 24:g}mm" '
-        f'viewBox="0 0 {LB_LEN + 20:g} {h + 24:g}">\n'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{page_w:g}mm" height="{h + 24:g}mm" '
+        f'viewBox="0 0 {page_w:g} {h + 24:g}">\n'
         f'<rect x="10" y="10" width="{LB_LEN:g}" height="{h:g}" fill="#000" stroke="#888" stroke-width="0.2"/>\n'
         f'<g transform="translate(0 10)">\n{words}\n</g>\n'
         f'<rect x="10" y="{h + 14:g}" width="50" height="2" fill="#000"/>\n'
@@ -733,11 +749,11 @@ for i, y in enumerate(LED_YS):
     lit = M["led_band"] if i < 2 else M["led_white"] if i == 4 else M["led_off"]
     cyl(f"Throttle LED {i + 1}", LED_X, y, -3.0, 2.5, 5.6, lit, frame)
     dome(f"Throttle LED {i + 1} dome", LED_X, y, 2.6, 2.5, 2.5, lit, frame)
-text("Label THROTTLE", "THROTTLE", LED_X + 11, (LED_YS[0] + LED_YS[-1]) / 2, 5, M["label"], frame, rot_z=math.pi / 2)
+text("Label THROTTLE", "THROTTLE", THR_X - 22, (LED_YS[0] + LED_YS[-1]) / 2, 5, M["label"], frame, rot_z=math.pi / 2)
 text("Label MAX", "MAX", LED_X, SLOT_Y1 + 9, 3.6, M["label"], frame)
 text("Label MIN", "MIN", LED_X, SLOT_Y0 - 1, 3.6, M["label"], frame)
 # Rumble under the palm rest, where the throttle hand rests: it ticks at cruise and buzzes into boost.
-box("Vibration module", THR_X, 38.0, -T_TOP - 4.0, 30, 22, 8, M["pcb_blue"], frame, IN)
+box("Vibration module", THR_X + 15, 40.0, -T_TOP - 4.0, 30, 22, 8, M["pcb_blue"], frame, IN)
 
 # ---------------- Stick: JH-D400X-R4 with button ----------------
 sx, sy = STICK
@@ -759,11 +775,12 @@ text("EMP legend", "EMP", BIG[0], BIG[1] + 32.0, 3.6, M["ink"], frame, z=1.25)
 cyl("EMP bezel", BIG[0], BIG[1], 1.2, 30.0, 5.0, M["black_plastic"], frame, r2=29.0)
 cyl("EMP dome skirt", BIG[0], BIG[1], 6.2, 27.5, 3.0, M["red"], frame)
 dome("EMP dome", BIG[0], BIG[1], 9.2, 27.5, 13.0, M["red"], frame)
-for name, (bx, by) in (("MENU", MENU),):
+# LOCK's and RIBBON's labels sit in front of them, so LOCK's clears MASTER ARM's.
+for name, (bx, by), label_dy in (("MENU", MENU, 21.5), ("LOCK", LOCK, -21.5), ("RIBBON", RIBBON, -21.5)):
     cyl(f"{name} flange", bx, by, 0, 16.65, 4.7, M["black_plastic"], frame)
     cyl(f"{name} plunger", bx, by, 4.7, 11.3, 4.2, M["white"], frame)
     dome(f"{name} plunger top", bx, by, 8.9, 11.3, 0.8, M["white"], frame)
-    text(f"Label {name}", name, bx, by + 21.5, 3.6, M["label"], frame)
+    text(f"Label {name}", name, bx, by + label_dy, 3.6, M["label"], frame)
 
 
 # ---------------- MASTER ARM (flip-cover toggle) ----------------
@@ -775,7 +792,7 @@ text("Label MASTER ARM", "MASTER ARM", ax, ay - 26, 3.6, M["label"], frame)
 
 # ---------------- LCD, warning lights, shield ----------------
 lx, ly = LCD
-box("LCD glass", lx, ly, -1.6, 71.5, 24.5, 0.6, M["lcd_glass"], frame)
+box("LCD glass", lx, ly, -1.6, LCD_WINDOW[0] - 0.5, LCD_WINDOW[1] - 0.5, 0.6, M["lcd_glass"], frame)
 face = "consola.ttf"
 text("LCD row 1", "* AXIOM  STANDBY", lx, ly + 5.2, 6.2, M["lcd_text"], frame, z=-1.2, face=face)
 text("LCD row 2", "  CRUISE   100%", lx, ly - 5.6, 6.2, M["lcd_text"], frame, z=-1.2, face=face)
@@ -799,18 +816,19 @@ for i, x in enumerate(SHIELD_XS):
     cyl(f"Shield LED {i + 1}", x, SHIELD_YS, -3.0, 2.5, 5.6, M["led_blue"], frame)
     dome(f"Shield LED {i + 1} dome", x, SHIELD_YS, 2.6, 2.5, 2.5, M["led_blue"], frame)
 text("Label SHIELD", "SHIELD", SHIELD_XS[1], SHIELD_YS + 11, 3.6, M["label"], frame)
-text("Wordmark", "AXIOM", STICK[0], WORD_Y, 13, M["label"], frame, face="segoeuil.ttf", spacing=1.35)
+text("Wordmark", "AXIOM", WORD[0], WORD[1], 10, M["label"], frame, face="segoeuil.ttf", spacing=1.35)
 
 # ---------------- Internals (hang from the panel unless noted) ----------------
 box("Stick body", sx, sy, -3 - 12.75, 40.4, 40.4, 25.5, M["black_plastic"], frame, IN)
 cyl("EMP body", BIG[0], BIG[1], -3 - 33, 12, 33, M["black_plastic"], frame, IN)
 box("EMP microswitch", BIG[0], BIG[1], -3 - 33 - 9, 20, 10, 18, M["black_plastic"], frame, IN)
-for name, (bx, by) in (("MENU", MENU),):
-    cyl(f"{name} body", bx, by, -3 - 30.3, 14, 30.3, M["black_plastic"], frame, IN)
-cyl("ARM body", ax, ay, -3 - 35, 6, 35, M["dark_metal"], frame, IN)
+# 30 mm buttons: a 34.8 mm nut, then the body and microswitch to about 60 mm under the panel (Happ drawing).
+for name, (bx, by) in (("MENU", MENU), ("LOCK", LOCK), ("RIBBON", RIBBON)):
+    cyl(f"{name} nut", bx, by, -3 - 5, 17.4, 5, M["black_plastic"], frame, IN)
+    cyl(f"{name} body", bx, by, -3 - 60, 14, 55, M["black_plastic"], frame, IN)
+box("ARM body", ax, ay, -3 - 15, 16, 28, 30, M["dark_metal"], frame, IN)   # 28 x 16 body, 30 mm deep (listing)
 box("LCD module", lx, ly, -3 - 7, 80, 36, 8, M["pcb_green"], frame, IN)
-# Uno + Gravity IO shield on the floor near the back wall, turned sideways so its plugs clear the MENU
-# button's microswitch (world coordinates)
+# Uno + Gravity IO shield on the floor left of MASTER ARM and LOCK (world coordinates)
 ux, uy = UNO
 floor = FEET + TW
 for i, (u, v) in enumerate(UNO_HOLES):
@@ -820,7 +838,13 @@ box("Gravity IO shield", ux, uy, floor + 24, 68.58, 53.34, 1.6, M["pcb_green"], 
 for side in (-1, 1):
     box(f"Shield headers {'front' if side < 0 else 'back'}", ux, uy + side * 21, floor + 29, 60, 8, 9,
         M["terminal"], coll=IN)
-box("Buzzer module", ux - 60, uy, floor + 3, 30, 22, 6, M["pcb_blue"], coll=IN)
+box("Buzzer module", ux, uy - 50, floor + 3, 30, 22, 6, M["pcb_blue"], coll=IN)
+# The USB-B plug in the Uno's jack (back left corner), and the plugs on the shield's rows with their leads
+# bending over: kept clear of everything above, but never rendered or exported.
+box("Uno USB plug", ux - 34.29 - 6.2 - 15, uy + 11.1, floor + 17.1, 30, 16, 12, M["black_plastic"], coll="Checks")
+box("Uno cable plugs", ux, uy, floor + 33.5 + 10, 64, 50, 20, M["black_plastic"], coll="Checks")
+for ob in COLL["Checks"].objects:
+    ob.hide_render = True
 
 # ---------------- Text to meshes (so exports keep them) ----------------
 dg = bpy.context.evaluated_depsgraph_get()
@@ -882,12 +906,13 @@ def camera(name, loc, target, lens=50, ortho=None):
     return ob
 
 
+DX = (W - 420) / 2   # the views were framed on the 420 mm box: keep them centred on this one
 cams = {
-    "hero": camera("Cam hero", (-330, -520, 470), (240, 150, 70), lens=45),
+    "hero": camera("Cam hero", (-330 + DX, -520, 470), (240 + DX, 150, 70), lens=45),
     "player": camera("Cam player view", (W / 2, -430, 420), (W / 2, 150, 80), lens=32),
-    "top": camera("Cam top", (250, 140, 1200), (250, 140.01, 0), ortho=560),   # same scale for both presets
+    "top": camera("Cam top", (250 + DX, 140, 1200), (250 + DX, 140.01, 0), ortho=560),   # same scale as before
     "side": camera("Cam side", (1400, 140, 90), (0, 140, 90), ortho=330),
-    "xray": camera("Cam xray", (-250, -380, 520), (250, 150, 40), lens=40),
+    "xray": camera("Cam xray", (-250 + DX, -380, 520), (250 + DX, 150, 40), lens=40),
 }
 scene.camera = cams["hero"]
 
@@ -918,7 +943,7 @@ except Exception as e:  # CPU fallback
 bpy.context.preferences.filepaths.save_version = 0   # no .blend1 backups next to the file
 bpy.ops.wm.save_as_mainfile(filepath=str(HERE / f"{NAME}.blend"))
 for ob in bpy.data.objects:
-    ob.select_set(ob.users_collection[0].name != "Studio")
+    ob.select_set(ob.users_collection[0].name in ("Cockpit", "Internals"))
 bpy.ops.export_scene.gltf(filepath=str(HERE / f"{NAME}.glb"), export_format="GLB",
                           use_selection=True, export_apply=True)
 print("Saved", HERE / f"{NAME}.blend", f"({W:g} x {D:g} mm)")

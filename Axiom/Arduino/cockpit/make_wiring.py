@@ -277,8 +277,8 @@ t(RX - 10, TOP + 565, "USB-B", "pin", "end")
 line([(RX + 30, TOP + 560), (QX, TOP + 560)], GRAY, 6)
 ov_box(QX, TOP + 530, W - 40 - QX, 60, "H10  Panel USB cable (StarTech USBPNLBFBM1)", ["Uno to a socket in the back wall"],
        "plug-in", PLUGIN)
-t(QX + 12, TOP + 610, "D11 LOCK: COM → G, NO → S; V and NC unused. Same wiring as H3.", "tiny")
-t(QX + 12, TOP + 628, "Free: D9, D10, D13 and I2C #2.", "tiny")
+t(QX + 12, TOP + 610, "D11 LOCK and D9 RIBBON: COM → G, NO → S; V and NC unused. Same wiring as H3.", "tiny")
+t(QX + 12, TOP + 628, "RIBBON waits for light ribbons in the game. Free: D10, D13 and I2C #2.", "tiny")
 
 # =====================================================================
 # 2  Harness details
@@ -348,7 +348,7 @@ notes(16, 214, [
 add("</g>")
 
 # H3 MENU ------------------------------------------------------------------
-panel(COLS[2], R1, PW, PH, "H3  MENU / LOCK buttons (D4 / D11)", "2 each")
+panel(COLS[2], R1, PW, PH, "H3  MENU / LOCK / RIBBON buttons (D4 / D11 / D9)", "2 each")
 ys = header(44, 90, "D4", used="GS")
 add(f'<rect x="{TX + 6}" y="62" width="110" height="84" rx="5" fill="#495057"/>')
 t(TX + 61, 108, "microswitch", "pin", "middle", 'font-size="12"')
@@ -359,7 +359,7 @@ for py, c, lab in ((ys[0], BLACK, "COM"), (ys[2], SIG["D4"], "NO")):
 pad(TX, 138, None, used=False)
 t(TX - 10, 142, "NC (unused)", "tinyb", "end")
 notes(16, 206, [
-    "Shown: MENU on D4. Wire LOCK identically on D11; leave V and NC unused.",
+    "Shown: MENU on D4. Wire LOCK (D11) and RIBBON (D9) the same; leave V and NC unused.",
     "Tabs are 4.8 mm (3/16 in): solder to them, or crimp 4.8 mm female spade connectors instead.",
     "Find COM and NO with the meter: COM–NC reads 0 Ω at rest, COM–NO only when pressed.",
     "The microswitch clips off the button: wire it first, then clip it back on.",
@@ -476,7 +476,7 @@ add("</g>")
 panel(COLS[2], R3, PW, PH, "H10  USB and the shield", "plug-in", PLUGIN)
 add('<rect x="40" y="70" width="160" height="100" rx="8" fill="#0f7291"/>')
 t(120, 112, "Uno + shield", "pin", "middle", 'font-size="12"')
-t(120, 130, "(turned sideways)", "tiny", "middle", 'style="fill:#d0ebff"')
+t(120, 130, "(behind the stick)", "tiny", "middle", 'style="fill:#d0ebff"')
 add('<rect x="200" y="96" width="24" height="24" rx="2" fill="#adb5bd" stroke="#495057"/>')
 line([(224, 108), (300, 108), (300, 120), (330, 120)], GRAY, 6)
 add('<rect x="330" y="96" width="26" height="48" rx="3" fill="#495057"/>')
@@ -485,8 +485,8 @@ t(364, 194, "back wall", "tiny", "middle")
 t(380, 124, "socket", "tiny")
 notes(16, 230, [
     "Panel cable (StarTech USBPNLBFBM1, 30 cm): its B plug goes in the Uno, and the socket",
-    "screws into the 6 mm back wall beside it. Measure its screw spacing before the wall is cut.",
-    "The Uno lies sideways against the back wall so its plugs clear the MENU button's microswitch.",
+    "screws into the 6 mm back wall. Coil the spare cable.",
+    "The Uno sits behind the stick, where nothing hangs low. Jumper any lead that falls short.",
     "Shield: press it onto the Uno, power jumper on 5V, nothing on SERVO_PWR.",
     "USB powers everything (500 mA fuse); see the budget in section 4."], 17)
 add("</g>")
@@ -551,16 +551,17 @@ notes(16, ty + 22, [
 add("</g>")
 
 # Panel map with the light route (compact preset: same numbers as make_cockpit.py)
-PANEL_W, PANEL_D = 420.0, 245.0
-THR_X, TRAVEL, STEM_MIN, FADER_L, FADER_W = 72.0, 100.0, 109.0, 128.0, 9.3
-CENTRE, BIG, MENU, STICK, ARM = 222.0, (222.0, 103.0), (222.0, 160.0), (345.0, 130.0), (140.0, 185.0)
+PANEL_W, PANEL_D = 350.0, 245.0
+THR_X, TRAVEL, STEM_MIN, FADER_L, FADER_W = 32.0, 100.0, 109.0, 128.0, 9.3
+CENTRE, BIG, MENU, STICK, ARM = 175.0, (175.0, 103.0), (175.0, 160.0), (277.0, 130.0), (94.0, 212.0)
+LOCK, RIBBON = (94.0, 166.0), (94.0, 119.0)
 LCD_Y, ANN_Y = 200.0, 230.0
 LED_X = THR_X + 36.0
 throttle = [(LED_X, STEM_MIN + TRAVEL / 16 + TRAVEL / 8 * i) for i in range(8)]
 lights = [(CENTRE + d, ANN_Y) for d in (-50.0, -25.0, 0.0, 25.0, 50.0)]
 shield = [(CENTRE + 48.0 + 13.0 * i, LCD_Y) for i in range(3)]
 chain = throttle + lights + shield
-UNO = (PANEL_W / 2, PANEL_D - 6.35 - 6.0 - 53.34 / 2)     # turned sideways near the back wall
+UNO = (295.0, 186.0)     # behind the stick
 
 panel(790, NY, W - 830, 600, "Where the modules sit: top view of the panel", "route", "#e64980")
 S = 1.35
@@ -587,13 +588,14 @@ add(f'<rect x="{fx0}" y="{fy0}" width="{FADER_W * S}" height="{FADER_L * S}" rx=
 add(f'<rect x="{sx_ - 1.75 * S}" y="{m(0, STEM_MIN + TRAVEL + 4)[1]}" width="{3.5 * S}" height="{(TRAVEL + 8) * S}" '
     f'rx="2" fill="#868e96"/>')
 t(fx0 - 6, sy_, "fader", "map", "end", 'style="fill:#ffa94d"')
-for (cx_, cy_), r, lab in ((STICK, 20, "stick"), (BIG, 30, "EMP"), (MENU, 14, "MENU"), (ARM, 6, "ARM")):
+for (cx_, cy_), r, lab in ((STICK, 20, "stick"), (BIG, 30, "EMP"), (MENU, 14, "MENU"), (LOCK, 14, "LOCK"),
+                           (RIBBON, 14, "RIBBON"), (ARM, 6, "ARM")):
     px_, py_ = m(cx_, cy_)
     add(f'<circle cx="{px_}" cy="{py_}" r="{r * S}" fill="#495057"/>')
     t(px_, py_ + 4, lab, "map", "middle", 'style="fill:#e9ecef"')
-lx_, ly2 = m(CENTRE - 36, LCD_Y + 12.5)
-add(f'<rect x="{lx_}" y="{ly2}" width="{72 * S}" height="{25 * S}" fill="#2f9e44"/>')
-t(lx_ + 36 * S, ly2 + 12.5 * S + 4, "LCD", "map", "middle", 'style="fill:#fff"')
+lx_, ly2 = m(CENTRE - 34.5, LCD_Y + 12)
+add(f'<rect x="{lx_}" y="{ly2}" width="{69 * S}" height="{24 * S}" fill="#2f9e44"/>')
+t(lx_ + 34.5 * S, ly2 + 12 * S + 4, "LCD", "map", "middle", 'style="fill:#fff"')
 pts = [m(*UNO)] + [m(*p) for p in chain]
 add('<polyline points="' + " ".join(f"{x:g},{y:g}" for x, y in pts) +
     '" fill="none" stroke="#e64980" stroke-width="2.5" stroke-dasharray="7 4" marker-mid="url(#arr)"/>')
@@ -632,7 +634,7 @@ add(f'<line x1="40" y1="{TY + 8}" x2="{W - 40}" y2="{TY + 8}" stroke="#adb5bd"/>
 table = [
     ("H1  Joystick", "11", "6 pot lugs (X, Y) + 5 joins (twist, button)", "Medium: keep each lug on its pin"),
     ("H2  EMP 60 mm dome", "4", "COM and NO tabs + the 2 lamp tabs (or crimp spades)", "Easy"),
-    ("H3  MENU + LOCK buttons", "4", "COM and NO tabs on each button (or crimp spades)", "Easy: good first practice"),
+    ("H3  MENU, LOCK + RIBBON buttons", "6", "COM and NO tabs on each button (or crimp spades)", "Easy: good first practice"),
     ("H4  MASTER ARM", "5", "3 tabs + 2 splices for the 10 kΩ in the cable", "Easy"),
     ("H5  Throttle fader", "3", "pins 1, 2 and 3 on a 3-pin cable", "Easy"),
     ("H6  Buzzer module", "0", "Gravity cable", "None"),

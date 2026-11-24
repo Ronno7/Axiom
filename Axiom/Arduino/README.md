@@ -2,7 +2,7 @@
 
 ![The cockpit](cockpit/renders/hero.png)
 
-A custom controller for Axiom: an Arduino Uno in a sloped desk box, 420 × 245 mm. Only one exists, so this is a build
+A custom controller for Axiom: an Arduino Uno in a sloped desk box, 350 × 245 mm. Only one exists, so this is a build
 record, not a how-to.
 
 The electronics work on the bench. The throttle is a 100 mm fader, and the laser cut enclosure is next.
@@ -19,6 +19,7 @@ The electronics work on the bench. The throttle is a 100 mm fader, and the laser
 | LOCK | Hold to paint up to four targets, release to fire missiles |
 | EMP | The big red button. One pulse per life |
 | MENU | Pause. Back in menus |
+| RIBBON | Light ribbons, once they're in the game |
 
 Plus a 16×2 LCD the game draws on, a buzzer and rumble.
 
@@ -30,7 +31,7 @@ Plus a 16×2 LCD the game draws on, a buzzer and rumble.
 | --- | --- |
 | Stick X, Y, twist | A0, A1, A2 |
 | Throttle fader | A3 |
-| FIRE, EMP, MENU, LOCK | D2, D3, D4, D11 |
+| FIRE, EMP, MENU, LOCK, RIBBON | D2, D3, D4, D11, D9 |
 | Rumble | D5 |
 | LED string | D6 |
 | MASTER ARM | D7 |

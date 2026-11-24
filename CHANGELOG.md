@@ -10,7 +10,8 @@
 - The Swept Dart is the player ship, and it materializes in the entry and after every crash.
 - Xbox controller support, with prompts that name its buttons.
 - A death sequence: the ship breaks apart, the view cuts to the checkpoint, and the ship rebuilds before you fly on.
-- Laser cut files for the cockpit's panel, body, knob and warning light boxes.
+- Laser cut files for a 35 cm wide cockpit: its panel, body, knob and warning light boxes.
+- A RIBBON button on the cockpit, for the light ribbons to come.
 - The cockpit's rumble ticks as the throttle settles into cruise and buzzes when a boost fires.
 
 ### Fixed
