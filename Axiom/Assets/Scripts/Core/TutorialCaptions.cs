@@ -21,12 +21,12 @@ namespace GeometricFlight.Core
             if (string.IsNullOrEmpty(line)) return line;
             bool pad = controls == Controls.Gamepad, keys = controls == Controls.Keyboard;
             bool keyThrottle = keys || (controls == Controls.Cockpit && keyboardThrottleWithCockpit);
-            return line.Replace("{fire}", pad ? "[RB]" : keys ? "[SPACE]" : "[FIRE]")
+            return line.Replace("{fire}", pad ? "[A]" : keys ? "[SPACE]" : "[FIRE]")
                 .Replace("{lower}", pad ? "[LT]" : keyThrottle ? "[Q]" : "THROTTLE BACK")
                 .Replace("{raise}", pad ? "[RT]" : keyThrottle ? "[E]" : "THROTTLE FORWARD")
-                .Replace("{boost}", pad ? "[RT] ALL THE WAY" : keyThrottle ? "HOLD [E]" : "TO THE FINAL STOP")
+                .Replace("{boost}", pad ? "HOLD [RT]" : keyThrottle ? "HOLD [E]" : "TO THE FINAL STOP")
                 .Replace("{arm}", pad ? "[VIEW]" : keys ? "[T]" : "[MASTER ARM]")
-                .Replace("{lock}", pad ? "[LB]" : keys ? "[LEFT SHIFT]" : "[LOCK]")
+                .Replace("{lock}", pad ? "[B]" : keys ? "[LEFT SHIFT]" : "[LOCK]")
                 .Replace("{emp}", pad ? "[Y]" : keys ? "[R]" : "[EMP]");
         }
     }

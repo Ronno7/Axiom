@@ -47,7 +47,9 @@ namespace GeometricFlight.Player
         public int InputSampleFrame { get; private set; } = -1;
         /// <summary>This frame's throttle after the cruise notch, -1 to +1.</summary>
         public float Throttle { get; private set; }
-        public float CurrentSpeed => state.Speed;
+        /// <summary>The speed the ship is flying: zero while flight is off (destroyed, or rebuilding at a checkpoint),
+        /// when it stands still.</summary>
+        public float CurrentSpeed => enabled ? state.Speed : 0f;
         /// <summary>World velocity this frame; shots inherit it.</summary>
         public Vector3 Velocity => state.Forward * state.Speed;
         public float CruiseSpeed => SpeedAt(0f);

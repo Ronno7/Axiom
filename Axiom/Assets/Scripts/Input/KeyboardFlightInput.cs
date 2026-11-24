@@ -3,6 +3,10 @@ using UnityEngine.InputSystem;
 
 namespace GeometricFlight.Input
 {
+    /// <summary>
+    /// The keyboard, and the latched throttle: Q and E (and a gamepad's triggers, passed in through
+    /// <see cref="AddThrottleChange"/>) move the setting at a steady rate, and it stays where they leave it.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class KeyboardFlightInput : FlightInputSource
     {
@@ -22,9 +26,19 @@ namespace GeometricFlight.Input
         private InputAction emp;
         private InputAction pause;
         private float throttleSetting;
+        private float pendingThrottleChange;
 
         /// <summary>True when this frame's read had a key in use: the keyboard is the one being flown.</summary>
         public bool Actuated { get; private set; }
+
+        /// <summary>Moves the latched throttle in the next read as Q/E would (-1…+1, scaled by the rate): a gamepad's
+        /// triggers share the latch, so switching between keys and pad never makes the throttle jump.</summary>
+        public void AddThrottleChange(float change) => pendingThrottleChange += change;
+
+        /// <summary>The latch: the setting moves by change × rate × time and holds when change is zero.</summary>
+        public static float Latch(float setting, float change, float rate, float deltaTime) =>
+            Mathf.Clamp(setting + Mathf.Clamp(change, -1f, 1f) * Mathf.Max(0f, rate) * Mathf.Max(0f, deltaTime),
+                -1f, 1f);
 
         private void Awake()
         {
@@ -96,10 +110,11 @@ namespace GeometricFlight.Input
         public override FlightInput ReadInput(float deltaTime)
         {
             Actuated = false;
+            float padChange = pendingThrottleChange;
+            pendingThrottleChange = 0f;
             if (!isActiveAndEnabled || steering == null) return default;
             float change = throttle.ReadValue<float>();
-            throttleSetting = Mathf.Clamp(throttleSetting + change
-                * Mathf.Max(0f, throttleChangeRate) * Mathf.Max(0f, deltaTime), -1f, 1f);
+            throttleSetting = Latch(throttleSetting, change + padChange, throttleChangeRate, deltaTime);
             var input = new FlightInput(steering.ReadValue<Vector2>(), throttleSetting,
                 fire.IsPressed(), pause.WasPressedThisFrame(), twist.ReadValue<float>(), missileLock.IsPressed(),
                 empHeld: emp.IsPressed());

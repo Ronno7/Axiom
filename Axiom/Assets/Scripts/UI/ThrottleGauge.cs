@@ -30,9 +30,10 @@ namespace GeometricFlight.UI
             return LeverFraction(lever);
         }
 
-        /// <summary>LOW, CRUISE, FULL or BOOST; empty between cruise and full.</summary>
+        /// <summary>LOW, CRUISE, FULL or BOOST; empty between cruise and full, and while the ship isn't flying.</summary>
         public static string Word(ShipFlight flight)
         {
+            if (!flight.enabled) return string.Empty;
             if (flight.Boost == BoostStatus.Active) return "BOOST";
             float lever = flight.Throttle;
             if (lever < 0f) return "LOW";

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace GeometricFlight.Presentation
 {
     /// <summary>Diegetic shield readout: hull segments switch from lit to dark as the shield is lost,
-    /// and the aircraft blinks while post-hit protection lasts.</summary>
+    /// and the aircraft blinks while post-hit protection lasts: its renderers and its exhaust jets together.</summary>
     [DisallowMultipleComponent]
     public sealed class ShieldDisplay : MonoBehaviour
     {
@@ -19,6 +19,10 @@ namespace GeometricFlight.Presentation
         [SerializeField, Min(1f)] private float blinkRate = 12f;
 
         private bool blinking;
+        private ThrustDisplay[] jets;
+
+        // The exhaust redraws itself every frame, so it blinks through its own flag rather than the renderer list.
+        private void Awake() => jets = GetComponentsInChildren<ThrustDisplay>(true);
 
         private void OnEnable()
         {
@@ -51,6 +55,9 @@ namespace GeometricFlight.Presentation
 
         private void SetVisible(bool visible)
         {
+            if (jets != null)
+                foreach (ThrustDisplay jet in jets)
+                    if (jet != null) jet.Hidden = !visible;
             if (blinkRenderers == null) return;
             foreach (Renderer r in blinkRenderers) r.enabled = visible;
         }

@@ -187,6 +187,45 @@ namespace GeometricFlight.Tests
         }
 
         [UnityTest]
+        public IEnumerator TheRebuildReadsNoSpeedWhileTheShipStandsStill()
+        {
+            yield return game.ReachControl();
+            game.Shield.Destroy();
+            yield return game.Wait(ShipRebuild.CutSeconds + 0.5f);
+            Assert.That(game.Course.Rebuilding && !game.Flight.enabled, "mid build, the hull standing still");
+            Assert.That(game.HudText("throttle-speed"), Is.EqualTo("SPEED 0 M/S"), "no cruise speed while it stands still");
+            yield return game.Capture("rebuild-speed");
+            yield return game.Rebuilt();
+            yield return game.Wait(0.2f);
+            Assert.That(game.HudText("throttle-speed"), Does.Not.StartWith("SPEED 0 "), "control returns at speed");
+        }
+
+        [UnityTest]
+        public IEnumerator AHitBlinksTheExhaustWithTheHull()
+        {
+            yield return game.ReachControl();
+            var shieldDisplay = Object.FindFirstObjectByType<ShieldDisplay>();
+            var hull = (Renderer[])typeof(ShieldDisplay).GetField("blinkRenderers",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(shieldDisplay);
+            Renderer jet = game.Flight.GetComponentInChildren<ThrustDisplay>().GetComponent<Renderer>();
+            Assert.That(hull.Length > 0 && jet.enabled, "the hull and the exhaust are showing");
+
+            game.Shield.ApplyHit();
+            int hidden = 0, apart = 0;
+            for (int frame = 0; frame < 120 && game.Shield.State.IsProtected; frame++)
+            {
+                yield return new WaitForEndOfFrame();
+                if (!hull[0].enabled) hidden++;
+                if (hull[0].enabled != jet.enabled) apart++;
+            }
+            Assert.That(hidden, Is.GreaterThan(0), "the hull blinks after a hit");
+            Assert.That(apart, Is.Zero, "the exhaust blinks with it, frame for frame");
+            yield return game.Until("protection to end", () => !game.Shield.State.IsProtected, 5f);
+            yield return game.Wait(0.1f);
+            Assert.That(hull[0].enabled && jet.enabled, "both show again once protection ends");
+        }
+
+        [UnityTest]
         public IEnumerator FlyingThroughARingScoresItOnceAndARetryForgetsIt()
         {
             yield return game.ReachControl();

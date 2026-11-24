@@ -99,6 +99,21 @@ namespace GeometricFlight.Tests
             Assert.That(flight.State.Position, Is.EqualTo(staged.Position));
         }
 
+        [Test]
+        public void AShipStandingStillReadsNoSpeedAndNoThrottleWord()
+        {
+            Hold();
+            flight.StageEntry(EntryState(true));
+            Step(flight, 0.1f);
+            Assert.That(flight.CurrentSpeed, Is.EqualTo(30f));
+
+            flight.enabled = false; // destroyed, or rebuilding at a checkpoint: the flight is off and the hull stands still
+            Assert.That(flight.CurrentSpeed, Is.Zero, "the readout shows the speed the ship is really doing");
+            Assert.That(GeometricFlight.UI.ThrottleGauge.Word(flight), Is.Empty, "no CRUISE while it stands still");
+            flight.enabled = true;
+            Assert.That(flight.CurrentSpeed, Is.EqualTo(30f), "control returns at the speed it kept");
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void AdmissionKeepsHeldInputAndStartsTheNormalMovementLaw(bool full)

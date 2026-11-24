@@ -49,10 +49,14 @@ namespace GeometricFlight.Presentation
             mesh.triangles = indices;
         }
 
+        /// <summary>Hidden while the hull blinks after a hit (<see cref="ShieldDisplay"/>), so the jets blink with it.
+        /// Only the drawing stops: the jets keep responding underneath.</summary>
+        public bool Hidden { get; set; }
+
         private void LateUpdate()
         {
             bool running = !Application.isPlaying || (flight != null && flight.isActiveAndEnabled);
-            jetRenderer.enabled = running;
+            jetRenderer.enabled = running && !Hidden;
             if (!running) return;
             if (Application.isPlaying)
             {
