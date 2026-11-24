@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SweptDart_Interior_Interior_circuits_Cyan
+  m_Name: PlayerLightJet_Interior_Interior_controls_Light
   m_Shader: {fileID: 4800000, guid: feaa4133d7ef8f844a54aecb2c92420f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -30,14 +30,14 @@ Material:
     m_Ints: []
     m_Floats:
     - _BuildProgress: 1
-    - _EmissionStrength: 0.55
+    - _EmissionStrength: 0
     - _FrontDuration: 0.05
     - _FrontStrength: 12
     - _RetireAt: 2.9166667
     - _ShadeStrength: 0.65
     - _UseArrivalMap: 0
     m_Colors:
-    - _BaseColor: {r: 0.4352941, g: 0.7647059, b: 0.8745098, a: 1}
+    - _BaseColor: {r: 0.9019608, g: 1, b: 1, a: 1}
     - _EdgeColor: {r: 0.4352941, g: 0.7647059, b: 0.8745098, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

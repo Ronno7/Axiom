@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SweptDart_Hull_Shield_carrier_Structure
+  m_Name: PlayerLightJet_Hull_Secondary_facet_Text
   m_Shader: {fileID: 4800000, guid: feaa4133d7ef8f844a54aecb2c92420f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -38,7 +38,7 @@ Material:
     - _ShadeStrength: 0.65
     - _UseArrivalMap: 1
     m_Colors:
-    - _BaseColor: {r: 0.0470588, g: 0.078431346, b: 0.12156858, a: 1}
+    - _BaseColor: {r: 0.7176471, g: 0.7882353, b: 0.81960785, a: 1}
     - _EdgeColor: {r: 0.4352941, g: 0.7647059, b: 0.8745098, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

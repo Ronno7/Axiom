@@ -3,7 +3,7 @@ using UnityEngine;
 namespace GeometricFlight.Presentation
 {
     /// <summary>
-    /// The Swept Dart's construction, as authored (v13): construction traces draw, the interior assembles, the hull
+    /// The Player Light Jet's construction, as authored (v13): construction traces draw, the interior assembles, the hull
     /// arrives across its surface and the permanent systems light last. Every material reads one build progress, 0 to 1,
     /// standing for the sequence's three reference seconds; the caller owns the clock, so the same build plays in the
     /// entry and, faster, in a rebuild. The interior and traces only exist while building.

@@ -1,7 +1,7 @@
-# Swept Dart
+# Player Light Jet
 
-The next player ship: a white low poly hull, a modelled interior and a three second materialization. It isn't in the
-game yet.
+The player ship: a white low poly hull, a modelled interior and a three second materialization. It builds itself in the
+game's entry and again after every crash. Files from the design study keep their old working name.
 
 - [Ship views](../reviews/v13/presentation/ship-sheet.jpg), with 4K [front](../reviews/v13/presentation/ship-front.png),
   [rear](../reviews/v13/presentation/ship-rear.png) and [underside](../reviews/v13/presentation/ship-underside.png)

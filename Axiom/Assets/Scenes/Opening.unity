@@ -6457,7 +6457,7 @@ GameObject:
   - component: {fileID: 89151809}
   - component: {fileID: 89151810}
   m_Layer: 0
-  m_Name: SweptDart
+  m_Name: PlayerLightJet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8690,7 +8690,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1a6c4b75d9e05d44fb90e2bb7ba7c7b4, type: 3}
       propertyPath: m_Name
-      value: SweptDart_Interior
+      value: PlayerLightJet_Interior
       objectReference: {fileID: 0}
     - target: {fileID: 1750460269040596612, guid: 1a6c4b75d9e05d44fb90e2bb7ba7c7b4, type: 3}
       propertyPath: m_Enabled
@@ -15637,10 +15637,12 @@ MonoBehaviour:
   positionLag: 0.15
   maxLag: 2
   lookAhead: 20
-  rollFollow: 0.25
   rotationLag: 0.06
   baseFieldOfView: 62
   speedFieldOfView: 10
+  lookAcross: 150
+  lookUpDown: 60
+  lookLag: 0.12
 --- !u!1 &463556569
 GameObject:
   m_ObjectHideFlags: 0
@@ -32463,7 +32465,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ed456fc05c5cdb44c8327c52956cde3a, type: 3}
       propertyPath: m_Name
-      value: SweptDart_Construction
+      value: PlayerLightJet_Construction
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -35769,17 +35771,10 @@ MonoBehaviour:
     cruiseSpeed: 30
     throttleMultipliers: {x: 0.6, y: 1.5}
     acceleration: 20
-    turnRate: 90
-    turnAtThrottleEnds: {x: 0.85, y: 0.65}
-    maxBank: 65
-    bankResponse: 0.15
-    twistYawRate: 27
-    pitchRate: 75
-    maxPitch: 65
-    pitchLevelTime: 1.2
     rollRate: 220
     loopRate: 100
-    fullTwistYawRate: 40
+    turnAtThrottleEnds: {x: 0.85, y: 0.65}
+    rudderRate: 40
     gravity: 0
     thrustResponse: 0.7
     dragResponse: 0.3
@@ -35802,7 +35797,6 @@ MonoBehaviour:
     stickExpo: 1.7
     twistExpo: 2
   pushToDive: 1
-  fullRotation: 1
   railEndZ: 5976
   railHeadingLimit: 45
 --- !u!114 &1293384977
@@ -36083,14 +36077,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc7b67b4a2940ef4f9b414ecd460ee27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GeometricFlight.Runtime::GeometricFlight.Input.GamepadFlightInput
-  steerBinding: <Gamepad>/leftStick
-  twistBinding: <Gamepad>/rightStick/x
-  raiseBinding: <Gamepad>/rightTrigger
-  lowerBinding: <Gamepad>/leftTrigger
-  fireBinding: <Gamepad>/rightShoulder
-  lockBinding: <Gamepad>/leftShoulder
-  empBinding: <Gamepad>/buttonNorth
-  pauseBinding: <Gamepad>/start
   triggerRest: 0.05
 --- !u!1 &1293922254
 GameObject:
@@ -36486,7 +36472,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c7b49ba70685a8b468d791f067706232, type: 3}
       propertyPath: m_Name
-      value: SweptDart
+      value: PlayerLightJet
       objectReference: {fileID: 0}
     - target: {fileID: 989570082673885018, guid: c7b49ba70685a8b468d791f067706232, type: 3}
       propertyPath: m_CastShadows

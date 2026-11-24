@@ -1,5 +1,5 @@
 // Staged source only. Compile and visually verify in Unity during the future import.
-Shader "GeometricFlight/Swept Dart Surface"
+Shader "GeometricFlight/Player Light Jet Surface"
 {
     Properties
     {
@@ -19,7 +19,7 @@ Shader "GeometricFlight/Swept Dart Surface"
         Tags { "RenderType"="TransparentCutout" "RenderPipeline"="UniversalPipeline" "Queue"="AlphaTest" }
         Pass
         {
-            Name "SweptDartForward"
+            Name "PlayerLightJetForward"
             Tags { "LightMode"="SRPDefaultUnlit" }
             Cull Back
             ZWrite On

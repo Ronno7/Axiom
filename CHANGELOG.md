@@ -2,12 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-23
+
 ### Changed
 - The cockpit's throttle is a 100 mm fader.
 - The menu flies over a fixed floor grid, and the wider passage's walls, ribs, seams and floor bars sit on its lines.
 
 ### Added
-- The Swept Dart is the player ship, and it materializes in the entry and after every crash.
+- The Player Light Jet is the player ship, and it materializes in the entry and after every crash.
 - Xbox controller support, with free look on the right stick in the arena and prompts that name its buttons.
 - A death sequence: the ship breaks apart, the view cuts to the checkpoint, and the ship rebuilds before you fly on.
 - Laser cut files for a 35 cm wide cockpit: its panel, body, knob and warning light boxes.
@@ -51,7 +53,7 @@
 - CRT display option that includes the HUD and menus.
 - Twelve color palette across art and UI.
 - Keyboard throttle option for use with the cockpit.
-- Swept Dart player ship with 4K renders and a materialization preview, not yet in the game.
+- Player Light Jet with 4K renders and a materialization preview, not yet in the game.
 - UI showcase page.
 
 ### Changed
@@ -143,7 +145,8 @@
 ### Added
 - Prototype scene: geometric ship, corridor and camera.
 
-[Unreleased]: https://github.com/Ronno7/Axiom/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/Ronno7/Axiom/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/Ronno7/Axiom/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/Ronno7/Axiom/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Ronno7/Axiom/compare/v0.1.9...v0.2.0
 [0.1.9]: https://github.com/Ronno7/Axiom/releases/tag/v0.1.9

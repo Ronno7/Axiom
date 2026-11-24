@@ -1,5 +1,5 @@
 // One mesh/material; each spline reads its own row of the sampled v13 animation.
-Shader "GeometricFlight/Swept Dart Trace"
+Shader "GeometricFlight/Player Light Jet Trace"
 {
     Properties
     {
@@ -13,7 +13,7 @@ Shader "GeometricFlight/Swept Dart Trace"
         Tags { "RenderType"="Transparent" "RenderPipeline"="UniversalPipeline" "Queue"="Transparent" }
         Pass
         {
-            Name "SweptDartTraceForward"
+            Name "PlayerLightJetTraceForward"
             Tags { "LightMode"="SRPDefaultUnlit" }
             Cull Back
             ZWrite Off

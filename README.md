@@ -1,11 +1,12 @@
 # Axiom
 
-A flight shooter set in a world of light lines and dark glass. Flown on a custom Arduino cockpit, or on the keyboard.
+A flight shooter set in a world of light lines and dark glass. Flown on a custom Arduino cockpit, an Xbox controller
+or the keyboard.
 
 ![The main menu](Axiom/Docs/images/menu.webp)
 
 <h3 align="center">
-  <a href="https://github.com/Ronno7/Axiom/releases/latest">Download 0.2.1</a> ·
+  <a href="https://github.com/Ronno7/Axiom/releases/latest">Download 0.2.2</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
   <a href="https://ronno7.github.io/Axiom/">Showcase</a>
 </h3>
@@ -15,16 +16,18 @@ build isn't signed, so Windows may show a warning.
 
 ## Controls
 
-| Key | |
-| --- | --- |
-| WASD or arrows | Steer |
-| Z / C | Twist |
-| Q / E | Throttle. Hold E at full to boost |
-| T | Arm weapons |
-| Space | Guns |
-| Shift | Hold to paint targets, release to fire missiles |
-| R | EMP |
-| Esc | Pause |
+| | Keyboard | Xbox controller |
+| --- | --- | --- |
+| Steer | WASD or arrows | Left stick |
+| Twist | Z / C | LB / RB |
+| Throttle, which stays where you leave it | Q / E | LT / RT |
+| Boost | Hold E at full | Hold RT at full |
+| Arm weapons | T | View |
+| Guns | Space | A |
+| Paint targets, release to fire missiles | Hold Shift | Hold B |
+| EMP | R | Y |
+| Look around, in the arena | | Right stick |
+| Pause | Esc | Menu |
 
 ## Roadmap
 
