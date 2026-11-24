@@ -62,18 +62,14 @@ namespace GeometricFlight.Tests
             Set(flow, "<EntryHeld>k__BackingField", true);
         }
 
-        private static ArenaFlightState EntryState(bool full)
-        {
-            var state = new ArenaFlightState { Position = new Vector3(0f, 70f, 0f), Speed = 30f };
-            state.SetFullRotation(full);
-            return state;
-        }
+        private static ArenaFlightState EntryState() =>
+            new ArenaFlightState { Position = new Vector3(0f, 70f, 0f), Speed = 30f };
 
         [Test]
         public void HeldEntrySamplesEachUpdateWithoutAdvancingTheStagedState()
         {
             Hold();
-            ArenaFlightState staged = EntryState(true);
+            ArenaFlightState staged = EntryState();
             staged.Position.z = -100f;
             flight.StageEntry(staged);
             input.Value = new FlightInput(Vector2.right, 0.73f, true, true, 0.4f, true, false, true);
@@ -103,7 +99,7 @@ namespace GeometricFlight.Tests
         public void AShipStandingStillReadsNoSpeedAndNoThrottleWord()
         {
             Hold();
-            flight.StageEntry(EntryState(true));
+            flight.StageEntry(EntryState());
             Step(flight, 0.1f);
             Assert.That(flight.CurrentSpeed, Is.EqualTo(30f));
 
@@ -114,12 +110,11 @@ namespace GeometricFlight.Tests
             Assert.That(flight.CurrentSpeed, Is.EqualTo(30f), "control returns at the speed it kept");
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void AdmissionKeepsHeldInputAndStartsTheNormalMovementLaw(bool full)
+        [Test]
+        public void AdmissionKeepsHeldInputAndStartsTheNormalMovementLaw()
         {
             Hold();
-            ArenaFlightState staged = EntryState(full);
+            ArenaFlightState staged = EntryState();
             flight.StageEntry(staged);
             input.Value = new FlightInput(Vector2.right, 0.7f, false, false, 0.25f);
             Step(flight, 0.1f);
@@ -136,16 +131,13 @@ namespace GeometricFlight.Tests
             ArenaFlightState expected = staged;
             Vector2 steering = Vector2.right * GameSettings.SteeringSensitivity;
             float throttle = ArenaFlightModel.SnapCruise(input.Value.Throttle, flight.Tuning.cruiseSnap);
-            if (full)
-                ArenaFlightModel.StepFull(ref expected, steering, 0.25f, throttle, flight.Tuning, bounds.Limits, 0.1f);
-            else
-                ArenaFlightModel.Step(ref expected, steering, 0.25f, throttle, flight.Tuning, bounds.Limits, 0.1f);
+            ArenaFlightModel.Fly(ref expected, steering, 0.25f, throttle, flight.Tuning, bounds.Limits, 0.1f);
             Step(flight, 0.1f);
             Step(flow, 0.1f);
 
             Assert.That(input.Reads, Is.EqualTo(2));
             Assert.That(Vector3.Distance(flight.State.Position, expected.Position), Is.LessThan(0.0001f));
-            Assert.That(Quaternion.Angle(flight.State.Rotation, expected.Rotation), Is.LessThan(0.01f));
+            Assert.That(Quaternion.Angle(flight.State.Attitude, expected.Attitude), Is.LessThan(0.01f));
             Assert.That(flight.CurrentSpeed, Is.EqualTo(expected.Speed).Within(0.0001f));
             Assert.That(flight.Velocity, Is.EqualTo(expected.Forward * expected.Speed));
             Assert.That(flow.ElapsedTime, Is.EqualTo(0.1f));
@@ -159,7 +151,7 @@ namespace GeometricFlight.Tests
         public void IdleMenuIgnoresPauseThenEntryUsesNativePauseAndRefusesPausedAdmission()
         {
             Hold();
-            flight.StageEntry(EntryState(true));
+            flight.StageEntry(EntryState());
             Set(flow, "courseEnd", actor.transform); // Completion would be immediate without the hold.
             Assert.That(flow.TryBeginEntryRun(), Is.False);
             flow.Pause();
@@ -213,15 +205,11 @@ namespace GeometricFlight.Tests
             Assert.That(input.Reads, Is.Zero, "Recovery observes the cached snapshot without polling input.");
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void CameraResetReplacesOldSpringWithShipMotionAndUsesTheExactStagedPose(bool full)
+        [Test]
+        public void CameraResetReplacesOldSpringWithShipMotionAndUsesTheExactStagedPose()
         {
             Hold();
-            ArenaFlightState staged = EntryState(full);
-            staged.Yaw = 25f;
-            staged.Pitch = 12f;
-            staged.Bank = 30f;
+            ArenaFlightState staged = EntryState();
             staged.Attitude = Quaternion.Euler(-12f, 25f, -30f);
             staged.Speed = flight.MaxSpeed;
             flight.StageEntry(staged);

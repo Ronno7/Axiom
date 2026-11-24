@@ -43,7 +43,7 @@ namespace GeometricFlight.Input
     {
         /// <summary>The keyboard and a gamepad together: the keyboard steers (and twists) while its keys are held,
         /// otherwise the pad does; the throttle is the one latched setting both move (carried by the keyboard's
-        /// snapshot); and weapons and pause come from either.</summary>
+        /// snapshot); weapons and pause come from either, and free look from the pad.</summary>
         public static FlightInput Local(FlightInput keyboard, FlightInput pad)
         {
             Vector2 steering = keyboard.Steering.sqrMagnitude > 0.0001f ? keyboard.Steering : pad.Steering;
@@ -51,27 +51,29 @@ namespace GeometricFlight.Input
             return new FlightInput(steering, keyboard.Throttle,
                 keyboard.FireHeld || pad.FireHeld, keyboard.PausePressed || pad.PausePressed, twist,
                 keyboard.LockHeld || pad.LockHeld, keyboard.LockCancelled || pad.LockCancelled,
-                keyboard.EmpHeld || pad.EmpHeld);
+                keyboard.EmpHeld || pad.EmpHeld, pad.Look);
         }
 
         /// <summary>Without a controller, keyboard input passes through. With one: its stick (and twist)
         /// steers unless a steering (or twist) key is held. The selected throttle source supplies its
-        /// setpoint, and weapons/pause come from either device. Hardware throttle retains its filtered
-        /// ease to cruise on sensor loss; it never silently switches to a stale keyboard setpoint.</summary>
+        /// setpoint, and weapons/pause come from either device. The cockpit has no free look, so the local
+        /// look passes through. Hardware throttle retains its filtered ease to cruise on sensor loss; it never
+        /// silently switches to a stale keyboard setpoint.</summary>
         public static FlightInput Merge(FlightInput keyboard, ControllerState controller,
             bool keyboardThrottleWithController = false)
         {
             if (!controller.Connected)
                 return new FlightInput(keyboard.Steering, keyboard.Throttle, keyboard.FireHeld,
                     keyboard.PausePressed, keyboard.Twist, keyboard.LockHeld,
-                    keyboard.LockCancelled || controller.LockCancelled, keyboard.EmpHeld);
+                    keyboard.LockCancelled || controller.LockCancelled, keyboard.EmpHeld, keyboard.Look);
             Vector2 steering = keyboard.Steering.sqrMagnitude > 0.0001f ? keyboard.Steering : controller.Stick;
             float twist = Mathf.Abs(keyboard.Twist) > 0.0001f ? keyboard.Twist : controller.Twist;
             float throttle = keyboardThrottleWithController ? keyboard.Throttle : controller.Throttle;
             return new FlightInput(steering, throttle,
                 keyboard.FireHeld || controller.Fire, keyboard.PausePressed || controller.MenuPressed,
                 twist, keyboard.LockHeld || controller.LockHeld,
-                keyboard.LockCancelled || controller.LockCancelled, keyboard.EmpHeld || controller.EmpHeld);
+                keyboard.LockCancelled || controller.LockCancelled, keyboard.EmpHeld || controller.EmpHeld,
+                keyboard.Look);
         }
     }
 }

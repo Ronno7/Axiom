@@ -4,7 +4,7 @@ namespace GeometricFlight.Input
 {
     /// <summary>One device-independent input snapshot. Throttle is a signed setpoint:
     /// -1 is minimum, 0 is cruise, +1 is maximum. Twist is the stick's rotation axis, -1 (anticlockwise)
-    /// to +1 (clockwise). Pause is a press edge; fire is held.</summary>
+    /// to +1 (clockwise). Pause is a press edge; fire is held. Look turns the view, never the ship.</summary>
     public readonly struct FlightInput
     {
         public readonly Vector2 Steering;
@@ -16,9 +16,11 @@ namespace GeometricFlight.Input
         public readonly bool EmpHeld;
         /// <summary>Cancel a painted volley when its input device is lost; this is not a release.</summary>
         public readonly bool LockCancelled;
+        /// <summary>Free look: where to turn the view around the ship, -1…+1 on each axis (right and up positive).</summary>
+        public readonly Vector2 Look;
 
         public FlightInput(Vector2 steering, float throttle, bool fireHeld, bool pausePressed, float twist = 0f,
-            bool lockHeld = false, bool lockCancelled = false, bool empHeld = false)
+            bool lockHeld = false, bool lockCancelled = false, bool empHeld = false, Vector2 look = default)
         {
             LockHeld = lockHeld;
             EmpHeld = empHeld;
@@ -28,6 +30,7 @@ namespace GeometricFlight.Input
             Throttle = Mathf.Clamp(throttle, -1f, 1f);
             FireHeld = fireHeld;
             PausePressed = pausePressed;
+            Look = Vector2.ClampMagnitude(look, 1f);
         }
     }
 

@@ -87,7 +87,7 @@ namespace GeometricFlight.Player
             {
                 // A very coarse request may point exactly backwards. Its halfway attitude retains
                 // which side the requested turn used; no arbitrary centering direction is needed.
-                Vector3 halfway = Quaternion.Slerp(before.Rotation, state.Rotation, 0.5f) * Vector3.forward;
+                Vector3 halfway = Quaternion.Slerp(before.Attitude, state.Attitude, 0.5f) * Vector3.forward;
                 transverse = Vector3.ProjectOnPlane(halfway, Vector3.forward);
             }
             if (transverse.sqrMagnitude < 1e-10f)
@@ -95,19 +95,9 @@ namespace GeometricFlight.Player
             if (transverse.sqrMagnitude < 1e-10f) transverse = Vector3.up;
 
             Vector3 permitted = Vector3.forward * Mathf.Cos(radians) + transverse.normalized * Mathf.Sin(radians);
-            if (state.FullRotation)
-            {
-                // Correct only the requested nose displacement. The shortest rotation carries the
-                // requested roll with it; rejecting the whole quaternion would freeze roll at a limit.
-                state.Attitude = (Quaternion.FromToRotation(requested, permitted) * state.Attitude).normalized;
-                Vector3 right = state.Attitude * Vector3.right;
-                state.Bank = Mathf.Asin(Mathf.Clamp(-right.y, -1f, 1f)) * Mathf.Rad2Deg;
-            }
-            // Bank & Turn keeps its requested bank lag even while heading is limited. Replacing it
-            // with an Euler roll extracted from a corrected quaternion changes the control law.
-            state.Yaw = Mathf.Repeat(Mathf.Atan2(permitted.x, permitted.z) * Mathf.Rad2Deg, 360f);
-            state.Pitch = Mathf.Asin(Mathf.Clamp(permitted.y, -1f, 1f)) * Mathf.Rad2Deg;
-            if (!state.FullRotation) state.Attitude = state.Rotation;
+            // Correct only the requested nose displacement. The shortest rotation carries the requested roll with
+            // it; rejecting the whole quaternion would freeze roll at a limit.
+            state.Attitude = (Quaternion.FromToRotation(requested, permitted) * state.Attitude).normalized;
             return true;
         }
     }

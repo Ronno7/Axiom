@@ -30,7 +30,7 @@ namespace GeometricFlight.Input
             previouslyAllowed = allowed;
             return new FlightInput(raw.Steering, raw.Throttle, allowed && !fireRelease && raw.FireHeld,
                 raw.PausePressed, raw.Twist, allowed && !lockRelease && raw.LockHeld, cancel,
-                allowed && !empRelease && raw.EmpHeld);
+                allowed && !empRelease && raw.EmpHeld, raw.Look);
         }
     }
 }

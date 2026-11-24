@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GeometricFlight.Player
 {
@@ -16,30 +17,16 @@ namespace GeometricFlight.Player
         [Min(0.1f)] public float acceleration = 20f;
 
         [Header("Turning")]
-        [Tooltip("Heading change at full bank with the throttle on the detent, degrees per second.")]
-        [Min(1f)] public float turnRate = 90f;
-        [Tooltip("Turn rate relative to the detent at minimum (x) and maximum (y) throttle. Below 1 at both ends "
-               + "makes the detent the fastest-turning setting; the brake end still gives the smallest circle.")]
-        public Vector2 turnAtThrottleEnds = new Vector2(0.85f, 0.65f);
-        [Range(5f, 85f)] public float maxBank = 65f;
-        [Tooltip("Seconds for the bank to close most of the gap to the stick (time constant).")]
-        [Min(0.01f)] public float bankResponse = 0.15f;
-        [Tooltip("Flat rudder from the twist, degrees per second at full twist.")]
-        [Min(0f)] public float twistYawRate = 27f;
-
-        [Header("Pitch")]
-        [Min(1f)] public float pitchRate = 75f;
-        [Range(10f, 85f)] public float maxPitch = 65f;
-        [Tooltip("With the stick centred, seconds for the nose to settle most of the way back to level.")]
-        [Min(0.05f)] public float pitchLevelTime = 1.2f;
-
-        [Header("Full rotation")]
         [Tooltip("Roll speed at full stick, degrees per second (a full barrel roll takes 360 / this).")]
         [Min(1f)] public float rollRate = 220f;
         [Tooltip("Pitch speed at full stick on the detent, degrees per second (a loop takes 360 / this).")]
         [Min(1f)] public float loopRate = 100f;
-        [Tooltip("Rudder from the twist in full rotation, degrees per second.")]
-        [Min(0f)] public float fullTwistYawRate = 40f;
+        [Tooltip("Pitch speed relative to the detent at minimum (x) and maximum (y) throttle. Below 1 at both ends "
+               + "makes the detent the fastest-turning setting; the brake end still gives the smallest circle.")]
+        public Vector2 turnAtThrottleEnds = new Vector2(0.85f, 0.65f);
+        [Tooltip("Rudder from the twist, degrees per second at full twist.")]
+        [FormerlySerializedAs("fullTwistYawRate")]
+        [Min(0f)] public float rudderRate = 40f;
 
         [Header("Energy and stall")]
         [Tooltip("Climbing trades speed for height and diving trades height for speed, metres per second squared "
@@ -92,51 +79,47 @@ namespace GeometricFlight.Player
         }
     }
 
+    /// <summary>The ship in flight. Its orientation is free (loops, rolls, inverted flight) and held in
+    /// <see cref="Attitude"/>; yaw, pitch and bank are read from it. A new state faces +Z, level.</summary>
     public struct ArenaFlightState
     {
         public Vector3 Position;
-        /// <summary>Heading in degrees around world up (0 = +Z).</summary>
-        public float Yaw;
-        /// <summary>Nose up is positive, degrees.</summary>
-        public float Pitch;
-        /// <summary>Right wing down is positive, degrees.</summary>
-        public float Bank;
         public float Speed;
         /// <summary>True while the arena edge is turning the ship back.</summary>
         public bool Returning;
         /// <summary>True while the ship is below stall speed.</summary>
         public bool Stalled;
-        /// <summary>Full rotation: the ship's orientation is free (loops, rolls, inverted flight) and held
-        /// here; Yaw, Pitch and Bank are then read back from it for display only.</summary>
-        public bool FullRotation;
-        public Quaternion Attitude;
         /// <summary>The throttle-end burst (charge, time left, armed).</summary>
         public BoostState Boost;
+        private Quaternion attitude;
 
-        /// <summary>Level direction of travel without bank (arcade); the attitude itself in full rotation.</summary>
-        public Quaternion Heading => FullRotation ? Attitude : Quaternion.Euler(-Pitch, Yaw, 0f);
-        public Quaternion Rotation => FullRotation ? Attitude : Heading * Quaternion.Euler(0f, 0f, -Bank);
-        public Vector3 Forward => Heading * Vector3.forward;
-
-        /// <summary>Switches flight mode, keeping the current orientation (leaving full rotation levels the
-        /// wings and limits pitch).</summary>
-        public void SetFullRotation(bool full)
+        public Quaternion Attitude
         {
-            if (full == FullRotation) return;
-            if (full) Attitude = Rotation;
-            FullRotation = full;
-            if (!full) Bank = 0f;
+            get => attitude.Equals(default(Quaternion)) ? Quaternion.identity : attitude;
+            set => attitude = value;
         }
+
+        public Vector3 Forward => Attitude * Vector3.forward;
+        /// <summary>Heading in degrees around world up (0 = +Z).</summary>
+        public float Yaw => Mathf.Repeat(Mathf.Atan2(Forward.x, Forward.z) * Mathf.Rad2Deg, 360f);
+        /// <summary>Nose up is positive, degrees.</summary>
+        public float Pitch => Mathf.Asin(Mathf.Clamp(Forward.y, -1f, 1f)) * Mathf.Rad2Deg;
+        /// <summary>Right wing down is positive, degrees.</summary>
+        public float Bank => Mathf.Asin(Mathf.Clamp(-(Attitude * Vector3.right).y, -1f, 1f)) * Mathf.Rad2Deg;
     }
 
     /// <summary>
-    /// Stateless arcade flight over a floor. The ship always flies forward. Stick X banks it, and the bank turns
-    /// it (so turns ease in), with the turn rate peaking at cruise; stick Y pitches (positive = nose up) and the nose
-    /// settles back to level when the stick is centred; the twist adds a flat rudder for fine aim. Near the edge the
-    /// ship is turned back toward the middle, and it can never leave the arena or pass the floor or ceiling.
+    /// The ship's one flight law, stateless, over a floor. The ship always flies forward. The stick rolls (X) and
+    /// pitches (Y, positive = nose up) it about its own axes, the twist yaws it, and nothing levels it, so holding
+    /// the stick flies barrel rolls and loops (back) or outside loops (forward). Turning is roll-then-pull, as in an
+    /// aircraft, and pitch speed peaks on the detent. Near the edge the ship is turned back toward the middle, a nose
+    /// pointing into the floor or ceiling is eased level, and it can never leave the arena.
     /// </summary>
     public static class ArenaFlightModel
     {
+        /// <summary>Seconds of outward travel the edge turn allows for beyond the turn itself.</summary>
+        private const float EdgeReaction = 0.3f;
+
         /// <summary>Response curve that keeps the sign: |v|^expo.</summary>
         public static float Shape(float value, float expo)
         {
@@ -189,92 +172,17 @@ namespace GeometricFlight.Player
             return Mathf.Sign(throttle) * Mathf.Clamp01((magnitude - snap) / Mathf.Max(0.0001f, 1f - snap));
         }
 
-        /// <summary>Radius of the full-bank turn circle at a speed and turn rate (degrees per second).</summary>
+        /// <summary>Radius of the turn circle at a speed and turn rate (degrees per second).</summary>
         public static float TurnRadius(float speed, float turnRateDegrees)
         {
             return speed / Mathf.Max(0.01f, turnRateDegrees * Mathf.Deg2Rad);
         }
 
-        /// <summary>One step of whichever handling the state is in.</summary>
+        /// <summary>One step of flight. A step of no time changes nothing.</summary>
         public static void Fly(ref ArenaFlightState s, Vector2 stick, float twist, float throttle, ArenaFlightTuning t,
             ArenaLimits limits, float deltaTime)
         {
-            if (s.FullRotation) StepFull(ref s, stick, twist, throttle, t, limits, deltaTime);
-            else Step(ref s, stick, twist, throttle, t, limits, deltaTime);
-        }
-
-        public static void Step(ref ArenaFlightState s, Vector2 stick, float twist, float throttle,
-            ArenaFlightTuning t, ArenaLimits limits, float deltaTime)
-        {
             if (deltaTime <= 0f) return;
-
-            bool boosting = ThrottleBoost.Step(ref s.Boost, throttle, t.boost, deltaTime);
-            throttle = ThrottleBoost.Lever(throttle, t.boost);
-            float averageSpeed = Energy(ref s.Speed, throttle, Mathf.Sin(s.Pitch * Mathf.Deg2Rad), t, deltaTime,
-                boosting);
-            s.Stalled = UpdateStall(s.Stalled, s.Speed, t);
-            float x = Shape(stick.x, t.stickExpo);
-            float y = Shape(stick.y, t.stickExpo);
-            float rudder = Shape(twist, t.twistExpo);
-            float turn = t.turnRate * TurnMultiplier(throttle, t.turnAtThrottleEnds);
-
-            // Arena edge: a ship heading outward is turned back toward the middle once the wall is close enough
-            // that it needs the room to turn. Turning until it runs along the wall carries it outward by
-            // r·(1 − √(1 − c²)), where r is the turn radius and c how directly it is heading out; the bank lag
-            // adds a little more. The turn starts gently at twice that distance and is full at it.
-            float targetBank = x * t.maxBank;
-            Vector3 offset = s.Position - limits.Center;
-            var flat = new Vector2(offset.x, offset.z);
-            float distance = flat.magnitude;
-            Vector3 forward = s.Forward;
-            var flatForward = new Vector2(forward.x, forward.z);
-            float outward = distance > 0.01f ? Vector2.Dot(flatForward, flat / distance) : 0f;
-            float push = 0f;
-            if (outward > 0f)
-            {
-                float needed = TurnRadius(s.Speed, turn) * (1f - Mathf.Sqrt(1f - outward * outward))
-                    + s.Speed * outward * t.bankResponse * 2f + 1f;
-                push = Mathf.Clamp01((2f * needed - (limits.Radius - distance)) / needed);
-            }
-            s.Returning = push > 0f;
-            if (s.Returning)
-            {
-                float home = Mathf.Atan2(-flat.x, -flat.y) * Mathf.Rad2Deg;
-                float side = Mathf.Sign(Mathf.DeltaAngle(s.Yaw, home));
-                targetBank = Mathf.Lerp(targetBank, side * t.maxBank, push);
-                rudder *= 1f - push;
-            }
-
-            s.Bank = Approach(s.Bank, targetBank, t.bankResponse, deltaTime);
-            s.Yaw = Mathf.Repeat(s.Yaw + (turn * (s.Bank / t.maxBank) + t.twistYawRate * rudder) * deltaTime, 360f);
-
-            // Pitch: the stick drives it; centred, the nose settles to level. Near the floor or ceiling the
-            // nose is eased away from it.
-            if (s.Stalled) s.Pitch = Approach(s.Pitch, -25f, 0.6f, deltaTime);
-            else if (Mathf.Abs(y) > 0.001f) s.Pitch += t.pitchRate * y * deltaTime;
-            else s.Pitch = Approach(s.Pitch, 0f, t.pitchLevelTime, deltaTime);
-            float altitude = s.Position.y - limits.Center.y;
-            float verticalBand = Mathf.Max(1f, s.Speed * 0.5f);
-            float aboveFloor = Mathf.Clamp01(1f - (altitude - limits.MinAltitude) / verticalBand);
-            float belowCeiling = Mathf.Clamp01(1f - (limits.Ceiling - altitude) / verticalBand);
-            if (aboveFloor > 0f && s.Pitch < 0f) s.Pitch = Mathf.Lerp(s.Pitch, 0f, aboveFloor);
-            if (belowCeiling > 0f && s.Pitch > 0f) s.Pitch = Mathf.Lerp(s.Pitch, 0f, belowCeiling);
-            s.Pitch = Mathf.Clamp(s.Pitch, -t.maxPitch, t.maxPitch);
-
-            s.Position = Contain(s.Position + s.Forward * (averageSpeed * deltaTime), limits);
-        }
-
-        /// <summary>
-        /// Full rotation: the stick rolls (X) and pitches (Y) the ship about its own axes, the twist yaws it, and
-        /// nothing levels it, so holding the stick flies barrel rolls and loops (back) or outside loops (forward).
-        /// Turning is roll-then-pull, as in an aircraft. Pitch speed peaks on the detent. The arena edge, floor and
-        /// ceiling still steer the ship away and hold it inside.
-        /// </summary>
-        public static void StepFull(ref ArenaFlightState s, Vector2 stick, float twist, float throttle,
-            ArenaFlightTuning t, ArenaLimits limits, float deltaTime)
-        {
-            if (deltaTime <= 0f) return;
-            if (s.Attitude == default) s.Attitude = Quaternion.Euler(-s.Pitch, s.Yaw, -s.Bank);
 
             bool boosting = ThrottleBoost.Step(ref s.Boost, throttle, t.boost, deltaTime);
             throttle = ThrottleBoost.Lever(throttle, t.boost);
@@ -291,7 +199,7 @@ namespace GeometricFlight.Player
             s.Stalled = UpdateStall(s.Stalled, s.Speed, t);
             float control = s.Stalled ? t.stallControl : 1f;
             s.Attitude *= Quaternion.Euler(-y * t.loopRate * multiplier * control * deltaTime,
-                rudder * t.fullTwistYawRate * control * deltaTime, -x * t.rollRate * control * deltaTime);
+                rudder * t.rudderRate * control * deltaTime, -x * t.rollRate * control * deltaTime);
             if (s.Stalled)
             {
                 Vector3 nose = s.Attitude * Vector3.forward;
@@ -302,8 +210,11 @@ namespace GeometricFlight.Player
                         * s.Attitude;
             }
 
-            // Arena edge: as in arcade flight, but the turn back is a flat turn about world up, so it works
-            // whatever way up the ship is.
+            // Arena edge: a ship heading outward is turned back toward the middle once the wall is close enough
+            // that it needs the room to turn. Turning until it runs along the wall carries it outward by
+            // r·(1 − √(1 − c²)), where r is the turn radius and c how directly it is heading out, plus a moment's
+            // reaction. The turn starts gently at twice that distance and is full at it. It is a flat turn about
+            // world up, so it works whatever way up the ship is.
             Vector3 offset = s.Position - limits.Center;
             var flat = new Vector2(offset.x, offset.z);
             float distance = flat.magnitude;
@@ -315,7 +226,7 @@ namespace GeometricFlight.Player
             if (outward > 0f)
             {
                 float needed = TurnRadius(s.Speed, turn) * (1f - Mathf.Sqrt(1f - Mathf.Min(1f, outward * outward)))
-                    + s.Speed * outward * t.bankResponse * 2f + 1f;
+                    + s.Speed * outward * EdgeReaction + 1f;
                 push = Mathf.Clamp01((2f * needed - (limits.Radius - distance)) / needed);
             }
             s.Returning = push > 0f;
@@ -343,14 +254,7 @@ namespace GeometricFlight.Player
             }
             s.Attitude = Normalize(s.Attitude);
 
-            // Readouts for display and for switching back to arcade flight.
-            forward = s.Attitude * Vector3.forward;
-            Vector3 right = s.Attitude * Vector3.right;
-            s.Yaw = Mathf.Repeat(Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg, 360f);
-            s.Pitch = Mathf.Asin(Mathf.Clamp(forward.y, -1f, 1f)) * Mathf.Rad2Deg;
-            s.Bank = Mathf.Asin(Mathf.Clamp(-right.y, -1f, 1f)) * Mathf.Rad2Deg;
-
-            s.Position = Contain(s.Position + forward * (averageSpeed * deltaTime), limits);
+            s.Position = Contain(s.Position + s.Forward * (averageSpeed * deltaTime), limits);
         }
 
         private static Vector3 Contain(Vector3 next, ArenaLimits limits)
@@ -371,13 +275,6 @@ namespace GeometricFlight.Player
         {
             float m = Mathf.Sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
             return m > 0f ? new Quaternion(q.x / m, q.y / m, q.z / m, q.w / m) : Quaternion.identity;
-        }
-
-        /// <summary>Exponential approach: covers 63 % of the gap every <paramref name="timeConstant"/> seconds,
-        /// independent of frame rate.</summary>
-        private static float Approach(float value, float target, float timeConstant, float deltaTime)
-        {
-            return Mathf.Lerp(value, target, 1f - Mathf.Exp(-deltaTime / Mathf.Max(0.001f, timeConstant)));
         }
     }
 }

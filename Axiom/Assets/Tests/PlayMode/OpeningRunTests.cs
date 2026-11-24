@@ -7,6 +7,7 @@ using GeometricFlight.Presentation;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 
@@ -354,6 +355,55 @@ namespace GeometricFlight.Tests
             game.ClickHud("resume-button");
             yield return game.Wait(0.3f);
             Assert.That(game.Flow.State, Is.EqualTo(RunState.Playing), "the resume button resumes");
+        }
+
+        [UnityTest]
+        public IEnumerator EscAndBEachTakeOneStepBack()
+        {
+            yield return game.ReachControl();
+            yield return game.PressKey(Key.Escape);
+            Assert.That(game.Flow.State, Is.EqualTo(RunState.Paused), "Esc pauses, and stays paused");
+
+            game.ClickHud("pause-help-button");
+            yield return game.Wait(0.3f);
+            yield return game.PressKey(Key.Escape);
+            AssertPausedOn("pause-panel", "help-panel"); // Esc is the pause key and a UI cancel: still one step
+
+            game.ClickHud("pause-options-button");
+            yield return game.Wait(0.3f);
+            yield return game.PressPad(GamepadButton.East);
+            AssertPausedOn("pause-panel", "options-panel");
+
+            yield return game.PressPad(GamepadButton.East);
+            Assert.That(game.Flow.State, Is.EqualTo(RunState.Playing), "B on the pause panel resumes");
+            Assert.That(game.HudShows("pause-panel"), Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator TheRightStickLooksAroundInTheArenaOnly()
+        {
+            yield return game.ReachControl();
+            Transform view = Camera.main.transform;
+            float Looked() => Vector3.SignedAngle(game.Flight.transform.forward, view.forward, game.Flight.transform.up);
+
+            game.Look(Vector2.right);
+            yield return game.Wait(0.6f);
+            Assert.That(Mathf.Abs(Looked()), Is.LessThan(15f), "no free look on the rail");
+            game.Look(Vector2.zero);
+
+            game.Jump(NearTheRailEnd);
+            yield return game.Until("the arena", () => game.Flight.RailReleased, 20f);
+            yield return game.Wait(0.5f);
+            Vector3 heading = game.Flight.State.Forward;
+            game.Look(Vector2.right);
+            yield return game.Wait(0.6f);
+            yield return game.Capture("free-look-right");
+            Assert.That(Looked(), Is.GreaterThan(120f), "right stick right swings the view round to the right");
+            Assert.That(Vector3.Angle(game.Flight.State.Forward, heading), Is.LessThan(2f), "the ship flies on unturned");
+
+            game.Look(Vector2.zero);
+            yield return game.Wait(0.8f);
+            Assert.That(Mathf.Abs(Looked()), Is.LessThan(15f), "let go, the view swings back behind the ship");
         }
 
         private void AssertPausedOn(string shown, string left)

@@ -63,12 +63,15 @@ namespace GeometricFlight.Core
         public Func<bool> CheckpointRecovery { get; set; }
         /// <summary>The ship's way back after a crash, set by the course that recovers it; for displays.</summary>
         public IShipRecovery Recovery { get; set; }
-        /// <summary>Set by the pause menu. The pause input leaves a submenu first (returning true) before it resumes.</summary>
+        /// <summary>Set by the pause menu. A step back leaves a submenu first (returning true) before it resumes.</summary>
         public Func<bool> LeaveSubmenu { get; set; }
 
         private ShootableTarget[] targets;
         private readonly RunRecord record = new RunRecord();
         private int controllerConnectedFrame = -1;
+        /// <summary>The frame the pause input or a UI cancel last paused, stepped back or resumed. Esc is both, arriving
+        /// in either order, so a frame takes one such step.</summary>
+        private int menuStepFrame = -1;
         private bool shipDestroyed;
 
         private void Awake()
@@ -108,22 +111,22 @@ namespace GeometricFlight.Core
             // While the ship is destroyed flight is off, but pause must still work through the rebuild.
             bool pausePressed = (shipDestroyed ? flight.ReadPausePress()
                     : flight.isActiveAndEnabled && flight.CurrentInput.PausePressed)
-                && Time.frameCount != controllerConnectedFrame;
+                && Time.frameCount != controllerConnectedFrame && Time.frameCount != menuStepFrame;
             if (State == RunState.Paused)
             {
-                if (pausePressed && (LeaveSubmenu == null || !LeaveSubmenu())) Resume();
+                if (pausePressed) Back();
                 return;
             }
             if (State != RunState.Playing) return;
 
             if (EntryHeld)
             {
-                if (pausePressed) Pause();
+                if (pausePressed) PauseByInput();
                 return;
             }
 
             ElapsedTime += deltaTime;
-            if (pausePressed) Pause();
+            if (pausePressed) PauseByInput();
             else if (flight.transform.position.z >= courseEnd.position.z) Complete();
         }
 
@@ -140,6 +143,21 @@ namespace GeometricFlight.Core
         private void OnControllerConnected() => controllerConnectedFrame = Time.frameCount;
 
         public void Pause() => Pause(PauseReason.Player);
+
+        private void PauseByInput()
+        {
+            menuStepFrame = Time.frameCount;
+            Pause();
+        }
+
+        /// <summary>One step back while paused, from the pause input or a UI cancel (B, or Esc): out of a submenu,
+        /// else out of the pause.</summary>
+        public void Back()
+        {
+            if (State != RunState.Paused || Time.frameCount == menuStepFrame) return;
+            menuStepFrame = Time.frameCount;
+            if (LeaveSubmenu == null || !LeaveSubmenu()) Resume();
+        }
 
         private void Pause(PauseReason reason)
         {

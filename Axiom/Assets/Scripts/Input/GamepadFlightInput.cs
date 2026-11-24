@@ -8,12 +8,13 @@ namespace GeometricFlight.Input
     /// twist (yaw), and the triggers move the latched throttle the keyboard keeps (<see cref="ThrottleChange"/>): the
     /// right trigger raises it, held at full into the boost gate, the left lowers it, and released it stays put, so the
     /// fingers are free for the bumpers. A fires the guns, B paints missiles, Y releases the EMP, View is MASTER ARM
-    /// (<see cref="MasterArmInput"/>) and Menu pauses. The right stick is left free.
+    /// (<see cref="MasterArmInput"/>) and Menu pauses. The right stick is free look: it turns the view, never the ship.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class GamepadFlightInput : FlightInputSource
     {
         private const string SteerBinding = "<Gamepad>/leftStick";
+        private const string LookBinding = "<Gamepad>/rightStick";
         private const string TwistLeftBinding = "<Gamepad>/leftShoulder";
         private const string TwistRightBinding = "<Gamepad>/rightShoulder";
         private const string RaiseBinding = "<Gamepad>/rightTrigger";
@@ -25,7 +26,7 @@ namespace GeometricFlight.Input
         [Tooltip("Below this a trigger counts as released, so a resting finger doesn't move the throttle.")]
         [SerializeField, Range(0f, 0.3f)] private float triggerRest = 0.05f;
 
-        private InputAction steer, twist, raise, lower, fire, missileLock, emp, pause;
+        private InputAction steer, look, twist, raise, lower, fire, missileLock, emp, pause;
         private bool lockWasHeld;
 
         /// <summary>True when this frame's read had a stick, trigger or button in use: the pad is the one being flown.</summary>
@@ -37,6 +38,7 @@ namespace GeometricFlight.Input
         private void Awake()
         {
             steer = new InputAction("Pad Steering", InputActionType.Value, SteerBinding);
+            look = new InputAction("Pad Look", InputActionType.Value, LookBinding);
             twist = new InputAction("Pad Twist", InputActionType.Value);
             twist.AddCompositeBinding("1DAxis").With("Negative", TwistLeftBinding).With("Positive", TwistRightBinding);
             raise = new InputAction("Pad Throttle Up", InputActionType.Value, RaiseBinding);
@@ -47,7 +49,7 @@ namespace GeometricFlight.Input
             pause = new InputAction("Pad Pause", InputActionType.Button, PauseBinding);
         }
 
-        private InputAction[] All => new[] { steer, twist, raise, lower, fire, missileLock, emp, pause };
+        private InputAction[] All => new[] { steer, look, twist, raise, lower, fire, missileLock, emp, pause };
 
         private void OnEnable() { foreach (InputAction action in All) action?.Enable(); }
         private void OnDisable() { foreach (InputAction action in All) action?.Disable(); }
@@ -66,9 +68,11 @@ namespace GeometricFlight.Input
             }
             ThrottleChange = Change(raise.ReadValue<float>(), lower.ReadValue<float>(), triggerRest);
             var input = new FlightInput(steer.ReadValue<Vector2>(), 0f, fire.IsPressed(),
-                pause.WasPressedThisFrame(), twist.ReadValue<float>(), missileLock.IsPressed(), empHeld: emp.IsPressed());
+                pause.WasPressedThisFrame(), twist.ReadValue<float>(), missileLock.IsPressed(), empHeld: emp.IsPressed(),
+                look: look.ReadValue<Vector2>());
             lockWasHeld = input.LockHeld;
-            Actuated = ThrottleChange != 0f || input.Steering.sqrMagnitude > 0f || Mathf.Abs(input.Twist) > 0f
+            Actuated = ThrottleChange != 0f || input.Steering.sqrMagnitude > 0f || input.Look.sqrMagnitude > 0f
+                || Mathf.Abs(input.Twist) > 0f
                 || input.FireHeld || input.LockHeld || input.EmpHeld || input.PausePressed;
             return input;
         }

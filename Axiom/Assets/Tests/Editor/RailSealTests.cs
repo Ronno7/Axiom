@@ -11,7 +11,7 @@ namespace GeometricFlight.Tests
 
         /// <summary>
         /// The seal arms as the hull clears the passage's end plane. Every reachable exit (heading within the rail's
-        /// 45° limit, any speed up to boost, any throttle, any full stick or twist, both handling modes) must take
+        /// 45° limit, any speed up to boost, any throttle, any full stick or twist) must take
         /// longer to bring any part of the hull back to that plane than the iris takes to close.
         /// </summary>
         [Test]
@@ -26,7 +26,6 @@ namespace GeometricFlight.Tests
                 new Vector2(0f, 1f), new Vector2(0f, -1f), new Vector2(1f, 0f), new Vector2(-1f, 0f),
                 new Vector2(1f, 1f), new Vector2(-1f, 1f), new Vector2(1f, -1f), new Vector2(-1f, -1f),
             };
-            foreach (bool full in new[] { true, false })
             foreach (float speed in new[] { 18f, 30f, 45f, 70f })
             foreach (float throttle in new[] { -1f, 0f, 1f })
             foreach (float yaw in angles)
@@ -37,15 +36,12 @@ namespace GeometricFlight.Tests
                 var s = new ArenaFlightState
                 {
                     Position = new Vector3(0f, 16f, HullReach), // the hull's rear has just cleared z = 0
-                    Yaw = yaw, Pitch = pitch, Speed = speed,
+                    Attitude = Quaternion.Euler(-pitch, yaw, 0f), Speed = speed,
                 };
-                s.SetFullRotation(full);
-                if (full) s.Attitude = Quaternion.Euler(-pitch, yaw, 0f);
                 const float dt = 1f / 120f;
                 for (float t = 0f; t < 4f; t += dt)
                 {
-                    if (full) ArenaFlightModel.StepFull(ref s, stick, twist, throttle, tuning, limits, dt);
-                    else ArenaFlightModel.Step(ref s, stick, twist, throttle, tuning, limits, dt);
+                    ArenaFlightModel.Fly(ref s, stick, twist, throttle, tuning, limits, dt);
                     if (s.Position.z - HullReach <= 0f) { earliest = Mathf.Min(earliest, t + dt); break; }
                 }
             }

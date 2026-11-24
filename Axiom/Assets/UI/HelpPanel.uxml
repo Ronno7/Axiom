@@ -36,6 +36,7 @@
                     <ui:Label text="ESC" class="key"/>
                     <ui:Label text="Pause" class="key-action"/>
                 </ui:VisualElement>
+                <ui:Label text="On an Xbox controller the left stick steers, LB and RB twist, and RT and LT set the throttle, which stays where you leave it; hold RT at full to boost. A fires, B paints, Y is the EMP, View arms and Menu pauses. In the arena the right stick looks around. In menus B goes back." class="body-text"/>
             </ui:VisualElement>
             <ui:VisualElement class="help-column">
                 <ui:Label text="THE RUN" class="section-title"/>
@@ -44,7 +45,6 @@
                 <ui:Label text="Weapons stay SAFE until you arm them. Flight is unaffected." class="body-text"/>
                 <ui:Label text="Cyan floor markings call for a throttle change. The throttle gauge shows the target speed." class="body-text"/>
                 <ui:Label text="Turn on Cockpit controller in Options to use the cockpit. The stick steers and twists and the lever sets the throttle. The MASTER ARM switch, FIRE, LOCK and the EMP dome do the rest." class="body-text"/>
-                <ui:Label text="On an Xbox controller the left stick steers, LB and RB twist, and RT and LT raise and lower the throttle, which stays where you leave it. Hold RT at full to boost. A fires, B paints targets, Y is the EMP, View arms and Menu pauses." class="body-text"/>
             </ui:VisualElement>
         </ui:VisualElement>
         <GeometricFlight.UI.SlantButton name="help-back" text="BACK" class="menu-button"/>

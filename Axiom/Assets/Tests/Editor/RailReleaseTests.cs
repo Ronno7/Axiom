@@ -74,8 +74,7 @@ namespace GeometricFlight.Tests
 
         private static ArenaFlightState State(Quaternion attitude, float z = 9f) => new ArenaFlightState
         {
-            Position = new Vector3(13f, 70f, z), Speed = 30f,
-            FullRotation = true, Attitude = attitude,
+            Position = new Vector3(13f, 70f, z), Speed = 30f, Attitude = attitude,
         };
 
         private static bool Fly(ref ArenaFlightState state, Vector2 stick, float throttle, ArenaFlightTuning tuning,
@@ -96,7 +95,7 @@ namespace GeometricFlight.Tests
             Assert.That(railEnd.x, Is.GreaterThan(13f), "The exit must not recenter the ship.");
             Assert.That(railEnd.y, Is.EqualTo(70f).Within(0.0001f));
             Quaternion expected = startRotation * Quaternion.Euler(0f, 0f, -18f);
-            Assert.That(Quaternion.Angle(state.Rotation, expected), Is.LessThan(0.03f),
+            Assert.That(Quaternion.Angle(state.Attitude, expected), Is.LessThan(0.03f),
                 "Held roll must act for the complete frame without a neutral gate or duplicate integration.");
             Assert.That(Vector3.Distance(state.Position, start), Is.EqualTo(3.1f).Within(0.0002f),
                 "The throttle ramp must integrate once across the split frame.");

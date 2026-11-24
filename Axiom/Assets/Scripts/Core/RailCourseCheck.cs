@@ -6,7 +6,7 @@ namespace GeometricFlight.Core
 {
     /// <summary>
     /// Pacing check for a rail: flies the real nose-led rail flight model through a list of gates at one fixed
-    /// throttle setting with a simple pilot (Bank &amp; Turn, aiming at the next gate), and reports which gates it
+    /// throttle setting with a simple pilot (roll then pull, aiming at the next gate), and reports which gates it
     /// makes. A slow section should fail at full throttle and pass slowly; a fast one the other way round. The pilot
     /// is a reasonable player, not a perfect one, so treat results as a guide for layout, not a guarantee.
     /// </summary>
@@ -85,7 +85,7 @@ namespace GeometricFlight.Core
             for (int i = 0; i < maxSteps && next < sorted.Count; i++)
             {
                 Gate gate = sorted[next];
-                Vector2 stick = Pilot(state, gate.Center, tuning);
+                Vector2 stick = Pilot(state, gate.Center);
                 Vector3 before = state.Position;
                 RailFlightModel.Step(ref state, stick, 0f, throttle, tuning, headingLimit, step);
                 Vector3 after = state.Position;
@@ -109,14 +109,19 @@ namespace GeometricFlight.Core
             return new Result(passed, sorted.Count, firstMiss, false, made);
         }
 
-        /// <summary>Banks toward the gate and pitches toward its height, levelling as it lines up.</summary>
-        private static Vector2 Pilot(ArenaFlightState s, Vector3 target, ArenaFlightTuning t)
+        /// <summary>Flies as a player does: rolls the gate onto the lift line (pulling, or pushing for one well
+        /// below), pulls the nose onto it, and levels the wings once lined up.</summary>
+        private static Vector2 Pilot(ArenaFlightState s, Vector3 target)
         {
             Vector3 to = target - s.Position;
-            float ahead = Mathf.Max(to.z, 8f);
-            float yawError = Mathf.DeltaAngle(s.Yaw, Mathf.Atan2(to.x, ahead) * Mathf.Rad2Deg);
-            float pitchError = Mathf.Atan2(to.y, ahead) * Mathf.Rad2Deg - s.Pitch;
-            return new Vector2(Mathf.Clamp(yawError / 12f, -1f, 1f), Mathf.Clamp(pitchError / 8f, -1f, 1f));
+            to.z = Mathf.Max(to.z, 8f);
+            Vector3 local = Quaternion.Inverse(s.Attitude) * to.normalized;
+            float off = Vector3.Angle(Vector3.forward, local);
+            if (off < 1.5f) return new Vector2(Mathf.Clamp(-s.Bank / 20f, -1f, 1f), Mathf.Clamp(local.y * 10f, -1f, 1f));
+            float pull = local.y >= -0.5f * Mathf.Abs(local.x) ? 1f : -1f;
+            float roll = Mathf.Atan2(local.x * pull, local.y * pull) * Mathf.Rad2Deg;
+            float lined = Mathf.Clamp01(Mathf.Cos(roll * Mathf.Deg2Rad));
+            return new Vector2(Mathf.Clamp(roll / 20f, -1f, 1f), pull * lined * Mathf.Clamp01(off / 6f));
         }
     }
 }

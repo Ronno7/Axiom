@@ -6,8 +6,8 @@ using UnityEngine;
 namespace GeometricFlight.Player
 {
     /// <summary>Flies the ship: the nose-led rail (RailFlightModel) up to the rail's end, then free flight in the arena
-    /// (ArenaFlightModel). The stick rolls and pitches or banks and turns, the twist is a rudder, the throttle sets speed
-    /// and how hard the ship turns. Reads its input source once per Update and exposes that snapshot, so nothing else
+    /// (ArenaFlightModel). The stick rolls and pitches, the twist is a rudder, the throttle sets speed and how hard the
+    /// ship turns. Reads its input source once per Update and exposes that snapshot, so nothing else
     /// reads the input a second time.</summary>
     [DisallowMultipleComponent]
     public sealed class ShipFlight : MonoBehaviour
@@ -18,9 +18,6 @@ namespace GeometricFlight.Player
         [Tooltip("Push the stick forward to dive, as in an aircraft. Off: forward climbs, like the rail course. "
                + "The Options invert setting flips either.")]
         [SerializeField] private bool pushToDive = true;
-        [Tooltip("Full rotation: free loops, rolls and inverted flight; turning is roll-then-pull. Off: arcade "
-               + "bank-and-turn that keeps the ship upright.")]
-        [SerializeField] private bool fullRotation = true;
         [Tooltip("World Z where the rail ends and the arena's flight takes over.")]
         [SerializeField] private float railEndZ = 900f;
         [Tooltip("How far the nose can turn from straight ahead on the rail. Wider cones need a separate time-integration "
@@ -38,7 +35,6 @@ namespace GeometricFlight.Player
         public bool InputLocked { get; set; }
         public ArenaFlightState State => state;
         public ArenaFlightTuning Tuning => tuning;
-        public bool FullRotation => state.FullRotation;
         public float RailHeadingLimit => railHeadingLimit;
         /// <summary>The ship has crossed the rail's end. Nothing else changes at that moment: no input or weapon reset.</summary>
         public bool RailReleased { get; private set; }
@@ -76,12 +72,11 @@ namespace GeometricFlight.Player
             state = new ArenaFlightState
             {
                 Position = transform.position,
-                Yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg,
+                Attitude = Quaternion.Euler(0f, Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg, 0f),
                 Speed = CruiseSpeed,
                 Boost = BoostState.Full,
             };
-            state.SetFullRotation(fullRotation);
-            transform.rotation = state.Rotation;
+            transform.rotation = state.Attitude;
             spawn = state;
         }
 
@@ -90,14 +85,12 @@ namespace GeometricFlight.Player
         public void Respawn(Vector3 position)
         {
             BoostState boost = state.Boost;
-            bool fullRotation = state.FullRotation;
             state = spawn;
-            state.SetFullRotation(fullRotation); // Keep the handling mode the player is flying.
             state.Position = position;
             state.Boost = boost;
             state.Boost.Remaining = 0f;
             state.Boost.Armed = false;
-            transform.SetPositionAndRotation(state.Position, state.Rotation);
+            transform.SetPositionAndRotation(state.Position, state.Attitude);
         }
 
         /// <summary>Full boost charge with no recharge delay (the developer infinite boost). A burst in progress runs on.</summary>
@@ -122,8 +115,7 @@ namespace GeometricFlight.Player
             BoostState boost = state.Boost;
             state = entryState;
             state.Boost = boost;
-            fullRotation = state.FullRotation;
-            transform.SetPositionAndRotation(state.Position, state.Rotation);
+            transform.SetPositionAndRotation(state.Position, state.Attitude);
         }
 
         internal void ReleaseEntry() => EntryHeld = false;
@@ -174,7 +166,7 @@ namespace GeometricFlight.Player
             if (wasBoosting && !state.Boost.Active && Throttle > tuning.boost.gate
                 && inputSource.LimitThrottle(ThrottleBoost.RetractSetpoint(tuning.boost, tuning.cruiseSnap)))
                 ThrottleBoost.Retracted(ref state.Boost);
-            transform.SetPositionAndRotation(state.Position, state.Rotation);
+            transform.SetPositionAndRotation(state.Position, state.Attitude);
         }
 
         private void Fly(Vector2 stick, float deltaTime)

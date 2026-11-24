@@ -331,7 +331,7 @@ namespace GeometricFlight.Core
                     ControllerState device = ControllerService.Instance.State;
                     return !device.Connected ? (CombinedFlightInput.GamepadInUse ? "GAMEPAD" : "KEYBOARD")
                         : GameSettings.KeyboardThrottleWithController ? "COCKPIT + KEYBOARD THROTTLE" : "COCKPIT";
-                case "handling": return flight.FullRotation ? "ROLL & PITCH" : "BANK & TURN";
+                case "handling": return "ROLL & PITCH";
                 case "passage": return $"PASSAGE {passage.Width:0} X {passage.Height:0} M";
                 case "shield": return shield.State == null ? "-" : $"{shield.State.Current} / {shield.State.Max}";
                 case "arm": return authority.Armed ? "ARMED" : "SAFE";

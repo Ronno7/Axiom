@@ -36,6 +36,7 @@ namespace GeometricFlight.Tests
         private readonly string captureFolder;
         private Action restoreSettings;
         private Keyboard keyboard;
+        private Gamepad pad;
         private InputSettings.BackgroundBehavior realBackground;
         private InputSettings.EditorInputBehaviorInPlayMode realEditorInput;
         private ShipHull hull;
@@ -123,8 +124,9 @@ namespace GeometricFlight.Tests
             Application.logMessageReceived -= RecordWarning;
             restoreSettings?.Invoke();
             DevCheats.Suspended = false;
-            if (keyboard == null) return;
-            InputSystem.RemoveDevice(keyboard);
+            if (keyboard == null && pad == null) return;
+            if (keyboard != null) InputSystem.RemoveDevice(keyboard);
+            if (pad != null) InputSystem.RemoveDevice(pad);
             InputSystem.settings.backgroundBehavior = realBackground;
             InputSystem.settings.editorInputBehaviorInPlayMode = realEditorInput;
         }
@@ -253,23 +255,48 @@ namespace GeometricFlight.Tests
         /// held.</summary>
         public void Hands(bool fire = false, bool menuButton = false) => Cockpit.Set(512, 512, 597, fire, menuButton);
 
-        /// <summary>Presses a key on a virtual keyboard inside the engine, so nothing reaches the rest of the PC. The
-        /// settings let it through while the Editor is out of focus.</summary>
+        /// <summary>Presses a key on a virtual keyboard inside the engine, so nothing reaches the rest of the PC.</summary>
         public IEnumerator PressKey(Key key)
         {
             if (keyboard == null)
             {
-                InputSettings settings = InputSystem.settings;
-                realBackground = settings.backgroundBehavior;
-                realEditorInput = settings.editorInputBehaviorInPlayMode;
-                settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
-                settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+                LetVirtualInputThrough();
                 keyboard = InputSystem.AddDevice<Keyboard>("Test keyboard");
             }
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(key));
             yield return Wait(0.1f);
             InputSystem.QueueStateEvent(keyboard, new KeyboardState());
             yield return Wait(0.1f);
+        }
+
+        /// <summary>Presses a button on a virtual gamepad inside the engine.</summary>
+        public IEnumerator PressPad(GamepadButton button)
+        {
+            InputSystem.QueueStateEvent(Pad(), new GamepadState().WithButton(button));
+            yield return Wait(0.1f);
+            InputSystem.QueueStateEvent(Pad(), new GamepadState());
+            yield return Wait(0.1f);
+        }
+
+        /// <summary>Holds the virtual gamepad's right stick where <paramref name="look"/> says; zero lets it go.</summary>
+        public void Look(Vector2 look) => InputSystem.QueueStateEvent(Pad(), new GamepadState { rightStick = look });
+
+        private Gamepad Pad()
+        {
+            if (pad != null) return pad;
+            LetVirtualInputThrough();
+            return pad = InputSystem.AddDevice<Gamepad>("Test gamepad");
+        }
+
+        /// <summary>Lets the virtual devices through while the Editor is out of focus; <see cref="Close"/> undoes it.</summary>
+        private void LetVirtualInputThrough()
+        {
+            if (keyboard != null || pad != null) return;
+            InputSettings settings = InputSystem.settings;
+            realBackground = settings.backgroundBehavior;
+            realEditorInput = settings.editorInputBehaviorInPlayMode;
+            settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
         }
 
         public IEnumerator PressMenu()

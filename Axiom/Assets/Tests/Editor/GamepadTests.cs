@@ -1,12 +1,13 @@
 using GeometricFlight.Core;
 using GeometricFlight.Input;
+using GeometricFlight.Player;
 using NUnit.Framework;
 using UnityEngine;
 
 namespace GeometricFlight.Tests
 {
     /// <summary>The Xbox-style gamepad (#60): triggers that move the latched throttle the keyboard keeps, flown
-    /// alongside the keyboard, and prompts that name its buttons.</summary>
+    /// alongside the keyboard, free look on the right stick, and prompts that name its buttons.</summary>
     public sealed class GamepadTests
     {
         [Test]
@@ -59,6 +60,34 @@ namespace GeometricFlight.Tests
             FlightInput merged = FlightInputMerge.Local(keys, lost);
             Assert.That(merged.LockCancelled);
             Assert.That(merged.LockHeld, Is.False);
+        }
+
+        [Test]
+        public void TheRightStickLooksAroundAndNeverSteers()
+        {
+            var keys = new FlightInput(new Vector2(1f, 0f), 0f, false, false);
+            var pad = new FlightInput(Vector2.zero, 0f, false, false, look: new Vector2(-0.8f, 0.3f));
+            FlightInput local = FlightInputMerge.Local(keys, pad);
+            Assert.That(local.Look, Is.EqualTo(pad.Look), "the pad's look rides along with the keys' steering");
+            Assert.That(local.Steering, Is.EqualTo(keys.Steering), "and steers nothing");
+            Assert.That(FlightInputMerge.Merge(local, default).Look, Is.EqualTo(pad.Look), "no cockpit");
+            var cockpit = new ControllerState(true, Vector2.up, 0f, false, false, false);
+            Assert.That(FlightInputMerge.Merge(local, cockpit).Look, Is.EqualTo(pad.Look), "the cockpit has no look of its own");
+            Assert.That(new WeaponAuthority().Filter(local, false, true).Look, Is.EqualTo(pad.Look),
+                "safe weapons don't stop it");
+        }
+
+        [Test]
+        public void FreeLookTurnsTheViewAboutTheShipWhicheverWayUpItIs()
+        {
+            Quaternion ship = Quaternion.Euler(0f, 30f, 180f); // inverted, heading 30°
+            Vector3 Viewed(Vector2 angles) => ChaseCamera.Orbit(ship, angles) * (ship * Vector3.forward);
+            Assert.That(Vector3.Angle(Viewed(Vector2.zero), ship * Vector3.forward), Is.LessThan(0.01f), "centred: the nose");
+            Assert.That(Vector3.Angle(Viewed(new Vector2(90f, 0f)), ship * Vector3.right), Is.LessThan(0.01f),
+                "90° right: out past the right wing");
+            Assert.That(Vector3.Angle(Viewed(new Vector2(180f, 0f)), ship * Vector3.back), Is.LessThan(0.01f), "behind");
+            Assert.That(Vector3.Dot(Viewed(new Vector2(0f, 45f)), ship * Vector3.up), Is.EqualTo(0.7071f).Within(1e-3f),
+                "up is the canopy's up, not the world's");
         }
 
         [Test]

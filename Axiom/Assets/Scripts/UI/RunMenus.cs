@@ -5,11 +5,11 @@ using UnityEngine.UIElements;
 namespace GeometricFlight.UI
 {
     /// <summary>The menus over a run: pause with Options, Help and calibration, and the results. Observes LevelFlow and
-    /// calls its public actions; owns no rules.</summary>
+    /// calls its public actions; owns no rules. A UI cancel (B on a pad, or Esc) steps back as the pause input does.</summary>
     public sealed class RunMenus
     {
         private readonly LevelFlow flow;
-        private readonly VisualElement screen, hud, pausePanel, resultsPanel, helpPanel, parRow;
+        private readonly VisualElement root, screen, hud, pausePanel, resultsPanel, helpPanel, parRow;
         private readonly Button resumeButton, nextButton, retryButton, resultsMenuButton, helpBack;
         private readonly Label resultsTitle;
         private readonly DamageFeedback damageFeedback;
@@ -21,6 +21,7 @@ namespace GeometricFlight.UI
         public RunMenus(VisualElement root, LevelFlow flow, DamageFeedback damageFeedback, float failedResultsDelay,
             float completedResultsDelay)
         {
+            this.root = root;
             this.flow = flow;
             this.damageFeedback = damageFeedback;
             this.failedResultsDelay = failedResultsDelay;
@@ -52,6 +53,7 @@ namespace GeometricFlight.UI
 
             flow.StateChanged += OnStateChanged;
             flow.LeaveSubmenu = LeaveSubmenu;
+            root.RegisterCallback<NavigationCancelEvent>(OnCancel);
             ShowOverlay(null, null);
         }
 
@@ -59,7 +61,10 @@ namespace GeometricFlight.UI
         {
             flow.StateChanged -= OnStateChanged;
             flow.LeaveSubmenu = null;
+            root.UnregisterCallback<NavigationCancelEvent>(OnCancel);
         }
+
+        private void OnCancel(NavigationCancelEvent _) => flow.Back();
 
         /// <summary>Calibration replaces the cockpit on the LCD while open.</summary>
         public void TickCalibration() => calibration.Tick();
@@ -97,7 +102,7 @@ namespace GeometricFlight.UI
 
         private void ShowPause() => ShowOverlay(pausePanel, resumeButton);
 
-        /// <summary>The pause input steps back out of a submenu, as Esc does on the title screen.</summary>
+        /// <summary>A step back leaves a submenu, as on the title screen.</summary>
         private bool LeaveSubmenu()
         {
             if (calibration.IsOpen) calibration.Cancel();
